@@ -1,0 +1,19 @@
+.home-container {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #e0e4eb 60%, #c7d0e3 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  /* Centrado vertical y horizontal */
+  justify-content: center;
+  align-items: center;
+  flex-direction: column; /* Si quieres que el contenido esté en columna */
+}
+
+.main-content {
+  /* Opcional: ajustar padding o ancho */
+  padding: 3rem 2.5rem;
+  max-width: 800px; /* para limitar ancho si quieres */
+  text-align: center; /* para centrar texto */
+}
+

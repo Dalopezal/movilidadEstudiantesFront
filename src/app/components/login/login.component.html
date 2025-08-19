@@ -1,0 +1,23 @@
+<div class="login-container">
+  <div class="login-box">
+    <div class="login-header">
+      <img src="https://www.ucm.edu.co/wp-content/uploads/2024/01/logo-ucm-light.png" alt="Logo UCM" class="logo" />
+    </div>
+    <h2>Iniciar Sesión</h2>
+    <h5>Sistema de Movilidad</h5>
+    <br>
+
+    <!-- Aquí se renderiza el botón de Google -->
+    <div id="googleSignInDiv"></div>
+
+    <p class="mensaje" *ngIf="mensaje">{{ mensaje }}</p>
+  </div>
+</div>
+
+<!-- Loader overlay -->
+<div *ngIf="loading" class="loader-overlay">
+  <div class="loader-content">
+    <img src="https://www.ucm.edu.co/wp-content/uploads/2024/01/logo-ucm-light.png" alt="Logo UCM" class="loader-logo" />
+    <p class="loader-text">Espere por favor...</p>
+  </div>
+</div>
