@@ -1,21 +1,42 @@
-<aside [class.collapsed]="isCollapsed" class="sidebar">
+<aside [class.collapsed]="isCollapsed" class="sidebar fuente">
   <div class="sidebar-header">
-    <ng-container *ngIf="!isCollapsed">
-      <img src="https://www.ucm.edu.co/wp-content/uploads/2024/01/logo-ucm-light.png" alt="Logo UCM" class="sidebar-logo" />
-    </ng-container>
-    <button class="toggle-btn" (click)="toggleSidebar()" aria-label="Toggle sidebar">
-      <i class="fa" [ngClass]="isCollapsed ? 'fa-bars' : 'fa-times'"></i>
-    </button>
+    <img src="../../../assets/logo_ucm.png" alt="Logo UCM" class="sidebar-logo" />
+  </div>
+  <div class="sidebar-header">
+    <img src="../../../assets/logo-mobility.png" alt="Logo UCM" class="sidebar-logo2" />
   </div>
   <nav class="sidebar-nav">
-    <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-      <i class="fa fa-home"></i> <span class="link-text">Inicio</span>
-    </a>
-    <a routerLink="/beneficios-convocatoria" class="nav-link"><i class="fa fa-gift"></i> <span class="link-text">Beneficio Convocatoria</span></a>
-    <a routerLink="/condicion" class="nav-link"><i class="fa fa-cogs"></i> <span class="link-text">Condicion</span></a>
-    <!-- <a routerLink="/home" class="nav-link"><i class="fa fa-user"></i> <span class="link-text">Perfil</span></a>
-    <a routerLink="/home" class="nav-link"><i class="fa fa-exchange-alt"></i> <span class="link-text">Movilidad</span></a>
-    <a routerLink="/home" class="nav-link"><i class="fa fa-cog"></i> <span class="link-text">Configuración</span></a> -->
-    <a routerLink="/login" class="nav-link"><i class="fa fa-sign-out-alt"></i> <span class="link-text">Salir</span></a>
-  </nav>
+  <a routerLink="/home"
+     routerLinkActive="active"
+     [routerLinkActiveOptions]="{ exact: true }"
+     class="nav-link">
+    <i class="fas fa-tachometer-alt"></i><span class="link-text">Inicio</span>
+  </a>
+
+  <a routerLink="/beneficios-convocatoria"
+     routerLinkActive="active"
+     [routerLinkActiveOptions]="{ exact: true }"
+     class="nav-link">
+    <i class="fas fa-user-graduate"></i>
+    <span class="link-text">Beneficio Convocatoria</span>
+  </a>
+
+  <!-- <a routerLink="/condicion"
+     routerLinkActive="active"
+     [routerLinkActiveOptions]="{ exact: true }"
+     class="nav-link">
+    <i class="fa-solid fa-list-check"></i>
+    <span class="link-text">Condicion</span>
+  </a> -->
+
+  <!-- ... otros enlaces ... -->
+
+  <a routerLink="/login"
+     routerLinkActive="active"
+     [routerLinkActiveOptions]="{ exact: true }"
+     class="nav-link">
+    <i class="fa fa-sign-out-alt"></i><span class="link-text">Salir</span>
+  </a>
+</nav>
 </aside>
+<br><br><br>

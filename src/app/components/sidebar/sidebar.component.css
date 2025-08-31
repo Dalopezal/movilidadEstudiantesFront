@@ -1,97 +1,91 @@
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
-
 .sidebar {
-  width: 350px;
-  background: #003366;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  padding-top: 1rem;
-  box-shadow: 2px 0 12px 0 rgba(0,0,0,0.08);
-  height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
-  transition: width 0.3s ease;
-  overflow: hidden;
+  width: 100%;
+  height: 60px;
+  background: white; /* fondo claro */
+  color: #333; /* texto oscuro */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-}
-
-.sidebar.collapsed {
-  width: 70px;
+  overflow: visible;
+  font-family: 'Urbanist', sans-serif; /* si usas Urbanist */
 }
 
 .sidebar-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 1rem 1rem 1rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  justify-content: flex-start;
+  height: 100%;
+  min-width: 180px;
+  padding-right: 1rem;
+  border-right: 1px solid #ddd; /* separador */
 }
 
 .sidebar-logo {
-  width: 150px;
-  transition: width 0.3s ease;
+  width: 200px;
+  height: auto;
+  object-fit: contain;
 }
 
-.sidebar.collapsed .sidebar-logo {
-  width: 40px;
-}
-
-.toggle-btn {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 1.4rem;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.sidebar-logo2 {
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+  margin-left: 10px;
 }
 
 .sidebar-nav {
-  margin-top: 2rem;
   display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  padding-left: 0;
+  flex-direction: row;
+  /* gap: 1.5rem; */
+  align-items: center;
+  height: 100%;
   list-style: none;
+  flex-grow: 1;
+  margin: 0;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  color: #fff;
+  gap: 0.5rem;
+  color: #7a7a7a; /* gris claro */
   text-decoration: none;
-  font-size: 1.08rem;
   font-weight: 500;
-  padding: 0.7rem 1.5rem;
-  border-left: 4px solid transparent;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  font-size: 1rem;
+  padding: 0.5rem 0.8rem;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  height: 100%;
   white-space: nowrap;
 }
 
 .nav-link i {
   font-size: 1.3rem;
+  color: #7a7a7a;
   min-width: 20px;
   text-align: center;
 }
 
-.nav-link .link-text {
-  transition: opacity 0.3s ease;
-}
-
-.sidebar.collapsed .nav-link .link-text {
-  opacity: 0;
-  pointer-events: none;
-  user-select: none;
-}
-
 .nav-link:hover,
 .nav-link.active {
-  background: #0055a5;
-  color: #fff;
-  border-left: 4px solid #ffd600;
+  color: #003366; /* azul oscuro */
+  background: #E2E6F7; /* fondo azul claro */
+  border-bottom: 3px solid #003366;
+  font-weight: 600;
+}
+
+.nav-link:hover i,
+.nav-link.active i {
+  color: #003366;
+}
+
+.sidebar.collapsed {
+  /* Si no quieres colapsar en horizontal, puedes dejar vacío o eliminar */
 }
