@@ -1,0 +1,142 @@
+/* Contenedor paginador */
+.card-footer {
+  padding: 1rem 1.5rem;
+  background-color: #f9fafb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #64748b;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Paginación */
+.pagination {
+  display: flex;
+  list-style: none;
+  gap: 0.5rem;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.pagination .page-item {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pagination .page-item button {
+  border: none;
+  background-color: #e0e7ff;
+  color: #0D133F;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  border-radius: 12px;
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination .page-item button:hover:not(:disabled) {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.pagination .page-item.active button {
+  background-color: #0D133F;
+  color: white;
+  cursor: default;
+}
+
+.pagination .page-item.disabled button {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Selector de items por página */
+.items-per-page {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.items-per-page select {
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 0.3rem 0.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: white;
+  color: #1e293b;
+  min-width: 60px;
+  height: 36px;
+  transition: border-color 0.3s ease;
+}
+
+.items-per-page select:hover,
+.items-per-page select:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+.button-completed {
+  background-color: #18206E; /* azul oscuro */
+  color: #00ACD4;
+  padding: 6px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: none;
+  cursor: default;
+  display: inline-block;
+  min-width: 90px;
+  text-align: center;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.button-completed:hover {
+  background-color: #00ACD4; /* un poco más oscuro al pasar el mouse */
+  color: white;
+}
+
+.button-pending {
+  background-color: #00ACD4; /* celeste */
+  color: #18206E; /* azul oscuro */
+  padding: 6px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: none;
+  cursor: default;
+  display: inline-block;
+  min-width: 90px;
+  text-align: center;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.button-pending:hover {
+  background-color: #18206E; /* celeste un poco más oscuro al hover */
+  color: white;
+}
+
+/* Quitar el fondo rayado de las filas */
+.table.table-striped tbody tr {
+  background-color: white !important;
+}
+
+/* Encabezado fijo */
+.table thead {
+  position: sticky;
+  top: 0;
+  background-color: white; /* Fondo blanco para el encabezado */
+  z-index: 10;
+}
+

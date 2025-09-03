@@ -7,7 +7,7 @@
         <section class="col-12 col-lg-4 d-flex flex-column" style="height: 75vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
             <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;">Administrar Beneficios - Convocatoria</p>
+              <p class="mb-0" style="color: #0D133F;">Administrar Convenios</p>
             </div>
 
             <!-- 👇 importante: que el body sea un flex column que crece -->
@@ -17,15 +17,45 @@
                   <label for="nombre" class="form-label fw-bold">Nombre</label>
                   <input type="text" class="form-control" id="nombre" placeholder="Digite Nombre" />
                 </div>
-                <div class="mb-3">
-                  <label for="descripcion" class="form-label fw-bold">Descripción</label>
-                  <textarea class="form-control" id="descripcion" rows="4" placeholder="Digite Descripción"></textarea>
+               <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <label for="nombre1" class="form-label fw-bold">Fecha Inicio</label>
+                    <input type="date" class="form-control" id="nombre1" placeholder="Digite Fecha Inicio" />
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <label for="nombre2" class="form-label fw-bold">Fecha Fin</label>
+                    <input type="date" class="form-control" id="nombre2" placeholder="Digite Fecha Fin" />
+                  </div>
                 </div>
                 <div class="mb-3">
-                  <label for="convocatoria" class="form-label fw-bold">Convocatoria</label>
+                  <label for="convocatoria" class="form-label fw-bold">Tipo Convenio</label>
                   <select class="form-select" id="convocatoria">
                     <option selected>Seleccione...</option>
                   </select>
+                </div>
+                <div class="mb-3">
+                  <label for="convocatoria" class="form-label fw-bold">Clasificación</label>
+                  <select class="form-select" id="convocatoria">
+                    <option selected>Seleccione...</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="convocatoria" class="form-label fw-bold">Tipo Actividad</label>
+                  <select class="form-select" id="convocatoria">
+                    <option selected>Seleccione...</option>
+                  </select>
+                </div>
+               <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <label for="nombre" class="form-label fw-bold">Días de Vigencia</label>
+                  <input type="number" class="form-control" id="nombre" placeholder="Digite días vigencia" />
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                  <input type="checkbox" class="form-check-input" id="EsObligatoria" style="margin-right: 5px;" />
+                  <label for="EsObligatoria" class="form-check-label fw-bold">Es Obligatoria</label>
+                  </div>
                 </div>
 
                 <!-- 👇 los botones se van al final gracias al mt-auto -->
@@ -47,7 +77,7 @@
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;">
                 <i class="fas fa-sync-alt"></i> Actualizar
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);" type="text" class="form-control" placeholder="Digite nombre beneficio / Nombre convocatoria" />
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);" type="text" class="form-control" placeholder="Digite nombre convenio" />
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;">
                 <i class="fas fa-search"></i> Buscar
               </button>
@@ -56,9 +86,9 @@
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
                   <tr>
-                    <th style="background: white">Nombre</th>
-                    <th style="background: white !important;">Descripción</th>
-                    <th style="background: white !important;">Convocatoria</th>
+                    <th style="background: white !important;">Nombre</th>
+                    <th style="background: white !important;">Fecha Inicio</th>
+                    <th style="background: white !important;">Fecha Fin</th>
                     <th style="background: white !important;">Estado</th>
                     <th style="background: white !important;">Opciones</th>
                   </tr>
