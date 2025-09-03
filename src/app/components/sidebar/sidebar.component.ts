@@ -11,6 +11,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 })
 export class SidebarComponent {
   isCollapsed = true;
+  ismovilidadOpen = false; // Controla submenú
 
   constructor(private elementRef: ElementRef) {}
 
@@ -18,11 +19,21 @@ export class SidebarComponent {
     this.isCollapsed = !this.isCollapsed;
   }
 
+  togglemovilidadMenu() {
+    this.ismovilidadOpen = !this.ismovilidadOpen;
+  }
+
+  closemovilidadMenu() {
+    this.ismovilidadOpen = false;
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const clickedInside = this.elementRef.nativeElement.contains(event.target);
-    if (!clickedInside && !this.isCollapsed) {
-      this.isCollapsed = true;
+    if (!clickedInside) {
+      // Cierra sidebar y submenú si se hace click fuera
+      if (!this.isCollapsed) this.isCollapsed = true;
+      if (this.ismovilidadOpen) this.ismovilidadOpen = false;
     }
   }
 }

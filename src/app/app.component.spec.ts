@@ -14,16 +14,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'mobilidad-catolica' title`, () => {
+  it(`should have the 'movilidad-catolica' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('mobilidad-catolica');
+    expect(app.title).toEqual('movilidad-catolica');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, mobilidad-catolica');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, movilidad-catolica');
   });
 });

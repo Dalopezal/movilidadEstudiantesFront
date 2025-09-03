@@ -17,6 +17,7 @@ export class CondicionComponent implements OnInit {
   pageSize = 10;
   totalPages = 0;
   pages: number[] = [];  // <-- Agrega esta propiedad
+  pageSizeOptions = [10, 11, 20, 50]; // Opciones para selector
 
   ngOnInit() {
     this.totalPages = Math.ceil(this.data.length / this.pageSize);
@@ -26,7 +27,7 @@ export class CondicionComponent implements OnInit {
 
   loadData(): any[] {
     const arr = [];
-    for (let i = 1; i <= 20; i++) {
+    for (let i = 1; i <= 0; i++) {
       arr.push({
         nombre: `Condición ${i}`,
         descripcion: `Descripción ${i}`,
@@ -51,5 +52,18 @@ export class CondicionComponent implements OnInit {
     return Array(this.totalPages)
       .fill(0)
       .map((x, i) => i + 1);
+  }
+
+  onPageSizeChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.pageSize = +select.value;
+    this.currentPage = 1; // resetear a página 1
+    this.calculateTotalPages();
+    this.updatePagedData();
+  }
+
+  calculateTotalPages() {
+    this.totalPages = Math.ceil(this.data.length / this.pageSize);
+    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 }

@@ -1,34 +1,40 @@
 <app-sidebar></app-sidebar>
-<div class="container" style="padding-left: 50px; padding-top: 20px; height: 100vh;">
+<div class="container fuente" style="padding-left: 50px; padding-top: 20px;">
   <div class="row h-100">
     <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;">
-      <div class="row g-4 flex-grow-1" style="height: 100%;">
+      <div class="row g-4 flex-grow-1">
         <!-- Formulario -->
-        <section class="col-12 col-lg-4 d-flex flex-column">
-          <div class="card shadow-sm flex-grow-0">
-            <div class="card-header text-white" style="background: #003366;">
-              <h5 class="mb-0">Administrar Condiciones</h5>
+        <section class="col-12 col-lg-4 d-flex flex-column" style="height: 75vh;">
+          <div class="card shadow-sm flex-grow-1 d-flex flex-column">
+            <div class="card-header text-white" style="background: #E2E6F7;">
+              <p class="mb-0" style="color: #0D133F;">Administrar Condiciones</p>
             </div>
-            <div class="card-body">
-              <form>
+
+            <!-- body: flex column que crece -->
+            <div class="card-body d-flex flex-column flex-grow-1">
+              <form class="d-flex flex-column flex-grow-1">
                 <div class="mb-3">
-                  <label for="nombre" class="form-label fw-bold">Nombre</label>
-                  <input type="text" class="form-control" id="nombre" placeholder="Digite Nombre" />
+                  <label for="nombreCondicion" class="form-label fw-bold">Nombre</label>
+                  <input type="text" class="form-control" id="nombreCondicion" placeholder="Digite Nombre" />
                 </div>
                 <div class="mb-3">
-                  <label for="descripcion" class="form-label fw-bold">Descripción</label>
-                  <textarea class="form-control" id="descripcion" rows="4" placeholder="Digite Descripción"></textarea>
+                  <label for="descripcionCondicion" class="form-label fw-bold">Descripción</label>
+                  <textarea class="form-control" id="descripcionCondicion" rows="4" placeholder="Digite Descripción"></textarea>
                 </div>
                 <div class="mb-3">
-                  <label for="nombre" class="form-label fw-bold">Condiciones</label>
-                  <input type="text" class="form-control" id="nombre" placeholder="Digite Condiciones" />
+                  <label for="condiciones" class="form-label fw-bold">Condiciones</label>
+                  <input type="text" class="form-control" id="condiciones" placeholder="Digite Condiciones" />
                 </div>
                <div class="form-check mb-3">
                 <input type="checkbox" class="form-check-input" id="EsObligatoria" />
                 <label for="EsObligatoria" class="form-check-label fw-bold">Es Obligatoria</label>
               </div>
-                <div class="d-flex gap-3">
-                  <button type="submit" class="btn flex-grow-1 text-white" style="background: #003366;">Ingresar/Actualizar</button>
+
+                <!-- botones al final -->
+                <div class="d-flex gap-3 mt-auto">
+                  <button type="submit" class="btn flex-grow-1 text-white" style="background: #0D133F;">
+                    Ingresar/Actualizar
+                  </button>
                   <button type="button" class="btn btn-secondary flex-grow-1">Cancelar</button>
                 </div>
               </form>
@@ -37,49 +43,54 @@
         </section>
 
         <!-- Tabla -->
-        <section class="col-12 col-lg-8 d-flex flex-column" style="height: 85%;">
+        <section class="col-12 col-lg-8 d-flex flex-column" style="height: 75vh;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
-            <div class="card-header d-flex align-items-center gap-3 text-white" style="background: #003366;">
-              <button class="btn btn-primary d-flex align-items-center gap-2">
+            <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;">
                 <i class="fas fa-sync-alt"></i> Actualizar
               </button>
-              <input type="text" class="form-control" placeholder="Digite nombre condición" />
-              <button class="btn btn-primary d-flex align-items-center gap-2">
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);" type="text" class="form-control" placeholder="Digite nombre condición" />
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;">
                 <i class="fas fa-search"></i> Buscar
               </button>
             </div>
+
             <div class="table-responsive flex-grow-1" style="min-height: 0; overflow-y: auto;">
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
                   <tr>
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Convocatoria</th>
-                    <th>Opciones</th>
+                    <th style="background: white">Nombre</th>
+                    <th style="background: white !important;">Descripción</th>
+                    <th style="background: white !important;">Convocatoria</th>
+                    <th style="background: white !important;">Opciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let item of pagedData">
                     <td>{{ item.nombre }}</td>
-                    <td>{{ item.descripcion }}</td>
+                    <td style="font-size: 13px;">{{ item.descripcion }}</td>
                     <td>{{ item.convocatoria }}</td>
                     <td>
-                      <button class="btn btn-link text-primary p-0 me-2" title="Actualizar">
-                        <i class="fas fa-sync-alt"></i>
-                      </button>
-                      <button class="btn btn-link text-danger p-0" title="Eliminar">
-                        <i class="fas fa-trash"></i>
-                      </button>
+
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div class="card-footer d-flex justify-content-between align-items-center">
+
+            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
+              <div class="items-per-page d-flex align-items-center gap-2">
+                <label for="itemsPerPageSelectCond" class="mb-0">Mostrar</label>
+                <select id="itemsPerPageSelectCond" (change)="onPageSizeChange($event)" [value]="pageSize">
+                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+                <span>de {{ data.length }}</span>
+              </div>
+
               <nav aria-label="Page navigation example">
                 <ul class="pagination mb-0">
                   <li class="page-item" [class.disabled]="currentPage === 1">
-                    <button class="page-link text-white" (click)="goToPage(currentPage - 1)" aria-label="Previous" style="background: #003366;">
+                    <button class="page-link text-white" (click)="goToPage(currentPage - 1)" aria-label="Previous" style="background: #0D133F;">
                       <span aria-hidden="true">&laquo;</span>
                     </button>
                   </li>
@@ -91,14 +102,14 @@
                     <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
                   </li>
                   <li class="page-item" [class.disabled]="currentPage === totalPages">
-                    <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background: #003366;">
+                    <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background: #0D133F;">
                       <span aria-hidden="true">&raquo;</span>
                     </button>
                   </li>
                 </ul>
               </nav>
-              <small class="text-muted">Total: {{ data.length }}</small>
             </div>
+
           </div>
         </section>
       </div>

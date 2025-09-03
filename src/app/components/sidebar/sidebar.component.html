@@ -3,40 +3,55 @@
     <img src="../../../assets/logo_ucm.png" alt="Logo UCM" class="sidebar-logo" />
   </div>
   <div class="sidebar-header">
-    <img src="../../../assets/logo-mobility.png" alt="Logo UCM" class="sidebar-logo2" />
+    <img src="../../../assets/logo-mobility.png" alt="Logo Mobility" class="sidebar-logo2" />
   </div>
+
   <nav class="sidebar-nav">
-  <a routerLink="/home"
-     routerLinkActive="active"
-     [routerLinkActiveOptions]="{ exact: true }"
-     class="nav-link">
-    <i class="fas fa-tachometer-alt"></i><span class="link-text">Inicio</span>
-  </a>
+    <a routerLink="/home"
+       routerLinkActive="active"
+       [routerLinkActiveOptions]="{ exact: true }"
+       class="nav-link">
+      <i class="fas fa-tachometer-alt"></i><span class="link-text">Inicio</span>
+    </a>
 
-  <a routerLink="/beneficios-convocatoria"
-     routerLinkActive="active"
-     [routerLinkActiveOptions]="{ exact: true }"
-     class="nav-link">
-    <i class="fas fa-user-graduate"></i>
-    <span class="link-text">Beneficio Convocatoria</span>
-  </a>
+    <a routerLink="/"
+       routerLinkActive="active"
+       [routerLinkActiveOptions]="{ exact: true }"
+       class="nav-link">
+      <i class="fas fa-globe-americas"></i><span class="link-text">Internacionalización del Currículo</span>
+    </a>
 
-  <!-- <a routerLink="/condicion"
-     routerLinkActive="active"
-     [routerLinkActiveOptions]="{ exact: true }"
-     class="nav-link">
-    <i class="fa-solid fa-list-check"></i>
-    <span class="link-text">Condicion</span>
-  </a> -->
+    <a routerLink="/"
+       routerLinkActive="active"
+       [routerLinkActiveOptions]="{ exact: true }"
+       class="nav-link">
+      <i class="fas fa-handshake"></i><span class="link-text">Cooperación</span>
+    </a>
 
-  <!-- ... otros enlaces ... -->
+    <div class="has-submenu">
+      <a (click)="togglemovilidadMenu()" class="nav-link submenu-toggle" role="button" aria-haspopup="true" [attr.aria-expanded]="ismovilidadOpen">
+        <i class="fas fa-plane"></i>
+        <span class="link-text">Movilidad</span>
+        <i class="fas fa-chevron-down submenu-icon" [class.rotate]="ismovilidadOpen"></i>
+      </a>
 
-  <a routerLink="/login"
-     routerLinkActive="active"
-     [routerLinkActiveOptions]="{ exact: true }"
-     class="nav-link">
-    <i class="fa fa-sign-out-alt"></i><span class="link-text">Salir</span>
-  </a>
-</nav>
+      <div class="submenu" [class.open]="ismovilidadOpen">
+        <a routerLink="/beneficios-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-cog"></i><span class="link-text">Beneficio Convocatoria</span>
+        </a>
+        <a routerLink="/condicion" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-cog"></i><span class="link-text">Condiciones</span>
+        </a>
+      </div>
+    </div>
+
+    <a routerLink="/login"
+       routerLinkActive="active"
+       [routerLinkActiveOptions]="{ exact: true }"
+       class="nav-link">
+      <i class="fa fa-sign-out-alt"></i><span class="link-text">Salir</span>
+    </a>
+  </nav>
 </aside>
+
 <br><br><br>

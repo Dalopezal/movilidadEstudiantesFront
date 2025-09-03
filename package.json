@@ -1,5 +1,5 @@
 {
-  "name": "mobilidad-catolica",
+  "name": "movilidad-catolica",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:mobilidad-catolica": "node dist/mobilidad-catolica/server/server.mjs"
+    "serve:ssr:movilidad-catolica": "node dist/movilidad-catolica/server/server.mjs"
   },
   "private": true,
   "dependencies": {

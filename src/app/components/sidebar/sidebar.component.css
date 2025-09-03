@@ -1,11 +1,12 @@
+/* --- contenedor principal --- */
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 60px;
-  background: white; /* fondo claro */
-  color: #333; /* texto oscuro */
+  background: white;
+  color: #333;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -13,9 +14,10 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   overflow: visible;
-  font-family: 'Urbanist', sans-serif; /* si usas Urbanist */
+  font-family: 'Urbanist', sans-serif;
 }
 
+/* headers / logos */
 .sidebar-header {
   display: flex;
   align-items: center;
@@ -23,26 +25,16 @@
   height: 100%;
   min-width: 180px;
   padding-right: 1rem;
-  border-right: 1px solid #ddd; /* separador */
+  border-right: 1px solid #ddd;
 }
 
-.sidebar-logo {
-  width: 200px;
-  height: auto;
-  object-fit: contain;
-}
+.sidebar-logo { width: 200px; height: auto; object-fit: contain; }
+.sidebar-logo2 { width: 140px; height: auto; object-fit: contain; margin-left: 10px; }
 
-.sidebar-logo2 {
-  width: 140px;
-  height: auto;
-  object-fit: contain;
-  margin-left: 10px;
-}
-
+/* nav principal (fila horizontal) */
 .sidebar-nav {
   display: flex;
   flex-direction: row;
-  /* gap: 1.5rem; */
   align-items: center;
   height: 100%;
   list-style: none;
@@ -50,22 +42,24 @@
   margin: 0;
 }
 
+/* links estándar */
 .nav-link {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #7a7a7a; /* gris claro */
+  color: #7a7a7a;
   text-decoration: none;
   font-weight: 500;
   font-size: 1rem;
-  padding: 0.5rem 0.8rem;
-  border-bottom: 3px solid transparent;
-  transition: all 0.3s ease;
-  cursor: pointer;
+  padding: 0 0.8rem;      /* usa padding vertical consistente */
   height: 100%;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
   white-space: nowrap;
 }
 
+/* iconos dentro de los links */
 .nav-link i {
   font-size: 1.3rem;
   color: #7a7a7a;
@@ -73,10 +67,11 @@
   text-align: center;
 }
 
+/* estado hover/activo */
 .nav-link:hover,
 .nav-link.active {
-  color: #003366; /* azul oscuro */
-  background: #E2E6F7; /* fondo azul claro */
+  color: #003366;
+  background: #E2E6F7;
   border-bottom: 3px solid #003366;
   font-weight: 600;
 }
@@ -86,6 +81,77 @@
   color: #003366;
 }
 
-.sidebar.collapsed {
-  /* Si no quieres colapsar en horizontal, puedes dejar vacío o eliminar */
+/* --- ajustes para item con submenu --- */
+.has-submenu {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative; /* para posicionar submenu absoluto */
+}
+
+/* asegura que el enlace que abre el submenu esté centrado verticalmente */
+.has-submenu .nav-link {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 0.8rem;
+}
+
+/* icono chevron junto al texto, no empuja la altura */
+.submenu-icon {
+  font-size: 0.9rem;
+  color: #7a7a7a;
+  margin-left: 6px;           /* lo dejamos pegado al texto */
+  transition: transform 0.25s ease, color 0.25s ease;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.submenu-icon.rotate {
+  transform: rotate(180deg);
+}
+
+/* --- estilos del submenu desplegable --- */
+.submenu {
+  position: absolute;
+  top: 100%;                 /* justo debajo de la barra (60px) */
+  left: 0;
+  background: white;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: all 0.18s ease;
+  z-index: 1001;
+  min-width: 220px;
+}
+
+/* abierto */
+.submenu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* links dentro del submenu */
+.submenu-link {
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  height: auto;
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #555;
+}
+
+.submenu-link i { font-size: 1rem; color: #7a7a7a; min-width: 18px; }
+
+.submenu-link:hover,
+.submenu-link.active {
+  background: #f0f4ff;
+  color: #003366;
 }

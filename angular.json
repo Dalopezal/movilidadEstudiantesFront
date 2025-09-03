@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "mobilidad-catolica": {
+    "movilidad-catolica": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/mobilidad-catolica",
+            "outputPath": "dist/movilidad-catolica",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -63,10 +63,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "mobilidad-catolica:build:production"
+              "buildTarget": "movilidad-catolica:build:production"
             },
             "development": {
-              "buildTarget": "mobilidad-catolica:build:development"
+              "buildTarget": "movilidad-catolica:build:development"
             }
           },
           "defaultConfiguration": "development"
