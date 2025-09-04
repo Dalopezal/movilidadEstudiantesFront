@@ -1,0 +1,8 @@
+{
+  "/Apis": {
+    "target": "https://ucminternacionaldev.ucm.edu.co",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

@@ -5,4 +5,151 @@
 }
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { font-family: 'Urbanist', sans-serif !important; }
+
+.my-error-toast {
+  font-family: 'Urbanist', sans-serif !important;
+  background: #dc2626 !important; /* rojo */
+  color: #fff !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 1rem !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  width: 22rem !important;
+}
+
+.my-error-toast svg {
+  font-size: 1.8rem !important;
+  color: #fecaca !important; /* ícono más claro */
+}
+
+.my-success-toast {
+  background: #22c55e !important; /* verde */
+  color: #fff !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 1rem !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  width: 22rem !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.my-success-toast svg {
+  font-size: 1.8rem !important;
+  color: #bbf7d0 !important; /* verde clarito */
+}
+
+.my-warning-toast {
+  background: #00ACD4 !important; /* amarillo */
+  color: white !important; /* gris oscuro */
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 1rem !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  width: 22rem !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.my-warning-toast svg {
+  font-size: 1.8rem !important;
+  color: #92400e !important; /* café oscuro */
+}
+
+
+/* --- Estilo general del cuadro --- */
+.p-confirm-dialog {
+  border-radius: 12px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+  border: none !important;
+  max-width: 400px !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.p-confirm-dialog .p-dialog-header {
+  background: #f3f4f6 !important; /* gris suave */
+  color: #374151 !important; /* gris oscuro */
+  font-weight: 600 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.p-confirm-dialog .p-dialog-content {
+  font-size: 0.95rem !important;
+  color: #374151 !important;
+  padding: 1.5rem !important;
+}
+
+/* --- Icono de advertencia --- */
+.custom-confirm-icon {
+  font-size: 2rem !important;
+  color: #facc15 !important; /* amarillo */
+  margin-right: 0.75rem !important;
+}
+
+/* --- Botones --- */
+.custom-accept-btn {
+  background: #00ACD4 !important; /* verde */
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 0.5rem 1.2rem !important;
+  color: white !important;
+}
+
+.custom-accept-btn:hover {
+  background: #0D133F !important;
+}
+
+.custom-reject-btn {
+  background: #6b7280 !important; /* gris */
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 0.5rem 1.2rem !important;
+  color: white !important;
+}
+
+.custom-reject-btn:hover {
+  background: #4b5563 !important;
+}
+
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.5));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+
+.loader-text {
+  margin-top: 1rem;
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 600;
+  font-family: 'Urbanist', sans-serif !important;
+  text-shadow: 0 0 5px rgba(0,0,0,0.7);
+  opacity: 0.8;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Urbanist', sans-serif !important;
+}
