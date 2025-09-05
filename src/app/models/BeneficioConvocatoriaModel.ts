@@ -5,9 +5,7 @@ export class BeneficioConvocatoriaModel {
   nombreBeneficio: string;
   nombreConvocatoria: string;
 
-  // Constructor vacío
   constructor();
-  // Constructor con parámetros
   constructor(
     id: number,
     descripcion: string,
@@ -15,7 +13,7 @@ export class BeneficioConvocatoriaModel {
     nombreBeneficio: string,
     nombreConvocatoria: string
   );
-  // Implementación del constructor
+
   constructor(
     id?: number,
     descripcion?: string,

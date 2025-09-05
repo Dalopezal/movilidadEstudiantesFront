@@ -34,7 +34,6 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
   totalPages = 0;
   pages: number[] = [];
 
-  // selectedConvocatoria es number (id) o '' para "Todas"
   selectedConvocatoria: number | '' = '';
   loading = false;
   error: string | null = null;
@@ -265,7 +264,6 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
       nombreBeneficio: this.model.nombreBeneficio
     };
 
-    // si es actualización, incluye el id según la API lo requiera
     if (isUpdate) {
       payload.id = this.model.id;
     }
@@ -309,8 +307,6 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
         }
       });
     }
-
-
   }
 
   resetForm(form?: NgForm) {
@@ -326,7 +322,6 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
 
   startEdit(item: BeneficioConvocatoriaModel) {
     this.model = Object.assign(new BeneficioConvocatoriaModel(), item);
-    // sincronizar select por id
     this.selectedConvocatoria = Number(item.convocatoriaId) || '';
     this.isEditing = true;
   }
