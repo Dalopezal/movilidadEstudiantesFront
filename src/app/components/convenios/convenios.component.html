@@ -10,60 +10,159 @@
               <p class="mb-0" style="color: #0D133F;">Administrar Convenios</p>
             </div>
 
-            <!-- 👇 importante: que el body sea un flex column que crece -->
             <div class="card-body d-flex flex-column flex-grow-1">
-              <form class="d-flex flex-column flex-grow-1">
+              <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
                 <div class="mb-3">
                   <label for="nombre" class="form-label fw-bold">Nombre</label>
-                  <input type="text" class="form-control" id="nombre" placeholder="Digite Nombre" />
-                </div>
-               <div class="row g-3">
-                  <div class="col-12 col-md-6">
-                    <label for="nombre1" class="form-label fw-bold">Fecha Inicio</label>
-                    <input type="date" class="form-control" id="nombre1" placeholder="Digite Fecha Inicio" />
-                  </div>
-
-                  <div class="col-12 col-md-6">
-                    <label for="nombre2" class="form-label fw-bold">Fecha Fin</label>
-                    <input type="date" class="form-control" id="nombre2" placeholder="Digite Fecha Fin" />
-                  </div>
-                </div>
-                <div class="mb-3">
-                  <label for="convocatoria" class="form-label fw-bold">Tipo Convenio</label>
-                  <select class="form-select" id="convocatoria">
-                    <option selected>Seleccione...</option>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label for="convocatoria" class="form-label fw-bold">Clasificación</label>
-                  <select class="form-select" id="convocatoria">
-                    <option selected>Seleccione...</option>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label for="convocatoria" class="form-label fw-bold">Tipo Actividad</label>
-                  <select class="form-select" id="convocatoria">
-                    <option selected>Seleccione...</option>
-                  </select>
-                </div>
-               <div class="row g-3">
-                  <div class="col-12 col-md-6">
-                    <label for="nombre" class="form-label fw-bold">Días de Vigencia</label>
-                  <input type="number" class="form-control" id="nombre" placeholder="Digite días vigencia" />
-                  </div>
-
-                  <div class="col-12 col-md-6">
-                  <input type="checkbox" class="form-check-input" id="EsObligatoria" style="margin-right: 5px;" />
-                  <label for="EsObligatoria" class="form-check-label fw-bold">Es Obligatoria</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nombre"
+                    name="nombre"
+                    placeholder="Digite Nombre"
+                    required
+                    minlength="3"
+                    [(ngModel)]="model.nombre"
+                    #nombreCtrl="ngModel"
+                  />
+                  <div class="text-danger small mt-1" *ngIf="nombreCtrl.invalid && (nombreCtrl.touched || nombreCtrl.dirty)">
+                    <div *ngIf="nombreCtrl.errors?.['required']">El nombre es obligatorio.</div>
+                    <div *ngIf="nombreCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
                   </div>
                 </div>
 
-                <!-- 👇 los botones se van al final gracias al mt-auto -->
+                <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <label for="fechaInicio" class="form-label fw-bold">Fecha Inicio</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="fechaInicio"
+                      name="fechaInicio"
+                      required
+                      [(ngModel)]="model.fechaInicio"
+                      #inicioCtrl="ngModel"
+                    />
+                    <div class="text-danger small mt-1" *ngIf="inicioCtrl.invalid && (inicioCtrl.touched || inicioCtrl.dirty)">
+                      <div *ngIf="inicioCtrl.errors?.['required']">La fecha de inicio es obligatoria.</div>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <label for="fechaFin" class="form-label fw-bold">Fecha Fin</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="fechaFin"
+                      name="fechaFin"
+                      required
+                      [(ngModel)]="model.fechaFin"
+                      #finCtrl="ngModel"
+                    />
+                    <div class="text-danger small mt-1" *ngIf="finCtrl.invalid && (finCtrl.touched || finCtrl.dirty)">
+                      <div *ngIf="finCtrl.errors?.['required']">La fecha fin es obligatoria.</div>
+                    </div>
+                    <div class="text-danger small mt-1" *ngIf="dateRangeInvalid">
+                      La fecha fin debe ser igual o posterior a la fecha inicio.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="tipoConvenio" class="form-label fw-bold">Tipo Convenio</label>
+                  <select
+                    class="form-select"
+                    id="tipoConvenio"
+                    name="tipoConvenioId"
+                    required
+                    [(ngModel)]="model.tipoConvenioId"
+                    #tipoConvCtrl="ngModel"
+                  >
+                    <option *ngFor="let t of tiposConvenio" [ngValue]="t.id">{{ t.descripcion }}</option>
+                  </select>
+                  <div class="text-danger small mt-1" *ngIf="tipoConvCtrl.invalid && (tipoConvCtrl.touched || tipoConvCtrl.dirty)">
+                    <div *ngIf="tipoConvCtrl.errors?.['required']">Seleccione un tipo de convenio.</div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="clasificacion" class="form-label fw-bold">Clasificación</label>
+                  <select
+                    class="form-select"
+                    id="clasificacion"
+                    name="clasificacionId"
+                    required
+                    [(ngModel)]="model.clasificacionId"
+                    #clasificacionCtrl="ngModel"
+                  >
+                    <option *ngFor="let c of clasificaciones" [value]="c.id">{{ c.nombre }}</option>
+                  </select>
+                  <div class="text-danger small mt-1" *ngIf="clasificacionCtrl.invalid && (clasificacionCtrl.touched || clasificacionCtrl.dirty)">
+                    <div *ngIf="clasificacionCtrl.errors?.['required']">Seleccione una clasificación.</div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="tipoActividad" class="form-label fw-bold">Tipo Actividad</label>
+                  <select
+                    class="form-select"
+                    id="tipoActividad"
+                    name="tipoActividadId"
+                    required
+                    [(ngModel)]="model.tipoActividadId"
+                    #tipoActCtrl="ngModel"
+                  >
+                    <option *ngFor="let a of tiposActividad" [value]="a.id">{{ a.nombre }}</option>
+                  </select>
+                  <div class="text-danger small mt-1" *ngIf="tipoActCtrl.invalid && (tipoActCtrl.touched || tipoActCtrl.dirty)">
+                    <div *ngIf="tipoActCtrl.errors?.['required']">Seleccione un tipo de actividad.</div>
+                  </div>
+                </div>
+
+                <div class="row g-3 align-items-center">
+                  <div class="col-12 col-md-6">
+                    <label for="diasVigencia" class="form-label fw-bold">Días de Vigencia</label>
+                    <input
+                      type="number"
+                      min="0"
+                      class="form-control"
+                      id="diasVigencia"
+                      name="diasVigencia"
+                      required
+                      [(ngModel)]="model.diasVigencia"
+                      #diasCtrl="ngModel"
+                    />
+                    <div class="text-danger small mt-1" *ngIf="diasCtrl.invalid && (diasCtrl.touched || diasCtrl.dirty)">
+                      <div *ngIf="diasCtrl.errors?.['required']">Ingrese los días de vigencia.</div>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-md-6 d-flex align-items-center">
+                    <input
+                      type="checkbox"
+                      class="form-check-input me-2"
+                      id="esObligatoria"
+                      name="esObligatoria"
+                      [(ngModel)]="model.esObligatoria"
+                    />
+                    <label for="esObligatoria" class="form-check-label fw-bold">Es Obligatoria</label>
+                  </div>
+                </div>
+
                 <div class="d-flex gap-3 mt-auto">
-                  <button type="submit" class="btn flex-grow-1 text-white" style="background: #0D133F;">
-                    Ingresar/Actualizar
+                  <button
+                    type="submit"
+                    class="btn btn-ucm flex-grow-1 text-white"
+                    [disabled]="myForm.invalid || loading || dateRangeInvalid"
+                    [ngStyle]="{ 'background': '#0D133F' }"
+                  >
+                    <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
+                    <span *ngIf="loading">Guardando...</span>
                   </button>
-                  <button type="button" class="btn btn-secondary flex-grow-1">Cancelar</button>
+
+                  <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading">
+                    Cancelar
+                  </button>
                 </div>
               </form>
             </div>
@@ -74,14 +173,15 @@
         <section class="col-12 col-lg-8 d-flex flex-column" style="height: 75vh;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
-              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;">
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;" (click)="fetchConvenios(); filtro=''">
                 <i class="fas fa-sync-alt"></i> Actualizar
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);" type="text" class="form-control" placeholder="Digite nombre convenio" />
-              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;">
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);" type="text" class="form-control" placeholder="Digite nombre convenio" [(ngModel)]="filtro" name="filtro"/>
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;" (click)="filterConvenios()">
                 <i class="fas fa-search"></i> Buscar
               </button>
             </div>
+
             <div class="table-responsive flex-grow-1" style="min-height: 0; overflow-y: auto;">
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
@@ -89,61 +189,65 @@
                     <th style="background: white !important;">Nombre</th>
                     <th style="background: white !important;">Fecha Inicio</th>
                     <th style="background: white !important;">Fecha Fin</th>
-                    <th style="background: white !important;">Estado</th>
                     <th style="background: white !important;">Opciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of pagedData">
+                  <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.nombre }}</td>
-                    <td style="font-size: 13px;">{{ item.descripcion }}</td>
-                    <td>{{ item.convocatoria }}</td>
+                    <td style="font-size: 13px;">{{ item.fechaInicio }}</td>
+                    <td>{{ item.fechaFin }}</td>
                     <td>
-                      <button *ngIf="item.completo" class="button-completed">Activo</button>
-                      <button *ngIf="!item.completo" class="button-pending">Pendiente</button>
+                      <button class="btn btn-sm btn-primary me-1" (click)="startEdit(item)">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-danger" (click)="deleteItem(item.id)">
+                        <i class="fas fa-trash"></i>
+                      </button>
                     </td>
-                    <td>
-                      <button class="button-completed" style="margin-bottom: 5px;"><i class="fas fa-edit"></i></button>
-                      <button class="button-pending"><i class="fas fa-trash"></i></button>
-                    </td>
+                  </tr>
+                  <tr *ngIf="pagedData.length === 0">
+                    <td colspan="4" class="text-center">No hay registros.</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-           <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
-          <div class="items-per-page d-flex align-items-center gap-2">
-            <label for="itemsPerPageSelect" class="mb-0">Mostrar</label>
-            <select id="itemsPerPageSelect" (change)="onPageSizeChange($event)" [value]="pageSize">
-              <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
-            </select>
-            <span>de {{ data.length }}</span>
-          </div>
 
-          <nav aria-label="Page navigation example">
-            <ul class="pagination mb-0">
-              <li class="page-item" [class.disabled]="currentPage === 1">
-                <button class="page-link text-white" (click)="goToPage(currentPage - 1)" aria-label="Previous" style="background: #0D133F;">
-                  <span aria-hidden="true">&laquo;</span>
-                </button>
-              </li>
-              <li
-                class="page-item"
-                *ngFor="let page of pages"
-                [class.active]="page === currentPage"
-              >
-                <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
-              </li>
-              <li class="page-item" [class.disabled]="currentPage === totalPages">
-                <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background: #0D133F;">
-                  <span aria-hidden="true">&raquo;</span>
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
+            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
+              <div class="items-per-page d-flex align-items-center gap-2">
+                <label for="itemsPerPageSelect" class="mb-0">Mostrar</label>
+                <select id="itemsPerPageSelect" (change)="onPageSizeChange($event)" [value]="pageSize">
+                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+                <span>de {{ data.length }}</span>
+              </div>
+
+              <nav aria-label="Page navigation example">
+                <ul class="pagination mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <button class="page-link text-white" (click)="goToPage(currentPage - 1)" aria-label="Previous" style="background: #0D133F;">
+                      <span aria-hidden="true">&laquo;</span>
+                    </button>
+                  </li>
+                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
+                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  </li>
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background: #0D133F;">
+                      <span aria-hidden="true">&raquo;</span>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
           </div>
         </section>
       </div>
     </main>
   </div>
 </div>
+
+<!-- Notificaciones de ngx-sonner -->
+<ngx-sonner-toaster />
+<!-- ConfirmDialog de PrimeNG -->
+<p-confirmDialog appendTo="body" styleClass="custom-confirm-dialog"></p-confirmDialog>
