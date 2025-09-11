@@ -70,7 +70,7 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.condiciones = items.map(i => ({ id: i.id, nombre: i.nombreCondicion }));
+          this.condiciones = items.map(i => ({ id: Number(i.id), nombre: i.nombreCondicion }));
         },
         error: (err) => { console.error('Error cargando condiciones', err); this.condiciones = []; }
       });
@@ -91,7 +91,7 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.convocatorias = items.map(i => ({ id: i.id, nombre: i.nombre }));
+          this.convocatorias = items.map(i => ({ id: Number(i.id), nombre: i.nombre }));
         },
         error: (err) => { console.error('Error cargando convocatorias', err); this.convocatorias = []; }
       });
@@ -176,7 +176,7 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.model.condicionId || !this.model.convocatoriaId) {
+    if (!this.model.condicionesId || !this.model.convocatoriaId) {
       this.error = 'Debe seleccionar una condición y una convocatoria.';
       return;
     }
@@ -186,7 +186,7 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
 
     const isUpdate = this.isEditing && this.model.id && this.model.id > 0;
     const payload: any = {
-      condicionId: Number(this.model.condicionId),
+      condicionesId: Number(this.model.condicionesId),
       convocatoriaId: Number(this.model.convocatoriaId)
     };
 
@@ -215,13 +215,13 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
     this.model = new CondicionConvocatoriaModel();
     this.isEditing = false;
     if (form) form.resetForm({
-      condicionId: '',
-      convocatoriaId: ''
+      condicionesId: null,
+      convocatoriaId: null
     });
   }
 
-  startEdit(item: CondicionConvocatoriaModel) {
-    this.model = Object.assign(new CondicionConvocatoriaModel(), item);
+  startEdit(item: CondicionConvocatoriaModel | any) {
+    this.model = CondicionConvocatoriaModel.fromJSON(item);
     this.isEditing = true;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }

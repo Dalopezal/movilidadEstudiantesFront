@@ -17,9 +17,9 @@
                   <select
                     class="form-select"
                     id="condicion"
-                    name="condicionId"
+                    name="condicionesId"
                     required
-                    [(ngModel)]="model.condicionId"
+                    [(ngModel)]="model.condicionesId"
                     #condCtrl="ngModel"
                   >
                     <option *ngFor="let c of condiciones" [ngValue]="c.id">{{ c.nombre }}</option>

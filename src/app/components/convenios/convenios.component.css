@@ -47,7 +47,7 @@
 }
 
 .pagination .page-item.active button {
-  background-color: #0D133F;
+  background-color: #18206E;
   color: white;
   cursor: default;
 }
@@ -95,7 +95,7 @@
   border: none;
   cursor: default;
   display: inline-block;
-  min-width: 90px;
+  min-width: 50px;
   text-align: center;
   user-select: none;
   transition: background-color 0.3s ease;
@@ -140,3 +140,23 @@
   z-index: 10;
 }
 
+.btn-ucm {
+  background: #18206E;
+  border-color: #18206E;
+  transition: background-color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+  cursor: pointer;
+  color: white;
+}
+
+.btn-ucm:hover:not(:disabled) {
+  background: #0f1a58;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(24,32,110,0.18);
+}
+
+.btn-ucm:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

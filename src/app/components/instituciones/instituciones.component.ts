@@ -25,7 +25,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
 
   paises: any[] = [];
   ciudades: any[] = [];
-  selectedPaisId: number | '' = '';
+  selectedPaisId: number | null = null;
 
   currentPage = 1;
   pageSize = 10;
@@ -58,7 +58,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
   // Cargar paises
   // -----------------------
   fetchPaises() {
-    this.api.get<any>('Pais/Consultar_Paises')
+    this.api.get<any>('Pais/Consultar_Pais')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -85,12 +85,13 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
   // Cargar ciudades por país
   // -----------------------
   onPaisChange() {
-    this.model.ciudadId = 0;
+    const paisId = Number(this.selectedPaisId ?? 0);
+    this.model.ciudadId = null; // <-- limpiar ciudad al cambiar país
     this.ciudades = [];
 
-    if (!this.selectedPaisId) return;
+    if (!paisId) return;
 
-    this.api.get<any>(`Ciudad/Consultar_CiudadesPorPais?paisId=${this.selectedPaisId}`)
+    this.api.get<any>(`Ciudad/Consultar_CiudadEspecificoPais?idPais=${paisId}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -104,7 +105,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.ciudades = items.map(item => ({ id: item.id, nombre: item.nombre }));
+          this.ciudades = items.map(item => ({ id: Number(item.id), nombre: item.nombreCiudad }));
         },
         error: (err) => {
           console.error('Error al cargar ciudades', err);
@@ -224,7 +225,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
     const payload: any = {
       nombre: this.model.nombre,
       contactoDescripcion: this.model.contactoDescripcion,
-      ciudadId: Number(this.model.ciudadId)
+      ciudadId: this.model.ciudadId != null ? Number(this.model.ciudadId) : null
     };
 
     if (isUpdate) payload.id = this.model.id;
@@ -250,24 +251,55 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
   }
 
   resetForm(form?: NgForm) {
-    this.model = new InstitucionModel();
-    this.isEditing = false;
-    this.selectedPaisId = '';
-    this.ciudades = [];
-    if (form) form.resetForm({
-      nombre: '',
-      contactoDescripcion: '',
-      pais: '',
-      ciudadId: ''
-    });
-  }
+  this.model = new InstitucionModel();
+  this.isEditing = false;
+  this.selectedPaisId = null;
+  this.ciudades = [];
+  if (form) form.resetForm();
+}
 
   startEdit(item: InstitucionModel) {
-    this.model = Object.assign(new InstitucionModel(), item);
-    this.selectedPaisId = item.paisId ?? '';
+    const paisId = item.paisId != null ? Number(item.paisId) : null;
+    const ciudadId = item.ciudadId != null ? Number(item.ciudadId) : null;
+
+    this.selectedPaisId = paisId;
     this.isEditing = true;
-    // cargar ciudades del país
-    this.onPaisChange();
+
+    if (!paisId) {
+      this.ciudades = [];
+      this.model = Object.assign(new InstitucionModel(), item);
+      this.model.ciudadId = null;
+      return;
+    }
+
+    // cargar ciudades y luego asignar ciudadId
+    this.api.get<any>(`Ciudad/Consultar_CiudadEspecificoPais?idPais=${paisId}`)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          let items: any[] = [];
+          if (Array.isArray(response)) items = response;
+          else if (response && typeof response === 'object') {
+            if (Array.isArray(response.data)) items = response.data;
+            else if (Array.isArray(response.items)) items = response.items;
+            else {
+              const arr = Object.values(response).find(v => Array.isArray(v));
+              if (Array.isArray(arr)) items = arr;
+            }
+          }
+          this.ciudades = items.map(i => ({ id: Number(i.id), nombre: i.nombreCiudad }));
+
+          // ahora sí asignar el modelo
+          this.model = Object.assign(new InstitucionModel(), item);
+          this.model.ciudadId = ciudadId;
+        },
+        error: () => {
+          this.ciudades = [];
+          this.model = Object.assign(new InstitucionModel(), item);
+          this.model.ciudadId = null;
+        }
+      });
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 

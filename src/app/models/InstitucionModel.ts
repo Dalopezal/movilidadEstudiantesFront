@@ -1,27 +1,18 @@
+// InstitucionModel.ts
 export class InstitucionModel {
   id: number;
   nombre: string;
   contactoDescripcion: string;
-  ciudadId: number;
+  ciudadId: number | null; // <-- permitir null
   paisId?: number;
   nombrePais?: string;
   nombreCiudad?: string;
 
-  constructor();
   constructor(
     id?: number,
     nombre?: string,
     contactoDescripcion?: string,
-    ciudadId?: number,
-    paisId?: number,
-    nombrePais?: string,
-    nombreCiudad?: string
-  );
-  constructor(
-    id?: number,
-    nombre?: string,
-    contactoDescripcion?: string,
-    ciudadId?: number,
+    ciudadId?: number | null, // <-- aceptar null
     paisId?: number,
     nombrePais?: string,
     nombreCiudad?: string
@@ -29,7 +20,7 @@ export class InstitucionModel {
     this.id = id ?? 0;
     this.nombre = nombre ?? '';
     this.contactoDescripcion = contactoDescripcion ?? '';
-    this.ciudadId = ciudadId ?? 0;
+    this.ciudadId = ciudadId ?? null; // <-- null por defecto
     this.paisId = paisId;
     this.nombrePais = nombrePais;
     this.nombreCiudad = nombreCiudad;
@@ -40,7 +31,7 @@ export class InstitucionModel {
       Number(json.id ?? 0),
       json.nombre ?? '',
       json.contactoDescripcion ?? '',
-      Number(json.ciudadId ?? 0),
+      json.ciudadId != null ? Number(json.ciudadId) : null, // <-- null si no hay valor
       json.paisId ? Number(json.paisId) : undefined,
       json.nombrePais ?? '',
       json.nombreCiudad ?? ''

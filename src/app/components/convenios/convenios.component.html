@@ -4,7 +4,7 @@
     <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;">
       <div class="row g-4 flex-grow-1">
         <!-- Formulario -->
-        <section class="col-12 col-lg-4 d-flex flex-column" style="height: 75vh;">
+        <section class="col-12 col-lg-4 d-flex flex-column" style="height: 98vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
             <div class="card-header text-white" style="background: #E2E6F7;">
               <p class="mb-0" style="color: #0D133F;">Administrar Convenios</p>
@@ -13,26 +13,44 @@
             <div class="card-body d-flex flex-column flex-grow-1">
               <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
                 <div class="mb-3">
-                  <label for="nombre" class="form-label fw-bold">Nombre</label>
+                  <label for="codigoUcm" class="form-label fw-bold">Código UCM</label>
                   <input
                     type="text"
                     class="form-control"
-                    id="nombre"
-                    name="nombre"
-                    placeholder="Digite Nombre"
+                    id="codigoUcm"
+                    name="codigoUcm"
+                    placeholder="Digite Código UCM"
                     required
                     minlength="3"
-                    [(ngModel)]="model.nombre"
-                    #nombreCtrl="ngModel"
+                    [(ngModel)]="model.codigoUcm"
+                    #codigoUcmCtrl="ngModel"
                   />
-                  <div class="text-danger small mt-1" *ngIf="nombreCtrl.invalid && (nombreCtrl.touched || nombreCtrl.dirty)">
-                    <div *ngIf="nombreCtrl.errors?.['required']">El nombre es obligatorio.</div>
-                    <div *ngIf="nombreCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                  <div class="text-danger small mt-1" *ngIf="codigoUcmCtrl.invalid && (codigoUcmCtrl.touched || codigoUcmCtrl.dirty)">
+                    <div *ngIf="codigoUcmCtrl.errors?.['required']">La descripción es obligatoria.</div>
+                    <div *ngIf="codigoUcmCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="descripcion" class="form-label fw-bold">Descripción</label>
+                  <textarea
+                    class="form-control"
+                    id="descripcion"
+                    name="descripcion"
+                    placeholder="Digite Descripción"
+                    required
+                    minlength="3"
+                    rows="4"
+                    [(ngModel)]="model.descripcion"
+                    #descripcionCtrl="ngModel"
+                  ></textarea>
+                  <div class="text-danger small mt-1" *ngIf="descripcionCtrl.invalid && (descripcionCtrl.touched || descripcionCtrl.dirty)">
+                    <div *ngIf="descripcionCtrl.errors?.['required']">La descripción es obligatoria.</div>
+                    <div *ngIf="descripcionCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
                   </div>
                 </div>
 
-                <div class="row g-3">
-                  <div class="col-12 col-md-6">
+                <div class="mb-3">
+                  <div class="col-12 col-md-12">
                     <label for="fechaInicio" class="form-label fw-bold">Fecha Inicio</label>
                     <input
                       type="date"
@@ -48,24 +66,24 @@
                     </div>
                   </div>
 
-                  <div class="col-12 col-md-6">
-                    <label for="fechaFin" class="form-label fw-bold">Fecha Fin</label>
+                  <!-- <div class="col-12 col-md-6">
+                    <label for="fechaVencimiento" class="form-label fw-bold">Fecha Vencimiento</label>
                     <input
                       type="date"
                       class="form-control"
-                      id="fechaFin"
-                      name="fechaFin"
+                      id="fechaVencimiento"
+                      name="fechaVencimiento"
                       required
-                      [(ngModel)]="model.fechaFin"
+                      [(ngModel)]="model.fechaVencimiento"
                       #finCtrl="ngModel"
                     />
                     <div class="text-danger small mt-1" *ngIf="finCtrl.invalid && (finCtrl.touched || finCtrl.dirty)">
-                      <div *ngIf="finCtrl.errors?.['required']">La fecha fin es obligatoria.</div>
+                      <div *ngIf="finCtrl.errors?.['required']">La fecha de vencimiento es obligatoria.</div>
                     </div>
                     <div class="text-danger small mt-1" *ngIf="dateRangeInvalid">
-                      La fecha fin debe ser igual o posterior a la fecha inicio.
+                      La fecha de vencimiento debe ser igual o posterior a la fecha de inicio.
                     </div>
-                  </div>
+                  </div> -->
                 </div>
 
                 <div class="mb-3">
@@ -90,12 +108,12 @@
                   <select
                     class="form-select"
                     id="clasificacion"
-                    name="clasificacionId"
+                    name="clasificacionConvenioId"
                     required
-                    [(ngModel)]="model.clasificacionId"
+                    [(ngModel)]="model.clasificacionConvenioId"
                     #clasificacionCtrl="ngModel"
                   >
-                    <option *ngFor="let c of clasificaciones" [value]="c.id">{{ c.nombre }}</option>
+                    <option *ngFor="let c of clasificaciones" [ngValue]="c.id">{{ c.nombre }}</option>
                   </select>
                   <div class="text-danger small mt-1" *ngIf="clasificacionCtrl.invalid && (clasificacionCtrl.touched || clasificacionCtrl.dirty)">
                     <div *ngIf="clasificacionCtrl.errors?.['required']">Seleccione una clasificación.</div>
@@ -107,12 +125,12 @@
                   <select
                     class="form-select"
                     id="tipoActividad"
-                    name="tipoActividadId"
+                    name="tipoActividadid"
                     required
-                    [(ngModel)]="model.tipoActividadId"
+                    [(ngModel)]="model.tipoActividadid"
                     #tipoActCtrl="ngModel"
                   >
-                    <option *ngFor="let a of tiposActividad" [value]="a.id">{{ a.nombre }}</option>
+                    <option *ngFor="let a of tiposActividad" [ngValue]="a.id">{{ a.nombre }}</option>
                   </select>
                   <div class="text-danger small mt-1" *ngIf="tipoActCtrl.invalid && (tipoActCtrl.touched || tipoActCtrl.dirty)">
                     <div *ngIf="tipoActCtrl.errors?.['required']">Seleccione un tipo de actividad.</div>
@@ -141,11 +159,11 @@
                     <input
                       type="checkbox"
                       class="form-check-input me-2"
-                      id="esObligatoria"
-                      name="esObligatoria"
-                      [(ngModel)]="model.esObligatoria"
+                      id="estado"
+                      name="estado"
+                      [(ngModel)]="model.estado"
                     />
-                    <label for="esObligatoria" class="form-check-label fw-bold">Es Obligatoria</label>
+                    <label for="estado" class="form-check-label fw-bold">Estado Activo</label>
                   </div>
                 </div>
 
@@ -170,13 +188,13 @@
         </section>
 
         <!-- Tabla -->
-        <section class="col-12 col-lg-8 d-flex flex-column" style="height: 75vh;">
+        <section class="col-12 col-lg-8 d-flex flex-column" style="height: 98vh;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;" (click)="fetchConvenios(); filtro=''">
                 <i class="fas fa-sync-alt"></i> Actualizar
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);" type="text" class="form-control" placeholder="Digite nombre convenio" [(ngModel)]="filtro" name="filtro"/>
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);" type="text" class="form-control" placeholder="Digite descripción convenio" [(ngModel)]="filtro" name="filtro"/>
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;" (click)="filterConvenios()">
                 <i class="fas fa-search"></i> Buscar
               </button>
@@ -186,28 +204,34 @@
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
                   <tr>
-                    <th style="background: white !important;">Nombre</th>
+                    <th style="background: white !important;">Código UCM</th>
+                    <th style="background: white !important;">Descripción</th>
+                    <th style="background: white !important;">Tipo Convenio</th>
+                    <th style="background: white !important;">Clasificación</th>
+                    <th style="background: white !important;">Tipo Actividad</th>
                     <th style="background: white !important;">Fecha Inicio</th>
-                    <th style="background: white !important;">Fecha Fin</th>
                     <th style="background: white !important;">Opciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
-                    <td>{{ item.nombre }}</td>
-                    <td style="font-size: 13px;">{{ item.fechaInicio }}</td>
-                    <td>{{ item.fechaFin }}</td>
+                    <td>{{ item.codigoUcm }}</td>
+                    <td style="font-size: 13px;">{{ item.descripcion }}</td>
+                    <td>{{ item.nombreTipoConvenio }}</td>
+                    <td>{{ item.nombreClasificacionConvenio }}</td>
+                    <td>{{ item.nombreTipoActividadConvenio }}</td>
+                    <td>{{ item.fechaInicio }}</td>
                     <td>
-                      <button class="btn btn-sm btn-primary me-1" (click)="startEdit(item)">
+                      <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="btn btn-sm btn-danger" (click)="deleteItem(item.id)">
+                      <button class="btn btn-sm btn-danger button-completed" (click)="deleteItem(item.id)">
                         <i class="fas fa-trash"></i>
                       </button>
                     </td>
                   </tr>
                   <tr *ngIf="pagedData.length === 0">
-                    <td colspan="4" class="text-center">No hay registros.</td>
+                    <td colspan="6" class="text-center">No hay registros.</td>
                   </tr>
                 </tbody>
               </table>
@@ -245,6 +269,7 @@
       </div>
     </main>
   </div>
+  <br><br><br><br><br><br><br><br><br>
 </div>
 
 <!-- Notificaciones de ngx-sonner -->

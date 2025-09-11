@@ -61,7 +61,8 @@
                     (change)="onPaisChange()"
                     #paisCtrl="ngModel"
                   >
-                    <option *ngFor="let p of paises" [value]="p.id">{{ p.nombre }}</option>
+                    <option [ngValue]="null" style="display:none;"></option>
+                    <option *ngFor="let p of paises" [ngValue]="p.id">{{ p.nombre }}</option>
                   </select>
                   <div class="text-danger small mt-1" *ngIf="paisCtrl.invalid && (paisCtrl.touched || paisCtrl.dirty)">
                     <div *ngIf="paisCtrl.errors?.['required']">Debe seleccionar un país.</div>
@@ -70,15 +71,17 @@
 
                 <div class="mb-3">
                   <label for="ciudad" class="form-label fw-bold">Ciudad</label>
-                  <select
+                 <select
                     class="form-select"
                     id="ciudad"
                     name="ciudadId"
                     required
                     [(ngModel)]="model.ciudadId"
                     #ciudadCtrl="ngModel"
+                    [disabled]="!ciudades || ciudades.length === 0"
                   >
-                    <option *ngFor="let c of ciudades" [value]="c.id">{{ c.nombre }}</option>
+                    <option [ngValue]="null" style="display:none;"></option>
+                    <option *ngFor="let c of ciudades" [ngValue]="c.id">{{ c.nombre }}</option>
                   </select>
                   <div class="text-danger small mt-1" *ngIf="ciudadCtrl.invalid && (ciudadCtrl.touched || ciudadCtrl.dirty)">
                     <div *ngIf="ciudadCtrl.errors?.['required']">Debe seleccionar una ciudad.</div>

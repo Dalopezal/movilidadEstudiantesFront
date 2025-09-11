@@ -74,7 +74,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.tiposConvenio = items.map(i => ({ id: i.id, descripcion: i.descripcion }));
+          this.tiposConvenio = items.map(i => ({ id: Number(i.id), descripcion: i.descripcion }));
         },
         error: (err) => { console.error('Error cargando tipos convenio', err); this.tiposConvenio = []; }
       });
@@ -95,14 +95,14 @@ export class ConveniosComponent implements OnInit, OnDestroy {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.clasificaciones = items.map(i => ({ id: i.id, nombre: i.nombre }));
+          this.clasificaciones = items.map(i => ({ id: Number(i.id), nombre: i.nombre }));
         },
         error: (err) => { console.error('Error cargando clasificaciones', err); this.clasificaciones = []; }
       });
   }
 
   fetchTiposActividad() {
-    this.api.get<any>('TipoActividad/Consultar_TiposActividad')
+    this.api.get<any>('TipoActividad/Consultar_TipoActividad')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
@@ -116,7 +116,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.tiposActividad = items.map(i => ({ id: i.id, nombre: i.nombre }));
+          this.tiposActividad = items.map(i => ({ id: Number(i.id), nombre: i.descripcion }));
         },
         error: (err) => { console.error('Error cargando tipos actividad', err); this.tiposActividad = []; }
       });
@@ -140,10 +140,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
             }
           }
 
-          this.data = items.map(item =>
-            ConvenioModel.fromJSON ? ConvenioModel.fromJSON(item) : Object.assign(new ConvenioModel(), item)
-          );
-
+          this.data = items.map(item => ConvenioModel.fromJSON(item));
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
@@ -182,7 +179,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
             }
           }
 
-          this.data = items.map(item => ConvenioModel.fromJSON ? ConvenioModel.fromJSON(item) : Object.assign(new ConvenioModel(), item));
+          this.data = items.map(item => ConvenioModel.fromJSON(item));
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
@@ -204,8 +201,8 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     this.validateDateRange();
     if (this.dateRangeInvalid) return;
 
-    if (!this.model.nombre?.trim()) {
-      this.error = 'El nombre es obligatorio.';
+    if (!this.model.descripcion?.trim()) {
+      this.error = 'La descripción es obligatoria.';
       return;
     }
 
@@ -213,20 +210,10 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     this.error = null;
 
     const isUpdate = this.isEditing && this.model.id && this.model.id > 0;
-    const payload: any = {
-      nombre: this.model.nombre,
-      fechaInicio: this.model.fechaInicio,
-      fechaFin: this.model.fechaFin,
-      tipoConvenioId: Number(this.model.tipoConvenioId),
-      clasificacionId: Number(this.model.clasificacionId),
-      tipoActividadId: Number(this.model.tipoActividadId),
-      diasVigencia: Number(this.model.diasVigencia ?? 0),
-      esObligatoria: !!this.model.esObligatoria
-    };
+    this.model.fechaVencimiento = '1900-01-01';
+    const payload = this.model.toJSON();
 
-    if (isUpdate) payload.id = this.model.id;
-
-    const endpoint = isUpdate ? 'Convenio/actualiza_Convenio' : 'Convenio/crear_Convenio';
+    const endpoint = isUpdate ? 'Convenios/Actualiza_Convenio' : 'Convenios/crear_Convenio';
     const obs = isUpdate ? this.api.put<any>(endpoint, payload) : this.api.post<any>(endpoint, payload);
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
@@ -247,9 +234,9 @@ export class ConveniosComponent implements OnInit, OnDestroy {
 
   validateDateRange() {
     this.dateRangeInvalid = false;
-    if (!this.model.fechaInicio || !this.model.fechaFin) return;
+    if (!this.model.fechaInicio || !this.model.fechaVencimiento) return;
     const inicio = new Date(this.model.fechaInicio);
-    const fin = new Date(this.model.fechaFin);
+    const fin = new Date(this.model.fechaVencimiento);
     if (fin < inicio) this.dateRangeInvalid = true;
   }
 
@@ -258,19 +245,20 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     this.isEditing = false;
     this.dateRangeInvalid = false;
     if (form) form.resetForm({
-      nombre: '',
+      codigoUcm: '',
+      descripcion: '',
       fechaInicio: '',
-      fechaFin: '',
-      tipoConvenioId: '',
-      clasificacionId: '',
-      tipoActividadId: '',
+      fechaVencimiento: '',
+      tipoConvenioId: null,
+      clasificacionConvenioId: null,
+      tipoActividadid: null,
       diasVigencia: 0,
-      esObligatoria: false
+      estado: false
     });
   }
 
-  startEdit(item: ConvenioModel) {
-    this.model = Object.assign(new ConvenioModel(), item);
+  startEdit(item: any) {
+    this.model = ConvenioModel.fromJSON(item);
     this.isEditing = true;
     this.validateDateRange();
     window.scrollTo({ top: 0, behavior: 'smooth' });
