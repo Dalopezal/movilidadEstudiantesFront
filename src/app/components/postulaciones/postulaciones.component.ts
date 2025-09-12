@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { SidebarComponent } from '../sidebar/sidebar.component';
 
 @Component({
   selector: 'app-postulaciones',
-  imports: [],
+  imports: [SidebarComponent],
   templateUrl: './postulaciones.component.html',
   styleUrl: './postulaciones.component.css'
 })

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, SimpleChanges } from '@angular/core';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -36,6 +36,8 @@ export class EntregableComponent implements OnInit, OnDestroy {
 
   model: EntregableModel = new EntregableModel();
   isEditing = false;
+  @Input() idConvocatoria!: any;
+  loadingTable: any;
 
   private destroy$ = new Subject<void>();
 
@@ -44,6 +46,12 @@ export class EntregableComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.fetchConvocatorias();
     this.fetchEntregables();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['idConvocatoria'] && this.idConvocatoria) {
+      this.fetchEntregables();
+    }
   }
 
   ngOnDestroy() {
@@ -79,7 +87,8 @@ export class EntregableComponent implements OnInit, OnDestroy {
   // Consultar entregables
   fetchEntregables() {
     this.error = null;
-    this.api.get<any>('Entregable/Consultar_Entregable')
+    this.loadingTable = true;
+    this.api.get<any>(this.idConvocatoria == 'undefined' || this.idConvocatoria == null ? 'Entregable/Consultar_Entregable' : `Entregable/Consultar_EntregableConvocataria?idConvocatoria=${this.idConvocatoria}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -101,6 +110,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
+          this.loadingTable = false;
         },
         error: (err) => {
           console.error('Error al consultar entregables', err);
@@ -110,6 +120,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
+          this.loadingTable = false;
         }
       });
   }
@@ -122,6 +133,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
       this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
       return;
     }
+    this.loadingTable = true;
 
     const q = encodeURIComponent(this.filtro.trim());
     this.api.get<any>(`Entregable/Consultar_EntregableGeneral?nombre=${q}&nombreConvocatoria=${q}`)
@@ -146,6 +158,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
+          this.loadingTable = false;
         },
         error: (err) => {
           console.error('Error al filtrar entregables', err);
@@ -155,6 +168,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
+          this.loadingTable = false;
         }
       });
   }

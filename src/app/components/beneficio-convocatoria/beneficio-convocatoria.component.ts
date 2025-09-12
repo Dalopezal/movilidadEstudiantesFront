@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, SimpleChanges } from '@angular/core';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -38,16 +38,24 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   private destroy$ = new Subject<void>();
+  loadingTable: any;
 
   model: BeneficioConvocatoriaModel = new BeneficioConvocatoriaModel();
   isEditing = false;
   filtro: String = "";
+  @Input() idConvocatoria!: any;
 
   constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
 
   ngOnInit() {
     this.fetchConvocatorias();
     this.fetchListaConvocatorias();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['idConvocatoria'] && this.idConvocatoria) {
+      this.fetchConvocatorias();
+    }
   }
 
   ngOnDestroy() {
@@ -87,8 +95,9 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
   // -----------------------
   fetchConvocatorias() {
     this.error = null;
+    this.loadingTable = true;
 
-    this.api.get<any>('BeneficioConvocatoria/Consultar_BeneficiosConvocatoria')
+    this.api.get<any>(this.idConvocatoria == 'undefined' || this.idConvocatoria == null ? 'BeneficioConvocatoria/Consultar_BeneficiosConvocatoria' : `BeneficioConvocatoria/Consultar_BeneficiosIdConvocatoria?idConvocatoria=${this.idConvocatoria}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -112,6 +121,7 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
+          this.loadingTable = false;
         },
         error: (err) => {
           console.error('Error al consultar beneficios', err);
@@ -121,6 +131,7 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
+          this.loadingTable = false;
         }
       });
   }
@@ -132,6 +143,7 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
       this.showWarning("Debe digitar un valor para ejecutar la busqueda");
       return;
     }
+    this.loadingTable = true;
 
     this.api.get<any>('BeneficioConvocatoria/Consultar_BeneficiosGeneral?nombreBeneficio='+ this.filtro +'&nombreConvocatoria=' + this.filtro)
       .pipe(takeUntil(this.destroy$))
@@ -157,6 +169,7 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
+          this.loadingTable = false;
         },
         error: (err) => {
           console.error('Error al consultar beneficios', err);
@@ -166,6 +179,7 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
+          this.loadingTable = false;
         }
       });
   }

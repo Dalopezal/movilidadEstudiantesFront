@@ -7,6 +7,8 @@ import { CondicionConvocatoriaComponent } from './components/condicion-convocato
 import { ConveniosComponent } from './components/convenios/convenios.component';
 import { EntregableComponent } from './components/entregable/entregable.component';
 import { InstitucionesComponent } from './components/instituciones/instituciones.component';
+import { PostulacionesComponent } from './components/postulaciones/postulaciones.component';
+import { ConvocatoriasGeneralComponent } from './components/convocatorias-general/convocatorias-general.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -17,5 +19,7 @@ export const routes: Routes = [
   { path: 'convenios', component: ConveniosComponent },
   { path: 'entregables', component: EntregableComponent },
   { path: 'instituciones', component: InstitucionesComponent },
+  { path: 'postulaciones', component: PostulacionesComponent },
+  { path: 'convocatorias-general', component: ConvocatoriasGeneralComponent },
   { path: '**', redirectTo: '' }
 ];

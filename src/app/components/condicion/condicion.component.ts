@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, SimpleChanges } from '@angular/core';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -31,11 +31,13 @@ export class CondicionComponent implements OnInit, OnDestroy {
   pages: number[] = [];
 
   loading = false;
+  loadingTable = false;
   error: string | null = null;
   filtro: string = '';
 
   model: CondicionModel = new CondicionModel();
   isEditing = false;
+  @Input() idConvocatoria!: any;
 
   private destroy$ = new Subject<void>();
 
@@ -43,6 +45,12 @@ export class CondicionComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.fetchCondiciones();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['idConvocatoria'] && this.idConvocatoria) {
+      this.fetchCondiciones();
+    }
   }
 
   ngOnDestroy() {
@@ -55,7 +63,8 @@ export class CondicionComponent implements OnInit, OnDestroy {
   // -----------------------
   fetchCondiciones() {
     this.error = null;
-    this.api.get<any>('Condicion/Consultar_Condicion')
+    this.loadingTable = true;
+    this.api.get<any>(this.idConvocatoria == 'undefined' || this.idConvocatoria == null ?  'Condicion/Consultar_Condicion' : `CondicionConvocatoria/Consultar_CondicionesConvocatoriaConvocatoria?idConvocatoria=${this.idConvocatoria}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -79,6 +88,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
+          this.loadingTable = false;
         },
         error: (err) => {
           console.error('Error al consultar condiciones', err);
@@ -88,6 +98,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
+          this.loadingTable = false;
         }
       });
   }
@@ -102,6 +113,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
       this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
       return;
     }
+    this.loadingTable = true;
 
     const q = encodeURIComponent(this.filtro.trim());
     this.api.get<any>(`Condicion/Consultar_CondicionGeneral?nombreCondicion=${q}`)
@@ -126,6 +138,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
+          this.loadingTable = false;
         },
         error: (err) => {
           console.error('Error al filtrar condiciones', err);
@@ -135,6 +148,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
+          this.loadingTable = false;
         }
       });
   }

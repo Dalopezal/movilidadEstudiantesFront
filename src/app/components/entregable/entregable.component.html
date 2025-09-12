@@ -1,17 +1,17 @@
-<app-sidebar></app-sidebar>
+<app-sidebar *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null"></app-sidebar>
 <div class="container fuente" style="padding-top: 20px;">
   <div class="row h-100">
-    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;">
+    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;font-size: 13px">
       <div class="row g-4 flex-grow-1">
         <!-- Formulario -->
-        <section class="col-12 col-lg-4 d-flex flex-column" style="height: 75vh;">
+        <section *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null" class="col-12 col-lg-4 d-flex flex-column" style="height: 75vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
             <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;">Administrar Entregables - Convocatoria</p>
+              <p class="mb-0" style="color: #0D133F;font-size: 14px">Administrar Entregables - Convocatoria</p>
             </div>
 
             <div class="card-body d-flex flex-column flex-grow-1">
-              <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
+              <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)" style="font-size: 13px;">
 
                 <div class="mb-3">
                   <label for="nombre" class="form-label fw-bold">Nombre</label>
@@ -25,6 +25,7 @@
                     minlength="3"
                     [(ngModel)]="model.nombre"
                     #nombreCtrl="ngModel"
+                    style="font-size: 13px;"
                   />
                   <div class="text-danger small mt-1" *ngIf="nombreCtrl.invalid && (nombreCtrl.touched || nombreCtrl.dirty)">
                     <div *ngIf="nombreCtrl.errors?.['required']">El nombre es obligatorio.</div>
@@ -44,6 +45,7 @@
                     minlength="10"
                     [(ngModel)]="model.descripcion"
                     #descCtrl="ngModel"
+                    style="font-size: 13px;"
                   ></textarea>
                   <div class="text-danger small mt-1" *ngIf="descCtrl.invalid && (descCtrl.touched || descCtrl.dirty)">
                     <div *ngIf="descCtrl.errors?.['required']">La descripción es obligatoria.</div>
@@ -60,6 +62,7 @@
                     required
                     [(ngModel)]="model.convocatoriaId"
                     #convCtrl="ngModel"
+                    style="font-size: 13px;"
                   >
                     <option *ngFor="let c of convocatorias" [value]="c.id">{{ c.nombre }}</option>
                   </select>
@@ -74,12 +77,14 @@
                     class="btn btn-ucm flex-grow-1 text-white"
                     [disabled]="myForm.invalid || loading"
                     [ngStyle]="{ 'background': '#0D133F' }"
+                    style="font-size: 13px;"
                   >
                     <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
                     <span *ngIf="loading">Guardando...</span>
                   </button>
 
-                  <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading">
+                  <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading"
+                    style="font-size: 13px;">
                     Cancelar
                   </button>
                 </div>
@@ -89,14 +94,17 @@
         </section>
 
         <!-- Tabla -->
-        <section class="col-12 col-lg-8 d-flex flex-column" style="height: 75vh;">
+        <section
+          class="col-12 d-flex flex-column"
+          [ngClass]="idConvocatoria == null || idConvocatoria === 'undefined' ? 'col-lg-8' : 'col-lg-12'"
+          style="height: 75vh;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
-            <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
-              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;" (click)="fetchEntregables(); filtro=''">
+            <div *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null" class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchEntregables(); filtro=''">
                 <i class="fas fa-sync-alt"></i> Actualizar
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);" type="text" class="form-control" placeholder="Digite nombre entregable / Nombre convocatoria" [(ngModel)]="filtro" name="filtro"/>
-              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;" (click)="filterEntregables()">
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite nombre entregable / Nombre convocatoria" [(ngModel)]="filtro" name="filtro"/>
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterEntregables()">
                 <i class="fas fa-search"></i> Buscar
               </button>
             </div>
@@ -107,16 +115,24 @@
                   <tr>
                     <th style="background: white !important;">Nombre</th>
                     <th style="background: white !important;">Descripción</th>
-                    <th style="background: white !important;">Convocatoria</th>
-                    <th style="background: white !important;">Opciones</th>
+                    <th *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null" style="background: white !important;">Convocatoria</th>
+                    <th *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null" style="background: white !important;">Opciones</th>
                   </tr>
                 </thead>
                 <tbody>
+                  <div *ngIf="loadingTable" class="table-overlay">
+                  <i class="fas fa-spinner fa-spin fa-3x"></i>
+                  <p style="background: transparent;;">Cargando datos</p>
+                  </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.nombre }}</td>
-                    <td style="font-size: 13px;">{{ item.descripcion }}</td>
-                    <td>{{ item.nombreConvocatoria }}</td>
-                    <td>
+                    <td
+                      class="text-truncate-custom"
+                      [title]="item.descripcion">
+                      {{ item.descripcion }}
+                    </td>
+                    <td *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null">{{ item.nombreConvocatoria }}</td>
+                    <td *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null">
                       <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">
                         <i class="fas fa-edit"></i>
                       </button>
@@ -125,7 +141,7 @@
                       </button>
                     </td>
                   </tr>
-                  <tr *ngIf="pagedData.length === 0">
+                  <tr *ngIf="!loadingTable && pagedData.length === 0">
                     <td colspan="5" class="text-center">No hay registros.</td>
                   </tr>
                 </tbody>

@@ -153,3 +153,82 @@ body { font-family: 'Urbanist', sans-serif !important; }
   align-items: center;
   font-family: 'Urbanist', sans-serif !important;
 }
+
+
+
+.text-truncate-custom {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.table-overlay i {
+  color: #0D133F;
+  margin-bottom: 10px;
+  background: transparent;
+}
+
+.table-overlay p {
+  margin: 0;
+  font-weight: 500;
+  color: #0D133F;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5) sepia(1) saturate(5) hue-rotate(200deg);
+  cursor: pointer;
+}
+
+.button-completed {
+  background-color: #18206E; /* azul oscuro */
+  color: #00ACD4;
+  padding: 2px 14px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  border: none;
+  cursor: default;
+  display: inline-block;
+  min-width: 50px;
+  text-align: center;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.button-completed:hover {
+  background-color: #00ACD4; /* un poco más oscuro al pasar el mouse */
+  color: white;
+}
+
+.button-pending {
+  background-color: #00ACD4; /* celeste */
+  color: #18206E; /* azul oscuro */
+  padding: 2px 14px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  border: none;
+  cursor: default;
+  display: inline-block;
+  min-width: 50px;
+  text-align: center;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.button-pending:hover {
+  background-color: #18206E; /* celeste un poco más oscuro al hover */
+  color: white;
+}
