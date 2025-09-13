@@ -255,3 +255,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background-color: #18206E; /* celeste un poco más oscuro al hover */
   color: white;
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

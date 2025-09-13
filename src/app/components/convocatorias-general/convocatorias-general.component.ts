@@ -343,9 +343,8 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
     }
   }
 
-  abrirTiposConvocatoria(item: ConvocatoriaGeneralModel) {
+  abrirPostulaciones(item: ConvocatoriaGeneralModel) {
     this.router.navigate(['/tipos-postulaciones'], {
-
-  });
+    });
   }
 }

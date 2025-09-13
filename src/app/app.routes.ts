@@ -20,7 +20,7 @@ export const routes: Routes = [
   { path: 'convenios', component: ConveniosComponent },
   { path: 'entregables', component: EntregableComponent },
   { path: 'instituciones', component: InstitucionesComponent },
-  { path: 'postulaciones', component: PostulacionesDetalleComponent },
+  { path: 'postulacion-detalle', component: PostulacionesDetalleComponent },
   { path: 'convocatorias-general', component: ConvocatoriasGeneralComponent },
   { path: 'tipos-postulaciones', component: TiposPostulacionesComponent },
   { path: '**', redirectTo: '' }

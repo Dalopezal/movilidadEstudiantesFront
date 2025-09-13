@@ -1,1 +1,58 @@
 <app-sidebar></app-sidebar>
+
+<div class="container fuente" style="padding-top: 20px;">
+  <div class="row h-100">
+    <main class="col-12 col-md-12 d-flex flex-column">
+      <div class="row g-4 flex-grow-1">
+        <section class="col-12 col-lg-12 d-flex flex-column" style="font-size: 20px;">
+          <div class="card shadow-sm d-flex flex-column flex-grow-1">
+            <div class="card-header text-white" style="background: #E2E6F7;">
+              <p class="mb-0" style="color: #0D133F">Detalle Postulación</p>
+            </div>
+            <div class="card-header d-flex align-items-center gap-3" style="background: white;min-height: 30vh;">
+              <div *ngIf="loading" class="table-overlay">
+                <i class="fas fa-spinner fa-spin fa-3x"></i>
+                <p style="background: transparent;font-size: 13px;">Cargando datos</p>
+              </div>
+              <div class="stepper-container">
+                <mat-vertical-stepper #stepper [linear]="false"  style="background: white !important;">
+                  <mat-step *ngFor="let step of steps; let i = index"
+                            [completed]="i < currentStep"
+                            [editable]="true">
+
+                    <ng-template matStepLabel>
+                      <span class="step-label">{{ step.nombre }}</span>
+                    </ng-template>
+
+                    <div class="step-content">
+                      <h4>{{ step.nombre }}</h4>
+                      <p>{{ step.descripcion || 'Contenido del paso ' + (i + 1) }}</p>
+
+                      <div class="step-actions">
+                        <button mat-button
+                                matStepperPrevious
+                                [disabled]="i === 0"
+                                color="primary">
+                          <mat-icon>arrow_back</mat-icon>
+                          Anterior
+                        </button>
+
+                        <button mat-raised-button
+                                matStepperNext
+                                [disabled]="i === steps.length - 1"
+                                color="primary">
+                          Siguiente
+                          <mat-icon>arrow_forward</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </mat-step>
+                </mat-vertical-stepper>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>

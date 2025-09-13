@@ -1,162 +1,85 @@
-/* Contenedor paginador */
-.card-footer {
-  padding: 1rem 1.5rem;
-  background-color: #f9fafb;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-  color: #64748b;
-  gap: 1rem;
-  flex-wrap: wrap;
+.stepper-container {
+  width: 100%;
+  margin: 0 auto;
+  font-family: 'Urbanist', sans-serif !important;
+  margin-bottom: 100px;
 }
 
-/* Paginación */
-.pagination {
-  display: flex;
-  list-style: none;
-  gap: 0.5rem;
-  padding-left: 0;
-  margin-bottom: 0;
+.step-content {
+  padding: 16px 0;
+  min-height: 200px;
+  font-family: 'Urbanist', sans-serif !important;
 }
 
-.pagination .page-item {
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.pagination .page-item button {
-  border: none;
-  background-color: #e0e7ff;
-  color: #0D133F;
-  padding: 0.5rem 0.9rem;
-  cursor: pointer;
+.step-content h4 {
+  color: #18206E;
+  margin-bottom: 12px;
   font-weight: 600;
-  transition: background-color 0.3s ease;
-  border-radius: 12px;
-  min-width: 36px;
-  height: 36px;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.step-content p {
+  color: #64748b;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.step-actions {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  font-family: 'Urbanist', sans-serif !important;
 }
 
-.pagination .page-item button:hover:not(:disabled) {
-  background-color: #3b82f6;
-  color: white;
+.step-label {
+  font-weight: 600;
+  color: #334155;
+  font-family: 'Urbanist', sans-serif !important;
 }
 
-.pagination .page-item.active button {
+/* Personalización del stepper */
+::ng-deep .mat-stepper-vertical {
+  background: transparent;
+}
+
+::ng-deep .mat-step-header {
+  padding: 12px 24px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+::ng-deep .mat-step-header:hover {
+  background-color: rgba(24, 32, 110, 0.05);
+}
+
+::ng-deep .mat-step-header .mat-step-icon {
+  background-color: #e2e8f0;
+  color: #64748b;
+  border: 2px solid #e2e8f0;
+  font-size: 13px;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+::ng-deep .mat-step-header .mat-step-icon-selected {
   background-color: #18206E;
   color: white;
-  cursor: default;
-}
-
-.pagination .page-item.disabled button {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-/* Selector de items por página */
-.items-per-page {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  color: #475569;
-}
-
-.items-per-page select {
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  padding: 0.3rem 0.6rem;
-  font-weight: 600;
-  cursor: pointer;
-  background-color: white;
-  color: #1e293b;
-  min-width: 60px;
-  height: 36px;
-  transition: border-color 0.3s ease;
-}
-
-.items-per-page select:hover,
-.items-per-page select:focus {
-  border-color: #3b82f6;
-  outline: none;
-}
-
-.button-completed {
-  background-color: #18206E; /* azul oscuro */
-  color: #00ACD4;
-  padding: 6px 16px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  border: none;
-  cursor: default;
-  display: inline-block;
-  min-width: 50px;
-  text-align: center;
-  user-select: none;
-  transition: background-color 0.3s ease;
-}
-
-.button-completed:hover {
-  background-color: #00ACD4; /* un poco más oscuro al pasar el mouse */
-  color: white;
-}
-
-.button-pending {
-  background-color: #00ACD4; /* celeste */
-  color: #18206E; /* azul oscuro */
-  padding: 6px 16px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  border: none;
-  cursor: default;
-  display: inline-block;
-  min-width: 90px;
-  text-align: center;
-  user-select: none;
-  transition: background-color 0.3s ease;
-}
-
-.button-pending:hover {
-  background-color: #18206E; /* celeste un poco más oscuro al hover */
-  color: white;
-}
-
-/* Quitar el fondo rayado de las filas */
-.table.table-striped tbody tr {
-  background-color: white !important;
-}
-
-/* Encabezado fijo */
-.table thead {
-  position: sticky;
-  top: 0;
-  background-color: white; /* Fondo blanco para el encabezado */
-  z-index: 10;
-}
-
-.btn-ucm {
-  background: #18206E;
   border-color: #18206E;
-  transition: background-color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
-  cursor: pointer;
+}
+
+::ng-deep .mat-step-header .mat-step-icon-state-done {
+  background-color: #22c55e;
   color: white;
+  border-color: #22c55e;
 }
 
-.btn-ucm:hover:not(:disabled) {
-  background: #0f1a58;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(24,32,110,0.18);
+::ng-deep .mat-vertical-content {
+  padding: 0 24px 24px 50px;
 }
 
-.btn-ucm:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+::ng-deep .mat-vertical-stepper-content {
+  border-left: 2px solid #e2e8f0;
+  margin-left: 18px;
 }
+

@@ -18,15 +18,11 @@ import { PostulacionTipoConsultaModel } from '../../models/PostulacionTipoModel'
 @Component({
   selector: 'app-postulaciones-entrantes',
   imports: [
-    SidebarComponent,
     CommonModule,
     FormsModule,
     HttpClientModule,
     ConfirmDialogModule,
     NgxSonnerToaster,
-    CondicionComponent,
-    BeneficioConvocatoriaComponent,
-    EntregableComponent
   ],
   templateUrl: './postulaciones-tipo.component.html',
   styleUrl: './postulaciones-tipo.component.css',
@@ -310,9 +306,8 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
         });
     }
 
-  abrirTiposConvocatoria(item: PostulacionTipoConsultaModel) {
-    this.router.navigate(['/tipos-convocatoria'], {
-
+  abrirPostulacionDetalle(item: PostulacionTipoConsultaModel) {
+    this.router.navigate(['/postulacion-detalle'], {
   });
   }
 
