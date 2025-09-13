@@ -43,6 +43,8 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   dateRangeInvalid = false;
 
   private destroy$ = new Subject<void>();
+  loadingTable: any;
+
 
   constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
 
@@ -125,6 +127,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   // ---------- CRUD / listado ----------
   fetchConvenios() {
     this.error = null;
+    this.loadingTable = true;
     this.api.get<any>('Convenios/Consultar_Convenio')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -144,6 +147,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
+          this.loadingTable = false;
         },
         error: (err) => {
           console.error('Error al consultar convenios', err);
@@ -153,6 +157,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
+          this.loadingTable = false;
         }
       });
   }
@@ -163,6 +168,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
       this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
       return;
     }
+    this.loadingTable = true;
     const q = encodeURIComponent(this.filtro.trim());
     this.api.get<any>(`Convenios/Consultar_ConvenioGeneral?nombreConvenio=${q}`)
       .pipe(takeUntil(this.destroy$))
@@ -183,10 +189,12 @@ export class ConveniosComponent implements OnInit, OnDestroy {
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
+          this.loadingTable = false;
         },
         error: (err) => {
           console.error('Error al filtrar convenios', err);
           this.showError();
+          this.loadingTable = false;
         }
       });
   }

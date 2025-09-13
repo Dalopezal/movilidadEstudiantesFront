@@ -1,7 +1,7 @@
 <app-sidebar></app-sidebar>
 <div class="container fuente" style="padding-top: 20px;">
   <div class="row h-100">
-    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;">
+    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;font-size: 13px">
       <div class="row g-4 flex-grow-1">
         <!-- Formulario -->
         <section class="col-12 col-lg-4 d-flex flex-column" style="height: 75vh;">
@@ -21,7 +21,9 @@
                     required
                     [(ngModel)]="model.condicionesId"
                     #condCtrl="ngModel"
+                    style="font-size: 13px"
                   >
+                    <option [ngValue]="null" style="display:none;"></option>
                     <option *ngFor="let c of condiciones" [ngValue]="c.id">{{ c.nombre }}</option>
                   </select>
                   <div class="text-danger small mt-1" *ngIf="condCtrl.invalid && (condCtrl.touched || condCtrl.dirty)">
@@ -38,6 +40,7 @@
                     required
                     [(ngModel)]="model.convocatoriaId"
                     #convCtrl="ngModel"
+                    style="font-size: 13px"
                   >
                     <option *ngFor="let c of convocatorias" [ngValue]="c.id">{{ c.nombre }}</option>
                   </select>
@@ -50,14 +53,16 @@
                   <button
                     type="submit"
                     class="btn btn-ucm flex-grow-1 text-white"
-                    [disabled]="myForm.invalid || loading"
+                    [disabled]="!model.condicionesId || !model.convocatoriaId || loading"
                     [ngStyle]="{ 'background': '#0D133F' }"
+                    style="font-size: 13px"
                   >
                     <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
                     <span *ngIf="loading">Guardando...</span>
                   </button>
 
-                  <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading">
+                  <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading"
+                    style="font-size: 13px">
                     Cancelar
                   </button>
                 </div>
@@ -70,11 +75,11 @@
         <section class="col-12 col-lg-8 d-flex flex-column" style="height: 75vh;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
-              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;" (click)="fetchRelaciones(); filtro=''">
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchRelaciones(); filtro=''">
                 <i class="fas fa-sync-alt"></i> Actualizar
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);" type="text" class="form-control" placeholder="Digite nombre condición / Nombre convocatoria" [(ngModel)]="filtro" name="filtro"/>
-              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;" (click)="filterRelaciones()">
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite nombre condición / Nombre convocatoria" [(ngModel)]="filtro" name="filtro"/>
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterRelaciones()">
                 <i class="fas fa-search"></i> Buscar
               </button>
             </div>
@@ -89,6 +94,10 @@
                   </tr>
                 </thead>
                 <tbody>
+                  <div *ngIf="loadingTable" class="table-overlay">
+                  <i class="fas fa-spinner fa-spin fa-3x"></i>
+                  <p style="background: transparent;">Cargando datos</p>
+                  </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.nombreCondicion }}</td>
                     <td>{{ item.nombreConvocatoria }}</td>
@@ -101,7 +110,7 @@
                       </button>
                     </td>
                   </tr>
-                  <tr *ngIf="pagedData.length === 0">
+                  <tr *ngIf="!loadingTable && pagedData.length === 0">
                     <td colspan="4" class="text-center">No hay registros.</td>
                   </tr>
                 </tbody>

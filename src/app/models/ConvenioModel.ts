@@ -8,10 +8,10 @@ export class ConvenioModel {
   estado: boolean;
 
   // ids
-  tipoConvenioId: number;
-  clasificacionConvenioId: number;
+  tipoConvenioId: string;
+  clasificacionConvenioId: string;
   // nota: la API original usa "tipoActividadid" (i minúscula). Lo incluimos y normalizamos.
-  tipoActividadid: number;
+  tipoActividadid: string;
 
   // campos opcionales para display (nombres legibles)
   nombreTipoConvenio?: string;
@@ -30,9 +30,9 @@ export class ConvenioModel {
     fechaVencimiento: string = '1900-01-01',
     diasVigencia: number = 0,
     estado: boolean = false,
-    tipoConvenioId: number = 0,
-    clasificacionConvenioId: number = 0,
-    tipoActividadid: number = 0
+    tipoConvenioId: string = '',
+    clasificacionConvenioId: string = '',
+    tipoActividadid: string = ''
   ) {
     this.id = id;
     this.codigoUcm = codigoUcm;
@@ -63,10 +63,10 @@ export class ConvenioModel {
     // estado / esObligatoria / estado booleano
     const estado = json.estado !== undefined ? Boolean(json.estado) : (json.esObligatoria !== undefined ? Boolean(json.esObligatoria) : false);
 
-    const tipoConvenioId = Number(json.tipoConvenioId ?? json.tipo_convenio_id ?? json.tipoConvenio?.id ?? 0);
-    const clasificacionConvenioId = Number(json.clasificacionConvenioId ?? json.clasificacion_convenio_id ?? json.clasificacion?.id ?? json.clasificacionId ?? 0);
+    const tipoConvenioId = (json.tipoConvenioId ?? json.tipo_convenio_id ?? json.tipoConvenio?.id ?? 0);
+    const clasificacionConvenioId = (json.clasificacionConvenioId ?? json.clasificacion_convenio_id ?? json.clasificacion?.id ?? json.clasificacionId ?? 0);
     // soporta tanto "tipoActividadid" como "tipoActividadId" y snake_case
-    const tipoActividadid = Number(json.tipoActividadid ?? json.tipoActividadId ?? json.tipo_actividad_id ?? json.tipoActividad?.id ?? 0);
+    const tipoActividadid = (json.tipoActividadid ?? json.tipoActividadId ?? json.tipo_actividad_id ?? json.tipoActividad?.id ?? 0);
 
     const model = new ConvenioModel(
       id,

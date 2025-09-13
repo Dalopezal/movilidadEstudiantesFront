@@ -1,13 +1,13 @@
 <app-sidebar></app-sidebar>
 <div class="container fuente" style="padding-top: 20px;">
   <div class="row h-100">
-    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;">
+    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;font-size: 13px">
       <div class="row g-4 flex-grow-1">
         <!-- Formulario -->
         <section class="col-12 col-lg-4 d-flex flex-column" style="height: 98vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
             <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;">Administrar Convenios</p>
+              <p class="mb-0" style="color: #0D133F;font-size: 14px">Administrar Convenios</p>
             </div>
 
             <div class="card-body d-flex flex-column flex-grow-1">
@@ -24,6 +24,7 @@
                     minlength="3"
                     [(ngModel)]="model.codigoUcm"
                     #codigoUcmCtrl="ngModel"
+                    style="font-size: 13px;"
                   />
                   <div class="text-danger small mt-1" *ngIf="codigoUcmCtrl.invalid && (codigoUcmCtrl.touched || codigoUcmCtrl.dirty)">
                     <div *ngIf="codigoUcmCtrl.errors?.['required']">La descripción es obligatoria.</div>
@@ -42,6 +43,7 @@
                     rows="4"
                     [(ngModel)]="model.descripcion"
                     #descripcionCtrl="ngModel"
+                    style="font-size: 13px;"
                   ></textarea>
                   <div class="text-danger small mt-1" *ngIf="descripcionCtrl.invalid && (descripcionCtrl.touched || descripcionCtrl.dirty)">
                     <div *ngIf="descripcionCtrl.errors?.['required']">La descripción es obligatoria.</div>
@@ -60,6 +62,7 @@
                       required
                       [(ngModel)]="model.fechaInicio"
                       #inicioCtrl="ngModel"
+                    style="font-size: 13px;"
                     />
                     <div class="text-danger small mt-1" *ngIf="inicioCtrl.invalid && (inicioCtrl.touched || inicioCtrl.dirty)">
                       <div *ngIf="inicioCtrl.errors?.['required']">La fecha de inicio es obligatoria.</div>
@@ -95,6 +98,7 @@
                     required
                     [(ngModel)]="model.tipoConvenioId"
                     #tipoConvCtrl="ngModel"
+                    style="font-size: 13px;"
                   >
                     <option *ngFor="let t of tiposConvenio" [ngValue]="t.id">{{ t.descripcion }}</option>
                   </select>
@@ -112,6 +116,7 @@
                     required
                     [(ngModel)]="model.clasificacionConvenioId"
                     #clasificacionCtrl="ngModel"
+                    style="font-size: 13px;"
                   >
                     <option *ngFor="let c of clasificaciones" [ngValue]="c.id">{{ c.nombre }}</option>
                   </select>
@@ -129,6 +134,7 @@
                     required
                     [(ngModel)]="model.tipoActividadid"
                     #tipoActCtrl="ngModel"
+                    style="font-size: 13px;"
                   >
                     <option *ngFor="let a of tiposActividad" [ngValue]="a.id">{{ a.nombre }}</option>
                   </select>
@@ -149,6 +155,7 @@
                       required
                       [(ngModel)]="model.diasVigencia"
                       #diasCtrl="ngModel"
+                    style="font-size: 13px;"
                     />
                     <div class="text-danger small mt-1" *ngIf="diasCtrl.invalid && (diasCtrl.touched || diasCtrl.dirty)">
                       <div *ngIf="diasCtrl.errors?.['required']">Ingrese los días de vigencia.</div>
@@ -162,6 +169,7 @@
                       id="estado"
                       name="estado"
                       [(ngModel)]="model.estado"
+                    style="font-size: 13px;"
                     />
                     <label for="estado" class="form-check-label fw-bold">Estado Activo</label>
                   </div>
@@ -173,12 +181,14 @@
                     class="btn btn-ucm flex-grow-1 text-white"
                     [disabled]="myForm.invalid || loading || dateRangeInvalid"
                     [ngStyle]="{ 'background': '#0D133F' }"
+                    style="font-size: 13px;"
                   >
                     <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
                     <span *ngIf="loading">Guardando...</span>
                   </button>
 
-                  <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading">
+                  <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading"
+                    style="font-size: 13px;">
                     Cancelar
                   </button>
                 </div>
@@ -191,11 +201,11 @@
         <section class="col-12 col-lg-8 d-flex flex-column" style="height: 98vh;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
-              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;" (click)="fetchConvenios(); filtro=''">
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchConvenios(); filtro=''">
                 <i class="fas fa-sync-alt"></i> Actualizar
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);" type="text" class="form-control" placeholder="Digite descripción convenio" [(ngModel)]="filtro" name="filtro"/>
-              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;" (click)="filterConvenios()">
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite descripción convenio" [(ngModel)]="filtro" name="filtro"/>
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterConvenios()">
                 <i class="fas fa-search"></i> Buscar
               </button>
             </div>
@@ -214,6 +224,10 @@
                   </tr>
                 </thead>
                 <tbody>
+                  <div *ngIf="loadingTable" class="table-overlay">
+                  <i class="fas fa-spinner fa-spin fa-3x"></i>
+                  <p style="background: transparent;">Cargando datos</p>
+                  </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.codigoUcm }}</td>
                     <td style="font-size: 13px;">{{ item.descripcion }}</td>
@@ -230,7 +244,7 @@
                       </button>
                     </td>
                   </tr>
-                  <tr *ngIf="pagedData.length === 0">
+                  <tr *ngIf="!loadingTable && pagedData.length === 0">
                     <td colspan="6" class="text-center">No hay registros.</td>
                   </tr>
                 </tbody>

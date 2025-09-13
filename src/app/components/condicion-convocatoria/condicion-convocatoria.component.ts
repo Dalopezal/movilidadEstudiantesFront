@@ -40,6 +40,7 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
   isEditing = false;
 
   private destroy$ = new Subject<void>();
+  loadingTable: any;
 
   constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
 
@@ -100,6 +101,7 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
   // ---------- CRUD / listado ----------
   fetchRelaciones() {
     this.error = null;
+    this.loadingTable = true;
     this.api.get<any>('CondicionConvocatoria/Consultar_CondicionesConvocatoria')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -122,6 +124,7 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
+          this.loadingTable = false;
         },
         error: (err) => {
           console.error('Error al consultar relaciones', err);
@@ -131,6 +134,7 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
+          this.loadingTable = false;
         }
       });
   }
@@ -141,6 +145,7 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
       this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
       return;
     }
+    this.loadingTable = true;
     const q = encodeURIComponent(this.filtro.trim());
     this.api.get<any>(`CondicionConvocatoria/Consultar_CondicionesConvocatoriaGeneral?nombreCondicion=${q}&nombreConvocatoria=${q}`)
       .pipe(takeUntil(this.destroy$))
@@ -161,10 +166,12 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
+          this.loadingTable = false;
         },
         error: (err) => {
           console.error('Error al filtrar relaciones', err);
           this.showError();
+          this.loadingTable = false;
         }
       });
   }

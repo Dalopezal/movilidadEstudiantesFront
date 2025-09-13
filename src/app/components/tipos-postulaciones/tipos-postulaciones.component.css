@@ -1,0 +1,32 @@
+.custom-tabs {
+  border-bottom: 2px solid #E2E6F7;
+}
+
+.custom-tabs .nav-link {
+  color: #0D133F;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  padding: 8px 16px;
+  transition: all 0.3s ease;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.custom-tabs .nav-link:hover {
+  color: #00ACD4; /* azul secundario */
+  background-color: #f5f7fb;
+}
+
+.custom-tabs .nav-link.active {
+  color: white;
+  border-bottom: 3px solid #00ACD4;
+  font-weight: 600;
+  background-color: #0D133F;
+}
+
+.custom-tab-content {
+  background: white;
+  height: 75vh;
+}

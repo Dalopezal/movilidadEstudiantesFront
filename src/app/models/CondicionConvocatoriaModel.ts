@@ -1,11 +1,11 @@
 export class CondicionConvocatoriaModel {
   id: number;
-  condicionesId: number;
-  convocatoriaId: number;
+  condicionesId: string;
+  convocatoriaId: string;
   nombreCondicion?: string;
   nombreConvocatoria?: string;
 
-  constructor(id: number = 0, condicionesId: number = 0, convocatoriaId: number = 0, nombreCondicion: string = '', nombreConvocatoria: string = '') {
+  constructor(id: number = 0, condicionesId: string = '', convocatoriaId: string = '', nombreCondicion: string = '', nombreConvocatoria: string = '') {
     this.id = id;
     this.condicionesId = condicionesId;
     this.convocatoriaId = convocatoriaId;
@@ -16,8 +16,8 @@ export class CondicionConvocatoriaModel {
   static fromJSON(json: any): CondicionConvocatoriaModel {
     return new CondicionConvocatoriaModel(
       Number(json.id ?? 0),
-      Number(json.condicionesId ?? json.condicion?.id ?? 0),
-      Number(json.convocatoriaId ?? json.convocatoria?.id ?? 0),
+      (json.condicionesId ?? json.condicion?.id ?? 0),
+      (json.convocatoriaId ?? json.convocatoria?.id ?? 0),
       String(json.nombreCondicion ?? json.condicion?.nombre ?? ''),
       String(json.nombreConvocatoria ?? json.convocatoria?.nombre ?? '')
     );

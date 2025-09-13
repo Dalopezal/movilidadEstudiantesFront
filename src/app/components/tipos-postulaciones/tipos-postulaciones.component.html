@@ -1,0 +1,25 @@
+<app-sidebar></app-sidebar>
+<div style="padding: 20px;">
+  <ul class="nav nav-tabs custom-tabs" id="convocatoriaTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">
+        <i class="fas fa-circle-arrow-right me-1"></i> Postulaciones Entrantes
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="condiciones-tab" data-bs-toggle="tab" data-bs-target="#condiciones" type="button" role="tab" aria-controls="condiciones" aria-selected="false">
+        <i class="fas fa-circle-arrow-left me-1"></i> Postulaciones Salientes
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content p-3 custom-tab-content" id="convocatoriaTabContent">
+    <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+      <app-postulaciones-entrantes [tipoPostulacion]="'entrante'"></app-postulaciones-entrantes>
+    </div>
+    <div class="tab-pane fade" id="condiciones" role="tabpanel" aria-labelledby="condiciones-tab">
+      <app-postulaciones-entrantes [tipoPostulacion]="'saliente'"></app-postulaciones-entrantes>
+    </div>
+  </div>
+
+</div>

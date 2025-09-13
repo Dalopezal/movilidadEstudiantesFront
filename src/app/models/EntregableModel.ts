@@ -2,16 +2,16 @@ export class EntregableModel {
   id: number;
   nombre: string;
   descripcion: string;
-  convocatoriaId: number;
+  convocatoriaId: string;
   nombreConvocatoria?: string;
 
   constructor();
-  constructor(id?: number, nombre?: string, descripcion?: string, convocatoriaId?: number, nombreConvocatoria?: string, completo?: boolean);
-  constructor(id?: number, nombre?: string, descripcion?: string, convocatoriaId?: number, nombreConvocatoria?: string, completo?: boolean) {
+  constructor(id?: number, nombre?: string, descripcion?: string, convocatoriaId?: string, nombreConvocatoria?: string, completo?: boolean);
+  constructor(id?: number, nombre?: string, descripcion?: string, convocatoriaId?: string, nombreConvocatoria?: string, completo?: boolean) {
     this.id = id ?? 0;
     this.nombre = nombre ?? '';
     this.descripcion = descripcion ?? '';
-    this.convocatoriaId = convocatoriaId ?? 0;
+    this.convocatoriaId = convocatoriaId ?? '';
     this.nombreConvocatoria = nombreConvocatoria ?? '';
   }
 
@@ -20,7 +20,7 @@ export class EntregableModel {
       Number(json.id ?? 0),
       json.nombre ?? '',
       json.descripcion ?? '',
-      Number(json.convocatoriaId ?? json.convocatoriaId ?? 0),
+      (json.convocatoriaId ?? json.convocatoriaId ?? ''),
       json.nombreConvocatoria ?? json.nombreConvocatoria ?? '',
     );
   }

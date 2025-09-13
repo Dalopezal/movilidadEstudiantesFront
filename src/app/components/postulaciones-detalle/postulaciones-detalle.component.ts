@@ -4,9 +4,9 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 @Component({
   selector: 'app-postulaciones',
   imports: [SidebarComponent],
-  templateUrl: './postulaciones.component.html',
-  styleUrl: './postulaciones.component.css'
+  templateUrl: './postulaciones-detalle.component.html',
+  styleUrl: './postulaciones-detalle.component.css'
 })
-export class PostulacionesComponent {
+export class PostulacionesDetalleComponent {
 
 }

@@ -1,7 +1,7 @@
 export class BeneficioConvocatoriaModel {
   id: number;
   descripcion: string;
-  convocatoriaId: number;
+  convocatoriaId: string;
   nombreBeneficio: string;
   nombreConvocatoria: string;
 
@@ -9,7 +9,7 @@ export class BeneficioConvocatoriaModel {
   constructor(
     id: number,
     descripcion: string,
-    convocatoriaId: number,
+    convocatoriaId: string,
     nombreBeneficio: string,
     nombreConvocatoria: string
   );
@@ -17,13 +17,13 @@ export class BeneficioConvocatoriaModel {
   constructor(
     id?: number,
     descripcion?: string,
-    convocatoriaId?: number,
+    convocatoriaId?: string,
     nombreBeneficio?: string,
     nombreConvocatoria?: string
   ) {
     this.id = id ?? 0;
     this.descripcion = descripcion ?? '';
-    this.convocatoriaId = convocatoriaId ?? 0;
+    this.convocatoriaId = convocatoriaId ?? '';
     this.nombreBeneficio = nombreBeneficio ?? '';
     this.nombreConvocatoria = nombreConvocatoria ?? '';
   }
@@ -32,7 +32,7 @@ export class BeneficioConvocatoriaModel {
     return new BeneficioConvocatoriaModel(
       Number(json.id),
       json.descripcion ?? '',
-      Number(json.convocatoriaId),
+      (json.convocatoriaId),
       json.nombreBeneficio ?? '',
       json.nombreConvocatoria ?? ''
     );

@@ -232,3 +232,26 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background-color: #18206E; /* celeste un poco más oscuro al hover */
   color: white;
 }
+
+
+
+.button-eye {
+  background-color: #00ACD4; /* celeste */
+  color: #18206E; /* azul oscuro */
+  padding: 5px 15px;
+  border-radius: 10px;
+  font-size: 1.2em;
+  border: none;
+  cursor: default;
+  display: inline-block;
+  min-width: 10px;
+  text-align: center;
+  user-select: none;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.button-eye:hover {
+  background-color: #18206E; /* celeste un poco más oscuro al hover */
+  color: white;
+}

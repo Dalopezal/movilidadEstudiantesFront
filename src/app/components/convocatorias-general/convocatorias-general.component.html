@@ -79,7 +79,7 @@
                     <th style="background: white;color: #0D133F;">Condiciones</th>
                     <th style="background: white;color: #0D133F;">Entregables</th>
                     <th style="background: white;color: #0D133F;">Estado</th>
-                    <th style="background: white;color: #0D133F;">Opciones</th>
+                    <th style="background: white;color: #0D133F;">Postulaciones</th>
                   </tr>
                 </thead>
                 <tbody style="font-size: 13px">
@@ -98,16 +98,16 @@
                     <td>{{ item.fechaCierre }}</td>
                     <td>{{ item.requisitos }}</td>
                     <td>{{ item.categoriaMovilidadNombre }}</td>
-                    <td align="center" (click)="openModalBeneficio(item)"><i class="fas fa-eye button-eye"></i></td>
+                    <td align="center" (click)="openModalBeneficio(item)"><i class="fa-duotone fa-regular fa-eye button-eye"></i></td>
                     <td>{{ item.movilidadNombre }}</td>
-                    <td align="center" (click)="openModalCondicion(item)"><i class="fas fa-eye fa-eye button-eye"></i></td>
-                    <td align="center" (click)="openModalEntregable(item)"><i class="fas fa-eye fa-eye button-eye"></i></td>
+                    <td align="center" (click)="openModalCondicion(item)"><i class="fa-duotone fa-regular fa-eye button-eye"></i></td>
+                    <td align="center" (click)="openModalEntregable(item)"><i class="fa-duotone fa-regular fa-eye button-eye"></i></td>
                     <td align="center">
                       <button *ngIf="item.esActiva" class="button-completed">Activo</button>
                       <button *ngIf="!item.esActiva" class="button-pending">Inactivo</button>
                     </td>
-                    <td align="center">
-                      <i class="fas fa-sign-in-alt button-eye"></i>
+                    <td align="center" title="Ir a postulación" (click)="abrirTiposConvocatoria(item)">
+                      <i class="fa-duotone fa-regular fa-share-from-square button-eye"></i>
                     </td>
                   </tr>
                   <tr *ngIf="!loading && pagedData.length === 0">

@@ -39,6 +39,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
 
   model: InstitucionModel = new InstitucionModel();
   isEditing = false;
+  loadingTable: any;
 
   private destroy$ = new Subject<void>();
 
@@ -119,6 +120,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
   // -----------------------
   fetchInstituciones() {
     this.error = null;
+    this.loadingTable = true;
     this.api.get<any>('Institucion/Consultar_Institucion')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -143,6 +145,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
+          this.loadingTable = false;
         },
         error: (err) => {
           console.error('Error al consultar instituciones', err);
@@ -152,6 +155,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
+          this.loadingTable = false;
         }
       });
   }
@@ -166,6 +170,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
       this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
       return;
     }
+    this.loadingTable = true;
 
     const q = encodeURIComponent(this.filtro.trim());
     this.api.get<any>(`Institucion/Consultar_InstitucionGeneral?nombreInstitucion=${q}`)
@@ -190,6 +195,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
+          this.loadingTable = false;
         },
         error: (err) => {
           console.error('Error al filtrar instituciones', err);
@@ -199,6 +205,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
+          this.loadingTable = false;
         }
       });
   }

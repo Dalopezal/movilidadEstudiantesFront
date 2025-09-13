@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -9,14 +9,14 @@ import { NgxSonnerToaster, toast } from 'ngx-sonner';
 
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { GenericApiService } from '../../services/generic-api.service';
-import { ConvocatoriaGeneralModel } from '../../models/ConvocatoriaGeneralModel';
 import { CondicionComponent } from '../condicion/condicion.component';
 import { BeneficioConvocatoriaComponent } from '../beneficio-convocatoria/beneficio-convocatoria.component';
 import { EntregableComponent } from '../entregable/entregable.component';
 import { Router } from '@angular/router';
+import { PostulacionTipoConsultaModel } from '../../models/PostulacionTipoModel';
 
 @Component({
-  selector: 'app-convocatorias-general',
+  selector: 'app-postulaciones-entrantes',
   imports: [
     SidebarComponent,
     CommonModule,
@@ -28,14 +28,14 @@ import { Router } from '@angular/router';
     BeneficioConvocatoriaComponent,
     EntregableComponent
   ],
-  templateUrl: './convocatorias-general.component.html',
-  styleUrl: './convocatorias-general.component.css',
+  templateUrl: './postulaciones-tipo.component.html',
+  styleUrl: './postulaciones-tipo.component.css',
   providers: [ConfirmationService]
 })
-export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
-  data: ConvocatoriaGeneralModel[] = [];
-  filteredData: ConvocatoriaGeneralModel[] = [];
-  pagedData: ConvocatoriaGeneralModel[] = [];
+export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
+  data: PostulacionTipoConsultaModel[] = [];
+  filteredData: PostulacionTipoConsultaModel[] = [];
+  pagedData: PostulacionTipoConsultaModel[] = [];
 
   categoriasMovilidad: any[] = [];
   modalidades: any[] = [];
@@ -51,16 +51,24 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   filtro: string = '';
   fechaInicial: string = '';
   fechaFinal: string = '';
-  movilidadId: number = 0;
+  estadoId: number = 0;
+  tipoMovilidadIdId: number = 0;
 
-  model: ConvocatoriaGeneralModel = new ConvocatoriaGeneralModel();
+  model: PostulacionTipoConsultaModel = new PostulacionTipoConsultaModel();
   isEditing = false;
 
   dateRangeInvalid = false;
 
   private destroy$ = new Subject<void>();
-  movilidad: any[] = [];
+  estados: any[] = [];
+  tipoMovilidad: any[] = [];
   convocatoriaId: any;
+
+  selectedItem: any = null;
+  cardPosition = { top: 100, left: 50 };
+  isClosing = false;
+
+  @Input() tipoPostulacion: any;
 
   constructor(
     private api: GenericApiService,
@@ -69,8 +77,9 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.fetchConvocatorias();
-    this.fetchListaMovilidad();
+    this.fetchPostulacionesEntrantes();
+    this.fetchListaEstados();
+    this.fetchListaTipoMovilidad();
   }
 
   ngOnDestroy(): void {
@@ -79,10 +88,10 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   }
 
   // ---------- CRUD / listado ----------
-  fetchConvocatorias() {
+  fetchPostulacionesEntrantes() {
     this.error = null;
     this.loading = true;
-    this.api.get<any>('Convocatoria/Consultar_Convocatoria')
+    this.api.get<any>(this.tipoPostulacion == 'entrante' ? 'ConsulltaPostuladosTipo/Consultar_PostuladosTipoEntrante?idEstado=1' : 'ConsulltaPostuladosTipo/Consultar_PostuladosTipoSaliente?idEstado=1')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -97,7 +106,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
             }
           }
 
-          this.data = items.map(item => ConvocatoriaGeneralModel.fromJSON(item));
+          this.data = items.map(item => PostulacionTipoConsultaModel.fromJSON(item));
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
@@ -116,19 +125,21 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
       });
   }
 
-  filterConvocatorias() {
+  filterPostulaciones() {
     this.error = null;
-    if ((!this.filtro || this.filtro.trim() === '') && (!this.fechaInicial || this.fechaInicial.trim() === '') && (!this.fechaFinal || this.fechaFinal.trim() === '') && (!this.movilidadId || this.movilidadId == 0)) {
+    if ((!this.tipoMovilidadIdId || this.tipoMovilidadIdId == 0) && (!this.filtro || this.filtro.trim() === '') && (!this.fechaInicial || this.fechaInicial.trim() === '') && (!this.fechaFinal || this.fechaFinal.trim() === '') && (!this.estadoId || this.estadoId == 0)) {
       this.showWarning('Debe digitar o seleccionar un valor para ejecutar la búsqueda');
       return;
     }
     this.loading = true;
 
+    const tipoMovilidad = encodeURIComponent(this.tipoMovilidadIdId);
     const nombre = encodeURIComponent(this.filtro.trim());
     const fInicial = encodeURIComponent(this.fechaInicial.trim());
     const fFinal = encodeURIComponent(this.fechaFinal.trim());
-    const movilidad = encodeURIComponent(this.movilidadId);
-    this.api.get<any>(`Convocatoria/Consultar_ConvocatoriaGeneral?NombreConvocatoria=${nombre}&FechaInicio=${fInicial}&FechaFina=${fFinal}l&IdModalidad=${movilidad}`)
+    const estadoId = encodeURIComponent(this.estadoId);
+    this.api.get<any>(this.tipoPostulacion == 'entrante' ? `ConsulltaPostuladosTipo/Consultar_PostuladosTipoEntrante?idEstado=${estadoId}&IdTipo=${tipoMovilidad}&DocumentoPostulado=${nombre}l&FechaInicioConvocatoria=${fInicial}&FechaFinConvocatoria=${fFinal}`
+                                                         : `ConsulltaPostuladosTipo/Consultar_PostuladosTipoSaliente?idEstado=${estadoId}&IdTipo=${tipoMovilidad}&DocumentoPostulado=${nombre}l&FechaInicioConvocatoria=${fInicial}&FechaFinConvocatoria=${fFinal}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -143,7 +154,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
             }
           }
 
-          this.data = items.map(item => ConvocatoriaGeneralModel.fromJSON(item));
+          this.data = items.map(item => PostulacionTipoConsultaModel.fromJSON(item));
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
@@ -157,16 +168,8 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
       });
   }
 
-  validateDateRange() {
-    this.dateRangeInvalid = false;
-    if (!this.model.fechaInicio || !this.model.fechaCierre) return;
-    const inicio = new Date(this.model.fechaInicio);
-    const fin = new Date(this.model.fechaCierre);
-    if (fin < inicio) this.dateRangeInvalid = true;
-  }
-
   resetForm(form?: NgForm) {
-    this.model = new ConvocatoriaGeneralModel();
+    this.model = new PostulacionTipoConsultaModel();
     this.isEditing = false;
     this.dateRangeInvalid = false;
     if (form) {
@@ -181,31 +184,6 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
         esActiva: false
       });
     }
-  }
-
-  startEdit(item: any) {
-    this.model = ConvocatoriaGeneralModel.fromJSON(item);
-    this.isEditing = true;
-    this.validateDateRange();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar esta convocatoria?');
-    if (!confirmado) return;
-
-    this.api.delete(`Convocatorias/Eliminar/${id}`)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.fetchConvocatorias();
-          this.showSuccess();
-        },
-        error: (err) => {
-          console.error('Error al eliminar convocatoria', err);
-          this.showError();
-        }
-      });
   }
 
   // ---------- Paginación ----------
@@ -236,10 +214,6 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
     this.currentPage = 1;
     this.calculateTotalPages();
     this.updatePagedData();
-  }
-
-  trackByIndex(_: number, item: ConvocatoriaGeneralModel) {
-    return item?.id ?? _;
   }
 
   // ---------- Toasters / Confirm ----------
@@ -286,8 +260,8 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
     });
   }
 
-  private fetchListaMovilidad() {
-      this.api.get<any>('Modalidad/Consultar_Modalidad')
+  private fetchListaEstados() {
+      this.api.get<any>('EstadosPostulacion/Consultar_Estado')
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (resp) => {
@@ -301,51 +275,66 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
                 if (Array.isArray(arr)) items = arr;
               }
             }
-            this.movilidad = items.map(item => ({ id: item.id, nombre: item.nombre }));
+            this.estados = items.map(item => ({ id: item.id, nombre: item.nombre }));
 
           },
           error: (err) => {
-            console.error('Error al cargar movilidad para select', err);
-            this.movilidad = [];
+            console.error('Error al cargar estado para select', err);
+            this.estados = [];
           }
         });
     }
 
-  selectedItem: ConvocatoriaGeneralModel | null = null;
+    private fetchListaTipoMovilidad() {
+      this.api.get<any>('TipoMovilidad/Consultar_TipoMovilida')
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (resp) => {
+            let items: any[] = [];
+            if (Array.isArray(resp)) items = resp;
+            else if (resp && typeof resp === 'object') {
+              if (Array.isArray(resp.data)) items = resp.data;
+              else if (Array.isArray(resp.items)) items = resp.items;
+              else {
+                const arr = Object.values(resp).find(v => Array.isArray(v));
+                if (Array.isArray(arr)) items = arr;
+              }
+            }
+            this.tipoMovilidad = items.map(item => ({ id: item.id, nombre: item.nombre }));
 
-  openModalCondicion(item: ConvocatoriaGeneralModel) {
-    this.selectedItem = item;
-    this.convocatoriaId = item.id;
-    const modalElement = document.getElementById('CondicionModal');
-    if (modalElement) {
-      const modal = new (window as any).bootstrap.Modal(modalElement);
-      modal.show();
+          },
+          error: (err) => {
+            console.error('Error al cargar tipo movilidad para select', err);
+            this.tipoMovilidad = [];
+          }
+        });
     }
-  }
 
-  openModalBeneficio(item: ConvocatoriaGeneralModel) {
-    this.selectedItem = item;
-    this.convocatoriaId = item.id;
-    const modalElement = document.getElementById('BeneficioModal');
-    if (modalElement) {
-      const modal = new (window as any).bootstrap.Modal(modalElement);
-      modal.show();
-    }
-  }
-
-  openModalEntregable(item: ConvocatoriaGeneralModel) {
-    this.selectedItem = item;
-    this.convocatoriaId = item.id;
-    const modalElement = document.getElementById('EntregableModal');
-    if (modalElement) {
-      const modal = new (window as any).bootstrap.Modal(modalElement);
-      modal.show();
-    }
-  }
-
-  abrirTiposConvocatoria(item: ConvocatoriaGeneralModel) {
-    this.router.navigate(['/tipos-postulaciones'], {
+  abrirTiposConvocatoria(item: PostulacionTipoConsultaModel) {
+    this.router.navigate(['/tipos-convocatoria'], {
 
   });
+  }
+
+  trackByIndex(_: number, item: PostulacionTipoConsultaModel) {
+      return item?.idPostulacion ?? _;
+  }
+
+  toggleDetalle(item: any) {
+    if (this.selectedItem && this.selectedItem.idPostulacion === item.idPostulacion) {
+      this.closeCard();
+    } else {
+      this.selectedItem = item;
+      this.isClosing = false;
+    }
+  }
+
+  closeCard() {
+    this.isClosing = true;
+
+    setTimeout(() => {
+      this.selectedItem = null;
+      this.isClosing = false;
+    }, 400);
   }
 }

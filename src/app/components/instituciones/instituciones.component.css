@@ -85,27 +85,6 @@
   outline: none;
 }
 
-.button-completed {
-  background-color: #18206E; /* azul oscuro */
-  color: #00ACD4;
-  padding: 6px 16px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  border: none;
-  cursor: default;
-  display: inline-block;
-  min-width: 50px;
-  text-align: center;
-  user-select: none;
-  transition: background-color 0.3s ease;
-}
-
-.button-completed:hover {
-  background-color: #00ACD4; /* un poco más oscuro al pasar el mouse */
-  color: white;
-}
-
 .button-pending {
   background-color: #00ACD4; /* celeste */
   color: #18206E; /* azul oscuro */
