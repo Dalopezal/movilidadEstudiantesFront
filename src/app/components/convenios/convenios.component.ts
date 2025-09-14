@@ -206,7 +206,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.validateDateRange();
+    //this.validateDateRange();
     if (this.dateRangeInvalid) return;
 
     if (!this.model.descripcion?.trim()) {
@@ -218,7 +218,6 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     this.error = null;
 
     const isUpdate = this.isEditing && this.model.id && this.model.id > 0;
-    this.model.fechaVencimiento = '1900-01-01';
     const payload = this.model.toJSON();
 
     const endpoint = isUpdate ? 'Convenios/Actualiza_Convenio' : 'Convenios/crear_Convenio';

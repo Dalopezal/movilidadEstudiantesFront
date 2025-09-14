@@ -7,22 +7,20 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 
-import { SidebarComponent } from '../sidebar/sidebar.component';
 import { GenericApiService } from '../../services/generic-api.service';
-import { CondicionComponent } from '../condicion/condicion.component';
-import { BeneficioConvocatoriaComponent } from '../beneficio-convocatoria/beneficio-convocatoria.component';
-import { EntregableComponent } from '../entregable/entregable.component';
 import { Router } from '@angular/router';
 import { PostulacionTipoConsultaModel } from '../../models/PostulacionTipoModel';
+import { SidebarComponent } from '../sidebar/sidebar.component';
 
 @Component({
-  selector: 'app-postulaciones-entrantes',
+  selector: 'app-postulaciones-tipo',
   imports: [
     CommonModule,
     FormsModule,
     HttpClientModule,
     ConfirmDialogModule,
     NgxSonnerToaster,
+    SidebarComponent
   ],
   templateUrl: './postulaciones-tipo.component.html',
   styleUrl: './postulaciones-tipo.component.css',
@@ -87,7 +85,7 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
   fetchPostulacionesEntrantes() {
     this.error = null;
     this.loading = true;
-    this.api.get<any>(this.tipoPostulacion == 'entrante' ? 'ConsulltaPostuladosTipo/Consultar_PostuladosTipoEntrante?idEstado=1' : 'ConsulltaPostuladosTipo/Consultar_PostuladosTipoSaliente?idEstado=1')
+    this.api.get<any>('ConsulltaPostuladosTipo/Consultar_PostuladosTipoEntrante?idEstado=1')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {

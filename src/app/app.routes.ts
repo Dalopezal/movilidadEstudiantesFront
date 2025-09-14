@@ -8,8 +8,9 @@ import { ConveniosComponent } from './components/convenios/convenios.component';
 import { EntregableComponent } from './components/entregable/entregable.component';
 import { InstitucionesComponent } from './components/instituciones/instituciones.component';
 import { ConvocatoriasGeneralComponent } from './components/convocatorias-general/convocatorias-general.component';
-import { TiposPostulacionesComponent } from './components/tipos-postulaciones/tipos-postulaciones.component';
 import { PostulacionesDetalleComponent } from './components/postulaciones-detalle/postulaciones-detalle.component';
+import { TiposConvocatoriaComponent } from './components/tipos-convocatoria/tipos-convocatoria.component';
+import { PostulcionesEntrantesComponent } from './components/postulaciones-tipo/postulaciones-tipo.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -22,6 +23,7 @@ export const routes: Routes = [
   { path: 'instituciones', component: InstitucionesComponent },
   { path: 'postulacion-detalle', component: PostulacionesDetalleComponent },
   { path: 'convocatorias-general', component: ConvocatoriasGeneralComponent },
-  { path: 'tipos-postulaciones', component: TiposPostulacionesComponent },
+  { path: 'tipos-convocatorias', component: TiposConvocatoriaComponent },
+  { path: 'postulacion-convocatoria', component: PostulcionesEntrantesComponent },
   { path: '**', redirectTo: '' }
 ];

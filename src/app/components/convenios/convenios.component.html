@@ -4,7 +4,7 @@
     <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;font-size: 13px">
       <div class="row g-4 flex-grow-1">
         <!-- Formulario -->
-        <section class="col-12 col-lg-4 d-flex flex-column" style="height: 98vh;">
+        <section class="col-12 col-lg-4 d-flex flex-column" style="height: 80vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
             <div class="card-header text-white" style="background: #E2E6F7;">
               <p class="mb-0" style="color: #0D133F;font-size: 14px">Administrar Convenios</p>
@@ -51,8 +51,9 @@
                   </div>
                 </div>
 
-                <div class="mb-3">
-                  <div class="col-12 col-md-12">
+                <!-- <div class="mb-3"> -->
+                <div class="row g-3" style="margin-bottom: 20px;">
+                  <div class="col-12 col-md-6">
                     <label for="fechaInicio" class="form-label fw-bold">Fecha Inicio</label>
                     <input
                       type="date"
@@ -68,78 +69,59 @@
                       <div *ngIf="inicioCtrl.errors?.['required']">La fecha de inicio es obligatoria.</div>
                     </div>
                   </div>
-
-                  <!-- <div class="col-12 col-md-6">
-                    <label for="fechaVencimiento" class="form-label fw-bold">Fecha Vencimiento</label>
-                    <input
-                      type="date"
-                      class="form-control"
-                      id="fechaVencimiento"
-                      name="fechaVencimiento"
+                  <div class="col-12 col-md-6">
+                    <label for="tipoConvenio" class="form-label fw-bold">Tipo Convenio</label>
+                    <select
+                      class="form-select"
+                      id="tipoConvenio"
+                      name="tipoConvenioId"
                       required
-                      [(ngModel)]="model.fechaVencimiento"
-                      #finCtrl="ngModel"
-                    />
-                    <div class="text-danger small mt-1" *ngIf="finCtrl.invalid && (finCtrl.touched || finCtrl.dirty)">
-                      <div *ngIf="finCtrl.errors?.['required']">La fecha de vencimiento es obligatoria.</div>
+                      [(ngModel)]="model.tipoConvenioId"
+                      #tipoConvCtrl="ngModel"
+                      style="font-size: 13px;"
+                    >
+                      <option *ngFor="let t of tiposConvenio" [ngValue]="t.id">{{ t.descripcion }}</option>
+                    </select>
+                    <div class="text-danger small mt-1" *ngIf="tipoConvCtrl.invalid && (tipoConvCtrl.touched || tipoConvCtrl.dirty)">
+                      <div *ngIf="tipoConvCtrl.errors?.['required']">Seleccione un tipo de convenio.</div>
                     </div>
-                    <div class="text-danger small mt-1" *ngIf="dateRangeInvalid">
-                      La fecha de vencimiento debe ser igual o posterior a la fecha de inicio.
-                    </div>
-                  </div> -->
-                </div>
-
-                <div class="mb-3">
-                  <label for="tipoConvenio" class="form-label fw-bold">Tipo Convenio</label>
-                  <select
-                    class="form-select"
-                    id="tipoConvenio"
-                    name="tipoConvenioId"
-                    required
-                    [(ngModel)]="model.tipoConvenioId"
-                    #tipoConvCtrl="ngModel"
-                    style="font-size: 13px;"
-                  >
-                    <option *ngFor="let t of tiposConvenio" [ngValue]="t.id">{{ t.descripcion }}</option>
-                  </select>
-                  <div class="text-danger small mt-1" *ngIf="tipoConvCtrl.invalid && (tipoConvCtrl.touched || tipoConvCtrl.dirty)">
-                    <div *ngIf="tipoConvCtrl.errors?.['required']">Seleccione un tipo de convenio.</div>
                   </div>
                 </div>
 
-                <div class="mb-3">
-                  <label for="clasificacion" class="form-label fw-bold">Clasificación</label>
-                  <select
-                    class="form-select"
-                    id="clasificacion"
-                    name="clasificacionConvenioId"
-                    required
-                    [(ngModel)]="model.clasificacionConvenioId"
-                    #clasificacionCtrl="ngModel"
-                    style="font-size: 13px;"
-                  >
-                    <option *ngFor="let c of clasificaciones" [ngValue]="c.id">{{ c.nombre }}</option>
-                  </select>
-                  <div class="text-danger small mt-1" *ngIf="clasificacionCtrl.invalid && (clasificacionCtrl.touched || clasificacionCtrl.dirty)">
-                    <div *ngIf="clasificacionCtrl.errors?.['required']">Seleccione una clasificación.</div>
+                <div class="row g-3" style="margin-bottom: 20px;">
+                  <div class="col-12 col-md-6">
+                    <label for="clasificacion" class="form-label fw-bold">Clasificación</label>
+                    <select
+                      class="form-select"
+                      id="clasificacion"
+                      name="clasificacionConvenioId"
+                      required
+                      [(ngModel)]="model.clasificacionConvenioId"
+                      #clasificacionCtrl="ngModel"
+                      style="font-size: 13px;"
+                    >
+                      <option *ngFor="let c of clasificaciones" [ngValue]="c.id">{{ c.nombre }}</option>
+                    </select>
+                    <div class="text-danger small mt-1" *ngIf="clasificacionCtrl.invalid && (clasificacionCtrl.touched || clasificacionCtrl.dirty)">
+                      <div *ngIf="clasificacionCtrl.errors?.['required']">Seleccione una clasificación.</div>
+                    </div>
                   </div>
-                </div>
-
-                <div class="mb-3">
-                  <label for="tipoActividad" class="form-label fw-bold">Tipo Actividad</label>
-                  <select
-                    class="form-select"
-                    id="tipoActividad"
-                    name="tipoActividadid"
-                    required
-                    [(ngModel)]="model.tipoActividadid"
-                    #tipoActCtrl="ngModel"
-                    style="font-size: 13px;"
-                  >
-                    <option *ngFor="let a of tiposActividad" [ngValue]="a.id">{{ a.nombre }}</option>
-                  </select>
-                  <div class="text-danger small mt-1" *ngIf="tipoActCtrl.invalid && (tipoActCtrl.touched || tipoActCtrl.dirty)">
-                    <div *ngIf="tipoActCtrl.errors?.['required']">Seleccione un tipo de actividad.</div>
+                  <div class="col-12 col-md-6">
+                    <label for="tipoActividad" class="form-label fw-bold">Tipo Actividad</label>
+                    <select
+                      class="form-select"
+                      id="tipoActividad"
+                      name="tipoActividadid"
+                      required
+                      [(ngModel)]="model.tipoActividadid"
+                      #tipoActCtrl="ngModel"
+                      style="font-size: 13px;"
+                    >
+                      <option *ngFor="let a of tiposActividad" [ngValue]="a.id">{{ a.nombre }}</option>
+                    </select>
+                    <div class="text-danger small mt-1" *ngIf="tipoActCtrl.invalid && (tipoActCtrl.touched || tipoActCtrl.dirty)">
+                      <div *ngIf="tipoActCtrl.errors?.['required']">Seleccione un tipo de actividad.</div>
+                    </div>
                   </div>
                 </div>
 
@@ -198,7 +180,7 @@
         </section>
 
         <!-- Tabla -->
-        <section class="col-12 col-lg-8 d-flex flex-column" style="height: 98vh;">
+        <section class="col-12 col-lg-8 d-flex flex-column" style="height: 80vh;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchConvenios(); filtro=''">
@@ -230,7 +212,11 @@
                   </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.codigoUcm }}</td>
-                    <td style="font-size: 13px;">{{ item.descripcion }}</td>
+                    <td
+                      class="text-truncate-custom"
+                      [title]="item.descripcion">
+                      {{ item.descripcion }}
+                    </td>
                     <td>{{ item.nombreTipoConvenio }}</td>
                     <td>{{ item.nombreClasificacionConvenio }}</td>
                     <td>{{ item.nombreTipoActividadConvenio }}</td>

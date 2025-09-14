@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TiposPostulacionesComponent } from './tipos-postulaciones.component';
+import { TiposConvocatoriaComponent } from './tipos-convocatoria.component';
 
 
 describe('TiposConvocatoriaComponent', () => {
-  let component: TiposPostulacionesComponent;
-  let fixture: ComponentFixture<TiposPostulacionesComponent>;
+  let component: TiposConvocatoriaComponent;
+  let fixture: ComponentFixture<TiposConvocatoriaComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TiposPostulacionesComponent]
+      imports: [TiposConvocatoriaComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TiposPostulacionesComponent);
+    fixture = TestBed.createComponent(TiposConvocatoriaComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

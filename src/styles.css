@@ -4,6 +4,10 @@
   font-family: 'Urbanist', sans-serif !important;
 }
 
+.container{
+  max-width: 97% !important;
+}
+
 html, body { height: 100%; }
 body { font-family: 'Urbanist', sans-serif !important; }
 

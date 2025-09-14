@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -7,7 +7,6 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 
-import { SidebarComponent } from '../sidebar/sidebar.component';
 import { GenericApiService } from '../../services/generic-api.service';
 import { ConvocatoriaGeneralModel } from '../../models/ConvocatoriaGeneralModel';
 import { CondicionComponent } from '../condicion/condicion.component';
@@ -17,8 +16,8 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-convocatorias-general',
+  standalone: true,
   imports: [
-    SidebarComponent,
     CommonModule,
     FormsModule,
     HttpClientModule,
@@ -61,6 +60,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   movilidad: any[] = [];
   convocatoriaId: any;
+  @Input() categoria: any;
 
   constructor(
     private api: GenericApiService,
@@ -344,7 +344,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   }
 
   abrirPostulaciones(item: ConvocatoriaGeneralModel) {
-    this.router.navigate(['/tipos-postulaciones'], {
+    this.router.navigate(['/postulacion-convocatoria'], {
     });
   }
 }
