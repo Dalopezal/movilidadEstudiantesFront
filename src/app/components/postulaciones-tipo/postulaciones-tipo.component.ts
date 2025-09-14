@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
@@ -8,9 +8,11 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 
 import { GenericApiService } from '../../services/generic-api.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PostulacionTipoConsultaModel } from '../../models/PostulacionTipoModel';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-postulaciones-tipo',
@@ -20,7 +22,9 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
     HttpClientModule,
     ConfirmDialogModule,
     NgxSonnerToaster,
-    SidebarComponent
+    SidebarComponent,
+    MatIconModule,
+    MatButtonModule
   ],
   templateUrl: './postulaciones-tipo.component.html',
   styleUrl: './postulaciones-tipo.component.css',
@@ -61,17 +65,21 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
   selectedItem: any = null;
   cardPosition = { top: 100, left: 50 };
   isClosing = false;
+  nombreCombocatoria: any;
+  idConvocatoria: any;
 
   @Input() tipoPostulacion: any;
 
   constructor(
     private api: GenericApiService,
     private confirmationService: ConfirmationService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
-    this.fetchPostulacionesEntrantes();
+    this.fetchPostulaciones();
     this.fetchListaEstados();
     this.fetchListaTipoMovilidad();
   }
@@ -82,10 +90,20 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
   }
 
   // ---------- CRUD / listado ----------
-  fetchPostulacionesEntrantes() {
+  fetchPostulaciones() {
+
+    //carga datos parametros
+
+    this.route.queryParams.subscribe(params => {
+      this.nombreCombocatoria = params['nombre'];
+      this.idConvocatoria = params['id'];
+      console.log(params['id']);
+      console.log(params['nombre']);
+    });
+
     this.error = null;
     this.loading = true;
-    this.api.get<any>('ConsulltaPostuladosTipo/Consultar_PostuladosTipoEntrante?idEstado=1')
+    this.api.get<any>('Postulaciones/Consultar_PostulacionConvocatoria?IdConvocatoria=' + this.idConvocatoria)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -305,12 +323,14 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
     }
 
   abrirPostulacionDetalle(item: PostulacionTipoConsultaModel) {
-    this.router.navigate(['/postulacion-detalle'], {
-  });
+    this.router.navigate(['/postulacion-detalle'], {queryParams: {
+      id: item.id
+    }
+    });
   }
 
   trackByIndex(_: number, item: PostulacionTipoConsultaModel) {
-      return item?.idPostulacion ?? _;
+      return item?.id ?? _;
   }
 
   toggleDetalle(item: any) {
@@ -329,5 +349,9 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
       this.selectedItem = null;
       this.isClosing = false;
     }, 400);
+  }
+
+  goBack() {
+    this.location.back();
   }
 }

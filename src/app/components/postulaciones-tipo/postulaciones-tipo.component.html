@@ -7,14 +7,22 @@
         <!--Tabla -->
         <section class="col-12 col-lg-12 d-flex flex-column" style="height: 70vh;font-size: 14px;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1">
-            <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;">Postulaciones - Convocatoria</p>
+            <div class="card-header d-flex align-items-center" style="background: #E2E6F7;">
+              <button title="Atrás"
+                mat-icon-button
+                (click)="goBack()"
+                [disableRipple]="true"
+                class="me-2"
+                style="background-color: transparent; width: 40px; height: 40px; padding: 0;">
+                <mat-icon style="font-size: 14px; width: 14px; height: 14px;">arrow_back</mat-icon>
+              </button>
+              <p class="mb-0" style="color: #0D133F;">Postulaciones Convocatoria - <strong>{{nombreCombocatoria}}</strong></p>
             </div>
             <div class="card-header d-flex align-items-center gap-3" style="background: white;">
               <button
                 class="btn btn-primary d-flex align-items-center gap-2"
                 style="background: #0D133F; border-color: #0D133F;font-size: 13px;padding: 5px 8px;"
-                (click)="fetchPostulacionesEntrantes(); filtro='';fechaInicial='';fechaFinal='';estadoId=0; tipoMovilidadIdId=0"
+                (click)="fetchPostulaciones(); filtro='';fechaInicial='';fechaFinal='';estadoId=0; tipoMovilidadIdId=0"
               >
                 <i class="fas fa-sync-alt"></i> Actualizar
               </button>
@@ -98,15 +106,15 @@
                   <p style="background: transparent;;">Cargando datos</p>
                 </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
-                    <td align="center">{{ item.idPostulacion }}</td>
-                    <td>{{ item.nombrePostulado }}</td>
-                    <td>{{ item.documentoPostulado }}</td>
-                    <td>{{ item.correoPostulado }}</td>
+                    <td align="center">{{ item.id }}</td>
+                    <td>{{ item.nombreCompleto }}</td>
+                    <td></td>
+                    <td></td>
                     <td align="center">{{ item.fechaPostulacion }}</td>
                     <td align="center">{{ item.periodo }}</td>
-                    <td align="center">{{ item.codigoConvenio }}</td>
+                    <td align="center"></td>
                     <td align="center">
-                      <button class="button-completed">{{item.nombreEstadoPostulacion}}</button>
+                      <button class="button-completed">{{item.nombreEstado}}</button>
                     </td>
                     <td align="center" class="text-center">
                       <i class="fa-duotone fa-solid fa-circle-info me-2 button-eye"
@@ -179,7 +187,7 @@
     <div class="card-body glass-effect scroll-body" style="font-size: 13px;">
       <!-- Postulado -->
       <div class="info-row">
-        <span class="label-glow">Postulado:</span> {{ selectedItem.nombrePostulado }}
+        <span class="label-glow">Postulado:</span> {{ selectedItem.nombreCompleto }}
       </div>
       <div class="info-row">
         <span class="label-glow">Documento:</span> {{ selectedItem.documentoPostulado }}
@@ -191,16 +199,12 @@
       <!-- Estado -->
       <div class="info-row">
         <span class="label-glow">Estado:</span>
-        <button class="button-completed">{{selectedItem.nombreEstadoPostulacion}}</button>
+        <button class="button-completed">{{selectedItem.nombreEstado}}</button>
       </div>
 
       <!-- Fechas -->
       <div class="info-row">
         <span class="label-glow">Fecha Postulación:</span> {{ selectedItem.fechaPostulacion }}
-      </div>
-      <div class="info-row">
-        <span class="label-glow">Convocatoria:</span>
-        {{ selectedItem.fechaInicioConvatoria }} → {{ selectedItem.fechaFinConvocatoria }}
       </div>
       <div class="info-row">
         <span class="label-glow">Movilidad:</span>
@@ -209,7 +213,7 @@
 
       <!-- Objetivo -->
       <div class="info-row">
-        <span class="label-glow">Objetivo:</span> {{selectedItem.objetivoPostulacion}}
+        <span class="label-glow">Objetivo:</span> {{selectedItem.objetivo}}
       </div>
       <!-- Periodo -->
       <div class="info-row">
@@ -229,7 +233,7 @@
         <span class="label-glow">Tipo Movilidad:</span> {{ selectedItem.nombreTipoMovilidad }}
       </div>
       <div class="info-row">
-        <span class="label-glow">Categoría:</span> {{ selectedItem.nombreCategoriaMovilidad }}
+        <span class="label-glow">Categoría:</span> {{ selectedItem.nombreConvocatoria }}
       </div>
       <div class="info-row">
         <span class="label-glow">Movilidad:</span> {{ selectedItem.nombreModalidad }}

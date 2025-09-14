@@ -1,26 +1,46 @@
 // src/app/models/postulacion-consulta.model.ts
 export class PostulacionTipoConsultaModel {
-  idPostulacion: number = 0;
+  id: number = 0;
+  usuarioId: number = 0;
+  convocatoriaId: number = 0;
+  estadoPostulacionId: number = 0;
   fechaPostulacion: string = '';
-  objetivoPostulacion: string = '';
+  objetivo: string = '';
   fechaInicioMovilidad: string = '';
   fechaFinMovilidad: string = '';
   periodo: number = 0;
+  institucionId: number = 0;
+  convenioId: number = 0;
+  observaciones: string = '';
+  fechaEntregable: string = '';
+  postRolActivo: number = 0;
+  tipoMovilidadId: number = 0;
+  programaAdademico: string | null = null;
+  nivelFormacion: string | null = null;
+  facultadNombre: string | null = null;
+  grupoInvestigacionNombre: string | null = null;
+  dependenciaNombre: string | null = null;
+  asistioEntrevista: boolean | null = null;
+  financiacioUcm: boolean | null = null;
+  financiacionExterna: boolean | null = null;
+  registradoSire: boolean | null = null;
+  realizoEncuestaSatisfaccion: boolean | null = null;
+  urlEncuestaSatisfaccion: string | null = null;
+  certificadoMovilidad: string | null = null;
+  esMatriculadoSiiga: boolean | null = null;
+  esNotificadoRegistroAcademico: boolean | null = null;
+  motivoRechazo: string | null = null;
+  esNotificadoCorreo: boolean | null = null;
+  requiereVisa: boolean | null = null;
+  promedioAcademico: number | null = null;
+
+  // Campos adicionales amigables para mostrar en UI
+  nombreCompleto: string = '';
+  nombreEstado: string = '';
   nombreInstitucion: string = '';
-  codigoConvenio: string = '';
+  codigoUcm: string = '';
   nombreTipoMovilidad: string = '';
-  idTipoMovilidad: number = 0;
-  nombreModalidad: string = '';
-  nombreCategoriaMovilidad: string = '';
-  fechaInicioConvatoria: string = '';
-  fechaFinConvocatoria: string = '';
-  nombreModalidadConvocatoria: string = '';
-  nombreEstadoPostulacion: string = '';
-  idEstadoPostulacion: number = 0;
-  documentoPostulado: string = '';
-  correoPostulado: string = '';
-  nombrePostulado: string = '';
-  tipo: string = '';
+  nombreConvocatoria: string = '';
 
   static fromJSON(obj: any): PostulacionTipoConsultaModel {
     const model = new PostulacionTipoConsultaModel();

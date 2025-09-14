@@ -4,43 +4,63 @@
   <div class="row h-100">
     <main class="col-12 col-md-12 d-flex flex-column">
       <div class="row g-4 flex-grow-1">
-        <section class="col-12 col-lg-12 d-flex flex-column" style="font-size: 20px;">
+        <section class="col-12 col-lg-12 d-flex flex-column" style="font-size: 14px;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1">
-            <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F">Detalle Postulación</p>
+            <div class="card-header d-flex align-items-center" style="background: #E2E6F7;">
+              <button title="Atrás"
+                mat-icon-button
+                (click)="goBack()"
+                [disableRipple]="true"
+                class="me-2"
+                style="background-color: transparent; width: 40px; height: 40px; padding: 0;">
+                <mat-icon style="font-size: 14px; width: 14px; height: 14px;">arrow_back</mat-icon>
+              </button>
+
+              <p class="mb-0 fw-bold" style="color: #0D133F; font-size: 14px;">
+                Detalle Postulación
+              </p>
             </div>
-            <div class="card-header d-flex align-items-center gap-3" style="background: white;min-height: 30vh;">
-              <div *ngIf="loading" class="table-overlay">
-                <i class="fas fa-spinner fa-spin fa-3x"></i>
-                <p style="background: transparent;font-size: 13px;">Cargando datos</p>
-              </div>
-              <div class="stepper-container">
-                <mat-vertical-stepper #stepper [linear]="false"  style="background: white !important;">
+            <div class="card-header d-flex align-items-start gap-3" style="background: white;height: 75vh;">
+            <div *ngIf="loading" class="table-overlay">
+              <i class="fas fa-spinner fa-spin fa-3x"></i>
+              <p style="font-size: 13px;">Cargando datos</p>
+            </div>
+
+            <div class="stepper-container w-100" *ngIf="!loading">
+              <mat-vertical-stepper
+                  #stepper
+                  [linear]="false"
+                  [(selectedIndex)]="currentStep"
+                  style="background:white !important; height: 100%;">
+
                   <mat-step *ngFor="let step of steps; let i = index"
                             [completed]="i < currentStep"
                             [editable]="true">
 
                     <ng-template matStepLabel>
-                      <span class="step-label">{{ step.nombre }}</span>
+                      {{ step.nombre }}
                     </ng-template>
 
-                    <div class="step-content">
-                      <h4>{{ step.nombre }}</h4>
-                      <p>{{ step.descripcion || 'Contenido del paso ' + (i + 1) }}</p>
+                    <div class="step-content" style="font-size: 13px">
+                      <div class="row">
+                        <div class="col-md-6 col-lg-4 mb-3"
+                            *ngFor="let field of campoEstado[step.id] || []">
+                          <label class="form-label d-block" style="color: #00ACD4;font-size: 14px;background: #f2f3f3;border-radius: 20px;padding: 5px 5px 5px 15px;">{{ field.label }}</label>
+                          <p class="fw-bold mb-1" style="font-size: 13px;color: #0D133F;">{{ step.data[field.name] || '-' }}</p>
+                        </div>
+                      </div>
 
-                      <div class="step-actions">
-                        <button mat-button
-                                matStepperPrevious
-                                [disabled]="i === 0"
-                                color="primary">
+                      <div class="d-flex justify-content-start align-items-center mt-3 pt-2">
+                        <button mat-button matStepperPrevious [disabled]="i===0">
                           <mat-icon>arrow_back</mat-icon>
                           Anterior
                         </button>
 
-                        <button mat-raised-button
-                                matStepperNext
-                                [disabled]="i === steps.length - 1"
-                                color="primary">
+                        <span class="text-muted small mx-3">
+                          Paso {{ i + 1 }} de {{ steps.length }}
+                        </span>
+
+                        <button mat-raised-button color="primary" matStepperNext [disabled]="i===steps.length-1">
                           Siguiente
                           <mat-icon>arrow_forward</mat-icon>
                         </button>

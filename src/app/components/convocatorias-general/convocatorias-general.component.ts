@@ -82,7 +82,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   fetchConvocatorias() {
     this.error = null;
     this.loading = true;
-    this.api.get<any>('Convocatoria/Consultar_Convocatoria')
+    this.api.get<any>('Convocatoria/ConsultarConvocatoria_Tipo?NombreTipo=' + this.categoria)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -128,7 +128,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
     const fInicial = encodeURIComponent(this.fechaInicial.trim());
     const fFinal = encodeURIComponent(this.fechaFinal.trim());
     const movilidad = encodeURIComponent(this.movilidadId);
-    this.api.get<any>(`Convocatoria/Consultar_ConvocatoriaGeneral?NombreConvocatoria=${nombre}&FechaInicio=${fInicial}&FechaFina=${fFinal}l&IdModalidad=${movilidad}`)
+    this.api.get<any>(`Convocatoria/Consultar_ConvocatoriaGeneral?NombreConvocatoria=${nombre}&FechaInicio=${fInicial}&FechaFinal=${fFinal}&IdModalidad=${movilidad}&NombreTipo=${this.categoria}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -344,7 +344,10 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   }
 
   abrirPostulaciones(item: ConvocatoriaGeneralModel) {
-    this.router.navigate(['/postulacion-convocatoria'], {
+    this.router.navigate(['/postulacion-convocatoria'], {queryParams: {
+      id: item.id,
+      nombre: item.nombre
+    }
     });
   }
 }
