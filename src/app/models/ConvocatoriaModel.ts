@@ -6,8 +6,8 @@ export class ConvocatoriaModel {
   fechaCierre: string;
   requisitos: string;
   esActiva: boolean;
-  categoriaMovilidadId: number;
-  modalidadId: number;
+  categoriaMovilidadId: string;
+  modalidadId: string;
   categoriaMovilidadNombre: string;
   movilidadNombre: string;
 
@@ -19,8 +19,8 @@ export class ConvocatoriaModel {
     fechaCierre: string = '',
     requisitos: string = '',
     esActiva: boolean = false,
-    categoriaMovilidadId: number = 0,
-    modalidadId: number = 0,
+    categoriaMovilidadId: string = '',
+    modalidadId: string = '',
     categoriaMovilidadNombre: string = '',
     movilidadNombre: string = ''
   ) {
@@ -46,8 +46,8 @@ export class ConvocatoriaModel {
       json?.fechaCierre ?? '',
       json?.requisitos ?? '',
       Boolean(json?.esActiva),
-      Number(json?.categoriaMovilidadId) || 0,
-      Number(json?.modalidadId) || 0,
+      (json?.categoriaMovilidadId) || 0,
+      (json?.modalidadId) || 0,
       json?.categoriaMovilidadNombre ?? '',
       json?.movilidadNombre ?? ''
     );

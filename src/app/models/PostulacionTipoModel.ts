@@ -34,7 +34,6 @@ export class PostulacionTipoConsultaModel {
   requiereVisa: boolean | null = null;
   promedioAcademico: number | null = null;
 
-  // Campos adicionales amigables para mostrar en UI
   nombreCompleto: string = '';
   nombreEstado: string = '';
   nombreInstitucion: string = '';

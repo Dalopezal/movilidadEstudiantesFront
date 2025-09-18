@@ -1,0 +1,410 @@
+<app-sidebar></app-sidebar>
+<div class="container fuente" style="padding-top: 20px;">
+  <div class="row h-100">
+    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;font-size: 13px">
+      <div class="row g-4 flex-grow-1">
+        <!-- Formulario -->
+        <section class="col-12 col-lg-4 d-flex flex-column" style="min-height: 80vh;">
+          <div class="card shadow-sm flex-grow-1 d-flex flex-column">
+            <div class="card-header text-white" style="background: #E2E6F7;">
+              <p class="mb-0" style="color: #0D133F;font-size: 14px">Administración Convocatorias</p>
+            </div>
+
+            <div class="card-body d-flex flex-column flex-grow-1">
+              <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
+                <div class="mb-3">
+                  <label for="nombre" class="form-label fw-bold">Nombre</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nombre"
+                    name="nombre"
+                    placeholder="Digite Nombre"
+                    required
+                    minlength="3"
+                    [(ngModel)]="model.nombre"
+                    #nombreCtrl="ngModel"
+                    style="font-size: 13px;"
+                  />
+                  <div class="text-danger small mt-1" *ngIf="nombreCtrl.invalid && (nombreCtrl.touched || nombreCtrl.dirty)">
+                    <div *ngIf="nombreCtrl.errors?.['required']">El nombre es obligatorio.</div>
+                    <div *ngIf="nombreCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="descripcion" class="form-label fw-bold">Descripción</label>
+                  <textarea
+                    class="form-control"
+                    id="descripcion"
+                    name="descripcion"
+                    placeholder="Digite Descripción"
+                    required
+                    minlength="3"
+                    rows="3"
+                    [(ngModel)]="model.descripcion"
+                    #descripcionCtrl="ngModel"
+                    style="font-size: 13px;"
+                  ></textarea>
+                  <div class="text-danger small mt-1" *ngIf="descripcionCtrl.invalid && (descripcionCtrl.touched || descripcionCtrl.dirty)">
+                    <div *ngIf="descripcionCtrl.errors?.['required']">La descripción es obligatoria.</div>
+                    <div *ngIf="descripcionCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                  </div>
+                </div>
+
+                <div class="row g-3" style="margin-bottom: 20px;">
+                  <div class="col-12 col-md-6">
+                    <label for="fechaInicio" class="form-label fw-bold">Fecha Inicio</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="fechaInicio"
+                      name="fechaInicio"
+                      required
+                      [(ngModel)]="model.fechaInicio"
+                      #fechaInicioCtrl="ngModel"
+                      style="font-size: 13px;"
+                    />
+                    <div class="text-danger small mt-1" *ngIf="fechaInicioCtrl.invalid && (fechaInicioCtrl.touched || fechaInicioCtrl.dirty)">
+                      <div *ngIf="fechaInicioCtrl.errors?.['required']">La fecha de inicio es obligatoria.</div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="fechaCierre" class="form-label fw-bold">Fecha Cierre</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="fechaCierre"
+                      name="fechaCierre"
+                      required
+                      [(ngModel)]="model.fechaCierre"
+                      #fechaCierreCtrl="ngModel"
+                      style="font-size: 13px;"
+                    />
+                    <div class="text-danger small mt-1" *ngIf="fechaCierreCtrl.invalid && (fechaCierreCtrl.touched || fechaCierreCtrl.dirty)">
+                      <div *ngIf="fechaCierreCtrl.errors?.['required']">La fecha de cierre es obligatoria.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row g-3" style="margin-bottom: 20px;">
+                  <div class="col-12 col-md-6">
+                    <label for="categoriaMovilidad" class="form-label fw-bold">Categoría Movilidad</label>
+                    <select
+                      class="form-select"
+                      id="categoriaMovilidad"
+                      name="categoriaMovilidadId"
+                      required
+                      [(ngModel)]="model.categoriaMovilidadId"
+                      #categoriaMovilidadCtrl="ngModel"
+                      style="font-size: 13px;"
+                    >
+                      <option *ngFor="let c of categoriasMovilidad" [ngValue]="c.id">{{ c.nombre }}</option>
+                    </select>
+                    <div class="text-danger small mt-1" *ngIf="categoriaMovilidadCtrl.invalid && (categoriaMovilidadCtrl.touched || categoriaMovilidadCtrl.dirty)">
+                      <div *ngIf="categoriaMovilidadCtrl.errors?.['required']">La categoría de movilidad es obligatoria.</div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="modalidad" class="form-label fw-bold">Modalidad</label>
+                    <select
+                      class="form-select"
+                      id="modalidad"
+                      name="modalidadId"
+                      required
+                      [(ngModel)]="model.modalidadId"
+                      #modalidadCtrl="ngModel"
+                      style="font-size: 13px;"
+                    >
+                      <option *ngFor="let m of modalidades" [ngValue]="m.id">{{ m.nombre }}</option>
+                    </select>
+                    <div class="text-danger small mt-1" *ngIf="modalidadCtrl.invalid && (modalidadCtrl.touched || modalidadCtrl.dirty)">
+                      <div *ngIf="modalidadCtrl.errors?.['required']">La modalidad es obligatoria.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="requisitos" class="form-label fw-bold">Requisitos</label>
+                  <textarea
+                    class="form-control"
+                    id="requisitos"
+                    name="requisitos"
+                    placeholder="Digite Requisitos"
+                    required
+                    minlength="3"
+                    rows="3"
+                    [(ngModel)]="model.requisitos"
+                    #requisitosCtrl="ngModel"
+                    style="font-size: 13px;"
+                  ></textarea>
+                  <div class="text-danger small mt-1" *ngIf="requisitosCtrl.invalid && (requisitosCtrl.touched || requisitosCtrl.dirty)">
+                    <div *ngIf="requisitosCtrl.errors?.['required']">Los requisitos son obligatorios.</div>
+                    <div *ngIf="requisitosCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                  </div>
+                </div>
+
+                <div class="row g-3 align-items-center" style="margin-bottom: 10px;">
+                  <div class="col-12 col-md-6 d-flex align-items-center">
+                    <input
+                      type="checkbox"
+                      class="form-check-input me-2"
+                      id="esActiva"
+                      name="esActiva"
+                      [(ngModel)]="model.esActiva"
+                      style="font-size: 13px;"
+                    />
+                    <label for="esActiva" class="form-check-label fw-bold">Estado Activo</label>
+                  </div>
+                </div>
+
+                <div class="d-flex gap-3 mt-auto">
+                  <button
+                    type="submit"
+                    class="btn btn-ucm flex-grow-1 text-white"
+                    [disabled]="myForm.invalid || loading || dateRangeInvalid"
+                    [ngStyle]="{ 'background': '#0D133F' }"
+                    style="font-size: 13px;"
+                  >
+                    <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
+                    <span *ngIf="loading">Guardando...</span>
+                  </button>
+
+                  <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading"
+                    style="font-size: 13px;">
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tabla -->
+        <section class="col-12 col-lg-8 d-flex flex-column" style="height: 80vh;">
+          <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
+            <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchConvocatorias(); filtro=''">
+                <i class="fas fa-sync-alt"></i> Actualizar
+              </button>
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite nombre convocatoria" [(ngModel)]="filtro" name="filtro"/>
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterConvocatorias()">
+                <i class="fas fa-search"></i> Buscar
+              </button>
+            </div>
+
+            <div class="table-responsive flex-grow-1" style="min-height: 0; overflow-y: auto;">
+              <table class="table table-striped mb-0">
+                <thead class="table-primary">
+                  <tr>
+                    <th style="background: white !important;">Nombre</th>
+                    <th style="background: white !important;">Estado</th>
+                    <th style="background: white !important;">Beneficios</th>
+                    <th style="background: white !important;">Condiciones</th>
+                    <th style="background: white !important;">Entregables</th>
+                    <th style="background: white !important;">Detalle</th>
+                    <th style="background: white !important;">Opciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <div *ngIf="loadingTable" class="table-overlay">
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <p style="background: transparent;">Cargando datos</p>
+                  </div>
+                  <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
+                    <td>{{ item.nombre }}</td>
+                    <td align="center">
+                      <button *ngIf="item.esActiva" class="button-completed">Activa</button>
+                      <button *ngIf="!item.esActiva" class="button-pending">Inactiva</button>
+                    </td>
+                    <td align="center" (click)="openModalBeneficio(item)"><i class="fa-duotone fa-regular fa-eye button-eye"></i></td>
+                    <td align="center" (click)="openModalCondicion(item)"><i class="fa-duotone fa-regular fa-eye button-eye"></i></td>
+                    <td align="center" (click)="openModalEntregable(item)"><i class="fa-duotone fa-regular fa-eye button-eye"></i></td>
+                    <td>
+                      <i class="fa-duotone fa-solid fa-circle-info ms-2 button-eye"
+                        (click)="toggleDetalleConvocatoria(item)">
+                      </i>
+                    </td>
+                    <td>
+                      <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-danger button-completed" (click)="deleteItem(item.id!)">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!loadingTable && pagedData.length === 0">
+                    <td colspan="8" class="text-center">No hay registros.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
+              <div class="items-per-page d-flex align-items-center gap-2">
+                <label for="itemsPerPageSelect" class="mb-0">Mostrar</label>
+                <select id="itemsPerPageSelect" (change)="onPageSizeChange($event)" [value]="pageSize">
+                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+                <span>de {{ data.length }}</span>
+              </div>
+
+              <nav aria-label="Page navigation example">
+                <ul class="pagination mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <button class="page-link text-white" (click)="goToPage(currentPage - 1)" aria-label="Previous" style="background: #0D133F;">
+                      <span aria-hidden="true">&laquo;</span>
+                    </button>
+                  </li>
+                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
+                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  </li>
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background: #0D133F;">
+                      <span aria-hidden="true">&raquo;</span>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <br><br><br><br><br><br><br><br><br>
+</div>
+
+<ngx-sonner-toaster />
+<p-confirmDialog appendTo="body" styleClass="custom-confirm-dialog"></p-confirmDialog>
+
+<div *ngIf="selectedItemCard"
+     class="custom-card-float"
+     [class.animate-slide-in]="!isClosing"
+     [class.animate-slide-out]="isClosing"
+     [style.top.px]="cardPosition.top"
+     [style.left.px]="cardPosition.left">
+  <div class="card shadow-glow">
+    <div class="card-header gradient-header text-white p-2">
+      <strong><i class="fa-duotone fa-solid fa-circle-info me-2"></i>Detalle Convocatoria</strong>
+      <button type="button" class="btn-close btn-close-white float-end pulse-button"
+              (click)="closeCard()"></button>
+    </div>
+
+    <div class="card-body glass-effect scroll-body" style="font-size: 13px;">
+      <!-- Información básica -->
+      <div class="info-row">
+        <span class="label-glow">ID:</span> {{ selectedItemCard?.id || 'N/A' }}
+      </div>
+      <div class="info-row">
+        <span class="label-glow">Nombre:</span> {{ selectedItemCard?.nombre || 'Sin nombre' }}
+      </div>
+      <div class="info-row">
+        <span class="label-glow">Descripción:</span>
+        <span class="text-wrap">{{ selectedItemCard?.descripcion || 'Sin descripción' }}</span>
+      </div>
+
+      <!-- Fechas -->
+      <div class="info-row">
+        <span class="label-glow">Fecha Inicio:</span> {{ selectedItemCard?.fechaInicio || 'No definida' }}
+      </div>
+      <div class="info-row">
+        <span class="label-glow">Fecha Cierre:</span> {{ selectedItemCard?.fechaCierre || 'No definida' }}
+      </div>
+      <div class="info-row">
+        <span class="label-glow">Periodo:</span>
+        {{ selectedItemCard?.fechaInicio && selectedItemCard?.fechaCierre ?
+           (selectedItemCard.fechaInicio + ' → ' + selectedItemCard.fechaCierre) : 'Fechas no definidas' }}
+      </div>
+
+      <!-- Requisitos -->
+      <div class="info-row">
+        <span class="label-glow">Requisitos:</span>
+        <div class="text-wrap mt-1" style="max-height: 80px; overflow-y: auto;">
+          {{ selectedItemCard?.requisitos || 'Sin requisitos especificados' }}
+        </div>
+      </div>
+
+      <!-- Categorías y modalidades -->
+      <div class="info-row">
+        <span class="label-glow">Categoría Movilidad:</span>
+        {{ selectedItemCard?.categoriaMovilidadNombre || 'No asignada' }}
+      </div>
+      <div class="info-row">
+        <span class="label-glow">Modalidad:</span>
+        {{ selectedItemCard?.movilidadNombre || 'No asignada' }}
+      </div>
+
+      <!-- Estado -->
+      <div class="info-row">
+        <span class="label-glow">Estado:</span>
+        <button *ngIf="selectedItemCard.esActiva" class="button-completed">Activa</button>
+                      <button *ngIf="!selectedItemCard.esActiva" class="button-pending">Inactiva</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Beneficios -->
+<div class="modal fade" id="BeneficioModal" tabindex="-1" aria-labelledby="BeneficioModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background: #E2E6F7;">
+        <p class="modal-title" id="BeneficioModalLabel" style="color: #0D133F;">
+          Beneficios de la Convocatoria
+        </p>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <app-beneficio-convocatoria
+          *ngIf="convocatoriaId"
+          [idConvocatoria]="convocatoriaId"
+          [attr.key]="convocatoriaId">
+        </app-beneficio-convocatoria>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Condiciones -->
+<div class="modal fade" id="CondicionModal" tabindex="-1" aria-labelledby="CondicionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background: #E2E6F7;">
+        <p class="modal-title" id="CondicionModalLabel" style="color: #0D133F;">
+          Condiciones de la Convocatoria
+        </p>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <app-condicion
+          *ngIf="convocatoriaId"
+          [idConvocatoria]="convocatoriaId"
+          [attr.key]="convocatoriaId">
+        </app-condicion>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Entregables -->
+<div class="modal fade" id="EntregableModal" tabindex="-1" aria-labelledby="EntregableModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background: #E2E6F7;">
+        <p class="modal-title" id="EntregableModalLabel" style="color: #0D133F;">
+          Entregables de la Convocatoria
+        </p>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <app-entregable
+          *ngIf="convocatoriaId"
+          [idConvocatoria]="convocatoriaId"
+          [attr.key]="convocatoriaId">
+        </app-entregable>
+      </div>
+    </div>
+  </div>
+</div>

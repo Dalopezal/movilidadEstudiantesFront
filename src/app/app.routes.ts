@@ -11,6 +11,7 @@ import { ConvocatoriasGeneralComponent } from './components/convocatorias-genera
 import { PostulacionesDetalleComponent } from './components/postulaciones-detalle/postulaciones-detalle.component';
 import { TiposConvocatoriaComponent } from './components/tipos-convocatoria/tipos-convocatoria.component';
 import { PostulcionesEntrantesComponent } from './components/postulaciones-tipo/postulaciones-tipo.component';
+import { AdminConvocatoriaComponent } from './components/admin-convocatoria/admin-convocatoria.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -25,5 +26,6 @@ export const routes: Routes = [
   { path: 'convocatorias-general', component: ConvocatoriasGeneralComponent },
   { path: 'tipos-convocatorias', component: TiposConvocatoriaComponent },
   { path: 'postulacion-convocatoria', component: PostulcionesEntrantesComponent },
+  { path: 'administracion-convocatoria', component: AdminConvocatoriaComponent },
   { path: '**', redirectTo: '' }
 ];
