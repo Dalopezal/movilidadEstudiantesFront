@@ -295,26 +295,26 @@
     <div class="card-body glass-effect scroll-body" style="font-size: 13px;">
       <!-- Información básica -->
       <div class="info-row">
-        <span class="label-glow">ID:</span> {{ selectedItemCard?.id || 'N/A' }}
+        <span class="label-glow">ID:</span> {{ selectedItemCard.id || 'N/A' }}
       </div>
       <div class="info-row">
-        <span class="label-glow">Nombre:</span> {{ selectedItemCard?.nombre || 'Sin nombre' }}
+        <span class="label-glow">Nombre:</span> {{ selectedItemCard.nombre || 'Sin nombre' }}
       </div>
       <div class="info-row">
         <span class="label-glow">Descripción:</span>
-        <span class="text-wrap">{{ selectedItemCard?.descripcion || 'Sin descripción' }}</span>
+        <span class="text-wrap">{{ selectedItemCard.descripcion || 'Sin descripción' }}</span>
       </div>
 
       <!-- Fechas -->
       <div class="info-row">
-        <span class="label-glow">Fecha Inicio:</span> {{ selectedItemCard?.fechaInicio || 'No definida' }}
+        <span class="label-glow">Fecha Inicio:</span> {{ selectedItemCard.fechaInicio || 'No definida' }}
       </div>
       <div class="info-row">
-        <span class="label-glow">Fecha Cierre:</span> {{ selectedItemCard?.fechaCierre || 'No definida' }}
+        <span class="label-glow">Fecha Cierre:</span> {{ selectedItemCard.fechaCierre || 'No definida' }}
       </div>
       <div class="info-row">
         <span class="label-glow">Periodo:</span>
-        {{ selectedItemCard?.fechaInicio && selectedItemCard?.fechaCierre ?
+        {{ selectedItemCard.fechaInicio && selectedItemCard.fechaCierre ?
            (selectedItemCard.fechaInicio + ' → ' + selectedItemCard.fechaCierre) : 'Fechas no definidas' }}
       </div>
 
@@ -322,18 +322,18 @@
       <div class="info-row">
         <span class="label-glow">Requisitos:</span>
         <div class="text-wrap mt-1" style="max-height: 80px; overflow-y: auto;">
-          {{ selectedItemCard?.requisitos || 'Sin requisitos especificados' }}
+          {{ selectedItemCard.requisitos || 'Sin requisitos especificados' }}
         </div>
       </div>
 
       <!-- Categorías y modalidades -->
       <div class="info-row">
         <span class="label-glow">Categoría Movilidad:</span>
-        {{ selectedItemCard?.categoriaMovilidadNombre || 'No asignada' }}
+        {{ selectedItemCard.categoriaMovilidadNombre || 'No asignada' }}
       </div>
       <div class="info-row">
         <span class="label-glow">Modalidad:</span>
-        {{ selectedItemCard?.movilidadNombre || 'No asignada' }}
+        {{ selectedItemCard.movilidadNombre || 'No asignada' }}
       </div>
 
       <!-- Estado -->

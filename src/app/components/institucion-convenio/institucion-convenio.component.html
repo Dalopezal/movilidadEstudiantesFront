@@ -1,0 +1,157 @@
+<app-sidebar></app-sidebar>
+<div class="container fuente" style="padding-top: 20px;">
+  <div class="row h-100">
+    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;font-size: 13px">
+      <div class="row g-4 flex-grow-1">
+        <!-- Formulario -->
+        <section class="col-12 col-lg-3 d-flex flex-column" style="height: 75vh;">
+          <div class="card shadow-sm flex-grow-1 d-flex flex-column">
+            <div class="card-header text-white" style="background: #E2E6F7;">
+              <p class="mb-0" style="color: #0D133F;">Administrar Condiciones - Convocatoria</p>
+            </div>
+
+            <div class="card-body d-flex flex-column flex-grow-1">
+              <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
+                <div class="mb-3">
+                  <label for="condicion" class="form-label fw-bold">Condición</label>
+                  <select
+                    class="form-select"
+                    id="condicion"
+                    name="condicionesId"
+                    required
+                    [(ngModel)]="model.condicionesId"
+                    #condCtrl="ngModel"
+                    style="font-size: 13px"
+                  >
+                    <option [ngValue]="null" style="display:none;"></option>
+                    <option *ngFor="let c of condiciones" [ngValue]="c.id">{{ c.nombre }}</option>
+                  </select>
+                  <div class="text-danger small mt-1" *ngIf="condCtrl.invalid && (condCtrl.touched || condCtrl.dirty)">
+                    <div *ngIf="condCtrl.errors?.['required']">Seleccione una condición.</div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="convocatoria" class="form-label fw-bold">Convocatoria</label>
+                  <select
+                    class="form-select"
+                    id="convocatoria"
+                    name="convocatoriaId"
+                    required
+                    [(ngModel)]="model.convocatoriaId"
+                    #convCtrl="ngModel"
+                    style="font-size: 13px"
+                  >
+                    <option *ngFor="let c of convocatorias" [ngValue]="c.id">{{ c.nombre }}</option>
+                  </select>
+                  <div class="text-danger small mt-1" *ngIf="convCtrl.invalid && (convCtrl.touched || convCtrl.dirty)">
+                    <div *ngIf="convCtrl.errors?.['required']">Seleccione una convocatoria.</div>
+                  </div>
+                </div>
+
+                <div class="d-flex gap-3 mt-auto">
+                  <button
+                    type="submit"
+                    class="btn btn-ucm flex-grow-1 text-white"
+                    [disabled]="!model.condicionesId || !model.convocatoriaId || loading"
+                    [ngStyle]="{ 'background': '#0D133F' }"
+                    style="font-size: 13px"
+                  >
+                    <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
+                    <span *ngIf="loading">Guardando...</span>
+                  </button>
+
+                  <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading"
+                    style="font-size: 13px">
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tabla -->
+        <section class="col-12 col-lg-9 d-flex flex-column" style="height: 75vh;">
+          <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
+            <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchRelaciones(); filtro=''">
+                <i class="fas fa-sync-alt"></i> Actualizar
+              </button>
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite nombre condición / Nombre convocatoria" [(ngModel)]="filtro" name="filtro"/>
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterRelaciones()">
+                <i class="fas fa-search"></i> Buscar
+              </button>
+            </div>
+
+            <div class="table-responsive flex-grow-1" style="min-height: 0; overflow-y: auto;">
+              <table class="table table-striped mb-0">
+                <thead class="table-primary">
+                  <tr>
+                    <th style="background: white !important;">Condición</th>
+                    <th style="background: white !important;">Convocatoria</th>
+                    <th style="background: white !important;">Opciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <div *ngIf="loadingTable" class="table-overlay">
+                  <i class="fas fa-spinner fa-spin fa-3x"></i>
+                  <p style="background: transparent;">Cargando datos</p>
+                  </div>
+                  <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
+                    <td>{{ item.nombreCondicion }}</td>
+                    <td>{{ item.nombreConvocatoria }}</td>
+                    <td>
+                      <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-danger button-completed" (click)="deleteItem(item.id)">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!loadingTable && pagedData.length === 0">
+                    <td colspan="4" class="text-center">No hay registros.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
+              <div class="items-per-page d-flex align-items-center gap-2">
+                <label for="itemsPerPageSelect" class="mb-0">Mostrar</label>
+                <select id="itemsPerPageSelect" (change)="onPageSizeChange($event)" [value]="pageSize">
+                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+                <span>de {{ data.length }}</span>
+              </div>
+
+              <nav aria-label="Page navigation example">
+                <ul class="pagination mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <button class="page-link text-white" (click)="goToPage(currentPage - 1)" aria-label="Previous" style="background: #0D133F;">
+                      <span aria-hidden="true">&laquo;</span>
+                    </button>
+                  </li>
+                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
+                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  </li>
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background: #0D133F;">
+                      <span aria-hidden="true">&raquo;</span>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Notificaciones de ngx-sonner -->
+<ngx-sonner-toaster />
+<!-- ConfirmDialog de PrimeNG -->
+<p-confirmDialog appendTo="body" styleClass="custom-confirm-dialog"></p-confirmDialog>
