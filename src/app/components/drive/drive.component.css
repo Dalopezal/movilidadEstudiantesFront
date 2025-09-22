@@ -1,0 +1,162 @@
+.dialog-title {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 16px;
+  gap: 8px;
+  color: #18206E;
+}
+
+.dialog-content {
+  min-height: 300px;
+  max-height: 500px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+
+.description {
+  margin-bottom: 16px;
+  color: #555;
+  font-size: 13px;
+}
+
+.upload-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.upload-text {
+  font-weight: 500;
+  color: #666;
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  color: #555;
+}
+
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+}
+
+.file-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f9f9f9;
+  transition: all 0.2s ease;
+}
+
+.file-card:hover {
+  background: #eef3ff;
+  border-color: #00ACD4;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.file-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.file-icon {
+  font-size: 32px;
+  color: #18206E;
+}
+
+.file-icon.folder {
+  color: #ff9800;
+}
+
+.file-menu-btn {
+  line-height: 32px;
+}
+
+.file-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #18206E;
+  cursor: pointer;
+  word-wrap: break-word;
+  margin-bottom: 6px;
+}
+
+.file-name:hover {
+  text-decoration: underline;
+  color: #00ACD4;
+}
+
+.file-date {
+  font-size: 11px;
+  color: #777;
+}
+
+.no-files {
+  text-align: center;
+  color: #999;
+  margin-top: 40px;
+}
+
+.no-files mat-icon {
+  margin-bottom: 10px;
+}
+
+.error-message {
+  margin-top: 12px;
+  padding: 10px;
+  background: #fdecea;
+  border: 1px solid #f5c2c7;
+  border-radius: 6px;
+  color: #b00020;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.delete-option {
+  color: #d32f2f !important;
+}
+
+.upload-progress {
+  margin: 20px 0;
+  width: 100%;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-text {
+  font-size: 13px;
+  color: #18206E;
+  font-weight: 500;
+}
+
+.progress-percentage {
+  font-size: 13px;
+  color: #00ACD4;
+  font-weight: 600;
+}
+
+.mat-mdc-progress-bar {
+  height: 6px !important;
+  border-radius: 3px;
+}

@@ -28,30 +28,120 @@
 
             <div class="stepper-container w-100" *ngIf="!loading">
               <mat-vertical-stepper
-                  #stepper
-                  [linear]="false"
-                  [(selectedIndex)]="currentStep"
-                  style="background:white !important; height: 100%;">
+                #stepper
+                [linear]="false"
+                [(selectedIndex)]="currentStep"
+                style="background:white !important;height: 100%;">
 
-                  <mat-step *ngFor="let step of steps; let i = index"
-                            [completed]="i < currentStep"
-                            [editable]="true">
+                <mat-step *ngFor="let step of steps; let i = index"
+                  [completed]="i < currentStep"
+                  [editable]="true"
+                  [ngClass]="getEstadoClass(i+1)">
 
-                    <ng-template matStepLabel>
-                      {{ step.nombre }}
-                    </ng-template>
+                  <ng-template matStepLabel>
+                    {{ step.nombre }}
+                  </ng-template>
 
-                    <div class="step-content" style="font-size: 13px">
-                      <div class="row">
-                        <div class="col-md-6 col-lg-4 mb-3"
-                            *ngFor="let field of campoEstado[step.id] || []">
-                          <label class="form-label d-block" style="color: #00ACD4;font-size: 14px;background: #f2f3f3;border-radius: 20px;padding: 5px 5px 5px 15px;">{{ field.label }}</label>
-                          <p class="fw-bold mb-1" style="font-size: 13px;color: #0D133F;">{{ step.data[field.name] || '-' }}</p>
+                  <div class="step-content" style="font-size: 13px;">
+
+                    <!-- Botones -->
+                    <div class="d-flex justify-content-end align-items-center pb-2 w-100">
+                      <div class="d-flex align-items-center gap-2 flex-wrap step-actions">
+
+                        <button class="btn-notif-round"
+                                (click)="onEnviarNotificacion(step)"
+                                title="Enviar Notificación"
+                                style="background-color: #18206E;color: #00ACD4;">
+                          <i class="fas fa-paper-plane "></i>
+                        </button>
+
+                        <button class="btn-notif-round" (click)="onVerNotificaciones(step)" title="Ver Notificaciones"
+                              style="background-color: #18206E;color: #00ACD4;">
+                          <i class="fas fa-bell"></i>
+                        </button>
+
+                        <button class="btn-notif-round" title="Ver Histórico"
+                              style="background-color: #18206E;color: #00ACD4;">
+                          <i class="fas fa-history"></i>
+                        </button>
+
+                        <button class="btn-notif-round" title="Ver Histórico" (click)="abrirModalDrive()"
+                              style="background-color: #18206E;color: #00ACD4;">
+                          <i class="fas fa-upload"></i>
+                        </button>
+
+                        <!-- Circulito del estado -->
+                        <div class="estado-circle" [style.background]="getColorEstado(step.id)"></div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-6 col-lg-4 mb-3"
+                          *ngFor="let field of campoEstado[step.id] || []">
+
+                        <label class="form-label d-block"
+                              style="color: #18206E;font-size: 14px;background: #f2f3f3;
+                                      border-radius: 20px;padding: 5px 5px 5px 15px;font-weight: 700;">
+                          {{ field.label }}
+                        </label>
+
+                        <!-- READONLY -->
+                        <p *ngIf="field.tipo === 'readonly'" class="fw-bold mb-1"
+                          style="font-size: 13px;color: grey;">
+                          {{ step.data[field.name] || '-' }}
+                        </p>
+
+                        <!-- TEXT -->
+                        <input *ngIf="field.tipo === 'text'" type="text"
+                              class="form-control form-control-sm"
+                              [(ngModel)]="step.data[field.name]"
+                              [readonly]="!field.editable"
+                              style="font-size: 13px;">
+
+                        <!-- TEXT AREA -->
+                        <textarea *ngIf="field.tipo === 'textarea'"
+                              class="form-control form-control-sm"
+                              [(ngModel)]="step.data[field.name]"
+                              [readonly]="!field.editable"
+                              style="font-size: 13px;"
+                              rows="3">
+                        </textarea>
+
+                        <!-- SELECT -->
+                        <select *ngIf="field.tipo === 'select'" class="form-select form-select-sm"
+                                [(ngModel)]="step.data[field.name]"
+                                [disabled]="!field.editable"
+                                style="font-size: 13px;">
+                          <option *ngFor="let opt of field.opciones" [value]="opt.value">
+                            {{ opt.label }}
+                          </option>
+                        </select>
+
+                        <!-- DATE -->
+                        <input *ngIf="field.tipo === 'date'" type="date"
+                              class="form-control form-control-sm"
+                              [(ngModel)]="step.data[field.name]"
+                              [readonly]="!field.editable"
+                              style="font-size: 13px;">
+
+                        <!-- CHECKBOX -->
+                        <div *ngIf="field.tipo === 'checkbox'" class="form-check">
+                          <input type="checkbox" class="form-check-input"
+                                [(ngModel)]="step.data[field.name]"
+                                [disabled]="!field.editable">
+                          <span class="form-check-label" style="font-size: 13px;">
+                            {{ step.data[field.name] ? 'Sí' : 'No' }}
+                          </span>
                         </div>
                       </div>
+                    </div>
 
-                      <div class="d-flex justify-content-start align-items-center mt-3 pt-2">
-                        <button mat-button matStepperPrevious [disabled]="i===0">
+                    <!-- Botones -->
+                    <div class="d-flex justify-content-between align-items-center mt-1 pt-2 w-100">
+
+                      <!-- Navegación Stepper -->
+                      <div class="d-flex align-items-center gap-2">
+                        <button mat-button matStepperPrevious [disabled]="i === 0">
                           <mat-icon>arrow_back</mat-icon>
                           Anterior
                         </button>
@@ -60,14 +150,29 @@
                           Paso {{ i + 1 }} de {{ steps.length }}
                         </span>
 
-                        <button mat-raised-button color="primary" matStepperNext [disabled]="i===steps.length-1">
+                        <button mat-raised-button color="primary" matStepperNext [disabled]="i === steps.length - 1">
                           Siguiente
                           <mat-icon>arrow_forward</mat-icon>
                         </button>
                       </div>
+
+                      <!-- Botonera dinámica -->
+                      <div class="d-flex align-items-center gap-2 flex-wrap step-actions">
+                        <button *ngFor="let btn of accionesEstado[step.id] || []"
+                                mat-raised-button
+                                [color]="getButtonColor(btn.texto)"
+                                class="btn-dinamico"
+                                (click)="btn.accion()"
+                                style="background: #18206E;color: white;color: white;">
+                          <mat-icon class="me-1" style="margin-left: 3px;color: #00ACD4;">{{ getButtonIcon(btn.texto) }}</mat-icon>
+                          {{ btn.texto }}
+                        </button>
+                      </div>
+
                     </div>
-                  </mat-step>
-                </mat-vertical-stepper>
+                  </div>
+                </mat-step>
+              </mat-vertical-stepper>
               </div>
             </div>
           </div>

@@ -1,0 +1,86 @@
+<h2 mat-dialog-title class="dialog-title">
+  Gestión de Archivos - Google Drive
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <p class="description">Gestiona los archivos de tu carpeta de Drive:</p>
+
+  <!-- Botón conectar -->
+  <div class="text-center" *ngIf="!isAuthenticated && !loading">
+    <button mat-raised-button color="primary" (click)="signIn()">
+      <mat-icon>login</mat-icon> Conectar con Drive
+    </button>
+  </div>
+
+  <!-- Botón subir archivo -->
+  <div class="upload-section" *ngIf="isAuthenticated">
+    <input type="file" #fileInput (change)="onFileSelected($event)" style="display: none;">
+    <button mat-fab style="background: #18206E;color: #00ACD4;" (click)="fileInput.click()" [disabled]="uploading">
+      <mat-icon *ngIf="!uploading">cloud_upload</mat-icon>
+      <mat-progress-spinner *ngIf="uploading" diameter="24" mode="indeterminate"></mat-progress-spinner>
+    </button>
+    <span class="upload-text">Subir archivo</span>
+  </div>
+
+  <div *ngIf="uploading" class="upload-progress">
+    <div class="progress-info">
+      <span class="progress-text">Subiendo archivo...</span>
+      <span class="progress-percentage">{{uploadProgress}}%</span>
+    </div>
+    <mat-progress-bar
+      mode="determinate"
+      [value]="uploadProgress"
+      color="primary">
+    </mat-progress-bar>
+  </div>
+
+  <!-- Lista de archivos -->
+  <div *ngIf="files.length > 0" class="file-grid">
+    <div class="file-card" *ngFor="let file of files">
+      <div class="file-header">
+        <mat-icon class="file-icon" *ngIf="file.mimeType !== 'application/vnd.google-apps.folder'">description</mat-icon>
+        <mat-icon class="file-icon folder" *ngIf="file.mimeType === 'application/vnd.google-apps.folder'">folder</mat-icon>
+
+        <button mat-icon-button [matMenuTriggerFor]="fileMenu" class="file-menu-btn">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+
+        <mat-menu #fileMenu="matMenu">
+          <button mat-menu-item (click)="openFile(file)">
+            <mat-icon>open_in_new</mat-icon> Abrir
+          </button>
+          <button mat-menu-item (click)="downloadFile(file)">
+            <mat-icon>download</mat-icon> Descargar
+          </button>
+          <button mat-menu-item (click)="deleteFile(file)" class="delete-option">
+            <mat-icon>delete</mat-icon> Eliminar
+          </button>
+        </mat-menu>
+      </div>
+
+      <div class="file-name" (click)="openFile(file)">{{ file.name }}</div>
+      <span class="file-date">{{ file.modifiedTime | date:'short' }}</span>
+    </div>
+  </div>
+
+  <!-- Sin archivos -->
+  <div *ngIf="files.length === 0 && isAuthenticated && !loading" class="no-files">
+    <mat-icon>folder_open</mat-icon>
+    <p>No hay archivos en esta carpeta</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-message">
+    <mat-icon>error</mat-icon> {{ error }}
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button color="warn" (click)="cerrar()">Cerrar</button>
+  <button mat-raised-button color="accent" (click)="refreshFiles()" *ngIf="isAuthenticated">
+    <mat-icon>refresh</mat-icon> Actualizar
+  </button>
+</mat-dialog-actions>
+
+<ngx-sonner-toaster />
+<p-confirmDialog appendTo="body" styleClass="custom-confirm-dialog"></p-confirmDialog>

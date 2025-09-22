@@ -7,6 +7,7 @@
   </div>
 
   <nav class="sidebar-nav">
+    <!-- Inicio -->
     <a routerLink="/home"
        routerLinkActive="active"
        [routerLinkActiveOptions]="{ exact: true }"
@@ -14,6 +15,7 @@
       <i class="fas fa-tachometer-alt"></i><span class="link-text">Inicio</span>
     </a>
 
+    <!-- Currículo -->
     <a routerLink="/"
        routerLinkActive="active"
        [routerLinkActiveOptions]="{ exact: true }"
@@ -21,6 +23,7 @@
       <i class="fas fa-globe-americas"></i><span class="link-text">Internacionalización del Currículo</span>
     </a>
 
+    <!-- Cooperación -->
     <a routerLink="/"
        routerLinkActive="active"
        [routerLinkActiveOptions]="{ exact: true }"
@@ -28,44 +31,53 @@
       <i class="fas fa-handshake"></i><span class="link-text">Cooperación</span>
     </a>
 
+    <!-- Movilidad -->
     <div class="has-submenu">
-      <a (click)="togglemovilidadMenu()" class="nav-link submenu-toggle" role="button" aria-haspopup="true" [attr.aria-expanded]="ismovilidadOpen">
+      <a (click)="togglemovilidadMenu()" class="nav-link submenu-toggle" role="button"
+         aria-haspopup="true" [attr.aria-expanded]="ismovilidadOpen">
         <i class="fas fa-plane"></i>
         <span class="link-text">Movilidad</span>
         <i class="fas fa-chevron-down submenu-icon" [class.rotate]="ismovilidadOpen"></i>
       </a>
 
       <div class="submenu" [class.open]="ismovilidadOpen">
-        <a routerLink="/administracion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Administración Convocatoria</span>
-        </a>
-        <a routerLink="/beneficios-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Beneficio Convocatoria</span>
-        </a>
+        <!-- Opciones directas de movilidad -->
         <a routerLink="/tipos-convocatorias" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Convocotorias General</span>
+          <i class="fas fa-dot-circle"></i><span class="link-text">Convocatorias General</span>
         </a>
-        <a routerLink="/condicion" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Condiciones</span>
-        </a>
-        <a routerLink="/condicion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Condiciones Convocatoria</span>
-        </a>
-        <a routerLink="/convenios" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Convenios</span>
-        </a>
-        <a routerLink="/entregables" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Entregables</span>
-        </a>
-        <a routerLink="/instituciones" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Instituciones</span>
-        </a>
-        <a routerLink="/financiacion-externa" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Financiación Externa</span>
-        </a>
+
+        <!-- SUBGRUPO Maestros -->
+        <div class="submenu-group">
+          <span class="submenu-title">Maestros</span>
+          <a routerLink="/condicion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i><span class="link-text">Condiciones Convocatoria</span>
+          </a>
+          <a routerLink="/entregables" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i><span class="link-text">Entregables</span>
+          </a>
+          <a routerLink="/financiacion-externa" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i><span class="link-text">Financiación Externa</span>
+          </a>
+          <a routerLink="/beneficios-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i><span class="link-text">Beneficio Convocatoria</span>
+          </a>
+          <a routerLink="/administracion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i><span class="link-text">Administración Convocatoria</span>
+          </a>
+          <a routerLink="/condicion" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i><span class="link-text">Condiciones</span>
+          </a>
+          <a routerLink="/convenios" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i><span class="link-text">Convenios</span>
+          </a>
+          <a routerLink="/instituciones" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i><span class="link-text">Instituciones</span>
+          </a>
+        </div>
       </div>
     </div>
 
+    <!-- Salir -->
     <a routerLink="/login"
        routerLinkActive="active"
        [routerLinkActiveOptions]="{ exact: true }"
