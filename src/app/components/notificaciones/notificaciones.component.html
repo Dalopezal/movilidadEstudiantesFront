@@ -1,0 +1,179 @@
+<div class="container fuente" style="padding-top: 20px;">
+  <div class="row h-100">
+    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;">
+      <div class="row g-4 flex-grow-1">
+
+        <!--Tabla -->
+        <section class="col-12 col-lg-12 d-flex flex-column" style="height: 70vh;font-size: 14px;">
+          <div class="card shadow-sm d-flex flex-column flex-grow-1">
+            <div class="card-header d-flex align-items-center gap-3" style="background: white;">
+              <button
+                class="btn btn-primary d-flex align-items-center gap-2"
+                style="background: #0D133F; border-color: #0D133F;font-size: 13px;padding: 5px 8px;"
+                (click)="fetchPostulaciones(); filtro='';fechaInicial='';fechaFinal='';estadoId=0; tipoMovilidadIdId=0"
+              >
+                <i class="fas fa-sync-alt"></i> Actualizar
+              </button>
+              <input
+                style="border-radius: 22px; background: rgb(242, 240, 240);font-size: 13px;"
+                type="date"
+                class="form-control"
+                placeholder="Fecha Inicio"
+                [(ngModel)]="fechaInicial"
+                name="filtro"
+              />
+              <input
+                style="border-radius: 22px; background: rgb(242, 240, 240);font-size: 13px;"
+                type="date"
+                class="form-control"
+                placeholder="Fecha Fin"
+                [(ngModel)]="fechaFinal"
+                name="filtro"
+              />
+              <button
+                class="btn btn-primary d-flex align-items-center gap-2"
+                style="background: #0D133F; border-color: #0D133F;font-size: 13px;font-size: 13px;padding: 5px 8px;"
+                (click)="filterPostulaciones()"
+              >
+                <i class="fas fa-search"></i> Buscar
+              </button>
+            </div>
+
+            <!-- Tabla -->
+            <div class="table-responsive flex-grow-1" style="overflow-y: auto;">
+              <table class="table table-striped mb-0">
+                <thead class="table-primary"  style="font-size: 13px">
+                  <tr align="center">
+                    <th style="background: white;color: #0D133F;">Asunto</th>
+                    <th style="background: white;color: #0D133F;">Descripción</th>
+                    <th style="background: white;color: #0D133F;">Fecha Envío</th>
+                  </tr>
+                </thead>
+                <tbody style="font-size: 13px">
+                <div *ngIf="loading" class="table-overlay">
+                  <i class="fas fa-spinner fa-spin fa-3x"></i>
+                  <p style="background: transparent;;">Cargando datos</p>
+                </div>
+                  <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
+                    <td align="center">{{ item.asunto }}</td>
+                    <td align="center">{{ item.asunto }}</td>
+                    <td align="center">{{ item.fechaenvio }}</td>
+                  </tr>
+                  <tr *ngIf="!loading && pagedData.length === 0">
+                    <td colspan="12" class="text-center">No hay registros.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paginación -->
+            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
+              <div class="items-per-page d-flex align-items-center gap-2">
+                <label for="itemsPerPageSelect" class="mb-0">Mostrar</label>
+                <select id="itemsPerPageSelect" (change)="onPageSizeChange($event)" [value]="pageSize">
+                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+                <span>de {{ data.length }}</span>
+              </div>
+              <nav>
+                <ul class="pagination mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <button class="page-link text-white" (click)="goToPage(currentPage - 1)" style="background:#0D133F">
+                      &laquo;
+                    </button>
+                  </li>
+                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
+                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  </li>
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <button class="page-link text-white" (click)="goToPage(currentPage + 1)" style="background:#0D133F">
+                      &raquo;
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Notificaciones -->
+<ngx-sonner-toaster />
+<!-- Confirm Dialog -->
+<p-confirmDialog appendTo="body"></p-confirmDialog>
+
+<div *ngIf="selectedItem"
+     class="custom-card-float"
+     [class.animate-slide-in]="!isClosing"
+     [class.animate-slide-out]="isClosing"
+     [style.top.px]="cardPosition.top"
+     [style.left.px]="cardPosition.left">
+  <div class="card shadow-glow">
+    <div class="card-header gradient-header text-white p-2">
+      <strong><i class="fa-duotone fa-solid fa-circle-info me-2"></i>Detalle Postulación</strong>
+      <button type="button" class="btn-close btn-close-white float-end pulse-button"
+              (click)="closeCard()"></button>
+    </div>
+
+    <div class="card-body glass-effect scroll-body" style="font-size: 13px;">
+      <!-- Postulado -->
+      <div class="info-row">
+        <span class="label-glow">Postulado:</span> {{ selectedItem.nombreCompleto }}
+      </div>
+      <div class="info-row">
+        <span class="label-glow">Documento:</span> {{ selectedItem.documentoPostulado }}
+      </div>
+      <div class="info-row">
+        <span class="label-glow">Correo:</span> {{ selectedItem.correoPostulado }}
+      </div>
+
+      <!-- Estado -->
+      <div class="info-row">
+        <span class="label-glow">Estado:</span>
+        <button class="button-completed">{{selectedItem.nombreEstado}}</button>
+      </div>
+
+      <!-- Fechas -->
+      <div class="info-row">
+        <span class="label-glow">Fecha Postulación:</span> {{ selectedItem.fechaPostulacion }}
+      </div>
+      <div class="info-row">
+        <span class="label-glow">Movilidad:</span>
+        {{ selectedItem.fechaInicioMovilidad }} → {{ selectedItem.fechaFinMovilidad }}
+      </div>
+
+      <!-- Objetivo -->
+      <div class="info-row">
+        <span class="label-glow">Objetivo:</span> {{selectedItem.objetivo}}
+      </div>
+      <!-- Periodo -->
+      <div class="info-row">
+        <span class="label-glow">Periodo:</span> {{ selectedItem.periodo }}
+      </div>
+
+      <!-- Institución y convenio -->
+      <div class="info-row">
+        <span class="label-glow">Institución:</span> {{ selectedItem.nombreInstitucion }}
+      </div>
+      <div class="info-row">
+        <span class="label-glow">Convenio:</span> {{ selectedItem.codigoConvenio }}
+      </div>
+
+      <!-- Movilidad y modalidad -->
+      <div class="info-row">
+        <span class="label-glow">Tipo Movilidad:</span> {{ selectedItem.nombreTipoMovilidad }}
+      </div>
+      <div class="info-row">
+        <span class="label-glow">Categoría:</span> {{ selectedItem.nombreConvocatoria }}
+      </div>
+      <div class="info-row">
+        <span class="label-glow">Movilidad:</span> {{ selectedItem.nombreModalidad }}
+      </div>
+      <div class="info-row">
+        <span class="label-glow">Modalidad Convocatoria:</span> {{ selectedItem.nombreModalidadConvocatoria }}
+      </div>
+  </div>
+</div>

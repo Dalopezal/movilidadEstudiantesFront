@@ -1,0 +1,90 @@
+<ngx-sonner-toaster />
+
+<div class="modal-header">
+  <div class="header-content">
+    <div class="icon-container">
+      <mat-icon class="notification-icon">notifications_active</mat-icon>
+    </div>
+    <div class="title-section">
+      <h2 mat-dialog-title class="modal-title" style="font-family: 'Urbanist', sans-serif !important;">Enviar Notificación</h2>
+      <p class="modal-subtitle" style="font-family: 'Urbanist', sans-serif !important;">{{ data.stepNombre }}</p>
+    </div>
+  </div>
+  <button mat-icon-button mat-dialog-close class="close-btn">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="modal-content">
+  <form class="notification-form">
+    <!-- Nombre -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label style="font-family: 'Urbanist', sans-serif !important;">Correo Electrónico</mat-label>
+      <input matInput
+             [(ngModel)]="nombre"
+             name="nombre"
+             placeholder="Ingrese correo electrónico"
+             maxlength="100"
+             required style="font-family: 'Urbanist', sans-serif !important;">
+      <mat-hint align="end">{{nombre.length || 0}}/100</mat-hint>
+    </mat-form-field>
+    <!-- Asunto -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label style="font-family: 'Urbanist', sans-serif !important;">Asunto</mat-label>
+      <input matInput
+             [(ngModel)]="asunto"
+             name="asunto"
+             placeholder="Ingrese el asunto de la notificación"
+             maxlength="100"
+             required style="font-family: 'Urbanist', sans-serif !important;">
+      <mat-hint align="end">{{asunto.length || 0}}/100</mat-hint>
+    </mat-form-field>
+
+    <!-- Descripción -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label style="font-family: 'Urbanist', sans-serif !important;">Descripción</mat-label>
+      <textarea matInput
+                [(ngModel)]="descripcion"
+                name="descripcion"
+                placeholder="Escriba aquí la descripción de la notificación..."
+                rows="6"
+                maxlength="500"
+                required style="font-family: 'Urbanist', sans-serif !important;">
+      </textarea>
+      <mat-hint align="end">{{descripcion.length || 0}}/500</mat-hint>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="modal-actions">
+  <button mat-stroked-button
+          mat-dialog-close
+          class="cancel-btn"
+          [disabled]="enviando">
+    <mat-icon>cancel</mat-icon>
+    Cancelar
+  </button>
+
+  <button mat-raised-button
+        color="primary"
+        class="send-btn d-flex align-items-center justify-content-center"
+        (click)="enviarNotificacion()"
+        [disabled]="!isFormValid() || enviando">
+
+  <!-- Spinner mientras se envía -->
+  <mat-progress-spinner *ngIf="enviando"
+                        [diameter]="20"
+                        [strokeWidth]="3"
+                        mode="indeterminate"
+                        class="me-2"
+                        [style.height.px]="20"
+                        [style.width.px]="20">
+  </mat-progress-spinner>
+
+  <!-- Icono cuando no se está enviando -->
+  <mat-icon *ngIf="!enviando" class="me-2" style="color: #00ACD4;">send</mat-icon>
+
+  <!-- Texto -->
+  {{ enviando ? 'Enviando...' : 'Enviar Notificación' }}
+</button>
+</mat-dialog-actions>

@@ -17,6 +17,8 @@ import { MatSelectModule } from '@angular/material/select'; // 👈 Nuevo para s
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { DriveComponent } from '../drive/drive.component';
+import { NotificacionModalComponent } from '../notificacion-modal/notificacion-modal.component';
+import { NotificacionesComponent } from '../notificaciones/notificaciones.component';
 
 interface FieldConfig {
   name: string;
@@ -50,7 +52,8 @@ interface Step {
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    NotificacionesComponent
   ],
   templateUrl: './postulaciones-detalle.component.html',
   styleUrls: ['./postulaciones-detalle.component.css'],
@@ -67,40 +70,40 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
 
   campoEstado: Record<number, FieldConfig[]> = {
     1: [ // Pre-postulación
-      { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
-      { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
+      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' },
       { name: 'periodo', label: 'Periodo', tipo: 'select', editable: true, opciones: [
         { value: 1, label: 'Periodo 1' }, { value: 2, label: 'Periodo 2' }
       ]},
-      { name: 'convenioId', label: 'Convenio', tipo: 'select', editable: true },
+      { name: 'nombreConvenio', label: 'Convenio', tipo: 'select', editable: true },
       { name: 'observaciones', label: 'Observaciones', tipo: 'textarea', editable: true },
-      { name: 'tipoMovilidadId', label: 'Tipo Movilidad', tipo: 'select', editable: true },
+      { name: 'nombreTipoMovilidad', label: 'Tipo Movilidad', tipo: 'select', editable: true },
       { name: 'urlEncuestaSatisfaccion', label: 'Encuesta Satisfacción', tipo: 'checkbox', editable: false }
     ],
     2: [ // Rechazado Pre-postulación
       { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
-      { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
+      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     3: [ // Postulado
-      { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
-      { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
+      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' },
       { name: 'periodo', label: 'Periodo', tipo: 'readonly' },
-      { name: 'convenioId', label: 'Convenio', tipo: 'readonly' },
+      { name: 'nombreConvenio', label: 'Convenio', tipo: 'readonly' },
       { name: 'observaciones', label: 'Observaciones', tipo: 'text', editable: true },
-      { name: 'tipoMovilidadId', label: 'Tipo Movilidad', tipo: 'readonly' },
+      { name: 'nombreTipoMovilidad', label: 'Tipo Movilidad', tipo: 'readonly' },
       { name: 'urlEncuestaSatisfaccion', label: 'Encuesta', tipo: 'readonly' },
       { name: 'objetivo', label: 'Objetivo', tipo: 'text', editable: true },
       { name: 'fechaInicioMovilidad', label: 'Fecha Inicio', tipo: 'date', editable: true },
       { name: 'fechaFinMovilidad', label: 'Fecha Fin', tipo: 'date', editable: true },
-      { name: 'institucionId', label: 'Institución', tipo: 'select', editable: true },
+      { name: 'nombreInstitucion', label: 'Institución', tipo: 'select', editable: true },
       { name: 'fechaEntregable', label: 'Fecha Entregable', tipo: 'date', editable: true },
       { name: 'asistioEntrevista', label: 'Asistió Entrevista', tipo: 'checkbox', editable: true }
     ],
@@ -111,96 +114,96 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
     ],
     5: [ // Rechazado Postulación
       { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
-      { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
+      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     6: [ // Aprobado Director de Programa
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     7: [ // Rechazado Director de Programa
       { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
-      { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
+      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     8: [ // Aprobado Decanatura
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     9: [ // Rechazado Decanatura
       { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
-      { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
+      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     10: [ // Aprobado Vicerrectoría Académica
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     11: [ // Rechazado Vicerrectoría Académica
       { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
-      { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
+      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     12: [ // Aprobado Jefe Inmediato
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     13: [ // Rechazado Jefe Inmediato
       { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
-      { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
+      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     14: [ // Aprobado Rectoría
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     15: [ // Rechazado Rectoría
       { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
-      { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
+      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     16: [ // Postulado Universidad Destino
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     17: [ // Aprobado Universidad Destino
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     18: [ // Rechazado Universidad Destino
       { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
-      { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
+      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
     ],
     19: [ // En Movilidad
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' },
       { name: 'esMatriculadoSiiga', label: 'Matriculado SIIGA', tipo: 'checkbox', editable: true },
       { name: 'esNotificadoRegistroAcademico', label: 'Notificado Registro Académico', tipo: 'checkbox', editable: true }
     ],
     20: [ // Finalizado
-      { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
       { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' },
       { name: 'certificadoMovilidad', label: 'Certificado Movilidad', tipo: 'text', editable: true },
       { name: 'realizoEncuestaSatisfaccion', label: 'Encuesta Satisfacción', tipo: 'checkbox', editable: true },
@@ -282,18 +285,13 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
           }
         }
 
-        // 🔹 NUEVO: Llenamos TODOS los steps con los datos disponibles
         this.steps.forEach(step => {
-          // Para cada step, buscamos en la bitácora los datos que le corresponden
           const fieldsForThisStep = this.campoEstado[step.id] || [];
 
-          // Creamos un objeto con los datos de este step
           const stepData: any = {};
 
-          // Recorremos toda la bitácora para extraer los campos que necesita este step
           bitacora.forEach(entry => {
             fieldsForThisStep.forEach(field => {
-              // Si el registro de bitácora tiene este campo, lo copiamos
               if (entry[field.name] !== undefined && entry[field.name] !== null) {
                 stepData[field.name] = entry[field.name];
               }
@@ -638,7 +636,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
     const estadosRojos = [2, 5, 7, 9, 11, 13, 15, 18];
     const estadosVerdes = [3, 4, 6, 8, 10, 12, 14, 16, 17, 19, 20];
 
-    if (estadosAmarillos.includes(id)) return '#FFD700';
+    if (estadosAmarillos.includes(id)) return '#eac701ff';
     if (estadosRojos.includes(id)) return '#FF4444';
     if (estadosVerdes.includes(id)) return '#22c55e';
 
@@ -665,11 +663,32 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   }
 
   onEnviarNotificacion(step: any) {
+    const dialogRef = this.dialog.open(NotificacionModalComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      disableClose: true,
+      data: {
+        stepId: step.id,
+        stepNombre: step.nombre,
+        postulacionId: this.idPostulacion
+      }
+    });
 
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.success) {
+        console.log('Notificación enviada exitosamente:', result.data);
+        // Opcional: refrescar datos o mostrar confirmación
+      }
+    });
   }
 
-  onVerNotificaciones(step: any) {
-
+  onVerNotificaciones() {
+    this.idPostulacion = this.idPostulacion;
+    const modalElement = document.getElementById('NotificacionModal');
+    if (modalElement) {
+      const modal = new (window as any).bootstrap.Modal(modalElement);
+      modal.show();
+    }
   }
 
   abrirModalDrive() {
@@ -678,6 +697,6 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
       height: '480px',
       disableClose: false
     });
-  }
 
+  }
 }

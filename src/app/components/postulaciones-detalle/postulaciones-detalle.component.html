@@ -35,11 +35,12 @@
 
                 <mat-step *ngFor="let step of steps; let i = index"
                   [completed]="i < currentStep"
-                  [editable]="true"
-                  [ngClass]="getEstadoClass(i+1)">
+                  [editable]="true">
 
                   <ng-template matStepLabel>
-                    {{ step.nombre }}
+                    <span [ngStyle]="{'color': getColorEstado(step.id)}">
+                      {{ step.nombre }}
+                    </span>
                   </ng-template>
 
                   <div class="step-content" style="font-size: 13px;">
@@ -55,7 +56,7 @@
                           <i class="fas fa-paper-plane "></i>
                         </button>
 
-                        <button class="btn-notif-round" (click)="onVerNotificaciones(step)" title="Ver Notificaciones"
+                        <button class="btn-notif-round" (click)="onVerNotificaciones()" title="Ver Notificaciones"
                               style="background-color: #18206E;color: #00ACD4;">
                           <i class="fas fa-bell"></i>
                         </button>
@@ -141,19 +142,19 @@
 
                       <!-- Navegación Stepper -->
                       <div class="d-flex align-items-center gap-2">
-                        <button mat-button matStepperPrevious [disabled]="i === 0">
+                        <!-- <button mat-button matStepperPrevious [disabled]="i === 0">
                           <mat-icon>arrow_back</mat-icon>
                           Anterior
-                        </button>
+                        </button> -->
 
                         <span class="text-muted small mx-3">
                           Paso {{ i + 1 }} de {{ steps.length }}
                         </span>
 
-                        <button mat-raised-button color="primary" matStepperNext [disabled]="i === steps.length - 1">
+                        <!-- <button mat-raised-button color="primary" matStepperNext [disabled]="i === steps.length - 1">
                           Siguiente
                           <mat-icon>arrow_forward</mat-icon>
-                        </button>
+                        </button> -->
                       </div>
 
                       <!-- Botonera dinámica -->
@@ -179,5 +180,24 @@
         </section>
       </div>
     </main>
+  </div>
+</div>
+
+<!-- Modal Notificacion -->
+<div class="modal fade" id="NotificacionModal" tabindex="-1" aria-labelledby="NotificacionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background: #E2E6F7;">
+        <p class="modal-title" id="NotificacionModalLabel" style="color: #0D133F;">
+          Notificacions de la Convocatoria
+        </p>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <app-notificaciones
+          [postulacionId]="idPostulacion">
+        </app-notificaciones>
+      </div>
+    </div>
   </div>
 </div>
