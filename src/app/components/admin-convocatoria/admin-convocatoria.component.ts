@@ -262,7 +262,7 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
     const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
     if (!confirmado) return;
 
-    this.api.delete(`Convocatorias/Eliminar/${id}`)
+    this.api.delete(`Convocatoria/Eliminar_Convocatoria/${id}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -270,7 +270,7 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
           this.showSuccess();
         },
         error: (err) => {
-          console.error('Error al eliminar convocatoria', err);
+          console.error('Error al eliminar convocatoria, el resgistro se encuentra asociado', err);
           this.showError();
         }
       });
@@ -321,7 +321,7 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
 
   showError() {
     toast.error('Error al procesar', {
-      description: 'Inténtalo nuevamente más tarde',
+      description: 'El registro se encuentra asociado',
       unstyled: true,
       class: 'my-error-toast'
     });

@@ -3,15 +3,17 @@ export class EntregableModel {
   nombre: string;
   descripcion: string;
   convocatoriaId: string;
+  estadoId: string;
   nombreConvocatoria?: string;
 
   constructor();
-  constructor(id?: number, nombre?: string, descripcion?: string, convocatoriaId?: string, nombreConvocatoria?: string, completo?: boolean);
-  constructor(id?: number, nombre?: string, descripcion?: string, convocatoriaId?: string, nombreConvocatoria?: string, completo?: boolean) {
+  constructor(id?: number, nombre?: string, descripcion?: string, convocatoriaId?: string, estadoId?: string, nombreConvocatoria?: string, completo?: boolean);
+  constructor(id?: number, nombre?: string, descripcion?: string, convocatoriaId?: string, estadoId?: string, nombreConvocatoria?: string, completo?: boolean) {
     this.id = id ?? 0;
     this.nombre = nombre ?? '';
     this.descripcion = descripcion ?? '';
     this.convocatoriaId = convocatoriaId ?? '';
+    this.estadoId = estadoId ?? "";
     this.nombreConvocatoria = nombreConvocatoria ?? '';
   }
 
@@ -21,6 +23,7 @@ export class EntregableModel {
       json.nombre ?? '',
       json.descripcion ?? '',
       (json.convocatoriaId ?? json.convocatoriaId ?? ''),
+      (json.estadoId ?? ""),
       json.nombreConvocatoria ?? json.nombreConvocatoria ?? '',
     );
   }
@@ -30,7 +33,8 @@ export class EntregableModel {
       id: this.id,
       nombre: this.nombre,
       descripcion: this.descripcion,
-      convocatoriaId: this.convocatoriaId
+      convocatoriaId: this.convocatoriaId,
+      estadoId: this.estadoId
     };
   }
 }

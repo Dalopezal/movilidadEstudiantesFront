@@ -239,7 +239,7 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
 
   showError() {
     toast.error('Error al procesar', {
-      description: 'Inténtalo nuevamente más tarde',
+      description: 'El registro se encuentra asociado',
       unstyled: true,
       class: 'my-error-toast'
     });

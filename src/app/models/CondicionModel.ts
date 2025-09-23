@@ -4,7 +4,7 @@ export class CondicionModel {
   descripcion: string;
   tipoCondicion: string;
   esObligatoria: boolean;
-  momento: number;
+  estadoId: number;
 
   constructor();
   constructor(
@@ -13,7 +13,7 @@ export class CondicionModel {
     descripcion?: string,
     tipoCondicion?: string,
     esObligatoria?: boolean,
-    momento?: number
+    estadoId?: number
   );
   constructor(
     id?: number,
@@ -21,14 +21,14 @@ export class CondicionModel {
     descripcion?: string,
     tipoCondicion?: string,
     esObligatoria?: boolean,
-    momento?: number
+    estadoId?: number
   ) {
     this.id = id ?? 0;
     this.nombreCondicion = nombreCondicion ?? '';
     this.descripcion = descripcion ?? '';
     this.tipoCondicion = tipoCondicion ?? '';
     this.esObligatoria = esObligatoria ?? false;
-    this.momento = momento ?? 0;
+    this.estadoId = estadoId ?? 0;
   }
 
   static fromJSON(json: any): CondicionModel {
@@ -38,7 +38,7 @@ export class CondicionModel {
       json.descripcion ?? '',
       json.tipoCondicion ?? json.tipo ?? '',
       json.esObligatoria === undefined ? false : Boolean(json.esObligatoria),
-      json.momento !== undefined ? Number(json.momento) : 0
+      json.estadoId !== undefined ? Number(json.estadoId) : 0
     );
   }
 
@@ -49,7 +49,7 @@ export class CondicionModel {
       descripcion: this.descripcion,
       tipoCondicion: this.tipoCondicion,
       esObligatoria: this.esObligatoria,
-      momento: this.momento
+      estadoId: this.estadoId
     };
   }
 }

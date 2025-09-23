@@ -322,7 +322,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
           this.showSuccess();
         },
         error: (err) => {
-          console.error('Error al eliminar institución', err);
+          console.error('Error al eliminar institución, el resgistro se encuentra asociado', err);
           this.showError();
         }
       });
@@ -377,7 +377,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
 
   showError() {
     toast.error('Error al procesar', {
-      description: 'Inténtalo nuevamente más tarde',
+      description: 'El registro se encuentra asociado',
       unstyled: true,
       class: 'my-error-toast'
     });

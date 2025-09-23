@@ -344,10 +344,13 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
   const confirmado = await this.showConfirm('Estas seguro de eliminar este registro');
   if (!confirmado) return;
 
-  this.api.delete(`BeneficioConvocatoria/Eliminar/${id}`)
+  this.api.delete(`BeneficioConvocatoria/Eliminar_Beneficios/${id}`)
     .pipe(takeUntil(this.destroy$))
     .subscribe({
-      next: () => this.fetchConvocatorias(),
+     next: () => {
+          this.fetchConvocatorias();
+          this.showSuccess();
+        },
       error: (err) => {
         console.error('Error al eliminar', err);
         this.showError()
@@ -365,7 +368,7 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
 
   showError() {
     toast.error('Error al procesar', {
-      description: 'Inténtalo nuevamente más tarde',
+      description: 'El registro se encuentra asociado',
       unstyled: true,
       class: 'my-error-toast'
     });

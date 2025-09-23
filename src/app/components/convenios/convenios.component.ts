@@ -275,7 +275,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
     if (!confirmado) return;
 
-    this.api.delete(`Convenio/Eliminar/${id}`)
+    this.api.delete(`Convenios/Eliminar_Entregable/${id}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -283,7 +283,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
           this.showSuccess();
         },
         error: (err) => {
-          console.error('Error al eliminar convenio', err);
+          console.error('Error al eliminar convenio, el resgistro se encuentra asociado', err);
           this.showError();
         }
       });
@@ -331,7 +331,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
 
   showError() {
     toast.error('Error al procesar', {
-      description: 'Inténtalo nuevamente más tarde',
+      description: 'El registro se encuentra asociado',
       unstyled: true,
       class: 'my-error-toast'
     });

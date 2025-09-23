@@ -38,6 +38,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
   isEditing = false;
   @Input() idConvocatoria!: any;
   loadingTable: any;
+  estados: any[] = [];
 
   private destroy$ = new Subject<void>();
 
@@ -46,6 +47,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.fetchConvocatorias();
     this.fetchEntregables();
+    this.fetchListaEstados();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -58,6 +60,31 @@ export class EntregableComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  private fetchListaEstados() {
+      this.api.get<any>('EstadosPostulacion/Consultar_Estado')
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (resp) => {
+            let items: any[] = [];
+            if (Array.isArray(resp)) items = resp;
+            else if (resp && typeof resp === 'object') {
+              if (Array.isArray(resp.data)) items = resp.data;
+              else if (Array.isArray(resp.items)) items = resp.items;
+              else {
+                const arr = Object.values(resp).find(v => Array.isArray(v));
+                if (Array.isArray(arr)) items = arr;
+              }
+            }
+            this.estados = items.map(item => ({ id: item.id, nombre: item.nombre }));
+
+          },
+          error: (err) => {
+            console.error('Error al cargar estado para select', err);
+            this.estados = [];
+          }
+        });
+    }
 
   // Convocatorias para select
   fetchConvocatorias() {
@@ -192,7 +219,8 @@ export class EntregableComponent implements OnInit, OnDestroy {
     const payload: any = {
       nombre: this.model.nombre,
       descripcion: this.model.descripcion,
-      convocatoriaId: Number(this.model.convocatoriaId)
+      convocatoriaId: Number(this.model.convocatoriaId),
+      estadoId: this.model.estadoId
     };
 
     if (isUpdate) payload.id = this.model.id;
@@ -236,7 +264,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
     const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
     if (!confirmado) return;
 
-    this.api.delete(`Entregable/Eliminar/${id}`)
+    this.api.delete(`Entregable/Eliminar_Entregable/${id}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -244,7 +272,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
           this.showSuccess();
         },
         error: (err) => {
-          console.error('Error al eliminar entregable', err);
+          console.error('Error al eliminar entregable, el resgistro se encuentra asociado', err);
           this.showError();
         }
       });
@@ -295,7 +323,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
 
   showError() {
     toast.error('Error al procesar', {
-      description: 'Inténtalo nuevamente más tarde',
+      description: 'El registro se encuentra asociado',
       unstyled: true,
       class: 'my-error-toast'
     });

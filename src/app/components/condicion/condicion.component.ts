@@ -29,6 +29,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
   pageSizeOptions = [10, 20, 30, 50];
   totalPages = 0;
   pages: number[] = [];
+  estados: any[] = [];
 
   loading = false;
   loadingTable = false;
@@ -45,6 +46,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.fetchCondiciones();
+    this.fetchListaEstados();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -56,6 +58,31 @@ export class CondicionComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private fetchListaEstados() {
+    this.api.get<any>('EstadosPostulacion/Consultar_Estado')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          let items: any[] = [];
+          if (Array.isArray(resp)) items = resp;
+          else if (resp && typeof resp === 'object') {
+            if (Array.isArray(resp.data)) items = resp.data;
+            else if (Array.isArray(resp.items)) items = resp.items;
+            else {
+              const arr = Object.values(resp).find(v => Array.isArray(v));
+              if (Array.isArray(arr)) items = arr;
+            }
+          }
+          this.estados = items.map(item => ({ id: item.id, nombre: item.nombre }));
+
+        },
+        error: (err) => {
+          console.error('Error al cargar estado para select', err);
+          this.estados = [];
+        }
+      });
   }
 
   // -----------------------
@@ -177,7 +204,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
       descripcion: this.model.descripcion,
       tipoCondicion: this.model.tipoCondicion,
       esObligatoria: !!this.model.esObligatoria,
-      momento: Number(this.model.momento ?? 0)
+      estadoId: Number(this.model.estadoId ?? 0)
     };
 
     if (isUpdate) payload.id = this.model.id;
@@ -210,7 +237,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
       descripcion: '',
       tipoCondicion: '',
       esObligatoria: false,
-      momento: 0
+      estadoId: 0
     });
   }
 
@@ -225,7 +252,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
     const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
     if (!confirmado) return;
 
-    this.api.delete(`Condicion/Eliminar/${id}`)
+    this.api.delete(`Condicion/Eliminar_Condicion/${id}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -233,7 +260,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
           this.showSuccess();
         },
         error: (err) => {
-          console.error('Error al eliminar condicion', err);
+          console.error('Error al eliminar condicion, el resgistro se encuentra asociado', err);
           this.showError();
         }
       });
@@ -288,7 +315,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
 
   showError() {
     toast.error('Error al procesar', {
-      description: 'Inténtalo nuevamente más tarde',
+      description: 'El registro se encuentra asociado',
       unstyled: true,
       class: 'my-error-toast'
     });

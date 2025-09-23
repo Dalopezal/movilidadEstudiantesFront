@@ -224,7 +224,7 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
           this.showSuccess();
         },
         error: (err) => {
-          console.error('Error al eliminar condicion', err);
+          console.error('Error al eliminar condicion, el resgistro se encuentra asociado', err);
           this.showError();
         }
       });
@@ -279,7 +279,7 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
 
   showError() {
     toast.error('Error al procesar', {
-      description: 'Inténtalo nuevamente más tarde',
+      description: 'El registro se encuentra asociado',
       unstyled: true,
       class: 'my-error-toast'
     });

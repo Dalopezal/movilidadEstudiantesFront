@@ -75,7 +75,7 @@ export class GenericApiService {
 
   delete<T>(endpoint: string, options?: any): Observable<T> {
     const url = this.buildUrl(endpoint);
-    return this.http.delete<ApiResponse<T>>(url, this.buildOptions(undefined, options))
+    return this.http.patch<ApiResponse<T>>(url, this.buildOptions(undefined, options))
       .pipe(
         map((res: ApiResponse<T> | any) => this.extractData(res)),
         catchError(err => this.handleError(err))

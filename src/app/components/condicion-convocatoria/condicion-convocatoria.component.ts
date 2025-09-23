@@ -233,11 +233,11 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async deleteItem(id: number) {
+  async deleteItem(condicioId: string, convocatoriaId: string) {
     const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
     if (!confirmado) return;
 
-    this.api.delete(`CondicionConvocatoria/Eliminar/${id}`)
+    this.api.delete(`CondicionConvocatoria/Eliminar_CondicionesConvocatoria/${condicioId},${convocatoriaId}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -245,7 +245,7 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
           this.showSuccess();
         },
         error: (err) => {
-          console.error('Error al eliminar relación', err);
+          console.error('Error al eliminar relación, el resgistro se encuentra asociado', err);
           this.showError();
         }
       });
@@ -293,7 +293,7 @@ export class CondicionConvocatoriaComponent implements OnInit, OnDestroy {
 
   showError() {
     toast.error('Error al procesar', {
-      description: 'Inténtalo nuevamente más tarde',
+      description: 'El registro se encuentra asociado',
       unstyled: true,
       class: 'my-error-toast'
     });

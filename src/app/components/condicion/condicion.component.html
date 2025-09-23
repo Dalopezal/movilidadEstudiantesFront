@@ -71,21 +71,21 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="momento" class="form-label fw-bold">Momento</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="momento"
-                    name="momento"
-                    required
-                    min="0"
-                    [(ngModel)]="model.momento"
-                    #momentoCtrl="ngModel"
-                    style="font-size: 13px"
-                  />
-                  <div class="text-danger small mt-1" *ngIf="momentoCtrl.invalid && (momentoCtrl.touched || momentoCtrl.dirty)">
-                    <div *ngIf="momentoCtrl.errors?.['required']">El momento es obligatorio.</div>
-                    <div *ngIf="momentoCtrl.errors?.['min']">Debe ser 0 o mayor.</div>
+                  <label for="estadoId" class="form-label fw-bold">Estado de la postulación</label>
+                  <select
+                      class="form-select"
+                      id="estadoId"
+                      name="estadoId"
+                      required
+                      style="font-size: 13px;"
+                      [(ngModel)]="model.estadoId"
+                      #estCtrl="ngModel"
+                      name="filtro"
+                    >
+                      <option *ngFor="let m of estados" [ngValue]="m.id">{{ m.nombre }}</option>
+                  </select>
+                  <div class="text-danger small mt-1" *ngIf="estCtrl.invalid && (estCtrl.touched || estCtrl.dirty)">
+                    <div *ngIf="estCtrl.errors?.['required']">Debe seleccionar una estado.</div>
                   </div>
                 </div>
 
