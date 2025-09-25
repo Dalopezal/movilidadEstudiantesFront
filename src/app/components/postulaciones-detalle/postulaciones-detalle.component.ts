@@ -13,12 +13,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatStepper } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select'; // 👈 Nuevo para selects
+import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { DriveComponent } from '../drive/drive.component';
 import { NotificacionModalComponent } from '../notificacion-modal/notificacion-modal.component';
 import { NotificacionesComponent } from '../notificaciones/notificaciones.component';
+import { SharePointDriveComponent } from '../drive/drive.component';
+import { GestionEntregableComponent } from '../gestion-entregable/gestion-entregable.component';
 
 interface FieldConfig {
   name: string;
@@ -53,7 +54,8 @@ interface Step {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    NotificacionesComponent
+    NotificacionesComponent,
+    GestionEntregableComponent
   ],
   templateUrl: './postulaciones-detalle.component.html',
   styleUrls: ['./postulaciones-detalle.component.css'],
@@ -67,6 +69,9 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   loading = false;
   idPostulacion: any;
+  documento: any;
+  convocatoria: any;
+  convocatoriaId: any;
 
   campoEstado: Record<number, FieldConfig[]> = {
     1: [ // Pre-postulación
@@ -302,7 +307,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
           step.data = stepData;
         });
 
-        // 🔹 El último registro de bitácora corresponde al estado actual
+        // El último registro de bitácora corresponde al estado actual
         if (bitacora.length > 0) {
           const ultimo = bitacora[bitacora.length - 1];
           const index = this.steps.findIndex(s => s.id === ultimo.estadoPostulacionId);
@@ -312,10 +317,14 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
             setTimeout(() => {
               if (this.stepper) {
                 this.stepper.selectedIndex = index;
+                this.documento = ultimo.documento;
+                this.convocatoria = ultimo.nombreConvocatoria;
+                this.convocatoriaId = ultimo.convocatoriaId;
               }
             }, 100);
           }
         }
+
 
         this.loading = false;
       },
@@ -691,12 +700,12 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
     }
   }
 
-  abrirModalDrive() {
-    this.dialog.open(DriveComponent, {
-      width: '600px',
-      height: '480px',
-      disableClose: false
-    });
-
+  onGestioDocumental(step: any) {
+    this.idPostulacion = this.idPostulacion;
+    const modalElement = document.getElementById('GestionDocumentalnModal');
+    if (modalElement) {
+      const modal = new (window as any).bootstrap.Modal(modalElement);
+      modal.show();
+    }
   }
 }

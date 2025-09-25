@@ -262,3 +262,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* los diálogos de Angular Material suelen estar cerca de z-index 1000+ */
+.cdk-overlay-container,
+.cdk-overlay-pane,
+.mat-mdc-menu-panel {
+  z-index: 1500 !important;
+}

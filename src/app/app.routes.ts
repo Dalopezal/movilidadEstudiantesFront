@@ -13,6 +13,7 @@ import { TiposConvocatoriaComponent } from './components/tipos-convocatoria/tipo
 import { PostulcionesEntrantesComponent } from './components/postulaciones-tipo/postulaciones-tipo.component';
 import { AdminConvocatoriaComponent } from './components/admin-convocatoria/admin-convocatoria.component';
 import { FinanciacionExternaComponent } from './components/financiacion-externa/financiacion-externa.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -29,5 +30,6 @@ export const routes: Routes = [
   { path: 'postulacion-convocatoria', component: PostulcionesEntrantesComponent },
   { path: 'administracion-convocatoria', component: AdminConvocatoriaComponent },
   { path: 'financiacion-externa', component: FinanciacionExternaComponent },
+  { path: 'dashboard', component: DashboardComponent },
   { path: '**', redirectTo: '' }
 ];

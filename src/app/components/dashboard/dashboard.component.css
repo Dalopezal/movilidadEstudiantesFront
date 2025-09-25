@@ -10,8 +10,7 @@
 
 .main-content {
   /* Opcional: ajustar padding o ancho */
-  /* padding: 0rem 1rem 1rem 1rem; */
-  padding: 0rem 2.5rem;
+  padding: 3rem 2.5rem;
   text-align: center; /* para centrar texto */
 }
 

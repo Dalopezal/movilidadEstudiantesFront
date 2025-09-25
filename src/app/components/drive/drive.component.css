@@ -73,15 +73,6 @@
   margin-bottom: 8px;
 }
 
-.file-icon {
-  font-size: 32px;
-  color: #18206E;
-}
-
-.file-icon.folder {
-  color: #ff9800;
-}
-
 .file-menu-btn {
   line-height: 32px;
 }
@@ -159,4 +150,19 @@
 .mat-mdc-progress-bar {
   height: 6px !important;
   border-radius: 3px;
+}
+
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;       /* altura fija para que quede bonito */
+  text-align: center;
+  color: #18206E;
+}
+
+.file-icon {
+  font-size: 24px;
+  margin-right: 8px;
 }

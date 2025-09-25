@@ -66,7 +66,7 @@
                           <i class="fas fa-history"></i>
                         </button>
 
-                        <button class="btn-notif-round" title="Ver Histórico" (click)="abrirModalDrive()"
+                        <button class="btn-notif-round" title="Ver Histórico" (click)="onGestioDocumental(step)"
                               style="background-color: #18206E;color: #00ACD4;">
                           <i class="fas fa-upload"></i>
                         </button>
@@ -189,7 +189,7 @@
     <div class="modal-content">
       <div class="modal-header" style="background: #E2E6F7;">
         <p class="modal-title" id="NotificacionModalLabel" style="color: #0D133F;">
-          Notificacions de la Convocatoria
+          Notificaciones de la Convocatoria
         </p>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -201,3 +201,29 @@
     </div>
   </div>
 </div>
+
+  <!-- Modal Gestión Entregable -->
+  <div *ngIf="convocatoriaId && convocatoria && documento"
+      class="modal fade"
+      id="GestionDocumentalnModal"
+      tabindex="-1"
+      aria-labelledby="GestionDocumentalnModalLabel"
+      aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header" style="background: #E2E6F7;">
+          <p class="modal-title" id="GestionDocumentalnModalLabel" style="color: #0D133F;">
+            Administración Documental
+          </p>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <app-gestion-entregable
+            [idConvocatoria]="convocatoriaId"
+            [convocatoria]="convocatoria"
+            [documento]="documento">
+          </app-gestion-entregable>
+        </div>
+      </div>
+    </div>
+  </div>

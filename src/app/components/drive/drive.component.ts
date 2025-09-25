@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -12,11 +12,11 @@ import { ToastModule } from 'primeng/toast';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
-declare var google: any;
-declare var gapi: any;
+import { HttpClient } from '@angular/common/http';
+import { MsalService } from '@azure/msal-angular';
 
 @Component({
-  selector: 'app-drive',
+  selector: 'app-sharepoint-drive',
   standalone: true,
   imports: [
     CommonModule,
@@ -27,253 +27,191 @@ declare var gapi: any;
     MatMenuModule,
     ConfirmDialogModule,
     ToastModule,
-    NgxSonnerToaster,
     MatProgressBarModule
   ],
   templateUrl: './drive.component.html',
   styleUrls: ['./drive.component.css'],
   providers: [ConfirmationService, MessageService],
 })
-export class DriveComponent {
+export class SharePointDriveComponent {
   files: any[] = [];
   isAuthenticated = false;
   loading = false;
   uploading = false;
   error = '';
 
-  private clientId = '399159101800-stm3ke3chlvtscr9mkde7rli01ao621q.apps.googleusercontent.com';
-  private apiKey   = 'AIzaSyBlxhdswu6MBCvOQ9vY-Er3ucpnyBC0LYc';
+  uploadProgress = 0;
 
-  private scope = 'https://www.googleapis.com/auth/drive.file';
-  private folderId = '1Bj0eiiZirD3q54W9zIKbpfRIT9aiBLbb';
+  @Input() convocatoria!: any;
+  @Input() documento!: any;
+
+  // driveId de Procesos_Movilidad
+  private driveId = "b!hxInP5NdSkWGDF706k5q4NgI4QHbbA9MuYfs3fRJTRQp2TIIFpMeSKgCChkFV0A1";
 
   constructor(
-    private dialogRef: MatDialogRef<DriveComponent>,
-    private confirmationService: ConfirmationService
+    private http: HttpClient,
+    private msal: MsalService,
+    private confirmationService: ConfirmationService,
   ) {}
 
+  // Login con MSAL
   async signIn() {
+    this.loading = true;
+    this.error = '';
     try {
-      this.loading = true;
-      this.error = '';
-
-      const tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: this.clientId,
-        scope: this.scope,
-        callback: async (tokenResponse: any) => {
-          if (tokenResponse.error) {
-            this.error = 'Error de autenticación: ' + tokenResponse.error;
-            this.loading = false;
-            return;
-          }
-          await this.loadGapiClient(tokenResponse.access_token);
-        }
+      const response = await this.msal.instance.loginPopup({
+        scopes: ['User.Read', 'Sites.ReadWrite.All', 'Files.ReadWrite.All']
       });
 
-      tokenClient.requestAccessToken();
-    } catch (err) {
-      this.error = 'Error al iniciar sesión: ' + err;
-      this.loading = false;
-    }
-  }
-
-  private async loadGapiClient(accessToken: string) {
-    await new Promise((resolve) => gapi.load('client', resolve));
-    await gapi.client.init({
-      apiKey: this.apiKey,
-      discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-    });
-    gapi.client.setToken({ access_token: accessToken });
-    this.isAuthenticated = true;
-    await this.loadFiles();
-  }
-
-  private async loadFiles() {
-    try {
-      const resp = await gapi.client.drive.files.list({
-        q: `'${this.folderId}' in parents and trashed = false`,
-        pageSize: 20,
-        fields: 'files(id, name, mimeType, modifiedTime, owners)',
-        orderBy: 'modifiedTime desc'
-      });
-      this.files = resp.result.files || [];
-    } catch (error) {
-      this.error = 'Error al cargar archivos de la carpeta: ' + JSON.stringify(error);
+      if (response.account) {
+        this.msal.instance.setActiveAccount(response.account);
+        this.isAuthenticated = true;
+        await this.loadFiles();
+      }
+    } catch (err: any) {
+      this.error = 'Error autenticación: ' + err.message;
     } finally {
       this.loading = false;
     }
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.uploadFile(file);
+  // Listar archivos en {documento}/{convocatoria}
+  async loadFiles() {
+    this.loading = true;
+    try {
+      const documentoFolderId = await this.getOrCreateFolder(this.documento);
+      const convocatoriaFolderId = await this.getOrCreateFolder(this.convocatoria, documentoFolderId);
+
+      const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const resp: any = await this.http.get(
+        `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${convocatoriaFolderId}/children`,
+        { headers }
+      ).toPromise();
+
+      this.files = resp.value || [];
+    } catch (err: any) {
+      this.error = 'Error al cargar archivos: ' + err.message;
+    } finally {
+      this.loading = false;
     }
-    event.target.value = '';
   }
 
-  uploadProgress = 0;
+  // Subida de archivo
+  async uploadFile(file: File) {
+    this.uploading = true;
+    this.uploadProgress = 0;
+    try {
+      const documentoFolderId = await this.getOrCreateFolder(this.documento);
+      const convocatoriaFolderId = await this.getOrCreateFolder(this.convocatoria, documentoFolderId);
 
-  async uploadFile(file: File): Promise<string | null> {
-    return new Promise<string | null>((resolve) => {
-      this.uploading = true;
-      this.uploadProgress = 0;
+      const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
+      const headers = { Authorization: `Bearer ${token}` };
 
-      const metadata = {
-        name: file.name,
-        parents: [this.folderId],
-      };
+      const url = `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${convocatoriaFolderId}:/${file.name}:/content`;
 
-      const form = new FormData();
-      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-      form.append('file', file);
-
-      const xhr = new XMLHttpRequest();
-
-      xhr.upload.addEventListener('progress', (event) => {
-        if (event.lengthComputable) {
-          this.uploadProgress = Math.round((event.loaded / event.total) * 100);
+      this.http.put(url, file, {
+        headers,
+        reportProgress: true,
+        observe: 'events'
+      }).subscribe({
+        next: (event: any) => {
+          if (event.type === 1 && event.total) {
+            this.uploadProgress = Math.round((event.loaded / event.total) * 100);
+          }
+          if (event.type === 4) {
+            this.showSuccess('¡Archivo listo!', 'Subido exitosamente');
+            this.uploading = false;
+            this.loadFiles();
+          }
+        },
+        error: (err) => {
+          this.showError('Error al subir', err.message);
+          this.uploading = false;
         }
       });
-
-      xhr.onreadystatechange = async () => {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-          this.uploading = false;
-          this.uploadProgress = 0;
-
-          if (xhr.status === 200) {
-            try {
-              const uploadedFile = JSON.parse(xhr.responseText);
-
-              // Aplicar permisos de lectura pública
-              await gapi.client.drive.permissions.create({
-                fileId: uploadedFile.id,
-                resource: { type: 'anyone', role: 'reader' }
-              });
-
-              const shareUrl = `https://drive.google.com/file/d/${uploadedFile.id}/view`;
-              await navigator.clipboard.writeText(shareUrl);
-
-              this.showSuccess('¡Operación exitosa!', 'Archivo subido y URL copiada');
-              await this.refreshFiles();
-              resolve(shareUrl);
-            } catch (error) {
-              this.showError('Error al procesar', 'No se pudo configurar permisos');
-              resolve(null);
-            }
-          } else {
-            this.showError('Error al subir archivo', 'Intenta nuevamente');
-            console.error('Upload error:', xhr.responseText);
-            resolve(null);
-          }
-        }
-      };
-
-      xhr.onerror = () => {
-        this.uploading = false;
-        this.uploadProgress = 0;
-        this.showError('Error de conexión', 'Verifica tu internet');
-        resolve(null);
-      };
-
-      xhr.open('POST', "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", true);
-      xhr.setRequestHeader("Authorization", "Bearer " + gapi.client.getToken().access_token);
-      xhr.send(form);
-    });
-  }
-
-  async downloadFile(file: any) {
-    try {
-      const response = await fetch(
-        `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`,
-        {
-          headers: new Headers({
-            "Authorization": "Bearer " + gapi.client.getToken().access_token
-          }),
-        }
-      );
-
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = file.name;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-
-        const permission = { type: "anyone", role: "reader" };
-        await gapi.client.drive.permissions.create({
-          fileId: file.id,
-          resource: permission
-        });
-
-        this.showSuccess('¡Operación exitosa!', 'Archivo descargado');
-      } else {
-        throw new Error('Error al descargar');
-      }
-    } catch (error) {
-      this.showError('Error al procesar', 'No se puede descargar archivo');
-      console.error('Download error:', error);
+    } catch (err: any) {
+      this.showError('Error inesperado', err.message);
+      this.uploading = false;
     }
   }
 
+  // Descargar archivo
+  async downloadFile(file: any) {
+    try {
+      const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
+      const blob: any = await this.http.get(
+        `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${file.id}/content`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          responseType: 'blob' as 'json'
+        }
+      ).toPromise();
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      a.click();
+      window.URL.revokeObjectURL(url);
+
+      this.showSuccess('Archivo descargado');
+    } catch (err: any) {
+      this.showError('Error al descargar', err.message);
+    }
+  }
+
+  // Eliminar archivo
   async deleteFile(file: any) {
     const confirmado = await this.showConfirm(`¿Estás seguro de eliminar "${file.name}"?`);
     if (confirmado) {
       try {
-        await gapi.client.drive.files.delete({ fileId: file.id });
-        this.showSuccess('¡Operación exitosa!', 'Archivo eliminado');
-        await this.refreshFiles();
-      } catch (error) {
-        this.showError('Error al procesar', 'El archivo no se cargo desde esta fuente.');
-        console.error('Delete error:', error);
+        const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
+        await this.http.delete(
+          `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${file.id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        ).toPromise();
+
+        this.showSuccess('Archivo eliminado');
+        this.loadFiles();
+      } catch (err: any) {
+        this.showError('Error al eliminar', err.message);
       }
     }
   }
 
-  openFile(file: any) {
-    const url = `https://drive.google.com/file/d/${file.id}/view`;
-    window.open(url, '_blank');
-  }
+  // Abrir archivo en nueva pestaña
+  async openFile(file: any) {
+    try {
+      const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
+      const headers = { Authorization: `Bearer ${token}` };
 
-  async refreshFiles() {
-    if (this.isAuthenticated) {
-      this.loading = true;
-      await this.loadFiles();
+      const metadata: any = await this.http.get(
+        `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${file.id}`,
+        { headers }
+      ).toPromise();
+
+      if (metadata && metadata.webUrl) {
+        window.open(metadata.webUrl, '_blank'); // ← link directo de SharePoint
+      } else {
+        this.showError('No se pudo obtener el enlace de visualización');
+      }
+    } catch (err: any) {
+      this.showError('Error al abrir archivo', err.message);
     }
   }
 
-  cerrar() {
-    this.dialogRef.close();
-  }
-
+  // Notifications
   showSuccess(msg: string, desc: string = '') {
-    toast.success(msg, {
-      description: desc,
-      unstyled: true,
-      class: 'my-success-toast'
-    });
+    toast.success(msg, { description: desc, unstyled: true, class: 'my-success-toast' });
   }
-
   showError(msg: string, desc: string = '') {
-    toast.error(msg, {
-      description: desc,
-      unstyled: true,
-      class: 'my-error-toast'
-    });
+    toast.error(msg, { description: desc, unstyled: true, class: 'my-error-toast' });
   }
-
   showWarning(msg: string, desc: string = '') {
-    toast.warning(msg, {
-      description: desc,
-      unstyled: true,
-      class: 'my-warning-toast'
-    });
+    toast.warning(msg, { description: desc, unstyled: true, class: 'my-warning-toast' });
   }
-
   showConfirm(mensaje: string): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
@@ -291,5 +229,124 @@ export class DriveComponent {
         reject: () => resolve(false),
       });
     });
+  }
+
+  // Función auxiliar para obtener token
+  private async getToken(scopes: string[]): Promise<string> {
+    const account = this.msal.instance.getActiveAccount();
+    if (!account) {
+      throw new Error('No active account. Please login first.');
+    }
+
+    const tokenResult = await this.msal.instance.acquireTokenSilent({
+      scopes,
+      account
+    });
+    return tokenResult.accessToken;
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.uploadFile(file);
+    }
+    event.target.value = '';
+  }
+
+  async refreshFiles() {
+    if (this.isAuthenticated) {
+      this.loadFiles();
+    }
+  }
+
+  // Obtener o crear carpeta en el drive de SharePoint
+  private async getOrCreateFolder(folderName: string, parentId?: string): Promise<string> {
+    const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
+    const headers = { Authorization: `Bearer ${token}` };
+
+    let url = parentId
+      ? `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${parentId}/children?$filter=name eq '${folderName}'`
+      : `https://graph.microsoft.com/v1.0/drives/${this.driveId}/root/children?$filter=name eq '${folderName}'`;
+
+    const resp: any = await this.http.get(url, { headers }).toPromise();
+
+    if (resp.value && resp.value.length > 0) {
+      return resp.value[0].id;
+    }
+
+    // Crear carpeta si no existe
+    const createUrl = parentId
+      ? `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${parentId}/children`
+      : `https://graph.microsoft.com/v1.0/drives/${this.driveId}/root/children`;
+
+    const createBody = { name: folderName, folder: {} };
+    const created: any = await this.http.post(createUrl, createBody, { headers }).toPromise();
+
+    return created.id;
+  }
+
+  // En tu SharePointDriveComponent
+  getFileIcon(file: any): string {
+    if (file.folder) {
+      return 'folder';
+    }
+
+    const fileName = file.name?.toLowerCase() || '';
+    const extension = fileName.split('.').pop() || '';
+
+    // Documentos
+    if (['pdf'].includes(extension)) {
+      return 'picture_as_pdf';
+    }
+    if (['doc', 'docx'].includes(extension)) {
+      return 'description';
+    }
+    if (['xls', 'xlsx'].includes(extension)) {
+      return 'grid_on';
+    }
+    if (['ppt', 'pptx'].includes(extension)) {
+      return 'slideshow';
+    }
+    if (['txt'].includes(extension)) {
+      return 'text_snippet';
+    }
+
+    // Imágenes
+    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].includes(extension)) {
+      return 'image';
+    }
+
+    // Videos
+    if (['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv'].includes(extension)) {
+      return 'movie';
+    }
+
+    // Audio
+    if (['mp3', 'wav', 'flac', 'aac', 'ogg'].includes(extension)) {
+      return 'audiotrack';
+    }
+
+    // Archivos comprimidos
+    if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) {
+      return 'archive';
+    }
+
+    // Código
+    if (['js', 'ts', 'html', 'css', 'json', 'xml', 'py', 'java', 'cpp', 'c'].includes(extension)) {
+      return 'code';
+    }
+
+    // Por defecto
+    return 'insert_drive_file';
+  }
+
+  getFileColor(file: any): string {
+    const extension = (file.name?.split('.').pop() || '').toLowerCase();
+    if (['pdf'].includes(extension)) return '#e53935';
+    if (['doc','docx'].includes(extension)) return '#1976d2';
+    if (['xls','xlsx'].includes(extension)) return '#2e7d32';
+    if (['ppt','pptx'].includes(extension)) return '#e65100';
+    if (['jpg','jpeg','png','gif'].includes(extension)) return '#8e24aa';
+    return '#424242';
   }
 }

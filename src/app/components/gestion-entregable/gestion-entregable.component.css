@@ -1,0 +1,292 @@
+/* Contenedor paginador */
+.card-footer {
+  padding: 1rem 1.5rem;
+  background-color: #f9fafb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #64748b;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Paginación */
+.pagination {
+  display: flex;
+  list-style: none;
+  gap: 0.5rem;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.pagination .page-item {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pagination .page-item button {
+  border: none;
+  background-color: #e0e7ff;
+  color: #0D133F;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  border-radius: 12px;
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination .page-item button:hover:not(:disabled) {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.pagination .page-item.active button {
+  background-color: #18206E;
+  color: white;
+  cursor: default;
+}
+
+.pagination .page-item.disabled button {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Selector de items por página */
+.items-per-page {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.items-per-page select {
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 0.3rem 0.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: white;
+  color: #1e293b;
+  min-width: 60px;
+  height: 36px;
+  transition: border-color 0.3s ease;
+}
+
+.items-per-page select:hover,
+.items-per-page select:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+/* Quitar el fondo rayado de las filas */
+.table.table-striped tbody tr {
+  background-color: white !important;
+}
+
+/* Encabezado fijo */
+.table thead {
+  position: sticky;
+  top: 0;
+  background-color: white; /* Fondo blanco para el encabezado */
+  z-index: 10;
+}
+
+.btn-ucm {
+  background: #18206E;
+  border-color: #18206E;
+  transition: background-color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+  cursor: pointer;
+  color: white;
+}
+
+.btn-ucm:hover:not(:disabled) {
+  background: #0f1a58;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(24,32,110,0.18);
+}
+
+.btn-ucm:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.custom-card-float {
+  position: absolute;
+  z-index: 1050;
+}
+
+.custom-card-float {
+  position: fixed;   /* 👈 cambia a fixed */
+  z-index: 1050;
+}
+
+/* Animación de entrada */
+.animate-slide-in {
+  animation: slideInBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: fixed;
+  z-index: 1050;
+}
+
+@keyframes slideInBounce {
+  0% {
+    transform: translateX(-100%) scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(10px) scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Card con sombra brillante */
+.shadow-glow {
+  box-shadow:
+    0 0 20px rgba(13, 19, 63, 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(13, 19, 63, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  width: 580px;
+  max-height: 800px;
+  backdrop-filter: blur(10px);
+}
+
+/* Header con gradiente */
+.gradient-header {
+  background: #0D133F;
+  border: none;
+  position: relative;
+}
+
+.gradient-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  animation: rainbow 3s linear infinite;
+}
+
+@keyframes rainbow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* Efecto cristal en el body */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Filas de información con hover */
+.info-row {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(13, 19, 63, 0.1);
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  margin: 2px 0;
+}
+
+.info-row:hover {
+  background: rgba(13, 19, 63, 0.05);
+  transform: translateX(5px);
+  padding-left: 10px;
+}
+
+/* Labels con brillo */
+.label-glow {
+  font-weight: 600;
+  color: #0D133F;
+  display: inline-block;
+  min-width: 100px;
+}
+
+/* Botón de cerrar con pulso */
+.pulse-button {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.pulse-button:hover {
+  animation: none;
+  transform: scale(1.2);
+  transition: transform 0.2s ease;
+}
+
+.scroll-body {
+  max-height: 73vh;      /* 📌 alto máximo de la card */
+  overflow-y: auto;       /* activa scroll vertical */
+  overflow-x: hidden;     /* evita scroll horizontal innecesario */
+  padding-right: 10px;    /* evita que tape el scroll */
+}
+
+/* Scrollbar moderno para navegadores que lo soporten */
+.scroll-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+
+/* Animación de entrada (la que ya tienes) */
+.animate-slide-in {
+  animation: slideInBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: fixed;
+  z-index: 1050;
+}
+
+@keyframes slideInBounce {
+  0% {
+    transform: translateX(-100%) scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(10px) scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* 🔥 Nueva animación de salida */
+.animate-slide-out {
+  animation: slideOutBounce 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+  position: fixed;
+  z-index: 1050;
+}
+
+@keyframes slideOutBounce {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  30% {
+    transform: translateX(-10px) scale(0.95);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(-100%) scale(0.8);
+    opacity: 0;
+  }
+}
+
