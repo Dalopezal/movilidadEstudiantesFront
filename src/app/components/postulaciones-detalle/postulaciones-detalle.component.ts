@@ -290,11 +290,11 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
           }
         }
 
+        console.log("bitacora:", bitacora);
+
         this.steps.forEach(step => {
           const fieldsForThisStep = this.campoEstado[step.id] || [];
-
           const stepData: any = {};
-
           bitacora.forEach(entry => {
             fieldsForThisStep.forEach(field => {
               if (entry[field.name] !== undefined && entry[field.name] !== null) {
@@ -302,29 +302,27 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
               }
             });
           });
-
-          // Asignamos los datos recopilados al step
           step.data = stepData;
         });
 
-        // El último registro de bitácora corresponde al estado actual
         if (bitacora.length > 0) {
           const ultimo = bitacora[bitacora.length - 1];
-          const index = this.steps.findIndex(s => s.id === ultimo.estadoPostulacionId);
+          console.log("ultimo registro:", ultimo);
+
+          const index = this.steps.findIndex(s =>
+            String(s.id) === String(ultimo.estadoPostulacionId)
+          );
+          console.log("index encontrado:", index);
 
           if (index >= 0) {
             this.currentStep = index;
-            setTimeout(() => {
-              if (this.stepper) {
-                this.stepper.selectedIndex = index;
-                this.documento = ultimo.documento;
-                this.convocatoria = ultimo.nombreConvocatoria;
-                this.convocatoriaId = ultimo.convocatoriaId;
-              }
-            }, 100);
+            // No usamos stepper porque tu UI ya es wizard lateral
+            this.documento = ultimo.documento;
+            this.convocatoria = ultimo.nombreConvocatoria;
+            this.convocatoriaId = ultimo.convocatoriaId;
+            this.focusCurrentStep();
           }
         }
-
 
         this.loading = false;
       },
@@ -339,6 +337,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
     if (this.stepper && index >= 0 && index < this.steps.length) {
       this.stepper.selectedIndex = index;
       this.currentStep = index;
+      this.focusCurrentStep();
     }
   }
 
@@ -707,5 +706,14 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();
     }
+  }
+
+  focusCurrentStep() {
+    setTimeout(() => {
+      const el = document.getElementById('step-item-' + this.currentStep);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }, 100);
   }
 }

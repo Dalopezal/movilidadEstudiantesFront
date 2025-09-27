@@ -10,10 +10,7 @@
   box-sizing: border-box;
 }
 
-.step-content {
-  min-height: 200px;
-  font-family: 'Urbanist', sans-serif !important;
-}
+
 
 .step-content h4 {
   color: #18206E;
@@ -234,7 +231,6 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-left: 8px;
   border: 2px solid #fff;
   box-shadow: 0 0 4px rgba(0,0,0,0.2);
 }
@@ -303,4 +299,61 @@
 /* texto */
 .btn-dinamico-pro .btn-text {
   font-weight: 500;
+}
+
+.progress-bar {
+  background-color: #18206E !important; /* azul UCM */
+}
+
+.step-content {
+  width: 99% !important;              /* ocupa todo el ancho del contenedor */
+  flex: 1;                  /* se expande dentro de flexbox */
+  padding: 1.2rem;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  min-height: 220px;
+  box-sizing: border-box;   /* asegura que padding no recorte ancho */
+}
+
+.step-content label {
+  font-weight: 600;
+}
+
+.btn {
+  border-radius: 18px;
+  padding: 6px 18px;
+}
+
+.btn-primary {
+  background-color: #18206E;
+  border: none;
+}
+
+.btn-notif-round {
+  background-color: #18206E;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00ACD4;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.btn-notif-round:hover {
+  background-color: #141b5a;
+}
+.btn-notif-round i {
+  font-size: 15px;
+}
+
+.estado-circle-lista {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 4px rgba(0,0,0,0.2);
 }
