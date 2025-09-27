@@ -14,6 +14,7 @@ import { PostulcionesEntrantesComponent } from './components/postulaciones-tipo/
 import { AdminConvocatoriaComponent } from './components/admin-convocatoria/admin-convocatoria.component';
 import { FinanciacionExternaComponent } from './components/financiacion-externa/financiacion-externa.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { InstitucionConvenioComponent } from './components/institucion-convenio/institucion-convenio.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -31,5 +32,6 @@ export const routes: Routes = [
   { path: 'administracion-convocatoria', component: AdminConvocatoriaComponent },
   { path: 'financiacion-externa', component: FinanciacionExternaComponent },
   { path: 'dashboard', component: DashboardComponent },
+  { path: 'institucion-convenio', component: InstitucionConvenioComponent },
   { path: '**', redirectTo: '' }
 ];

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -8,23 +8,20 @@ import { HttpClientModule } from '@angular/common/http';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
-import { InstitucionConvenioModel } from '../../models/InstitucionConvenioModel';
+import { BeneficioPostulacionaModel } from '../../models/BeneficioPostulacionModel';
 
 @Component({
-  selector: 'app-institucion-convenio',
+  selector: 'app-beneficios-postulacion',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
-  templateUrl: './institucion-convenio.component.html',
-  styleUrls: ['./institucion-convenio.component.css'],
+  imports: [CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  templateUrl: './beneficios-postulacion.component.html',
+  styleUrls: ['./beneficios-postulacion.component.css'],
   providers: [ConfirmationService]
 })
-export class InstitucionConvenioComponent implements OnInit, OnDestroy {
-  data: InstitucionConvenioModel[] = [];
-  filteredData: InstitucionConvenioModel[] = [];
-  pagedData: InstitucionConvenioModel[] = [];
-
-  instituciones: any[] = [];
-  convenios: any[] = [];
+export class BeneficiosComponent implements OnInit, OnDestroy {
+  data: BeneficioPostulacionaModel[] = [];
+  filteredData: BeneficioPostulacionaModel[] = [];
+  pagedData: BeneficioPostulacionaModel[] = [];
 
   currentPage = 1;
   pageSize = 10;
@@ -36,18 +33,21 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
   error: string | null = null;
   filtro: string = '';
 
-  model: InstitucionConvenioModel = new InstitucionConvenioModel();
+  model: BeneficioPostulacionaModel = new BeneficioPostulacionaModel();
   isEditing = false;
+   @Input() postulacionId: any;
+   @Input() convocatoriaId: any;
 
   private destroy$ = new Subject<void>();
   loadingTable: any;
+  beneficios: any[] = [];
 
   constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
 
   ngOnInit() {
-    this.fetchInstituciones();
-    this.fetchConvenios();
-    this.fetchRelaciones();
+    this.fetchBeneficios();
+    this.fetchBeneficioConvocatoria();
+    this.model.postulacionId = this.postulacionId;
   }
 
   ngOnDestroy() {
@@ -55,79 +55,23 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // ---------- loaders para selects ----------
-  fetchInstituciones() {
-    this.api.get<any>('Institucion/Consultar_Institucion')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (resp) => {
-          let items: any[] = [];
-          if (Array.isArray(resp)) items = resp;
-          else if (resp && typeof resp === 'object') {
-            if (Array.isArray(resp.data)) items = resp.data;
-            else if (Array.isArray(resp.items)) items = resp.items;
-            else {
-              const arr = Object.values(resp).find(v => Array.isArray(v));
-              if (Array.isArray(arr)) items = arr;
-            }
-          }
-          this.instituciones = items.map(i => ({ id: Number(i.id), nombre: i.nombre }));
-        },
-        error: (err) => { console.error('Error cargando instituciones', err); this.instituciones = []; }
-      });
-  }
-
-  fetchConvenios() {
-    this.api.get<any>('Convenios/Consultar_Convenio')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (resp) => {
-          let items: any[] = [];
-          if (Array.isArray(resp)) items = resp;
-          else if (resp && typeof resp === 'object') {
-            if (Array.isArray(resp.data)) items = resp.data;
-            else if (Array.isArray(resp.items)) items = resp.items;
-            else {
-              const arr = Object.values(resp).find(v => Array.isArray(v));
-              if (Array.isArray(arr)) items = arr;
-            }
-          }
-          this.convenios = items.map(i => ({ id: Number(i.id), nombre: i.codigoUcm }));
-        },
-        error: (err) => { console.error('Error cargando convenios', err); this.convenios = []; }
-      });
-  }
-
-  // ---------- CRUD / listado ----------
-  fetchRelaciones() {
+  // ---------- CRUD ----------
+  fetchBeneficios() {
     this.error = null;
     this.loadingTable = true;
-    this.api.get<any>('InstitucionConvenio/Consultar_ConsultarInstitucionConvenio')
+    this.api.get<any>('BeneficioPostulacion/Consultar_PostulacionBeneficios')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          let items: any[] = [];
-          if (Array.isArray(response)) items = response;
-          else if (response && typeof response === 'object') {
-            if (Array.isArray(response.data)) items = response.data;
-            else if (Array.isArray(response.items)) items = response.items;
-            else {
-              const arr = Object.values(response).find(v => Array.isArray(v));
-              if (Array.isArray(arr)) items = arr;
-            }
-          }
-
-          this.data = items.map(item =>
-            InstitucionConvenioModel.fromJSON ? InstitucionConvenioModel.fromJSON(item) : Object.assign(new InstitucionConvenioModel(), item)
-          );
-
+          let items: any[] = Array.isArray(response) ? response : response?.data ?? [];
+          this.data = items.map(item => BeneficioPostulacionaModel.fromJSON(item));
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
           this.loadingTable = false;
         },
         error: (err) => {
-          console.error('Error al consultar relaciones', err);
+          console.error('Error al consultar beneficios', err);
           this.error = 'No se pudo cargar la información. Intenta de nuevo.';
           this.data = [];
           this.filteredData = [];
@@ -139,7 +83,31 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
       });
   }
 
-  filterRelaciones() {
+  fetchBeneficioConvocatoria() {
+    this.api.get<any>('BeneficioConvocatoria/Consultar_BeneficiosIdConvocatoria?idConvocatoria=' + this.convocatoriaId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          let items: any[] = [];
+          if (Array.isArray(resp)) items = resp;
+          else if (resp && typeof resp === 'object') {
+            if (Array.isArray(resp.data)) items = resp.data;
+            else if (Array.isArray(resp.items)) items = resp.items;
+            else {
+              const arr = Object.values(resp).find(v => Array.isArray(v));
+              if (Array.isArray(arr)) items = arr;
+            }
+          }
+          this.beneficios = items.map(i => ({ id: Number(i.id), nombre: i.nombreBeneficio }));
+        },
+        error: (err) => {
+          console.error('Error cargando modalidades', err);
+          this.beneficios = [];
+        }
+      });
+  }
+
+  filterBeneficios() {
     this.error = null;
     if (!this.filtro || this.filtro.trim() === '') {
       this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
@@ -147,30 +115,20 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
     }
     this.loadingTable = true;
     const q = encodeURIComponent(this.filtro.trim());
-    this.api.get<any>(`InstitucionConvenio/Consultar_InstitucionConvenioGeneral?nombreInstitucion=${q}&nombreConvenio=${q}`)
+    this.api.get<any>(`Beneficios/Consultar_BeneficioGeneral?nombreBeneficio=${q}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          let items: any[] = [];
-          if (Array.isArray(response)) items = response;
-          else if (response && typeof response === 'object') {
-            if (Array.isArray(response.data)) items = response.data;
-            else if (Array.isArray(response.items)) items = response.items;
-            else {
-              const arr = Object.values(response).find(v => Array.isArray(v));
-              if (Array.isArray(arr)) items = arr;
-            }
-          }
-
-          this.data = items.map(item => InstitucionConvenioModel.fromJSON ? InstitucionConvenioModel.fromJSON(item) : Object.assign(new InstitucionConvenioModel(), item));
+          let items: any[] = Array.isArray(response) ? response : response?.data ?? [];
+          this.data = items.map(item => BeneficioPostulacionaModel.fromJSON(item));
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
           this.loadingTable = false;
         },
         error: (err) => {
-          console.error('Error al filtrar relaciones', err);
-          this.showError('Error al filtrar relacione');
+          console.error('Error al filtrar beneficios', err);
+          this.showError('Error al filtrar beneficios');
           this.loadingTable = false;
         }
       });
@@ -183,28 +141,18 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.model.institucionId || !this.model.convenioId) {
-      this.error = 'Debe seleccionar una condición y una convocatoria.';
-      return;
-    }
-
     this.loading = true;
     this.error = null;
 
-    const isUpdate = this.isEditing && this.model.id && this.model.id > 0;
-    const payload: any = {
-      institucionId: Number(this.model.institucionId),
-      convenioId: Number(this.model.convenioId)
-    };
+    const isUpdate = this.isEditing && this.model.id > 0;
+    const payload = this.model.toJSON();
 
-    if (isUpdate) payload.id = this.model.id;
-
-    const endpoint = isUpdate ? 'InstitucionConvenio/actualiza_Beneficio' : 'InstitucionConvenio/crear_InstitucionConvenio';
+    const endpoint = isUpdate ? 'BeneficioPostulacion/actualiza_BeneficioPostulacion' : 'BeneficioPostulacion/crear_BeneficioPostulacion';
     const obs = isUpdate ? this.api.put<any>(endpoint, payload) : this.api.post<any>(endpoint, payload);
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
-        this.fetchRelaciones();
+        this.fetchBeneficios();
         this.resetForm(form);
         this.loading = false;
 
@@ -213,12 +161,11 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          // fallback por si llega algo inesperado
           this.showError('Respuesta desconocida del servidor.');
         }
       },
       error: (err) => {
-        console.error(isUpdate ? 'Error al actualizar relación' : 'Error al crear relación', err);
+        console.error(isUpdate ? 'Error al actualizar beneficio' : 'Error al crear beneficio', err);
         this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
         this.loading = false;
         this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
@@ -227,34 +174,34 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
   }
 
   resetForm(form?: NgForm) {
-    this.model = new InstitucionConvenioModel();
+    this.model = new BeneficioPostulacionaModel();
     this.isEditing = false;
     if (form) form.resetForm({
-      institucionId: null,
-      convenioId: null
+      beneficioConvocatoriaId: null,
+      estado: false
     });
   }
 
-  startEdit(item: InstitucionConvenioModel | any) {
-    this.model = InstitucionConvenioModel.fromJSON(item);
+  startEdit(item: any) {
+    this.model = BeneficioPostulacionaModel.fromJSON(item);
     this.isEditing = true;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async deleteItem(id: number) {
+  async deleteItem(id: any) {
     const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
     if (!confirmado) return;
 
-    this.api.delete(`CondicionConvocatoria/Eliminar/${id}`)
+    this.api.delete(`BeneficioPostulacion/Eliminar_Beneficios/${id}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.fetchRelaciones();
-          this.showSuccess('Se elimino el registro satisfactoriamente');
+          this.fetchBeneficios();
+          this.showSuccess('Se eliminó el registro satisfactoriamente');
         },
         error: (err) => {
-          console.error('Error al eliminar relación, el resgistro se encuentra asociado', err);
-          this.showError('Error al eliminar relación, el resgistro se encuentra asociado');
+          console.error('Error al eliminar beneficio', err);
+          this.showError('Error al eliminar beneficio');
         }
       });
   }
@@ -286,8 +233,8 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
     this.updatePagedData();
   }
 
-  trackByIndex(_: number, item: InstitucionConvenioModel) {
-    return item?.id ?? _;
+  trackByIndex(_: number, item: BeneficioPostulacionaModel) {
+    return item?.beneficioConvocatoriaId ?? _;
   }
 
   // ---------- Toasters / Confirm ----------
@@ -306,6 +253,7 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
       class: 'my-error-toast'
     });
   }
+
   showWarning(mensaje: string) {
     toast.warning('Atención', {
       description: mensaje,

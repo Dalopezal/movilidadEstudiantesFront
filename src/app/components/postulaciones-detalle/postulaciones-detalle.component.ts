@@ -20,6 +20,8 @@ import { NotificacionModalComponent } from '../notificacion-modal/notificacion-m
 import { NotificacionesComponent } from '../notificaciones/notificaciones.component';
 import { SharePointDriveComponent } from '../drive/drive.component';
 import { GestionEntregableComponent } from '../gestion-entregable/gestion-entregable.component';
+import { BeneficiosComponent } from "../beneficios-postulacion/beneficios-postulacion.component";
+import { FinanciacionComponent } from "../financiacion/financiacion.component";
 
 interface FieldConfig {
   name: string;
@@ -55,8 +57,10 @@ interface Step {
     MatInputModule,
     MatSelectModule,
     NotificacionesComponent,
-    GestionEntregableComponent
-  ],
+    GestionEntregableComponent,
+    BeneficiosComponent,
+    FinanciacionComponent
+],
   templateUrl: './postulaciones-detalle.component.html',
   styleUrls: ['./postulaciones-detalle.component.css'],
   providers: [ConfirmationService]
@@ -715,5 +719,23 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
         el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }, 100);
+  }
+
+  onGestioBeneficios(step: any) {
+    this.idPostulacion = this.idPostulacion;
+    const modalElement = document.getElementById('BeneficiosModal');
+    if (modalElement) {
+      const modal = new (window as any).bootstrap.Modal(modalElement);
+      modal.show();
+    }
+  }
+
+  onGestioFinanciacion(step: any) {
+    this.idPostulacion = this.idPostulacion;
+    const modalElement = document.getElementById('FinanciacionModel');
+    if (modalElement) {
+      const modal = new (window as any).bootstrap.Modal(modalElement);
+      modal.show();
+    }
   }
 }

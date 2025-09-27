@@ -8,23 +8,23 @@ import { HttpClientModule } from '@angular/common/http';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
-import { InstitucionConvenioModel } from '../../models/InstitucionConvenioModel';
+import { FinanciacionModel } from '../../models/FinanciacionModel';
 
 @Component({
-  selector: 'app-institucion-convenio',
+  selector: 'app-financiacion',
   standalone: true,
   imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
-  templateUrl: './institucion-convenio.component.html',
-  styleUrls: ['./institucion-convenio.component.css'],
+  templateUrl: './financiacion.component.html',
+  styleUrls: ['./financiacion.component.css'],
   providers: [ConfirmationService]
 })
-export class InstitucionConvenioComponent implements OnInit, OnDestroy {
-  data: InstitucionConvenioModel[] = [];
-  filteredData: InstitucionConvenioModel[] = [];
-  pagedData: InstitucionConvenioModel[] = [];
+export class FinanciacionComponent implements OnInit, OnDestroy {
+  data: FinanciacionModel[] = [];
+  filteredData: FinanciacionModel[] = [];
+  pagedData: FinanciacionModel[] = [];
 
-  instituciones: any[] = [];
-  convenios: any[] = [];
+  tiposFinanciacionExterna: any[] = [];
+  tiposFinanciacion: any[] = [];
 
   currentPage = 1;
   pageSize = 10;
@@ -36,7 +36,7 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
   error: string | null = null;
   filtro: string = '';
 
-  model: InstitucionConvenioModel = new InstitucionConvenioModel();
+  model: FinanciacionModel = new FinanciacionModel();
   isEditing = false;
 
   private destroy$ = new Subject<void>();
@@ -45,9 +45,9 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
   constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
 
   ngOnInit() {
-    this.fetchInstituciones();
-    this.fetchConvenios();
-    this.fetchRelaciones();
+    this.fetchTiposFinanciacionExterna();
+    this.fetchTiposFinanciacion();
+    this.fetchFinanciaciones();
   }
 
   ngOnDestroy() {
@@ -56,8 +56,8 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
   }
 
   // ---------- loaders para selects ----------
-  fetchInstituciones() {
-    this.api.get<any>('Institucion/Consultar_Institucion')
+  fetchTiposFinanciacionExterna() {
+    this.api.get<any>('TipoFinanciacionExterna/Consultar_TipoFinanciacionExterna')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
@@ -71,14 +71,14 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.instituciones = items.map(i => ({ id: Number(i.id), nombre: i.nombre }));
+          this.tiposFinanciacionExterna = items.map(i => ({ id: Number(i.id), descripcion: i.descripcion }));
         },
-        error: (err) => { console.error('Error cargando instituciones', err); this.instituciones = []; }
+        error: (err) => { console.error('Error cargando tipos financiacion externa', err); this.tiposFinanciacionExterna = []; }
       });
   }
 
-  fetchConvenios() {
-    this.api.get<any>('Convenios/Consultar_Convenio')
+  fetchTiposFinanciacion() {
+    this.api.get<any>('TipoFinanciacion/Consultar_TipoFinanciacion')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
@@ -92,17 +92,17 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.convenios = items.map(i => ({ id: Number(i.id), nombre: i.codigoUcm }));
+          this.tiposFinanciacion = items.map(i => ({ id: Number(i.id), descripcion: i.descripcion }));
         },
-        error: (err) => { console.error('Error cargando convenios', err); this.convenios = []; }
+        error: (err) => { console.error('Error cargando tipos financiacion', err); this.tiposFinanciacion = []; }
       });
   }
 
   // ---------- CRUD / listado ----------
-  fetchRelaciones() {
+  fetchFinanciaciones() {
     this.error = null;
     this.loadingTable = true;
-    this.api.get<any>('InstitucionConvenio/Consultar_ConsultarInstitucionConvenio')
+    this.api.get<any>('Financiacion/Consultar_Financiacion')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -117,17 +117,14 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
             }
           }
 
-          this.data = items.map(item =>
-            InstitucionConvenioModel.fromJSON ? InstitucionConvenioModel.fromJSON(item) : Object.assign(new InstitucionConvenioModel(), item)
-          );
-
+          this.data = items.map(item => FinanciacionModel.fromJSON(item));
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
           this.loadingTable = false;
         },
         error: (err) => {
-          console.error('Error al consultar relaciones', err);
+          console.error('Error al consultar financiaciones', err);
           this.error = 'No se pudo cargar la información. Intenta de nuevo.';
           this.data = [];
           this.filteredData = [];
@@ -139,7 +136,7 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
       });
   }
 
-  filterRelaciones() {
+  filterFinanciaciones() {
     this.error = null;
     if (!this.filtro || this.filtro.trim() === '') {
       this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
@@ -147,7 +144,7 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
     }
     this.loadingTable = true;
     const q = encodeURIComponent(this.filtro.trim());
-    this.api.get<any>(`InstitucionConvenio/Consultar_InstitucionConvenioGeneral?nombreInstitucion=${q}&nombreConvenio=${q}`)
+    this.api.get<any>(`Financiacion/Consultar_FinanciacionGeneral?nombrePostulacion=${q}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -162,15 +159,15 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
             }
           }
 
-          this.data = items.map(item => InstitucionConvenioModel.fromJSON ? InstitucionConvenioModel.fromJSON(item) : Object.assign(new InstitucionConvenioModel(), item));
+          this.data = items.map(item => FinanciacionModel.fromJSON(item));
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
           this.loadingTable = false;
         },
         error: (err) => {
-          console.error('Error al filtrar relaciones', err);
-          this.showError('Error al filtrar relacione');
+          console.error('Error al filtrar financiaciones', err);
+          this.showError('Error al filtrar financiaciones');
           this.loadingTable = false;
         }
       });
@@ -183,28 +180,18 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.model.institucionId || !this.model.convenioId) {
-      this.error = 'Debe seleccionar una condición y una convocatoria.';
-      return;
-    }
-
     this.loading = true;
     this.error = null;
 
     const isUpdate = this.isEditing && this.model.id && this.model.id > 0;
-    const payload: any = {
-      institucionId: Number(this.model.institucionId),
-      convenioId: Number(this.model.convenioId)
-    };
+    const payload = this.model.toJSON();
 
-    if (isUpdate) payload.id = this.model.id;
-
-    const endpoint = isUpdate ? 'InstitucionConvenio/actualiza_Beneficio' : 'InstitucionConvenio/crear_InstitucionConvenio';
+    const endpoint = isUpdate ? 'Financiacion/Actualizar_Financiacion' : 'Financiacion/Crear_Financiacion';
     const obs = isUpdate ? this.api.put<any>(endpoint, payload) : this.api.post<any>(endpoint, payload);
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
-        this.fetchRelaciones();
+        this.fetchFinanciaciones();
         this.resetForm(form);
         this.loading = false;
 
@@ -213,12 +200,11 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          // fallback por si llega algo inesperado
           this.showError('Respuesta desconocida del servidor.');
         }
       },
       error: (err) => {
-        console.error(isUpdate ? 'Error al actualizar relación' : 'Error al crear relación', err);
+        console.error(isUpdate ? 'Error al actualizar financiacion' : 'Error al crear financiacion', err);
         this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
         this.loading = false;
         this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
@@ -227,16 +213,24 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
   }
 
   resetForm(form?: NgForm) {
-    this.model = new InstitucionConvenioModel();
+    this.model = new FinanciacionModel();
     this.isEditing = false;
     if (form) form.resetForm({
-      institucionId: null,
-      convenioId: null
+      postulacionId: 0,
+      arl: 0,
+      comisionServicios: 0,
+      descuentoMatricula: 0,
+      valorApoyoAlojamiento: 0,
+      valorApoyoEconomico: 0,
+      valorOtros: 0,
+      valorCompraTiquetes: 0,
+      tipoFinanciacionExternaId: null,
+      tipoFinanciacionId: null
     });
   }
 
-  startEdit(item: InstitucionConvenioModel | any) {
-    this.model = InstitucionConvenioModel.fromJSON(item);
+  startEdit(item: any) {
+    this.model = FinanciacionModel.fromJSON(item);
     this.isEditing = true;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -245,16 +239,16 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
     const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
     if (!confirmado) return;
 
-    this.api.delete(`CondicionConvocatoria/Eliminar/${id}`)
+    this.api.delete(`Financiacion/Eliminar_Financiacion/${id}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.fetchRelaciones();
-          this.showSuccess('Se elimino el registro satisfactoriamente');
+          this.fetchFinanciaciones();
+          this.showSuccess('Se eliminó el registro satisfactoriamente');
         },
         error: (err) => {
-          console.error('Error al eliminar relación, el resgistro se encuentra asociado', err);
-          this.showError('Error al eliminar relación, el resgistro se encuentra asociado');
+          console.error('Error al eliminar financiacion', err);
+          this.showError('Error al eliminar financiacion');
         }
       });
   }
@@ -286,7 +280,7 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
     this.updatePagedData();
   }
 
-  trackByIndex(_: number, item: InstitucionConvenioModel) {
+  trackByIndex(_: number, item: FinanciacionModel) {
     return item?.id ?? _;
   }
 
@@ -306,6 +300,7 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
       class: 'my-error-toast'
     });
   }
+
   showWarning(mensaje: string) {
     toast.warning('Atención', {
       description: mensaje,
