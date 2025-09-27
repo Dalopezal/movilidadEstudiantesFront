@@ -53,20 +53,22 @@
                 </div>
 
                 <div class="mb-3">
+
                   <label for="tipoCondicion" class="form-label fw-bold">Tipo Condición</label>
-                  <select
-                    class="form-select"
+                  <input
+                    type="text"
+                    class="form-control"
                     id="tipoCondicion"
                     name="tipoCondicion"
+                    placeholder="Digite Tipo Condición"
                     required
+                    minlength="3"
                     [(ngModel)]="model.tipoCondicion"
                     #tipoCtrl="ngModel"
                     style="font-size: 13px"
-                  >
-                    <option *ngFor="let t of tipoOptions" [value]="t">{{ t }}</option>
-                  </select>
+                  />
                   <div class="text-danger small mt-1" *ngIf="tipoCtrl.invalid && (tipoCtrl.touched || tipoCtrl.dirty)">
-                    <div *ngIf="tipoCtrl.errors?.['required']">Debe seleccionar un tipo.</div>
+                    <div *ngIf="tipoCtrl.errors?.['required']">Debe seleccionar un tipo</div>
                   </div>
                 </div>
 

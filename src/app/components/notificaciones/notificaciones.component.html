@@ -56,7 +56,7 @@
                 </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td align="center">{{ item.asunto }}</td>
-                    <td align="center">{{ item.asunto }}</td>
+                    <td align="center">{{ item.nombre }}</td>
                     <td align="center">{{ item.fechaenvio }}</td>
                   </tr>
                   <tr *ngIf="!loading && pagedData.length === 0">

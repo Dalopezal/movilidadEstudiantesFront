@@ -13,6 +13,7 @@ import { CondicionComponent } from '../condicion/condicion.component';
 import { BeneficioConvocatoriaComponent } from '../beneficio-convocatoria/beneficio-convocatoria.component';
 import { EntregableComponent } from '../entregable/entregable.component';
 import { Router } from '@angular/router';
+import { PostulacionTipoConsultaModel } from '../../models/PostulacionTipoModel';
 
 @Component({
   selector: 'app-convocatorias-general',
@@ -347,6 +348,13 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
     this.router.navigate(['/postulacion-convocatoria'], {queryParams: {
       id: item.id,
       nombre: item.nombre
+    }
+    });
+  }
+
+  abrirPostulacionDetalle() {
+    this.router.navigate(['/postulacion-detalle'], {queryParams: {
+
     }
     });
   }
