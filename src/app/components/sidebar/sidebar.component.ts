@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
@@ -12,8 +12,16 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 export class SidebarComponent {
   isCollapsed = true;
   ismovilidadOpen = false; // Controla submenú
+  usuario: any = {};
+  isUserMenuOpen = false;
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef, private router: Router) {}
+
+  ngOnInit(): void {
+    // Recuperar usuario guardado en login
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
+  }
 
   toggleSidebar() {
     this.isCollapsed = !this.isCollapsed;
@@ -35,5 +43,30 @@ export class SidebarComponent {
       if (!this.isCollapsed) this.isCollapsed = true;
       if (this.ismovilidadOpen) this.ismovilidadOpen = false;
     }
+  }
+
+  toggleUserMenu() {
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
+  logout() {
+    localStorage.clear();
+    this.router.navigate(['/login']);
+  }
+
+  decodeUtf8(str: string): string {
+    try {
+      return decodeURIComponent(escape(str));
+    } catch {
+      return str;
+    }
+  }
+
+  hasFoto(): boolean {
+    return this.usuario?.foto && this.usuario.foto.trim() !== '' && this.usuario.foto !== 'null';
+  }
+
+  onImageError(event: any) {
+    event.target.style.display = 'none';
   }
 }

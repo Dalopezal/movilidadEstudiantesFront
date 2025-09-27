@@ -79,15 +79,30 @@
         </div>
       </div>
     </div>
-
-    <!-- Salir -->
-    <a routerLink="/login"
-       routerLinkActive="active"
-       [routerLinkActiveOptions]="{ exact: true }"
-       class="nav-link">
-      <i class="fa fa-sign-out-alt"></i><span class="link-text">Salir</span>
-    </a>
   </nav>
+  <div class="sidebar-user" (click)="toggleUserMenu()" [class.open]="isUserMenuOpen">
+    <ng-container *ngIf="usuario?.foto && usuario.foto !== '' && usuario.foto !== 'null'; else userIcon">
+      <img [src]="usuario?.foto" alt="Usuario" class="user-avatar" (error)="onImageError($event)" />
+    </ng-container>
+    <ng-template #userIcon>
+      <i class="fas fa-user-circle user-icon"></i>
+    </ng-template>
+    <div class="user-info">
+      <strong style="font-size: 13.5px;">{{ decodeUtf8(usuario?.nombre) }}</strong>
+      <small>{{ usuario?.correo }}</small>
+      <small>{{ usuario?.rol }}</small>
+    </div>
+    <i class="fas fa-chevron-down user-chevron" [class.rotate]="isUserMenuOpen"></i>
+    <div class="user-submenu" *ngIf="isUserMenuOpen">
+      <a routerLink="/login"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }"
+         (click)="logout()"
+         class="submenu-link">
+        <i class="fa fa-sign-out-alt"></i> Salir
+      </a>
+    </div>
+  </div>
 </aside>
 
 <br><br><br>

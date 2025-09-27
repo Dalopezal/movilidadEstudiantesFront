@@ -156,7 +156,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError();
+          this.showError('No se pudo cargar la información. Intenta de nuevo');
           this.loadingTable = false;
         }
       });
@@ -193,7 +193,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al filtrar convenios', err);
-          this.showError();
+          this.showError('Error al filtrar convenios');
           this.loadingTable = false;
         }
       });
@@ -224,17 +224,25 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     const obs = isUpdate ? this.api.put<any>(endpoint, payload) : this.api.post<any>(endpoint, payload);
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
+      next: (response) => {
         this.fetchConvenios();
         this.resetForm(form);
         this.loading = false;
-        this.showSuccess();
+
+        if (response.exito && response.datos) {
+          this.showSuccess(response.exito);
+        } else if (response.error && response.datos === false) {
+          this.showError(response.error);
+        } else {
+          // fallback por si llega algo inesperado
+          this.showError('Respuesta desconocida del servidor.');
+        }
       },
       error: (err) => {
         console.error(isUpdate ? 'Error al actualizar convenio' : 'Error al crear convenio', err);
         this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
         this.loading = false;
-        this.showError();
+        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
       }
     });
   }
@@ -280,11 +288,11 @@ export class ConveniosComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchConvenios();
-          this.showSuccess();
+          this.showSuccess('Se elimino el registro satisfactoriamente');
         },
         error: (err) => {
           console.error('Error al eliminar convenio, el resgistro se encuentra asociado', err);
-          this.showError();
+          this.showError('Error al eliminar convenio, el resgistro se encuentra asociado');
         }
       });
   }
@@ -321,17 +329,17 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   }
 
   // ---------- Toasters / Confirm ----------
-  showSuccess() {
+  showSuccess(mensaje: any) {
     toast.success('¡Operación exitosa!', {
-      description: 'Tus datos se procesaron correctamente',
+      description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
     });
   }
 
-  showError() {
+  showError(mensaje: any) {
     toast.error('Error al procesar', {
-      description: 'El registro se encuentra asociado',
+      description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
     });
