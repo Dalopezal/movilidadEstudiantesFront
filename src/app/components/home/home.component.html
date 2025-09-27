@@ -22,11 +22,15 @@
         <th>Rol</th>
         <th>Selección</th>
       </tr>
-      <tr *ngFor="let rol of roles">
-        <td>{{ rol }}</td>
+       <tr *ngFor="let role of roles">
+        <td>{{ role.nombre }}</td> <!-- 👈 aquí usas la propiedad nombre -->
         <td>
-          <input type="radio" name="rol" [value]="rol"
-                 [(ngModel)]="selectedRole" />
+          <input
+            type="radio"
+            name="rol"
+            [value]="role.id"
+            [(ngModel)]="selectedRole"
+          />
         </td>
       </tr>
     </table>

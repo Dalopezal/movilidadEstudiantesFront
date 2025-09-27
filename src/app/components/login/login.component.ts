@@ -93,6 +93,7 @@ export class LoginComponent implements OnInit {
         correo: userData.email,
         nombre: userData.name,
         foto: userData.picture,
+        rolId: "",
         rol: "",
         tipo: "externo",
         tieneDatos: false,

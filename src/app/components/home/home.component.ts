@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { GenericApiService } from '../../services/generic-api.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -15,8 +17,13 @@ export class HomeComponent implements OnInit {
   usuario: any = {};
   showModalRol: boolean = false;   // modal 1
   showModalDatos: boolean = false; // modal 2
+  estados: any[] = [];
 
-  roles: string[] = ['Administrador', 'Estudiante', 'Profesor', 'Administrativo'];
+  private destroy$ = new Subject<void>();
+
+  constructor(private api: GenericApiService) {}
+
+  roles: any[] = [];
   selectedRole: string = '';
 
   datosPerfil: any = {
@@ -50,6 +57,7 @@ export class HomeComponent implements OnInit {
       this.usuario = JSON.parse(data);
 
       if (!this.usuario.rol || this.usuario.rol === '') {
+        this.fetchListaRoles();
         this.showModalRol = true;  // mostrar selección rol
       }
     }
@@ -65,7 +73,8 @@ export class HomeComponent implements OnInit {
 
   guardarRol() {
     if (this.selectedRole) {
-      this.usuario.rol = this.selectedRole;
+      this.usuario.rolId = this.selectedRole;
+      this.usuario.rol = this.getNombreRol(Number(this.selectedRole));
       localStorage.setItem('usuario', JSON.stringify(this.usuario));
 
       // preparar datosPerfil con datos previos
@@ -109,4 +118,34 @@ export class HomeComponent implements OnInit {
     // default
     return 'Ingresar';
   }
+
+  private fetchListaRoles() {
+    this.api.get<any>('Roles/Consultar_Rol?correo=sistemas@ucm.edu.co')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          let items: any[] = [];
+          if (Array.isArray(resp)) items = resp;
+          else if (resp && typeof resp === 'object') {
+            if (Array.isArray(resp.data)) items = resp.data;
+            else if (Array.isArray(resp.items)) items = resp.items;
+            else {
+              const arr = Object.values(resp).find(v => Array.isArray(v));
+              if (Array.isArray(arr)) items = arr;
+            }
+          }
+          this.roles = items.map(item => ({ id: item.idRol, nombre: item.nombreRol }));
+
+        },
+        error: (err) => {
+          console.error('Error al cargar estado para select', err);
+          this.roles = [];
+        }
+      });
+  }
+
+  getNombreRol(id: number): string {
+  const rol = this.roles.find(r => r.id === id);
+  return rol ? rol.nombre : 'Sin rol';
+}
 }
