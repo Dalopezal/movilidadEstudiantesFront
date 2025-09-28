@@ -1,6 +1,7 @@
 import { Component, OnInit, NgZone, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { MsalService } from '@azure/msal-angular';
 
 declare const google: any; // Declaramos la variable global de Google
 
@@ -19,7 +20,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private router: Router,
     private ngZone: NgZone,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private msalService: MsalService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
@@ -30,6 +32,52 @@ export class LoginComponent implements OnInit {
         this.initializeGoogleSignIn();
       });
     }
+
+    // Procesar la respuesta de Microsoft
+    this.msalService.instance.handleRedirectPromise().then(result => {
+      if (result && result.account) {
+        this.msalService.instance.setActiveAccount(result.account);
+        this.guardarUsuario(result.account);
+
+        this.ngZone.run(() => {
+          this.loading = true;
+          setTimeout(() => {
+            this.loading = false;
+            this.router.navigate(['/home']);
+          }, 1500);
+        });
+      } else {
+        // Si ya había un usuario activo, también lo rediriges
+        const account = this.msalService.instance.getActiveAccount();
+        if (account) {
+          this.guardarUsuario(account);
+          this.ngZone.run(() => {
+            this.loading = true;
+            setTimeout(() => {
+              this.loading = false;
+              this.router.navigate(['/home']);
+            }, 1500);
+          });
+        }
+      }
+    });
+  }
+
+  private guardarUsuario(account: any) {
+    console.log('Usuario Microsoft:', account);
+
+    localStorage.setItem('usuario', JSON.stringify({
+      correo: account.username,
+      nombre: account.name,
+      tipo: 'microsoft'
+    }));
+    localStorage.setItem('auth_token', JSON.stringify(this.msalService.instance.getActiveAccount()));
+  }
+
+  loginWithMicrosoft() {
+    this.msalService.loginRedirect({
+      scopes: ['user.read'] // pedir datos básicos del perfil
+    });
   }
 
   initializeGoogleSignIn() {
@@ -65,7 +113,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // 👉 Función para decodificar un JWT
+  // Función para decodificar un JWT
   private decodeToken(token: string): any {
     try {
       const payload = token.split('.')[1];
@@ -76,7 +124,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  // 👉 Respuesta de Google al loguearse
+  // Respuesta de Google al loguearse
   handleCredentialResponse(response: any) {
     this.loading = true;
     this.mensaje = '';

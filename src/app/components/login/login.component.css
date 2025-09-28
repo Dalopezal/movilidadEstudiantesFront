@@ -105,10 +105,10 @@ button:disabled {
   box-shadow: none;
 }
 
-button:hover:not(:disabled) {
+/* button:hover:not(:disabled) {
   background: linear-gradient(90deg, #002244 80%, #003366 100%);
   box-shadow: 0 4px 16px 0 rgba(0,51,102,0.13);
-}
+} */
 
 .forgot-link {
   display: block;
@@ -180,4 +180,53 @@ button:hover:not(:disabled) {
   font-family: Georgia, 'Times New Roman', Times, serif;
   text-shadow: 0 0 5px rgba(0,0,0,0.7);
   opacity: 0.8;
+}
+
+.auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.btn-auth-outline {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px 16px;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  background: #fff;
+  color: #3c4043;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.btn-auth-outline img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Hover igual en ambos */
+.btn-auth-outline:hover {
+  background: #f8faff;       /* azul muy suave */
+  border-color: #d2e3fc;     /* borde azul clarito */
+}
+
+/* Google */
+.google-btn:hover {
+  background: #f8faff;
+  border-color: #d2e3fc;
+}
+
+/* Microsoft */
+.microsoft-btn:hover {
+  background: #f8faff;
+  border-color: #d2e3fc;
 }

@@ -8,8 +8,17 @@
     <h5 class="fuente">Sistema de Internacionalización</h5>
     <br>
 
-    <!-- Aquí se renderiza el botón de Google -->
-    <div id="googleSignInDiv"></div>
+    <div class="auth-buttons">
+      <!-- Botón Google -->
+      <div id="googleSignInDiv"></div>
+
+      <!-- Botón Microsoft -->
+      <button class="btn-auth-outline microsoft-btn" (click)="loginWithMicrosoft()">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" />
+        <span>Iniciar sesión con Microsoft</span>
+      </button>
+    </div>
+
 
     <p class="mensaje" *ngIf="mensaje">{{ mensaje }}</p>
   </div>

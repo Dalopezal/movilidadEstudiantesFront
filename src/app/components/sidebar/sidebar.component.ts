@@ -1,6 +1,7 @@
 import { Component, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { MsalService } from '@azure/msal-angular';
 
 @Component({
   selector: 'app-sidebar',
@@ -15,7 +16,7 @@ export class SidebarComponent {
   usuario: any = {};
   isUserMenuOpen = false;
 
-  constructor(private elementRef: ElementRef, private router: Router) {}
+  constructor(private elementRef: ElementRef, private router: Router, private msalService: MsalService) {}
 
   ngOnInit(): void {
     // Recuperar usuario guardado en login
@@ -49,10 +50,10 @@ export class SidebarComponent {
     this.isUserMenuOpen = !this.isUserMenuOpen;
   }
 
-  logout() {
-    localStorage.clear();
-    this.router.navigate(['/login']);
-  }
+  // logout() {
+  //   localStorage.clear();
+  //   this.router.navigate(['/login']);
+  // }
 
   decodeUtf8(str: string): string {
     try {
@@ -69,4 +70,39 @@ export class SidebarComponent {
   onImageError(event: any) {
     event.target.style.display = 'none';
   }
+
+  logout() {
+    const usuario = localStorage.getItem('usuario');
+    if (usuario) {
+      const { tipo } = JSON.parse(usuario);
+
+      if (tipo === 'microsoft') {
+        this.logoutMicrosoft();
+      } else if (tipo === 'externo') { // Google
+        this.logoutGoogle();
+      } else {
+        // otro caso o custom logout
+        localStorage.clear();
+        this.router.navigate(['/login']);
+      }
+    }
+  }
+
+  logoutMicrosoft() {
+    this.msalService.logoutRedirect({
+      postLogoutRedirectUri: 'http://localhost:4200/login' // o la ruta de tu login
+    });
+  }
+
+  logoutGoogle() {
+    const win: any = window;
+    if (win.google && win.google.accounts && win.google.accounts.id) {
+      win.google.accounts.id.disableAutoSelect();
+    }
+
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('usuario');
+    this.router.navigate(['/login']);
+  }
+
 }
