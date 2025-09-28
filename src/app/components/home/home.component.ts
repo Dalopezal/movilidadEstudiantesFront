@@ -57,7 +57,7 @@ export class HomeComponent implements OnInit {
       this.usuario = JSON.parse(data);
 
       if (!this.usuario.rol || this.usuario.rol === '') {
-        this.fetchListaRoles();
+        this.fetchListaRoles(this.usuario.correo);
         this.showModalRol = true;  // mostrar selección rol
       }
     }
@@ -83,6 +83,9 @@ export class HomeComponent implements OnInit {
       // cerrar modal 1 y abrir modal 2
       this.showModalRol = false;
       this.showModalDatos = true;
+
+      //forzar refrescar menú en el sidebar
+      window.dispatchEvent(new Event("storage"));
     }
   }
 
@@ -119,8 +122,8 @@ export class HomeComponent implements OnInit {
     return 'Ingresar';
   }
 
-  private fetchListaRoles() {
-    this.api.get<any>('Roles/Consultar_Rol?correo=sistemas@ucm.edu.co')
+  private fetchListaRoles(correo: any) {
+    this.api.get<any>('Roles/Consultar_Rol?correo=' + correo)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {

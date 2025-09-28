@@ -2,6 +2,8 @@ import { Component, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MsalService } from '@azure/msal-angular';
+import { GenericApiService } from '../../services/generic-api.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-sidebar',
@@ -15,14 +17,36 @@ export class SidebarComponent {
   ismovilidadOpen = false; // Controla submenú
   usuario: any = {};
   isUserMenuOpen = false;
+  menu: any[] = [];
+  maestros: any[] = [];
 
-  constructor(private elementRef: ElementRef, private router: Router, private msalService: MsalService) {}
+  private destroy$ = new Subject<void>();
 
-  ngOnInit(): void {
-    // Recuperar usuario guardado en login
+  constructor(private elementRef: ElementRef, private router: Router, private msalService: MsalService, private api: GenericApiService) {}
+
+  ngOnInit() {
+    window.addEventListener("storage", this.onStorageChange.bind(this));
     const data = localStorage.getItem('usuario');
     this.usuario = data ? JSON.parse(data) : {};
+
+    // Validar antes de llamar API
+    if (this.usuario?.rolId && this.usuario.rolId > 0) {
+      this.fetchMenu(this.usuario.rolId);
+    } else {
+      console.warn('RolId no definido, aún no se carga menú');
+    }
   }
+
+  ngOnDestroy() {
+    window.removeEventListener("storage", this.onStorageChange.bind(this));
+  }
+
+  private onStorageChange() {
+  const user = JSON.parse(localStorage.getItem("usuario") || "{}");
+  if (user?.rolId) {
+    this.fetchMenu(user.rolId);
+  }
+}
 
   toggleSidebar() {
     this.isCollapsed = !this.isCollapsed;
@@ -103,6 +127,42 @@ export class SidebarComponent {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('usuario');
     this.router.navigate(['/login']);
+  }
+
+  private fetchMenu(rol: any) {
+    this.api.get<any>('Permisos/Consultar_Permisos?RolId=' + rol)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          let items: any[] = [];
+          if (Array.isArray(resp)) items = resp;
+          else if (resp && typeof resp === 'object') {
+            if (Array.isArray(resp.data)) items = resp.data;
+            else if (Array.isArray(resp.items)) items = resp.items;
+            else {
+              const arr = Object.values(resp).find(v => Array.isArray(v));
+              if (Array.isArray(arr)) items = arr;
+            }
+          }
+
+          // 👌 Mapear permisos → url + nombre
+          this.menu = items.map(item => ({
+            url: item.paginaUrl,
+            nombre: item.nombre
+          }));
+
+          // Filtrar: dashboard siempre fijo, tipos-convocatorias fijo
+          this.maestros = this.menu.filter(m =>
+            m.url !== '/dashboard' && m.url !== '/tipos-convocatorias'
+          );
+
+        },
+        error: (err) => {
+          console.error('Error al cargar menús dinámicos', err);
+          this.menu = [];
+          this.maestros = [];
+        }
+      });
   }
 
 }

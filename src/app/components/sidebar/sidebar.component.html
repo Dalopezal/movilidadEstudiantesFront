@@ -45,39 +45,18 @@
         <a routerLink="/dashboard" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i><span class="link-text">Dashboard</span>
         </a>
-        <a routerLink="/tipos-convocatorias" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Convocatorias General</span>
-        </a>
 
         <!-- SUBGRUPO Maestros -->
         <div class="submenu-group">
-          <span class="submenu-title">Maestros</span>
-          <a routerLink="/condicion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i><span class="link-text">Condiciones Convocatoria</span>
-          </a>
-          <a routerLink="/entregables" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i><span class="link-text">Entregables Convocatoria</span>
-          </a>
-          <a routerLink="/financiacion-externa" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i><span class="link-text">Financiación Externa</span>
-          </a>
-          <a routerLink="/beneficios-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i><span class="link-text">Beneficio Convocatoria</span>
-          </a>
-          <a routerLink="/administracion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i><span class="link-text">Administración Convocatoria</span>
-          </a>
-          <a routerLink="/condicion" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i><span class="link-text">Condiciones</span>
-          </a>
-          <a routerLink="/convenios" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i><span class="link-text">Convenios</span>
-          </a>
-          <a routerLink="/instituciones" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i><span class="link-text">Instituciones</span>
-          </a>
-          <a routerLink="/institucion-convenio" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i><span class="link-text">Instituciones Convenio</span>
+          <span class="submenu-title">GENERAL</span>
+
+          <!-- menú dinámico generado según permisos -->
+          <a *ngFor="let m of maestros"
+            [routerLink]="'/'+m.url"
+            routerLinkActive="active"
+            class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">{{ m.nombre }}</span>
           </a>
         </div>
       </div>
