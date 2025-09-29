@@ -18,7 +18,6 @@ import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { NotificacionModalComponent } from '../notificacion-modal/notificacion-modal.component';
 import { NotificacionesComponent } from '../notificaciones/notificaciones.component';
-import { SharePointDriveComponent } from '../drive/drive.component';
 import { GestionEntregableComponent } from '../gestion-entregable/gestion-entregable.component';
 import { BeneficiosComponent } from "../beneficios-postulacion/beneficios-postulacion.component";
 import { FinanciacionComponent } from "../financiacion/financiacion.component";
@@ -26,7 +25,7 @@ import { FinanciacionComponent } from "../financiacion/financiacion.component";
 interface FieldConfig {
   name: string;
   label: string;
-  tipo?: 'text' | 'select' | 'checkbox' | 'readonly' | 'date' | 'textarea';
+  tipo?: 'text' | 'select' |'selectChange' | 'checkbox' | 'readonly' | 'date' | 'textarea' | 'number';
   editable?: boolean;
   opciones?: { value: any, label: string }[];
 }
@@ -76,156 +75,183 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   documento: any;
   convocatoria: any;
   convocatoriaId: any;
-
-  campoEstado: Record<number, FieldConfig[]> = {
-    1: [ // Pre-postulación
-      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
-      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' },
-      { name: 'periodo', label: 'Periodo', tipo: 'select', editable: true, opciones: [
-        { value: 1, label: 'Periodo 1' }, { value: 2, label: 'Periodo 2' }
-      ]},
-      { name: 'nombreConvenio', label: 'Convenio', tipo: 'select', editable: true },
-      { name: 'observaciones', label: 'Observaciones', tipo: 'textarea', editable: true },
-      { name: 'nombreTipoMovilidad', label: 'Tipo Movilidad', tipo: 'select', editable: true },
-      { name: 'urlEncuestaSatisfaccion', label: 'Encuesta Satisfacción', tipo: 'checkbox', editable: false }
-    ],
-    2: [ // Rechazado Pre-postulación
-      { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
-      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    3: [ // Postulado
-      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
-      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' },
-      { name: 'periodo', label: 'Periodo', tipo: 'readonly' },
-      { name: 'nombreConvenio', label: 'Convenio', tipo: 'readonly' },
-      { name: 'observaciones', label: 'Observaciones', tipo: 'text', editable: true },
-      { name: 'nombreTipoMovilidad', label: 'Tipo Movilidad', tipo: 'readonly' },
-      { name: 'urlEncuestaSatisfaccion', label: 'Encuesta', tipo: 'readonly' },
-      { name: 'objetivo', label: 'Objetivo', tipo: 'text', editable: true },
-      { name: 'fechaInicioMovilidad', label: 'Fecha Inicio', tipo: 'date', editable: true },
-      { name: 'fechaFinMovilidad', label: 'Fecha Fin', tipo: 'date', editable: true },
-      { name: 'nombreInstitucion', label: 'Institución', tipo: 'select', editable: true },
-      { name: 'fechaEntregable', label: 'Fecha Entregable', tipo: 'date', editable: true },
-      { name: 'asistioEntrevista', label: 'Asistió Entrevista', tipo: 'checkbox', editable: true }
-    ],
-    4: [ // Aprobado Postulación
-      { name: 'fechaEntregable', label: 'Fecha Entregable', tipo: 'readonly' },
-      { name: 'requiereVisa', label: 'Requiere Visa', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    5: [ // Rechazado Postulación
-      { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
-      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    6: [ // Aprobado Director de Programa
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    7: [ // Rechazado Director de Programa
-      { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
-      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    8: [ // Aprobado Decanatura
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    9: [ // Rechazado Decanatura
-      { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
-      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    10: [ // Aprobado Vicerrectoría Académica
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    11: [ // Rechazado Vicerrectoría Académica
-      { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
-      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    12: [ // Aprobado Jefe Inmediato
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    13: [ // Rechazado Jefe Inmediato
-      { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
-      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    14: [ // Aprobado Rectoría
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    15: [ // Rechazado Rectoría
-      { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
-      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    16: [ // Postulado Universidad Destino
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    17: [ // Aprobado Universidad Destino
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    18: [ // Rechazado Universidad Destino
-      { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'text', editable: true },
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
-      { name: 'nombreCompleto', label: 'Usuario', tipo: 'readonly' },
-      { name: 'nombreConvocatoria', label: 'Convocatoria', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
-    ],
-    19: [ // En Movilidad
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' },
-      { name: 'esMatriculadoSiiga', label: 'Matriculado SIIGA', tipo: 'checkbox', editable: true },
-      { name: 'esNotificadoRegistroAcademico', label: 'Notificado Registro Académico', tipo: 'checkbox', editable: true }
-    ],
-    20: [ // Finalizado
-      { name: 'nombreEstado', label: 'Estado', tipo: 'readonly' },
-      { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' },
-      { name: 'certificadoMovilidad', label: 'Certificado Movilidad', tipo: 'text', editable: true },
-      { name: 'realizoEncuestaSatisfaccion', label: 'Encuesta Satisfacción', tipo: 'checkbox', editable: true },
-      { name: 'registradoSire', label: 'Registrado SIRE', tipo: 'checkbox', editable: true },
-      { name: 'financiacionExterna', label: 'Financiación Externa', tipo: 'text', editable: true },
-      { name: 'financiacioUcm', label: 'Financiación UCM', tipo: 'text', editable: true }
-    ]
-  };
+  usuario: any = {};
+  nombreUsuario: string = '';
+  campoEstado: Record<number, FieldConfig[]> = {};
+  idCovocatoria: any;
+  nombreCombocatoria: any;
+  instituciones: any[] = [];
+  convenios: any[] = [];
 
   constructor(private api: GenericApiService, private location: Location, private route: ActivatedRoute, public dialog: MatDialog ) {}
 
   ngOnInit() {
+    window.addEventListener("storage", this.onStorageChange.bind(this));
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
     this.getEstados();
+    this.fetchListaInstituciones();
+    this.cargatSecciones();
+  }
+
+  cargatSecciones(){
+    this.campoEstado = {
+      1: [ // Pre-postulación / Pendiente Pre-Postulación
+        { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' }, // Cédula y nombre automático
+        { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' }, // Default seleccionada previamente
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' }, // "Pendiente Pre-Postulación" o "Pre-postulado"
+        { name: 'fechaPrePostulacion', label: 'Fecha Pre-Postulación', tipo: 'readonly' }, // Automático sistema
+        { name: 'periodo', label: 'Periodo', tipo: 'number', editable: true},
+        { name: 'institucionId', label: this.usuario.tipoUsuario == '1' ? 'Institución Destino' : 'Institución Origen', tipo: 'selectChange', editable: true, opciones: this.instituciones }, // Label cambia según rol
+        { name: 'convenioId', label: 'Convenio', tipo: 'select', editable: true, opciones: this.convenios }, // Dependiente de institución
+        { name: 'observaciones', label: 'Observaciones', tipo: 'textarea', editable: true },
+        { name: 'tipoMovilidadId', label: 'Tipo Movilidad', tipo: 'select', editable: true },
+      ],
+      2: [ // Rechazado Pre-postulación (solo rol ORI Interno 7)
+        { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+        { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'textarea', editable: true }, // Obligatorio
+        { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
+        { name: 'fechaRechazoPostulacion', label: 'Fecha Rechazo Postulación', tipo: 'readonly' }
+      ],
+      21: [ // Aceptado Pre-postulación (solo rol ORI Interno 7)
+        { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
+        { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      3: [ // Postulado (lo hace el usuario)
+        { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
+        { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' },
+        { name: 'periodo', label: 'Periodo', tipo: 'readonly' },
+        { name: 'convenioId', label: 'Convenio', tipo: 'readonly' },
+        { name: 'observaciones', label: 'Observaciones', tipo: 'textarea', editable: true },
+        { name: 'tipoMovilidadId', label: 'Tipo Movilidad', tipo: 'readonly' },
+        { name: 'urlEncuestaSatisfaccion', label: 'Encuesta Satisfacción', tipo: 'readonly' },
+        { name: 'objetivo', label: 'Objetivo', tipo: 'textarea', editable: true }, // Obligatorio
+        { name: 'fechaInicioMovilidad', label: 'Fecha Inicio Movilidad', tipo: 'date', editable: true },
+        { name: 'fechaFinMovilidad', label: 'Fecha Fin Movilidad', tipo: 'date', editable: true },
+        { name: 'institucionId', label: 'Institución', tipo: 'select', editable: true },
+        { name: 'fechaEntregable', label: 'Fecha Entregable', tipo: 'date', editable: true },
+        { name: 'asistioEntrevista', label: 'Asistió Entrevista', tipo: 'checkbox', editable: true }
+      ],
+      4: [ // Rechazado Postulación (lo hace ORI)
+        { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
+        { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'textarea', editable: true },
+        { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      5: [ // Aprobado Postulación (lo hace ORI) - Estado 3 según documento
+        { name: 'fechaEntregable', label: 'Fecha Entregable', tipo: 'readonly' },
+        { name: 'requiereVisa', label: 'Requiere Visa', tipo: 'checkbox', editable: true }, // Lo pide ORI
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      6: [ // Aprobado Director de Programa
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      7: [ // Rechazado Director de Programa
+        { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
+        { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'textarea', editable: true },
+        { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      8: [ // Aprobado Decanatura
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      9: [ // Rechazado Decanatura
+        { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
+        { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'textarea', editable: true },
+        { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      10: [ // Aprobado Vicerrectoría Académica
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      11: [ // Rechazado Vicerrectoría Académica
+        { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
+        { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'textarea', editable: true },
+        { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      12: [ // Aprobado Jefe Inmediato
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      13: [ // Rechazado Jefe Inmediato
+        { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
+        { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'textarea', editable: true },
+        { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      14: [ // Aprobado Rectoría
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      15: [ // Rechazado Rectoría
+        { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
+        { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'textarea', editable: true },
+        { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      16: [ // Postulado Universidad Destino
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      17: [ // Aprobado Universidad Destino
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      18: [ // Rechazado Universidad Destino
+        { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
+        { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' },
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'motivoRechazo', label: 'Motivo Rechazo', tipo: 'textarea', editable: true },
+        { name: 'esNotificadoCorreo', label: 'Notificado Correo', tipo: 'checkbox', editable: true },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' }
+      ],
+      19: [ // En Movilidad
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' },
+        { name: 'esMatriculadoSiiga', label: 'Matriculado SIIGA', tipo: 'checkbox', editable: true },
+        { name: 'esNotificadoRegistroAcademico', label: 'Notificado Registro Académico', tipo: 'checkbox', editable: true }
+      ],
+      20: [ // Finalizado
+        { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
+        { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' },
+        { name: 'certificadoMovilidad', label: 'Certificado Movilidad', tipo: 'text', editable: true }, // Genera PDF
+        { name: 'realizoEncuestaSatisfaccion', label: 'Realizó Encuesta Satisfacción', tipo: 'checkbox', editable: true },
+        { name: 'registradoSire', label: 'Registrado SIRE', tipo: 'checkbox', editable: true },
+        { name: 'financiacionExterna', label: 'Financiación Externa', tipo: 'text', editable: true },
+        { name: 'financiacioUcm', label: 'Financiación UCM', tipo: 'text', editable: true }
+      ]
+    };
+
+  }
+
+  private onStorageChange() {
+    const user = JSON.parse(localStorage.getItem("usuario") || "{}");
+    if (user?.rolId) {
+
+    }
   }
 
   ngOnDestroy() {
@@ -266,6 +292,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
           this.getBitacora(this.idPostulacion);
 
           this.loading = false;
+
         },
         error: (err) => {
           console.error('Error cargando estados', err);
@@ -275,66 +302,179 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Paso 2 – bitácora, asignar a los steps existentes
-  getBitacora(id: number) {
-  this.api.get<any>(`Postulaciones/Consultar_PostulacionBitacora?id=${id}`)
+private fetchListaInstituciones() {
+
+  this.route.queryParams.subscribe(params => {
+      this.idCovocatoria = params['idConvocatoria'];
+      this.nombreCombocatoria = params['nombre'];
+    });
+
+  this.api.get<any>('InstitucionConvenio/Consultar_InstitucionConvenioEspecifico?id=' + this.idCovocatoria)
     .pipe(takeUntil(this.destroy$))
     .subscribe({
       next: (resp) => {
-        let bitacora: any[] = [];
-
-        if (Array.isArray(resp)) {
-          bitacora = resp;
-        } else if (resp && typeof resp === 'object') {
-          if (Array.isArray(resp.data)) bitacora = resp.data;
-          else if (Array.isArray(resp.items)) bitacora = resp.items;
+        let items: any[] = [];
+        if (Array.isArray(resp)) items = resp;
+        else if (resp && typeof resp === 'object') {
+          if (Array.isArray(resp.data)) items = resp.data;
+          else if (Array.isArray(resp.items)) items = resp.items;
           else {
             const arr = Object.values(resp).find(v => Array.isArray(v));
-            if (Array.isArray(arr)) bitacora = arr;
+            if (Array.isArray(arr)) items = arr;
           }
         }
+        this.instituciones = items.map(item => ({ value: item.id, label: item.institucionNombre }));
+        console.log("instituciones", this.instituciones);
+        this.cargatSecciones();
 
-        console.log("bitacora:", bitacora);
-
-        this.steps.forEach(step => {
-          const fieldsForThisStep = this.campoEstado[step.id] || [];
-          const stepData: any = {};
-          bitacora.forEach(entry => {
-            fieldsForThisStep.forEach(field => {
-              if (entry[field.name] !== undefined && entry[field.name] !== null) {
-                stepData[field.name] = entry[field.name];
-              }
-            });
-          });
-          step.data = stepData;
-        });
-
-        if (bitacora.length > 0) {
-          const ultimo = bitacora[bitacora.length - 1];
-          console.log("ultimo registro:", ultimo);
-
-          const index = this.steps.findIndex(s =>
-            String(s.id) === String(ultimo.estadoPostulacionId)
-          );
-          console.log("index encontrado:", index);
-
-          if (index >= 0) {
-            this.currentStep = index;
-            // No usamos stepper porque tu UI ya es wizard lateral
-            this.documento = ultimo.documento;
-            this.convocatoria = ultimo.nombreConvocatoria;
-            this.convocatoriaId = ultimo.convocatoriaId;
-            this.focusCurrentStep();
-          }
-        }
-
-        this.loading = false;
       },
       error: (err) => {
-        console.error('Error al cargar bitácora', err);
-        this.loading = false;
+        console.error('Error al cargar estado para select', err);
+        this.instituciones = [];
       }
     });
+  }
+
+  onFieldChange(field: FieldConfig, value: any) {
+    this.steps[this.currentStep].data = {
+      ...this.steps[this.currentStep].data,
+      [field.name]: value
+    };
+
+    if (field.name === 'institucionId') {
+      this.fetchListaConvocatoria(value);
+    }
+  }
+
+
+  fetchListaConvocatoria(value: any){
+    this.api.get<any>('InstitucionConvenio/Consultar_ConvenioXInstitucion?idInstitucion=' + value)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          let items: any[] = [];
+          if (Array.isArray(resp)) items = resp;
+          else if (resp && typeof resp === 'object') {
+            if (Array.isArray(resp.data)) items = resp.data;
+            else if (Array.isArray(resp.items)) items = resp.items;
+            else {
+              const arr = Object.values(resp).find(v => Array.isArray(v));
+              if (Array.isArray(arr)) items = arr;
+            }
+          }
+          this.convenios = items.map(item => ({ value: item.id, label: item.codigoUcm }));
+          this.cargatSecciones();
+
+        },
+        error: (err) => {
+          console.error('Error al cargar estado para select', err);
+          this.convenios = [];
+        }
+      });
+  }
+
+  // Paso 2 – bitácora, asignar a los steps existentes
+    getBitacora(id: number) {
+
+    this.steps.forEach(step => {
+        const fieldsForThisStep = this.campoEstado[step.id] || [];
+        const stepData: any = {};
+
+        this.route.queryParams.subscribe(params => {
+          this.idCovocatoria = params['id'];
+          this.nombreCombocatoria = params['nombre'];
+        });
+
+        // PASO 1: Cargar datos del localStorage primero
+        fieldsForThisStep.forEach(field => {
+          if (field.name === 'usuarioId' && this.usuario?.nombre) {
+            stepData[field.name] = `${this.usuario.nombre}`;
+          }
+
+          if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
+            stepData[field.name] = `${this.nombreCombocatoria}`;
+          }
+
+          if (field.name === 'estadoPostulacionId' && 'Pre-postulacion') {
+            stepData[field.name] = `Pre-postulacion`;
+          }
+
+          if (field.name === 'estadoPostulacionId' && 'Pre-postulación') {
+            stepData[field.name] = 'Pre-postulación';
+            stepData['fechaPrePostulacion'] = new Date().toLocaleDateString();
+          }
+        });
+
+        step.data = stepData;
+      });
+
+    this.api.get<any>(`Postulaciones/Consultar_PostulacionBitacora?id=${id}`)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          let bitacora: any[] = [];
+
+          if (Array.isArray(resp)) {
+            bitacora = resp;
+          } else if (resp && typeof resp === 'object') {
+            if (Array.isArray(resp.data)) bitacora = resp.data;
+            else if (Array.isArray(resp.items)) bitacora = resp.items;
+            else {
+              const arr = Object.values(resp).find(v => Array.isArray(v));
+              if (Array.isArray(arr)) bitacora = arr;
+            }
+          }
+
+          console.log("bitacora:", bitacora);
+
+          this.steps.forEach(step => {
+            const fieldsForThisStep = this.campoEstado[step.id] || [];
+            const stepData: any = {};
+
+            // PASO 1: Cargar datos del localStorage primero
+            fieldsForThisStep.forEach(field => {
+              if (field.name === 'usuarioId' && this.usuario?.nombre) {
+                stepData[field.name] = `${this.usuario.nombre}`;
+              }
+            });
+
+            // PASO 2: Sobreescribir con datos de bitácora si existen
+            bitacora.forEach(entry => {
+              fieldsForThisStep.forEach(field => {
+                if (entry[field.name] !== undefined && entry[field.name] !== null) {
+                  stepData[field.name] = entry[field.name];
+                }
+              });
+            });
+
+            step.data = stepData;
+          });
+
+          if (bitacora.length > 0) {
+            const ultimo = bitacora[bitacora.length - 1];
+            console.log("ultimo registro:", ultimo);
+
+            const index = this.steps.findIndex(s =>
+              String(s.id) === String(ultimo.estadoPostulacionId)
+            );
+            console.log("index encontrado:", index);
+
+            if (index >= 0) {
+              this.currentStep = index;
+              this.documento = ultimo.documento;
+              this.convocatoria = ultimo.nombreConvocatoria;
+              this.convocatoriaId = ultimo.convocatoriaId;
+              this.focusCurrentStep();
+            }
+          }
+
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Error al cargar bitácora', err);
+          this.loading = false;
+        }
+      });
 }
 
   goToStep(index: number) {
@@ -368,64 +508,83 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   }
 
   accionesEstado: Record<number, { texto: string; accion: () => void }[]> = {
-    1: [
+    // ---------------- FASE PRE ----------------
+    1: [ // Pre-postulación
       { texto: 'Prepostularme', accion: () => this.onPrepostular() }
     ],
-    2: [
-      { texto: 'Rechazar Pre-postulación', accion: () => this.onRechazarPre() },
+    2: [ // Rechazado Pre-postulación
+      { texto: 'Rechazado Pre-postulación', accion: () => this.onRechazarPre() }
+    ],
+    21: [ // Aceptado Pre-postulación
       { texto: 'Aceptar Pre-postulación', accion: () => this.onAceptarPre() }
     ],
-    3: [
+
+    // ---------------- FASE POSTULACIÓN ----------------
+    3: [ // En postulación (usuario llena formulario y confirma postulacion)
       { texto: 'Postularme', accion: () => this.onPostular() },
-      { texto: 'Cancelar postulación', accion: () => this.onCancelar() }
+      { texto: 'Cancelar la postulación', accion: () => this.onCancelar() }
     ],
-    4: [], // solo consulta
-    5: [
-      { texto: 'Rechazar postulación', accion: () => this.onRechazarPostulacion() },
+    4: [ // Aprobado Postulación (ORI)
       { texto: 'Aprobar postulación', accion: () => this.onAprobarPostulacion() }
     ],
+    5: [ // Rechazado Postulación (ORI)
+      { texto: 'Rechazar postulación', accion: () => this.onRechazarPostulacion() }
+    ],
+
+    // ---------------- FASE DIRECTOR ----------------
     6: [
-      { texto: 'Rechazar director de programa', accion: () => this.onRechazarDirector() },
-      { texto: 'Aprobar director de programa', accion: () => this.onAprobarDirector() }
+      { texto: 'Aprobar director de programa', accion: () => this.onAprobarDirector() },
+      // { texto: 'Rechazar director de programa', accion: () => this.onRechazarDirector() }
     ],
     7: [
-      { texto: 'Rechazada por director programa', accion: () => this.onConfirmarRechazoDirector() }
+      { texto: 'Rechazar director programa', accion: () => this.onConfirmarRechazoDirector() }
     ],
+
+    // ---------------- FASE DECANATURA ----------------
     8: [
       { texto: 'Aprobado Decanatura', accion: () => this.onAprobarDecanatura() }
     ],
     9: [
       { texto: 'Rechazo Decanatura', accion: () => this.onRechazarDecanatura() }
     ],
+
+    // ---------------- FASE VICERRECTORÍA ----------------
     10: [
       { texto: 'Aprobado Vicerrectoría Académica', accion: () => this.onAprobarVicerrectoria() }
     ],
     11: [
       { texto: 'Rechazo Vicerrectoría Académica', accion: () => this.onRechazarVicerrectoria() }
     ],
+
+    // ---------------- JEFE INMEDIATO ----------------
     12: [
       { texto: 'Aprobado Jefe Inmediato', accion: () => this.onAprobarJefe() }
     ],
     13: [
       { texto: 'Rechazado Jefe Inmediato', accion: () => this.onRechazarJefe() }
     ],
+
+    // ---------------- RECTORÍA ----------------
     14: [
       { texto: 'Aprobado Rectoría', accion: () => this.onAprobarRectoria() }
     ],
     15: [
       { texto: 'Rechazo Rectoría', accion: () => this.onRechazarRectoria() }
     ],
+
+    // ---------------- UNIVERSIDAD DESTINO ----------------
     16: [
       { texto: 'Postulado Universidad Destino', accion: () => this.onPostularUniversidad() },
       { texto: 'Cancelar postulación', accion: () => this.onCancelar() }
     ],
     17: [
-      { texto: 'Aprobado Universidad Destino', accion: () => this.onAprobarUniversidad() },
-      { texto: 'Cancelar postulación', accion: () => this.onCancelar() }
+      { texto: 'Aceptado Universidad Destino', accion: () => this.onAprobarUniversidad() }
     ],
     18: [
-      { texto: 'Rechazo Universidad Destino', accion: () => this.onRechazarUniversidad() }
+      { texto: 'Rechazado Universidad Destino', accion: () => this.onRechazarUniversidad() }
     ],
+
+    // ---------------- ETAPA FINAL ----------------
     19: [
       { texto: 'En movilidad', accion: () => this.onEnMovilidad() }
     ],
@@ -435,193 +594,431 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   };
 
   onPrepostular() {
-    const payload = { ...this.steps[0].data, estadoPostulacionId: 1 };
-    this.api.post('Postulaciones/Prepostular', payload).subscribe(resp => {
-      console.log('Prepostulado:', resp);
+    const payload = {
+      ...this.steps[0].data,
+      estadoPostulacionId: 1, // servidor cambiará a “Pre-postulado”
+    };
+    this.api.post('Postulaciones/crear_Postulacion', payload).subscribe(() => {
       this.refreshBitacora();
     });
   }
 
   onRechazarPre() {
-    const payload = { ...this.steps[1].data, estadoPostulacionId: 2 };
-    this.api.post('Postulaciones/RechazarPre', payload).subscribe(resp => {
-      console.log('Rechazado Pre:', resp);
-      this.refreshBitacora();
+    const currentStepData = this.steps[this.currentStep]?.data || {};
+    const payload = {
+      motivoRechazo: currentStepData['motivoRechazo'],
+      estadoPostulacionId: 2,
+      esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
+      usuarioId: currentStepData['usuarioId'],
+      convocatoriaId: currentStepData['convocatoriaId'],
+      fechaPostulacion: currentStepData['fechaPostulacion']
+    };
+
+    this.api.post('Postulaciones/RechazarPre', payload).subscribe({
+      next: (resp) => {
+        console.log('Rechazado Pre-postulación:', resp);
+        this.refreshBitacora();
+      },
+      error: (err) => console.error('Error al rechazar pre-postulación:', err)
     });
   }
 
   onAceptarPre() {
-    const payload = { ...this.steps[1].data, estadoPostulacionId: 21 };
-    this.api.post('Postulaciones/AceptarPre', payload).subscribe(resp => {
-      console.log('Aceptado Pre:', resp);
+    const payload = {
+      ...this.steps[0].data,
+      estadoPostulacionId: 21
+    };
+    this.api.post('Postulaciones/AceptarPre', payload).subscribe(() => {
       this.refreshBitacora();
     });
   }
 
   onPostular() {
-    const payload = { ...this.steps[2].data, estadoPostulacionId: 3 };
-    this.api.post('Postulaciones/Postular', payload).subscribe(resp => {
-      console.log('Postulado:', resp);
-      this.refreshBitacora();
-    });
-  }
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    usuarioId: currentStepData['usuarioId'],
+    convocatoriaId: currentStepData['convocatoriaId'],
+    estadoPostulacionId: 4,
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    periodo: currentStepData['periodo'],
+    convenioId: currentStepData['convenioId'],
+    observaciones: currentStepData['observaciones'],
+    tipoMovilidadId: currentStepData['tipoMovilidadId'],
+    urlEncuestaSatisfaccion: currentStepData['urlEncuestaSatisfaccion'],
+    objetivo: currentStepData['objetivo'], // Obligatorio
+    fechaInicioMovilidad: currentStepData['fechaInicioMovilidad'],
+    fechaFinMovilidad: currentStepData['fechaFinMovilidad'],
+    institucionId: currentStepData['institucionId'],
+    fechaEntregable: currentStepData['fechaEntregable'],
+    asistioEntrevista: currentStepData['asistioEntrevista'] || false
+  };
 
-  // Estados 4-5: Postulación
-  onRechazarPostulacion() {
-    const payload = { ...this.steps[4].data, estadoPostulacionId: 5 };
-    this.api.post('Postulaciones/RechazarPostulacion', payload).subscribe(resp => {
+  this.api.post('Postulaciones/Postular', payload).subscribe({
+    next: (resp) => {
+      console.log('Postulado exitosamente:', resp);
+      this.refreshBitacora();
+    },
+    error: (err) => console.error('Error al postular:', err)
+  });
+}
+
+onRechazarPostulacion() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    motivoRechazo: currentStepData['motivoRechazo'],
+    estadoPostulacionId: 5,
+    esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
+    usuarioId: currentStepData['usuarioId'],
+    convocatoriaId: currentStepData['convocatoriaId'],
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/RechazarPostulacion', payload).subscribe({
+    next: (resp) => {
       console.log('Rechazado Postulación:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al rechazar postulación:', err)
+  });
+}
 
-  onAprobarPostulacion() {
-    const payload = { ...this.steps[4].data, estadoPostulacionId: 4 };
-    this.api.post('Postulaciones/AprobarPostulacion', payload).subscribe(resp => {
+onAprobarPostulacion() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    fechaEntregable: currentStepData['fechaEntregable'],
+    requiereVisa: currentStepData['requiereVisa'] || false,
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    estadoPostulacionId: 3 // Estado 3 según documento
+  };
+
+  this.api.post('Postulaciones/AprobarPostulacion', payload).subscribe({
+    next: (resp) => {
       console.log('Aprobado Postulación:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al aprobar postulación:', err)
+  });
+}
 
-  // Estados 6-7: Director de Programa
-  onRechazarDirector() {
-    const payload = { ...this.steps[5].data, estadoPostulacionId: 7 };
-    this.api.post('Postulaciones/RechazarDirector', payload).subscribe(resp => {
+onRechazarDirector() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    motivoRechazo: currentStepData['motivoRechazo'],
+    estadoPostulacionId: 7,
+    esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
+    usuarioId: currentStepData['usuarioId'],
+    convocatoriaId: currentStepData['convocatoriaId'],
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/RechazarDirector', payload).subscribe({
+    next: (resp) => {
       console.log('Rechazado Director:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al rechazar director:', err)
+  });
+}
 
-  onAprobarDirector() {
-    const payload = { ...this.steps[5].data, estadoPostulacionId: 6 };
-    this.api.post('Postulaciones/AprobarDirector', payload).subscribe(resp => {
+onAprobarDirector() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    estadoPostulacionId: 6,
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/AprobarDirector', payload).subscribe({
+    next: (resp) => {
       console.log('Aprobado Director:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al aprobar director:', err)
+  });
+}
 
-  onConfirmarRechazoDirector() {
-    const payload = { ...this.steps[6].data, estadoPostulacionId: 7 };
-    this.api.post('Postulaciones/ConfirmarRechazoDirector', payload).subscribe(resp => {
+onConfirmarRechazoDirector() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    motivoRechazo: currentStepData['motivoRechazo'],
+    estadoPostulacionId: 7,
+    esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
+    usuarioId: currentStepData['usuarioId'],
+    convocatoriaId: currentStepData['convocatoriaId'],
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/ConfirmarRechazoDirector', payload).subscribe({
+    next: (resp) => {
       console.log('Confirmado Rechazo Director:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al confirmar rechazo director:', err)
+  });
+}
 
-  // Estados 8-9: Decanatura
-  onAprobarDecanatura() {
-    const payload = { ...this.steps[7].data, estadoPostulacionId: 8 };
-    this.api.post('Postulaciones/AprobarDecanatura', payload).subscribe(resp => {
+onAprobarDecanatura() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    estadoPostulacionId: 8,
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/AprobarDecanatura', payload).subscribe({
+    next: (resp) => {
       console.log('Aprobado Decanatura:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al aprobar decanatura:', err)
+  });
+}
 
-  onRechazarDecanatura() {
-    const payload = { ...this.steps[8].data, estadoPostulacionId: 9 };
-    this.api.post('Postulaciones/RechazarDecanatura', payload).subscribe(resp => {
+onRechazarDecanatura() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    motivoRechazo: currentStepData['motivoRechazo'],
+    estadoPostulacionId: 9,
+    esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
+    usuarioId: currentStepData['usuarioId'],
+    convocatoriaId: currentStepData['convocatoriaId'],
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/RechazarDecanatura', payload).subscribe({
+    next: (resp) => {
       console.log('Rechazado Decanatura:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al rechazar decanatura:', err)
+  });
+}
 
-  // Estados 10-11: Vicerrectoría Académica
-  onAprobarVicerrectoria() {
-    const payload = { ...this.steps[9].data, estadoPostulacionId: 10 };
-    this.api.post('Postulaciones/AprobarVicerrectoria', payload).subscribe(resp => {
+onAprobarVicerrectoria() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    estadoPostulacionId: 10,
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/AprobarVicerrectoria', payload).subscribe({
+    next: (resp) => {
       console.log('Aprobado Vicerrectoría:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al aprobar vicerrectoría:', err)
+  });
+}
 
-  onRechazarVicerrectoria() {
-    const payload = { ...this.steps[10].data, estadoPostulacionId: 11 };
-    this.api.post('Postulaciones/RechazarVicerrectoria', payload).subscribe(resp => {
+onRechazarVicerrectoria() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    motivoRechazo: currentStepData['motivoRechazo'],
+    estadoPostulacionId: 11,
+    esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
+    usuarioId: currentStepData['usuarioId'],
+    convocatoriaId: currentStepData['convocatoriaId'],
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/RechazarVicerrectoria', payload).subscribe({
+    next: (resp) => {
       console.log('Rechazado Vicerrectoría:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al rechazar vicerrectoría:', err)
+  });
+}
 
-  // Estados 12-13: Jefe Inmediato
-  onAprobarJefe() {
-    const payload = { ...this.steps[11].data, estadoPostulacionId: 12 };
-    this.api.post('Postulaciones/AprobarJefe', payload).subscribe(resp => {
+onAprobarJefe() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    estadoPostulacionId: 12,
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/AprobarJefe', payload).subscribe({
+    next: (resp) => {
       console.log('Aprobado Jefe Inmediato:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al aprobar jefe inmediato:', err)
+  });
+}
 
-  onRechazarJefe() {
-    const payload = { ...this.steps[12].data, estadoPostulacionId: 13 };
-    this.api.post('Postulaciones/RechazarJefe', payload).subscribe(resp => {
+onRechazarJefe() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    motivoRechazo: currentStepData['motivoRechazo'],
+    estadoPostulacionId: 13,
+    esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
+    usuarioId: currentStepData['usuarioId'],
+    convocatoriaId: currentStepData['convocatoriaId'],
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/RechazarJefe', payload).subscribe({
+    next: (resp) => {
       console.log('Rechazado Jefe Inmediato:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al rechazar jefe inmediato:', err)
+  });
+}
 
-  // Estados 14-15: Rectoría
-  onAprobarRectoria() {
-    const payload = { ...this.steps[13].data, estadoPostulacionId: 14 };
-    this.api.post('Postulaciones/AprobarRectoria', payload).subscribe(resp => {
+onAprobarRectoria() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    estadoPostulacionId: 14,
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/AprobarRectoria', payload).subscribe({
+    next: (resp) => {
       console.log('Aprobado Rectoría:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al aprobar rectoría:', err)
+  });
+}
 
-  onRechazarRectoria() {
-    const payload = { ...this.steps[14].data, estadoPostulacionId: 15 };
-    this.api.post('Postulaciones/RechazarRectoria', payload).subscribe(resp => {
+onRechazarRectoria() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    motivoRechazo: currentStepData['motivoRechazo'],
+    estadoPostulacionId: 15,
+    esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
+    usuarioId: currentStepData['usuarioId'],
+    convocatoriaId: currentStepData['convocatoriaId'],
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/RechazarRectoria', payload).subscribe({
+    next: (resp) => {
       console.log('Rechazado Rectoría:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al rechazar rectoría:', err)
+  });
+}
 
-  // Estados 16-18: Universidad Destino
-  onPostularUniversidad() {
-    const payload = { ...this.steps[15].data, estadoPostulacionId: 16 };
-    this.api.post('Postulaciones/PostularUniversidad', payload).subscribe(resp => {
+onPostularUniversidad() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    estadoPostulacionId: 16,
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/PostularUniversidad', payload).subscribe({
+    next: (resp) => {
       console.log('Postulado Universidad Destino:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al postular universidad:', err)
+  });
+}
 
-  onAprobarUniversidad() {
-    const payload = { ...this.steps[16].data, estadoPostulacionId: 17 };
-    this.api.post('Postulaciones/AprobarUniversidad', payload).subscribe(resp => {
+onAprobarUniversidad() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    estadoPostulacionId: 17,
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/AprobarUniversidad', payload).subscribe({
+    next: (resp) => {
       console.log('Aprobado Universidad Destino:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al aprobar universidad:', err)
+  });
+}
 
-  onRechazarUniversidad() {
-    const payload = { ...this.steps[17].data, estadoPostulacionId: 18 };
-    this.api.post('Postulaciones/RechazarUniversidad', payload).subscribe(resp => {
+onRechazarUniversidad() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    motivoRechazo: currentStepData['motivoRechazo'],
+    estadoPostulacionId: 18,
+    esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
+    usuarioId: currentStepData['usuarioId'],
+    convocatoriaId: currentStepData['convocatoriaId'],
+    fechaPostulacion: currentStepData['fechaPostulacion']
+  };
+
+  this.api.post('Postulaciones/RechazarUniversidad', payload).subscribe({
+    next: (resp) => {
       console.log('Rechazado Universidad Destino:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al rechazar universidad:', err)
+  });
+}
 
-  // Estados 19-20: En Movilidad y Finalizado
-  onEnMovilidad() {
-    const payload = { ...this.steps[18].data, estadoPostulacionId: 19 };
-    this.api.post('Postulaciones/EnMovilidad', payload).subscribe(resp => {
+onEnMovilidad() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    estadoPostulacionId: 19,
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    esMatriculadoSiiga: currentStepData['esMatriculadoSiiga'] || false,
+    esNotificadoRegistroAcademico: currentStepData['esNotificadoRegistroAcademico'] || false
+  };
+
+  this.api.post('Postulaciones/EnMovilidad', payload).subscribe({
+    next: (resp) => {
       console.log('En Movilidad:', resp);
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al marcar en movilidad:', err)
+  });
+}
 
-  onFinalizado() {
-    const payload = { ...this.steps[19].data, estadoPostulacionId: 20 };
-    this.api.post('Postulaciones/Finalizado', payload).subscribe(resp => {
+onFinalizado() {
+  const currentStepData = this.steps[this.currentStep]?.data || {};
+  const payload = {
+    estadoPostulacionId: 20,
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    certificadoMovilidad: currentStepData['certificadoMovilidad'],
+    realizoEncuestaSatisfaccion: currentStepData['realizoEncuestaSatisfaccion'] || false,
+    registradoSire: currentStepData['registradoSire'] || false,
+    financiacionExterna: currentStepData['financiacionExterna'],
+    financiacioUcm: currentStepData['financiacioUcm']
+  };
+
+  this.api.post('Postulaciones/Finalizado', payload).subscribe({
+    next: (resp) => {
       console.log('Finalizado:', resp);
+      // Aquí puedes agregar lógica para generar el PDF del certificado
+      this.generarCertificadoMovilidad();
       this.refreshBitacora();
-    });
-  }
+    },
+    error: (err) => console.error('Error al finalizar:', err)
+  });
+}
 
-  onCancelar() {
-    console.log('Cancelar postulación (placeholder)');
+onCancelar() {
+  // Placeholder - implementar según necesidades
+  console.log('Cancelar postulación - funcionalidad pendiente');
+  // Aquí puedes agregar un modal de confirmación o lógica específica
+}
 
-  }
+// Método adicional para generar certificado de movilidad
+generarCertificadoMovilidad() {
+  // Implementar generación de PDF con datos quemados como indica el documento
+  console.log('Generando certificado de movilidad PDF...');
+  // Aquí puedes usar una librería como jsPDF o llamar a un endpoint que genere el PDF
+}
+
+// Método actualizado para colores
+getColorEstado(id: number): string {
+  const estadosAmarillos = [1]; // Pre-postulación
+  const estadosRojos = [2, 5, 7, 9, 11, 13, 15, 18]; // Todos los rechazos
+  const estadosVerdes = [3, 4, 6, 8, 10, 12, 14, 16, 17, 19, 20, 21]; // Aprobaciones y progreso
+
+  if (estadosAmarillos.includes(id)) return '#eac701ff'; // Amarillo
+  if (estadosRojos.includes(id)) return '#FF4444'; // Rojo
+  if (estadosVerdes.includes(id)) return '#22c55e'; // Verde
+
+  return '#e2e8f0'; // Gris por defecto
+}
+
 
   private refreshBitacora() {
     if (this.idPostulacion) {
@@ -640,19 +1037,6 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
     if (estadosVerdes.includes(this.currentStep)) return 'estado-verde';
 
     return '';
-  }
-
-  // Método actualizado para colores
-  getColorEstado(id: number): string {
-    const estadosAmarillos = [1];
-    const estadosRojos = [2, 5, 7, 9, 11, 13, 15, 18];
-    const estadosVerdes = [3, 4, 6, 8, 10, 12, 14, 16, 17, 19, 20];
-
-    if (estadosAmarillos.includes(id)) return '#eac701ff';
-    if (estadosRojos.includes(id)) return '#FF4444';
-    if (estadosVerdes.includes(id)) return '#22c55e';
-
-    return '#e2e8f0';
   }
 
   getButtonColor(texto: string): 'primary' | 'accent' | 'warn' {
@@ -737,5 +1121,9 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();
     }
+  }
+
+  onGestioEncuesta(step: any) {
+    window.open("https://docs.google.com/forms/d/e/1FAIpQLSe1piZ1G84UYLDpToyN86EZhhFDSB01FdUyRVmlksoGyAJ8-w/viewform");
   }
 }

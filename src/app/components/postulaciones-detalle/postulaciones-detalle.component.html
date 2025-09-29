@@ -117,6 +117,13 @@
                           <i class="fas fa-gift"></i>
                         </button>
 
+                        <!-- Botón Encuenta satisfacción -->
+                        <button class="btn-notif-round"
+                                (click)="onGestioEncuesta(step)"
+                                title="Gestión de Beneficios">
+                          <i class="fas fa-file"></i>
+                        </button>
+
                       <div class="estado-circle" [style.background]="getColorEstado(step.id)"></div>
                     </div>
                   </div>
@@ -149,6 +156,12 @@
                               [(ngModel)]="steps[currentStep].data[field.name]"
                               [readonly]="!field.editable">
 
+                        <!-- NUMBER -->
+                        <input *ngIf="field.tipo === 'number'" type="number"
+                              class="form-control form-control-sm"
+                              [(ngModel)]="steps[currentStep].data[field.name]"
+                              [readonly]="!field.editable">
+
                         <!-- TEXTAREA -->
                         <textarea *ngIf="field.tipo === 'textarea'"
                               class="form-control form-control-sm"
@@ -159,6 +172,14 @@
                         <!-- SELECT -->
                         <select *ngIf="field.tipo === 'select'" class="form-select form-select-sm"
                                 [(ngModel)]="steps[currentStep].data[field.name]"
+                                [disabled]="!field.editable">
+                          <option *ngFor="let opt of field.opciones" [value]="opt.value">{{ opt.label }}</option>
+                        </select>
+
+                        <!-- SELECT CHANGE -->
+                        <select *ngIf="field.tipo === 'selectChange'" class="form-select form-select-sm"
+                                [(ngModel)]="steps[currentStep].data[field.name]"
+                                (ngModelChange)="onFieldChange(field, $event)"
                                 [disabled]="!field.editable">
                           <option *ngFor="let opt of field.opciones" [value]="opt.value">{{ opt.label }}</option>
                         </select>
@@ -188,6 +209,20 @@
                     <small class="fw-bold" style="color:#18206E;">
                       Paso {{ currentStep+1 }} de {{ steps.length }}
                     </small>
+
+                    <div class="d-flex justify-content-between mt-3">
+                      <button class="btn btn-outline-primary"
+                              (click)="prevStep()"
+                              [disabled]="currentStep === 0">
+                        Anterior
+                      </button>
+
+                      <button class="btn btn-primary"
+                              (click)="nextStep()"
+                              [disabled]="currentStep === steps.length - 1">
+                        Siguiente
+                      </button>
+                    </div>
 
                     <!-- Lado derecho: los botones -->
                     <div class="d-flex align-items-center gap-2 flex-wrap step-actions" style="margin-right: 5px;">

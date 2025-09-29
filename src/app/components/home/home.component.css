@@ -190,3 +190,13 @@ input.ng-valid.ng-touched {
   display: block; /* fuerza que tome toda la línea */
   font-size: 13px; /* como pediste */
 }
+
+.sidebar-header {
+  align-items: center;
+  justify-content: flex;
+  height: 100%;
+  min-width: 80px;
+  padding-right: 1rem;
+}
+
+.sidebar-logo2 { width: 190px; height: auto; object-fit: contain; margin-left: 10px; margin-bottom: 15px; }

@@ -24,6 +24,7 @@ export class HomeComponent implements OnInit {
   constructor(private api: GenericApiService) {}
 
   roles: any[] = [];
+  tipoUsuario: any;
   selectedRole: string = '';
 
   datosPerfil: any = {
@@ -74,18 +75,7 @@ export class HomeComponent implements OnInit {
   guardarRol() {
     if (this.selectedRole) {
       this.usuario.rolId = this.selectedRole;
-      this.usuario.rol = this.getNombreRol(Number(this.selectedRole));
-      localStorage.setItem('usuario', JSON.stringify(this.usuario));
-
-      // preparar datosPerfil con datos previos
-      this.datosPerfil = { ...this.usuario };
-
-      // cerrar modal 1 y abrir modal 2
-      this.showModalRol = false;
-      this.showModalDatos = true;
-
-      //forzar refrescar menú en el sidebar
-      window.dispatchEvent(new Event("storage"));
+      this.fetchInfoUsuario(this.usuario.correo, this.usuario.rolId);
     }
   }
 
@@ -120,6 +110,33 @@ export class HomeComponent implements OnInit {
 
     // default
     return 'Ingresar';
+  }
+
+  private fetchInfoUsuario(correo: any, rolId: any) {
+    this.api.get<any>(`Usuarios/Consultar_Usuario_Rol?Correo=${correo}&RolId=${rolId}`)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          this.tipoUsuario = resp.datos[0].tipoEstudianteId;
+          this.usuario.rol = this.getNombreRol(Number(this.selectedRole));
+          this.usuario.tipoUsuario = this.tipoUsuario;
+          this.usuario.idUsuario =resp.datos[0].id;
+          localStorage.setItem('usuario', JSON.stringify(this.usuario));
+          // preparar datosPerfil con datos previos
+          this.datosPerfil = { ...this.usuario };
+
+          // cerrar modal 1 y abrir modal 2
+          this.showModalRol = false;
+          this.showModalDatos = true;
+
+          //forzar refrescar menú en el sidebar
+          window.dispatchEvent(new Event("storage"));
+        },
+        error: (err) => {
+          console.error('Error al cargar estado para select', err);
+          this.roles = [];
+        }
+      });
   }
 
   private fetchListaRoles(correo: any) {

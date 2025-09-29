@@ -42,11 +42,11 @@ export class SidebarComponent {
   }
 
   private onStorageChange() {
-  const user = JSON.parse(localStorage.getItem("usuario") || "{}");
-  if (user?.rolId) {
-    this.fetchMenu(user.rolId);
+    const user = JSON.parse(localStorage.getItem("usuario") || "{}");
+    if (user?.rolId) {
+      this.fetchMenu(user.rolId);
+    }
   }
-}
 
   toggleSidebar() {
     this.isCollapsed = !this.isCollapsed;

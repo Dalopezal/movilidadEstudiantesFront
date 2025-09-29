@@ -103,7 +103,7 @@
                       <button *ngIf="item.esActiva" class="button-completed">Activo</button>
                       <button *ngIf="!item.esActiva" class="button-pending">Inactivo</button>
                     </td>
-                    <td align="center" title="Ir a postulación" (click)="abrirPostulacionDetalle()">
+                    <td align="center" title="Ir a postulación" (click)="abrirPostulacionDetalle(item)">
                       <i class="fa-duotone fa-regular fa-user button-eye"></i>
                     </td>
                     <td align="center" title="Ir a postulación" (click)="abrirPostulaciones(item)">
