@@ -75,8 +75,8 @@
                     <th style="background: white;color: #0D133F;">Condiciones</th>
                     <th style="background: white;color: #0D133F;">Entregables</th>
                     <th style="background: white;color: #0D133F;">Estado</th>
-                    <th style="background: white;color: #0D133F;">Postularme</th>
-                    <th style="background: white;color: #0D133F;">Postulaciones</th>
+                    <th *ngIf="this.usuario.rolId != 7" style="background: white;color: #0D133F;">Postularme</th>
+                    <th *ngIf="this.usuario.rolId == 7" style="background: white;color: #0D133F;">Postulaciones</th>
                   </tr>
                 </thead>
                 <tbody style="font-size: 13px">
@@ -103,10 +103,10 @@
                       <button *ngIf="item.esActiva" class="button-completed">Activo</button>
                       <button *ngIf="!item.esActiva" class="button-pending">Inactivo</button>
                     </td>
-                    <td align="center" title="Ir a postulación" (click)="abrirPostulacionDetalle(item)">
+                    <td *ngIf="this.usuario.rolId != 7" align="center" title="Ir a postulación" (click)="abrirPostulacionDetalle(item)">
                       <i class="fa-duotone fa-regular fa-user button-eye"></i>
                     </td>
-                    <td align="center" title="Ir a postulación" (click)="abrirPostulaciones(item)">
+                    <td *ngIf="this.usuario.rolId == 7" align="center" title="Ir a postulación" (click)="abrirPostulaciones(item)">
                       <i class="fa-duotone fa-regular fa-share-from-square button-eye"></i>
                     </td>
                   </tr>

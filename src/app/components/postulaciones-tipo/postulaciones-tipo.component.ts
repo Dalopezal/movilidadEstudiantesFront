@@ -324,7 +324,9 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
 
   abrirPostulacionDetalle(item: PostulacionTipoConsultaModel) {
     this.router.navigate(['/postulacion-detalle'], {queryParams: {
-      id: item.id
+      nombre: item.nombreConvocatoria,
+      id: item.id,
+      idConvocatoria: item.convocatoriaId,
     }
     });
   }

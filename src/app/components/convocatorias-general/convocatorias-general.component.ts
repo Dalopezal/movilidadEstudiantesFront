@@ -62,6 +62,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   movilidad: any[] = [];
   convocatoriaId: any;
   @Input() categoria: any;
+  usuario: any;
 
   constructor(
     private api: GenericApiService,
@@ -70,8 +71,15 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    window.addEventListener("storage", this.onStorageChange.bind(this));
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
     this.fetchConvocatorias();
     this.fetchListaMovilidad();
+  }
+
+  private onStorageChange() {
+    const user = JSON.parse(localStorage.getItem("usuario") || "{}");
   }
 
   ngOnDestroy(): void {

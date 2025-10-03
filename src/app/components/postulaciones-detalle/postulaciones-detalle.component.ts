@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { GenericApiService } from '../../services/generic-api.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -21,6 +21,9 @@ import { NotificacionesComponent } from '../notificaciones/notificaciones.compon
 import { GestionEntregableComponent } from '../gestion-entregable/gestion-entregable.component';
 import { BeneficiosComponent } from "../beneficios-postulacion/beneficios-postulacion.component";
 import { FinanciacionComponent } from "../financiacion/financiacion.component";
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { NgxSonnerToaster, toast } from 'ngx-sonner';
+import { firstValueFrom } from 'rxjs';
 
 interface FieldConfig {
   name: string;
@@ -58,7 +61,8 @@ interface Step {
     NotificacionesComponent,
     GestionEntregableComponent,
     BeneficiosComponent,
-    FinanciacionComponent
+    FinanciacionComponent,
+    ConfirmDialogModule, NgxSonnerToaster
 ],
   templateUrl: './postulaciones-detalle.component.html',
   styleUrls: ['./postulaciones-detalle.component.css'],
@@ -82,16 +86,44 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   nombreCombocatoria: any;
   instituciones: any[] = [];
   convenios: any[] = [];
+  tiposMovlidad: any[] = [];
 
-  constructor(private api: GenericApiService, private location: Location, private route: ActivatedRoute, public dialog: MatDialog ) {}
+  constructor(private api: GenericApiService, private location: Location, private route: ActivatedRoute, public dialog: MatDialog, private confirmationService: ConfirmationService) {}
+
+  estadosMap: Record<number, string> = {
+    1:  'Pre‑postulación',
+    2:  'Rechazado Pre‑postulación',
+    21: 'Aceptado Pre‑postulación',
+
+    4:  'Postulado',
+    5:  'Rechazado Postulación',
+    6:  'Aprobado Postulación',
+    7:  'Aprobado Director de Programa',
+    8:  'Rechazado Director de Programa',
+    9:  'Aprobado Decanatura',
+    10: 'Rechazado Decanatura',
+    11: 'Aprobado Vicerrectoría Académica',
+    12: 'Rechazado Vicerrectoría Académica',
+    13: 'Aprobado Jefe Inmediato',
+    14: 'Rechazado Jefe Inmediato',
+    15: 'Aprobado Rectoría',
+    16: 'Rechazado Rectoría',
+    17: 'Postulado Universidad Destino',
+    18: 'Rechazado Universidad Destino',
+    19: 'Aprobado Universidad Destino',
+    20: 'En Movilidad',
+    22: 'Finalizado'
+  };
 
   ngOnInit() {
     window.addEventListener("storage", this.onStorageChange.bind(this));
     const data = localStorage.getItem('usuario');
+    console.log("Data", data);
     this.usuario = data ? JSON.parse(data) : {};
+    console.log("Data2", data);
     this.getEstados();
-    this.fetchListaInstituciones();
     this.cargatSecciones();
+    this.fetchListaInstituciones();
   }
 
   cargatSecciones(){
@@ -105,7 +137,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
         { name: 'institucionId', label: this.usuario.tipoUsuario == '1' ? 'Institución Destino' : 'Institución Origen', tipo: 'selectChange', editable: true, opciones: this.instituciones }, // Label cambia según rol
         { name: 'convenioId', label: 'Convenio', tipo: 'select', editable: true, opciones: this.convenios }, // Dependiente de institución
         { name: 'observaciones', label: 'Observaciones', tipo: 'textarea', editable: true },
-        { name: 'tipoMovilidadId', label: 'Tipo Movilidad', tipo: 'select', editable: true },
+        { name: 'tipoMovilidadId', label: 'Tipo Movilidad', tipo: 'select', editable: true, opciones: this.tiposMovlidad },
       ],
       2: [ // Rechazado Pre-postulación (solo rol ORI Interno 7)
         { name: 'usuarioId', label: 'Usuario', tipo: 'readonly' },
@@ -305,15 +337,16 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
 private fetchListaInstituciones() {
 
   this.route.queryParams.subscribe(params => {
-      this.idCovocatoria = params['idConvocatoria'];
-      this.nombreCombocatoria = params['nombre'];
-    });
+    this.idCovocatoria = params['idConvocatoria'];
+    this.nombreCombocatoria = params['nombre'];
+  });
 
-  this.api.get<any>('InstitucionConvenio/Consultar_InstitucionConvenioEspecifico?id=' + this.idCovocatoria)
+  // this.api.get<any>('InstitucionConvenio/Consultar_InstitucionConvenioEspecifico?id=' + this.idCovocatoria)
+  this.api.get<any>('/Institucion/Consultar_Institucion')
     .pipe(takeUntil(this.destroy$))
     .subscribe({
       next: (resp) => {
-        let items: any[] = [];
+        let items: any[] = [];''
         if (Array.isArray(resp)) items = resp;
         else if (resp && typeof resp === 'object') {
           if (Array.isArray(resp.data)) items = resp.data;
@@ -323,8 +356,9 @@ private fetchListaInstituciones() {
             if (Array.isArray(arr)) items = arr;
           }
         }
-        this.instituciones = items.map(item => ({ value: item.id, label: item.institucionNombre }));
+        this.instituciones = items.map(item => ({ value: item.id, label: item.nombre }));
         console.log("instituciones", this.instituciones);
+        this.fetchListaTipoMovilidad();
         this.cargatSecciones();
 
       },
@@ -362,13 +396,39 @@ private fetchListaInstituciones() {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.convenios = items.map(item => ({ value: item.id, label: item.codigoUcm }));
+          this.convenios = items.map(item => ({ value: item.convenioId, label: item.codigoUcm }));
           this.cargatSecciones();
 
         },
         error: (err) => {
           console.error('Error al cargar estado para select', err);
           this.convenios = [];
+        }
+      });
+  }
+
+  fetchListaTipoMovilidad(){
+    this.api.get<any>('TipoMovilidad/Consultar_TipoMovilida')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          let items: any[] = [];
+          if (Array.isArray(resp)) items = resp;
+          else if (resp && typeof resp === 'object') {
+            if (Array.isArray(resp.data)) items = resp.data;
+            else if (Array.isArray(resp.items)) items = resp.items;
+            else {
+              const arr = Object.values(resp).find(v => Array.isArray(v));
+              if (Array.isArray(arr)) items = arr;
+            }
+          }
+          this.tiposMovlidad = items.map(item => ({ value: item.id, label: item.nombre }));
+          this.cargatSecciones();
+
+        },
+        error: (err) => {
+          console.error('Error al cargar estado para select', err);
+          this.tiposMovlidad = [];
         }
       });
   }
@@ -381,7 +441,7 @@ private fetchListaInstituciones() {
         const stepData: any = {};
 
         this.route.queryParams.subscribe(params => {
-          this.idCovocatoria = params['id'];
+          this.idCovocatoria = params['idConvocatoria'];
           this.nombreCombocatoria = params['nombre'];
         });
 
@@ -393,10 +453,6 @@ private fetchListaInstituciones() {
 
           if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
             stepData[field.name] = `${this.nombreCombocatoria}`;
-          }
-
-          if (field.name === 'estadoPostulacionId' && 'Pre-postulacion') {
-            stepData[field.name] = `Pre-postulacion`;
           }
 
           if (field.name === 'estadoPostulacionId' && 'Pre-postulación') {
@@ -431,17 +487,24 @@ private fetchListaInstituciones() {
             const fieldsForThisStep = this.campoEstado[step.id] || [];
             const stepData: any = {};
 
-            // PASO 1: Cargar datos del localStorage primero
-            fieldsForThisStep.forEach(field => {
-              if (field.name === 'usuarioId' && this.usuario?.nombre) {
-                stepData[field.name] = `${this.usuario.nombre}`;
-              }
-            });
-
-            // PASO 2: Sobreescribir con datos de bitácora si existen
             bitacora.forEach(entry => {
               fieldsForThisStep.forEach(field => {
-                if (entry[field.name] !== undefined && entry[field.name] !== null) {
+                if (field.name === 'usuarioId' && this.usuario?.nombre) {
+                  stepData[field.name] = this.usuario.nombre;
+                }else
+
+                if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
+                  stepData[field.name] = this.nombreCombocatoria;
+                }else
+
+                if (field.name === 'estadoPostulacionId') {
+                  const estado = entry.estadoPostulacionId;
+                  stepData[field.name] = this.estadosMap[estado] ?? estado;
+
+                  if (estado === 1) {
+                    stepData['fechaPrePostulacion'] = new Date().toLocaleDateString();
+                  }
+                } else if (entry[field.name] !== undefined && entry[field.name] !== null) {
                   stepData[field.name] = entry[field.name];
                 }
               });
@@ -507,10 +570,10 @@ private fetchListaInstituciones() {
     this.location.back();
   }
 
-  accionesEstado: Record<number, { texto: string; accion: () => void }[]> = {
+  accionesEstado: Record<number, { texto: string; accion: (form?: NgForm) => void }[]> = {
     // ---------------- FASE PRE ----------------
     1: [ // Pre-postulación
-      { texto: 'Prepostularme', accion: () => this.onPrepostular() }
+      { texto: 'Prepostularme', accion: (form?: NgForm) => this.onPrepostular(form) }
     ],
     2: [ // Rechazado Pre-postulación
       { texto: 'Rechazado Pre-postulación', accion: () => this.onRechazarPre() }
@@ -593,13 +656,57 @@ private fetchListaInstituciones() {
     ]
   };
 
-  onPrepostular() {
+  // onPrepostular() {
+  //   const payload = {
+  //     ...this.steps[0].data,
+  //     estadoPostulacionId: 1,
+  //     convocatoriaId: this.convocatoriaId,
+  //     usuarioId: this.usuario.usuarioId
+  //   };
+  //   this.api.post('Postulaciones/crear_Postulacion', payload).subscribe(() => {
+  //     this.refreshBitacora();
+  //   });
+  // }
+
+  async onPrepostular(form?: NgForm) {
+
+    // Si hay formulario y no es válido: marcar touched y mostrar advertencia
+    if (form && !form.valid) {
+      // marcar todos los controls como touched para que aparezcan errores
+      Object.values(form.controls).forEach(ctrl => ctrl.markAsTouched());
+      this.showWarning('Complete todos los campos obligatorios antes de continuar.');
+      return;
+    }
+
+    const confirmado = await this.showConfirm('¿Está seguro que desea realizar la pre-postulación?');
+
+    if (!confirmado) {
+      return;
+    }
+
     const payload = {
       ...this.steps[0].data,
-      estadoPostulacionId: 1, // servidor cambiará a “Pre-postulado”
+      estadoPostulacionId: 1,
+      convocatoriaId: this.idCovocatoria,
+      usuarioId: this.usuario.idUsuario,
     };
-    this.api.post('Postulaciones/crear_Postulacion', payload).subscribe(() => {
-      this.refreshBitacora();
+
+    // Opcional: mostrar loading mientras se procesa
+    this.loading = true;
+
+    this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
+      next: () => {
+        this.loading = false;
+        console.log('Pre-postulación creada exitosamente');
+        this.showSuccess("Pre-postulación creada exitosamente");
+        this.refreshBitacora();
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Error al crear pre-postulación', err);
+        // Opcional: mostrar mensaje de error al usuario
+        this.showError('Ocurrió un error al crear la pre-postulación. Por favor intente nuevamente.');
+      }
     });
   }
 
@@ -1125,5 +1232,48 @@ getColorEstado(id: number): string {
 
   onGestioEncuesta(step: any) {
     window.open("https://docs.google.com/forms/d/e/1FAIpQLSe1piZ1G84UYLDpToyN86EZhhFDSB01FdUyRVmlksoGyAJ8-w/viewform");
+  }
+
+  showSuccess(mensaje: any) {
+    toast.success('¡Operación exitosa!', {
+      description: mensaje,
+      unstyled: true,
+      class: 'my-success-toast'
+    });
+  }
+
+  showError(mensaje: any) {
+    toast.error('Error al procesar', {
+      description: mensaje,
+      unstyled: true,
+      class: 'my-error-toast'
+    });
+  }
+
+  showWarning(mensaje: string) {
+    toast.warning('Atención', {
+      description: mensaje,
+      unstyled: true,
+      class: 'my-warning-toast'
+    });
+  }
+
+  showConfirm(mensaje: string): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.confirmationService.confirm({
+        message: mensaje,
+        header: 'Confirmar acción',
+        icon: 'pi pi-exclamation-triangle custom-confirm-icon',
+        acceptLabel: 'Sí, Confirmo',
+        rejectLabel: 'Cancelar',
+        acceptIcon: 'pi pi-check',
+        rejectIcon: 'pi pi-times',
+        acceptButtonStyleClass: 'custom-accept-btn',
+        rejectButtonStyleClass: 'custom-reject-btn',
+        defaultFocus: 'reject',
+        accept: () => resolve(true),
+        reject: () => resolve(false),
+      });
+    });
   }
 }

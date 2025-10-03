@@ -20,7 +20,8 @@
                     <th style="background: white !important;">Descripción</th>
                     <th style="background: white !important;">Convocatoria</th>
                     <th style="background: white !important;">Url</th>
-                    <th style="background: white !important;">Aprobado Oficina Movilidad</th>
+                    <th *ngIf="this.usuario.rolId != 7" style="background: white !important;">Aprobado Oficina Movilidad</th>
+                    <th *ngIf="this.usuario.rolId == 7" style="background: white !important;">Aprobar</th>
                     <th style="background: white !important;">Opciones</th>
                   </tr>
                 </thead>
@@ -42,7 +43,8 @@
                       </button>
                     </td>
                      <td align="center">
-                      <button class="button-pending">No</button>
+                      <button *ngIf="this.usuario.rolId != 7" class="button-pending">No</button>
+                      <input *ngIf="this.usuario.rolId == 7" type="checkbox" class="form-check-label">
                     </td>
                     <td>
                       <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="toggleDetalleConvocatoria(item)">

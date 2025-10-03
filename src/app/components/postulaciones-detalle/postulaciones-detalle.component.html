@@ -134,111 +134,114 @@
                          [style.width.%]="(currentStep+1)/steps.length*100"></div>
                   </div>
 
-                  <div class="step-content flex-grow-1 p-3 border rounded bg-white overflow-auto">
-                    <div class="row">
-                      <div class="col-md-6 col-lg-4 mb-3"
-                          *ngFor="let field of (steps[currentStep] ? campoEstado[steps[currentStep].id] : [])">
+                  <form #form="ngForm" novalidate>
+                    <div class="step-content flex-grow-1 p-3 border rounded bg-white overflow-auto">
+                      <div class="row">
+                        <div class="col-md-6 col-lg-4 mb-3"
+                            *ngFor="let field of (steps[currentStep] ? campoEstado[steps[currentStep].id] : []); let j = index">
 
-                        <label class="form-label d-block"
-                              style="color: #18206E;font-size: 14px;background: #f2f3f3;
-                                     border-radius: 20px;padding: 5px 5px 5px 15px;font-weight: 700;">
-                          {{ field.label }}
-                        </label>
+                          <label class="form-label d-block">
+                            {{ field.label }}
+                          </label>
 
-                        <!-- READONLY -->
-                        <p *ngIf="field.tipo === 'readonly'" class="fw-bold mb-1 text-muted">
-                          {{ steps[currentStep].data[field.name] || '-' }}
-                        </p>
+                          <!-- READONLY -->
+                          <p *ngIf="field.tipo === 'readonly'" class="fw-bold mb-1 text-muted">
+                            {{ steps[currentStep].data[field.name] || '-' }}
+                          </p>
 
-                        <!-- TEXT -->
-                        <input *ngIf="field.tipo === 'text'" type="text"
-                              class="form-control form-control-sm"
-                              [(ngModel)]="steps[currentStep].data[field.name]"
-                              [readonly]="!field.editable">
-
-                        <!-- NUMBER -->
-                        <input *ngIf="field.tipo === 'number'" type="number"
-                              class="form-control form-control-sm"
-                              [(ngModel)]="steps[currentStep].data[field.name]"
-                              [readonly]="!field.editable">
-
-                        <!-- TEXTAREA -->
-                        <textarea *ngIf="field.tipo === 'textarea'"
-                              class="form-control form-control-sm"
-                              [(ngModel)]="steps[currentStep].data[field.name]"
-                              [readonly]="!field.editable"
-                              rows="3"></textarea>
-
-                        <!-- SELECT -->
-                        <select *ngIf="field.tipo === 'select'" class="form-select form-select-sm"
+                          <!-- TEXT -->
+                          <input *ngIf="field.tipo === 'text'" type="text"
+                                class="form-control form-control-sm"
+                                [name]="'ctrl-'+currentStep+'-'+j"
                                 [(ngModel)]="steps[currentStep].data[field.name]"
-                                [disabled]="!field.editable">
-                          <option *ngFor="let opt of field.opciones" [value]="opt.value">{{ opt.label }}</option>
-                        </select>
+                                [readonly]="!field.editable"
+                                [required]="!!field.editable">
 
-                        <!-- SELECT CHANGE -->
-                        <select *ngIf="field.tipo === 'selectChange'" class="form-select form-select-sm"
+                          <!-- NUMBER -->
+                          <input *ngIf="field.tipo === 'number'" type="number"
+                                class="form-control form-control-sm"
+                                [name]="'ctrl-'+currentStep+'-'+j"
                                 [(ngModel)]="steps[currentStep].data[field.name]"
-                                (ngModelChange)="onFieldChange(field, $event)"
-                                [disabled]="!field.editable">
-                          <option *ngFor="let opt of field.opciones" [value]="opt.value">{{ opt.label }}</option>
-                        </select>
+                                [readonly]="!field.editable"
+                                [required]="!!field.editable">
 
-                        <!-- DATE -->
-                        <input *ngIf="field.tipo === 'date'" type="date"
-                              class="form-control form-control-sm"
-                              [(ngModel)]="steps[currentStep].data[field.name]"
-                              [readonly]="!field.editable">
+                          <!-- TEXTAREA -->
+                          <textarea *ngIf="field.tipo === 'textarea'"
+                                    class="form-control form-control-sm"
+                                    [name]="'ctrl-'+currentStep+'-'+j"
+                                    [(ngModel)]="steps[currentStep].data[field.name]"
+                                    [readonly]="!field.editable"
+                                    [required]="!!field.editable"
+                                    rows="3"></textarea>
 
-                        <!-- CHECKBOX -->
-                        <div *ngIf="field.tipo === 'checkbox'" class="form-check">
-                          <input type="checkbox" class="form-check-input"
+                          <!-- SELECT -->
+                          <select *ngIf="field.tipo === 'select' || field.tipo === 'selectChange'"
+                                  class="form-select form-select-sm"
+                                  [name]="'ctrl-'+currentStep+'-'+j"
+                                  [(ngModel)]="steps[currentStep].data[field.name]"
+                                  (ngModelChange)="field.tipo === 'selectChange' ? onFieldChange(field, $event) : null"
+                                  [disabled]="!field.editable"
+                                  [required]="!!field.editable">
+                            <option value="" disabled *ngIf="field.editable">Seleccione...</option>
+                            <option *ngFor="let opt of field.opciones" [value]="opt.value">{{ opt.label }}</option>
+                          </select>
+
+                          <!-- DATE -->
+                          <input *ngIf="field.tipo === 'date'" type="date"
+                                class="form-control form-control-sm"
+                                [name]="'ctrl-'+currentStep+'-'+j"
                                 [(ngModel)]="steps[currentStep].data[field.name]"
-                                [disabled]="!field.editable">
-                          <span class="form-check-label small">
-                            {{ steps[currentStep].data[field.name] ? 'Sí' : 'No' }}
-                          </span>
+                                [readonly]="!field.editable"
+                                [required]="!!field.editable">
+
+                          <!-- CHECKBOX -->
+                          <div *ngIf="field.tipo === 'checkbox'" class="form-check">
+                            <input type="checkbox" class="form-check-input"
+                                  [name]="'ctrl-'+currentStep+'-'+j"
+                                  [(ngModel)]="steps[currentStep].data[field.name]"
+                                  [disabled]="!field.editable"
+                                  [required]="!!field.editable">
+                            <span class="form-check-label small">
+                              {{ steps[currentStep].data[field.name] ? 'Sí' : 'No' }}
+                            </span>
+                          </div>
+
+                          <div class="invalid-feedback d-block"
+                              *ngIf="form.controls['ctrl-'+currentStep+'-'+j]?.invalid &&
+                                      (form.controls['ctrl-'+currentStep+'-'+j]?.touched || form.submitted)">
+                            Este campo es obligatorio.
+                          </div>
+
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div class="d-flex justify-content-between align-items-center flex-wrap"
-                      *ngIf="steps[currentStep] as step">
 
-                    <!-- Lado izquierdo: el texto -->
-                    <small class="fw-bold" style="color:#18206E;">
-                      Paso {{ currentStep+1 }} de {{ steps.length }}
-                    </small>
+                    <!-- Footer (botones) -->
+                    <div class="d-flex justify-content-between align-items-center flex-wrap mt-2" *ngIf="steps[currentStep] as step">
+                      <small class="fw-bold">Paso {{ currentStep+1 }} de {{ steps.length }}</small>
 
-                    <div class="d-flex justify-content-between mt-3">
-                      <button class="btn btn-outline-primary"
-                              (click)="prevStep()"
-                              [disabled]="currentStep === 0">
-                        Anterior
-                      </button>
+                      <div class="d-flex justify-content-between mt-3">
+                        <button class="btn btn-outline-primary" (click)="prevStep()" [disabled]="currentStep === 0">Anterior</button>
+                        <button class="btn btn-primary" (click)="nextStep()" [disabled]="currentStep === steps.length - 1">Siguiente</button>
+                      </div>
 
-                      <button class="btn btn-primary"
-                              (click)="nextStep()"
-                              [disabled]="currentStep === steps.length - 1">
-                        Siguiente
-                      </button>
+                      <div class="d-flex align-items-center gap-2 flex-wrap step-actions" style="margin-right: 5px;">
+                        <button *ngFor="let btn of accionesEstado[step.id] || []"
+                                mat-raised-button
+                                [color]="getButtonColor(btn.texto)"
+                                class="btn-dinamico"
+                                (click)="btn.accion(form)"
+                                [disabled]="step.id === 1 && form && !form.form.valid"
+                                style="background: #18206E; color: white;"
+                                [ngClass]="{'btn-bloqueado': step.id === 1 && form && !form.form.valid}">
+                          <mat-icon class="me-1" style="margin-left: 3px; color: #00ACD4;" [ngClass]="{'btn-bloqueado': step.id === 1 && form && !form.form.valid}">
+                            {{ getButtonIcon(btn.texto) }}
+                          </mat-icon>
+                          {{ btn.texto }}
+                        </button>
+                      </div>
                     </div>
-
-                    <!-- Lado derecho: los botones -->
-                    <div class="d-flex align-items-center gap-2 flex-wrap step-actions" style="margin-right: 5px;">
-                      <button *ngFor="let btn of accionesEstado[step.id] || []"
-                              mat-raised-button
-                              [color]="getButtonColor(btn.texto)"
-                              class="btn-dinamico"
-                              (click)="btn.accion()"
-                              style="background: #18206E; color: white;">
-                        <mat-icon class="me-1" style="margin-left: 3px; color: #00ACD4;">
-                          {{ getButtonIcon(btn.texto) }}
-                        </mat-icon>
-                        {{ btn.texto }}
-                      </button>
-                    </div>
-                  </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -287,11 +290,11 @@
           [convocatoria]="convocatoria"
           [documento]="documento">
         </app-gestion-entregable>
-        <app-gestion-entregable
+        <!-- <app-gestion-entregable
           [idConvocatoria]="convocatoriaId"
           [convocatoria]="convocatoria"
           [documento]="documento">
-        </app-gestion-entregable>
+        </app-gestion-entregable> -->
       </div>
     </div>
   </div>
@@ -325,8 +328,13 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <app-financiacion></app-financiacion>
+        <app-financiacion [postulacionId]="idPostulacion" ></app-financiacion>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Notificaciones de ngx-sonner -->
+<ngx-sonner-toaster />
+<!-- ConfirmDialog de PrimeNG -->
+<p-confirmDialog appendTo="body" styleClass="custom-confirm-dialog"></p-confirmDialog>

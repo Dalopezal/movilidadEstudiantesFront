@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
@@ -40,6 +40,7 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   loadingTable: any;
+  @Input() postulacionId: any;
 
   constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
 
@@ -101,7 +102,7 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
   fetchFinanciaciones() {
     this.error = null;
     this.loadingTable = true;
-    this.api.get<any>('Financiacion/Consultar_Financiacion')
+    this.api.get<any>('FinanciacionUCM/Consultar_FinanciacionesPostulacion?PostulacionId=' + this.postulacionId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {

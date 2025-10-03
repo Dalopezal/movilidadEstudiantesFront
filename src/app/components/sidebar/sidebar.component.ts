@@ -102,7 +102,7 @@ export class SidebarComponent {
 
       if (tipo === 'microsoft') {
         this.logoutMicrosoft();
-      } else if (tipo === 'externo') { // Google
+      } else if (tipo === 'google') {
         this.logoutGoogle();
       } else {
         // otro caso o custom logout
@@ -114,7 +114,7 @@ export class SidebarComponent {
 
   logoutMicrosoft() {
     this.msalService.logoutRedirect({
-      postLogoutRedirectUri: 'http://localhost:4200/login' // o la ruta de tu login
+      postLogoutRedirectUri: 'http://localhost:4200/login'
     });
   }
 

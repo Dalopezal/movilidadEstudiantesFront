@@ -26,7 +26,7 @@
         <th>Selección</th>
       </tr>
        <tr *ngFor="let role of roles">
-        <td>{{ role.nombre }}</td> <!-- 👈 aquí usas la propiedad nombre -->
+        <td>{{ role.nombre }}</td>
         <td>
           <input
             type="radio"
@@ -46,18 +46,10 @@
 
 <div class="modal-overlay" *ngIf="showModalDatos">
   <div class="modal-content-xl wide">
-    <div class="modal-header mb-3">
-       <h4><p class="mb-0" style="color: #0D133F;">Actualice sus datos</p></h4>
+    <div class="modal-header mb-3 d-flex justify-content-between align-items-center">
+      <h4 class="mb-0 text-dark">Actualice sus datos</h4>
+      <img src="../../../assets/logo-ucm.png" alt="Logo Mobility" class="sidebar-logo3"/>
     </div>
-    <!-- <div class="card shadow-sm flex-grow-1 d-flex flex-column"> -->
-
-      <!-- Header -->
-      <!-- <div class="card-header text-white" style="background: #E2E6F7;">
-        <p class="mb-0" style="color: #0D133F;font-size: 16px;">Actualice sus datos</p>
-      </div> -->
-
-      <!-- Body -->
-      <!-- <div class="card-body d-flex flex-column flex-grow-1"> -->
         <form class="d-flex flex-column flex-grow-1"
               #datosForm="ngForm"
               (ngSubmit)="guardarDatos()"
@@ -65,16 +57,14 @@
 
           <div class="row">
             <!-- Tipo Documento -->
+            <!-- Tipo Documento -->
             <div class="col-md-4 mb-3">
               <label class="form-label fw-bold">Tipo de Documento</label>
               <select class="form-select" name="tipoDocumento"
-                      [(ngModel)]="datosPerfil.tipoDocumento"
+                      [(ngModel)]="datosPerfil.tipoDocumentoId"
                       required style="font-size:13px;">
-                <option value="">Seleccione tipo documento</option>
-                <option value="CC">Cédula de ciudadanía</option>
-                <option value="TI">Tarjeta de identidad</option>
-                <option value="CE">Cédula de extranjería</option>
-                <option value="PAS">Pasaporte</option>
+                <option [ngValue]="null">Seleccione tipo documento</option>
+                <option *ngFor="let t of tiposDocumento" [ngValue]="t.id">{{ t.nombre }}</option>
               </select>
             </div>
 
@@ -120,7 +110,7 @@
               <input type="text" class="form-control" name="pasaporte"
                      [(ngModel)]="datosPerfil.pasaporte"
                      placeholder="Número de pasaporte"
-                     required style="font-size:13px;">
+                     style="font-size:13px;">
             </div>
 
             <!-- Fecha -->
@@ -128,7 +118,7 @@
               <label class="form-label fw-bold">Fecha nacimiento</label>
               <input type="date" class="form-control" name="fechaNacimiento"
                      [(ngModel)]="datosPerfil.fechaNacimiento"
-                     required style="font-size:13px;">
+                    style="font-size:13px;">
             </div>
 
             <!-- Dirección -->
@@ -137,20 +127,17 @@
               <input type="text" class="form-control" name="direccion"
                      [(ngModel)]="datosPerfil.direccion"
                      placeholder="Digite dirección"
-                     required style="font-size:13px;">
+                    style="font-size:13px;">
             </div>
 
             <!-- País -->
             <div class="col-md-4 mb-3">
               <label class="form-label fw-bold">País</label>
               <select class="form-select" name="pais"
-                      [(ngModel)]="datosPerfil.pais"
+                      [(ngModel)]="datosPerfil.paisId"
+                      (change)="onPaisChange()"
                       required style="font-size:13px;">
-                <option value="">Seleccione país</option>
-                <option value="Colombia">Colombia</option>
-                <option value="México">México</option>
-                <option value="España">España</option>
-                <option value="Argentina">Argentina</option>
+               <option *ngFor="let p of paises" [ngValue]="p.id">{{ p.nombre }}</option>
               </select>
             </div>
 
@@ -158,13 +145,9 @@
             <div class="col-md-4 mb-3">
               <label class="form-label fw-bold">Ciudad</label>
               <select class="form-select" name="ciudad"
-                      [(ngModel)]="datosPerfil.ciudad"
+                      [(ngModel)]="datosPerfil.ciudadId"
                       required style="font-size:13px;">
-                <option value="">Seleccione ciudad</option>
-                <option *ngIf="datosPerfil.pais==='Colombia'" value="Bogotá">Bogotá</option>
-                <option *ngIf="datosPerfil.pais==='Colombia'" value="Medellín">Medellín</option>
-                <option *ngIf="datosPerfil.pais==='México'" value="CDMX">Ciudad de México</option>
-                <option *ngIf="datosPerfil.pais==='España'" value="Madrid">Madrid</option>
+                <option *ngFor="let c of ciudades" [ngValue]="c.id">{{ c.nombre }}</option>
               </select>
             </div>
 
@@ -174,7 +157,7 @@
               <input type="text" class="form-control" name="cargo"
                      [(ngModel)]="datosPerfil.cargo"
                      placeholder="Digite cargo"
-                     required style="font-size:13px;">
+                    style="font-size:13px;">
             </div>
 
             <!-- Contrato -->
@@ -182,7 +165,7 @@
               <label class="form-label fw-bold">Contrato</label>
               <select class="form-select" name="contrato"
                       [(ngModel)]="datosPerfil.contrato"
-                      required style="font-size:13px;">
+                      style="font-size:13px;">
                 <option value="">Seleccione tipo contrato</option>
                 <option>Planta</option>
                 <option>Término fijo</option>
@@ -197,7 +180,7 @@
               <input type="number" min="1" class="form-control" name="semestre"
                      [(ngModel)]="datosPerfil.semestre"
                      placeholder="Digite semestre"
-                     required style="font-size:13px;">
+                    style="font-size:13px;">
             </div>
 
             <!-- Avance -->
@@ -206,7 +189,7 @@
               <input type="number" min="0" max="100" class="form-control" name="avance"
                      [(ngModel)]="datosPerfil.avance"
                      placeholder="Ej: 50"
-                     required style="font-size:13px;">
+                    style="font-size:13px;">
             </div>
 
             <!-- Programa -->
@@ -215,7 +198,7 @@
               <input type="text" class="form-control" name="programa"
                      [(ngModel)]="datosPerfil.programa"
                      placeholder="Digite programa"
-                     required style="font-size:13px;">
+                    style="font-size:13px;">
             </div>
 
             <!-- Facultad -->
@@ -224,7 +207,7 @@
               <input type="text" class="form-control" name="facultad"
                      [(ngModel)]="datosPerfil.facultad"
                      placeholder="Digite facultad"
-                     required style="font-size:13px;">
+                    style="font-size:13px;">
             </div>
 
             <!-- Dependencia -->
@@ -233,7 +216,7 @@
               <input type="text" class="form-control" name="dependencia"
                      [(ngModel)]="datosPerfil.dependencia"
                      placeholder="Digite dependencia"
-                     required style="font-size:13px;">
+                    style="font-size:13px;">
             </div>
 
             <!-- Nivel formación -->
@@ -241,7 +224,7 @@
               <label class="form-label fw-bold">Nivel formación</label>
               <select class="form-select" name="nivelFormacion"
                       [(ngModel)]="datosPerfil.nivelFormacion"
-                      required style="font-size:13px;">
+                      style="font-size:13px;">
                 <option value="">Seleccione nivel</option>
                 <option>Pregrado</option>
                 <option>Especialización</option>
@@ -257,7 +240,7 @@
                      name="promedio"
                      [(ngModel)]="datosPerfil.promedio"
                      placeholder="Ej: 4.3"
-                     required style="font-size:13px;">
+                    style="font-size:13px;">
             </div>
 
             <!-- Grupo investigación -->
@@ -266,27 +249,25 @@
               <input type="text" class="form-control" name="grupo"
                      [(ngModel)]="datosPerfil.grupo"
                      placeholder="Digite grupo"
-                     required style="font-size:13px;">
+                    style="font-size:13px;">
             </div>
           </div>
 
           <!-- Botones -->
           <div class="d-flex justify-content-end gap-2 mt-3">
-            <!-- <button type="submit"
-                    class="btn-guardar"
-                    [disabled]="datosForm.invalid || loading"
-                    style="font-size:13px; min-width:120px;">
-              {{ textoBotonDatos }}
-            </button> -->
             <button type="submit"
                     class="btn-guardar"
-                    style="font-size:13px; min-width:120px;">
+                    style="font-size:13px; min-width:120px;"
+                    [disabled]="!datosForm.valid">
               {{ textoBotonDatos }}
             </button>
           </div>
 
         </form>
-      <!-- </div> -->
-    <!-- </div> -->
   </div>
 </div>
+
+<!-- Notificaciones -->
+<ngx-sonner-toaster />
+<!-- Confirm Dialog -->
+<p-confirmDialog appendTo="body"></p-confirmDialog>

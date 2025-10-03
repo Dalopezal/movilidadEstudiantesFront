@@ -11,11 +11,12 @@ import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { EntregableModel } from '../../models/EntregableModel';
 import { MatDialog } from '@angular/material/dialog';
 import { SharePointDriveComponent } from '../drive/drive.component';
+import { InstitucionConvenioComponent } from "../institucion-convenio/institucion-convenio.component";
 
 @Component({
   selector: 'app-gestion-entregable',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster, SharePointDriveComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster, SharePointDriveComponent, InstitucionConvenioComponent],
   templateUrl: './gestion-entregable.component.html',
   styleUrls: ['./gestion-entregable.component.css'],
   providers: [ConfirmationService]
@@ -43,6 +44,8 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
   @Input() documento!: any;
   loadingTable: any;
   estados: any[] = [];
+  entregable: any;
+  usuario: any;
 
   selectedItemCard: EntregableModel | null = null;
 
@@ -51,8 +54,16 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
   constructor(private api: GenericApiService, private confirmationService: ConfirmationService, public dialog: MatDialog) {}
 
   ngOnInit() {
+    window.addEventListener("storage", this.onStorageChange.bind(this));
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
     this.fetchEntregables();
   }
+
+  private onStorageChange() {
+    const user = JSON.parse(localStorage.getItem("usuario") || "{}");
+  }
+
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['idConvocatoria'] && this.idConvocatoria) {
