@@ -87,6 +87,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   instituciones: any[] = [];
   convenios: any[] = [];
   tiposMovlidad: any[] = [];
+  accionesEstado: Record<number, { texto: string; accion: (form?: NgForm) => void }[]> = {};
 
   constructor(private api: GenericApiService, private location: Location, private route: ActivatedRoute, public dialog: MatDialog, private confirmationService: ConfirmationService) {}
 
@@ -120,10 +121,11 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
     const data = localStorage.getItem('usuario');
     console.log("Data", data);
     this.usuario = data ? JSON.parse(data) : {};
-    console.log("Data2", data);
-    this.getEstados();
+
+    this.buildAccionesEstado();
+
     this.cargatSecciones();
-    this.fetchListaInstituciones();
+    this.getEstados();
   }
 
   cargatSecciones(){
@@ -346,7 +348,7 @@ private fetchListaInstituciones() {
     .pipe(takeUntil(this.destroy$))
     .subscribe({
       next: (resp) => {
-        let items: any[] = [];''
+        let items: any[] = [];
         if (Array.isArray(resp)) items = resp;
         else if (resp && typeof resp === 'object') {
           if (Array.isArray(resp.data)) items = resp.data;
@@ -358,8 +360,14 @@ private fetchListaInstituciones() {
         }
         this.instituciones = items.map(item => ({ value: item.id, label: item.nombre }));
         console.log("instituciones", this.instituciones);
+
         this.fetchListaTipoMovilidad();
-        this.cargatSecciones();
+
+        const payload = {
+          ...this.steps[0].data
+        };
+
+        this.fetchListaConvocatoria(payload['institucionId']);
 
       },
       error: (err) => {
@@ -532,6 +540,7 @@ private fetchListaInstituciones() {
           }
 
           this.loading = false;
+          this.fetchListaInstituciones();
         },
         error: (err) => {
           console.error('Error al cargar bitácora', err);
@@ -570,91 +579,93 @@ private fetchListaInstituciones() {
     this.location.back();
   }
 
-  accionesEstado: Record<number, { texto: string; accion: (form?: NgForm) => void }[]> = {
+  private buildAccionesEstado() {
+    this.accionesEstado = {
     // ---------------- FASE PRE ----------------
-    1: [ // Pre-postulación
-      { texto: 'Prepostularme', accion: (form?: NgForm) => this.onPrepostular(form) }
-    ],
-    2: [ // Rechazado Pre-postulación
-      { texto: 'Rechazado Pre-postulación', accion: () => this.onRechazarPre() }
-    ],
-    21: [ // Aceptado Pre-postulación
-      { texto: 'Aceptar Pre-postulación', accion: () => this.onAceptarPre() }
-    ],
+      1: this.usuario.rolId != 7 ? [ // Pre-postulación
+        { texto: 'Prepostularme', accion: (form?: NgForm) => this.onPrepostular(form) }
+      ] : [],
+      2: [ // Rechazado Pre-postulación
+        { texto: 'Rechazado Pre-postulación', accion: () => this.onRechazarPre() }
+      ],
+      21: [ // Aceptado Pre-postulación
+        { texto: 'Aceptar Pre-postulación', accion: () => this.onAceptarPre() }
+      ],
 
-    // ---------------- FASE POSTULACIÓN ----------------
-    3: [ // En postulación (usuario llena formulario y confirma postulacion)
-      { texto: 'Postularme', accion: () => this.onPostular() },
-      { texto: 'Cancelar la postulación', accion: () => this.onCancelar() }
-    ],
-    4: [ // Aprobado Postulación (ORI)
-      { texto: 'Aprobar postulación', accion: () => this.onAprobarPostulacion() }
-    ],
-    5: [ // Rechazado Postulación (ORI)
-      { texto: 'Rechazar postulación', accion: () => this.onRechazarPostulacion() }
-    ],
+      // ---------------- FASE POSTULACIÓN ----------------
+      3: [ // En postulación (usuario llena formulario y confirma postulacion)
+        { texto: 'Postularme', accion: () => this.onPostular() },
+        { texto: 'Cancelar la postulación', accion: () => this.onCancelar() }
+      ],
+      4: [ // Aprobado Postulación (ORI)
+        { texto: 'Aprobar postulación', accion: () => this.onAprobarPostulacion() }
+      ],
+      5: [ // Rechazado Postulación (ORI)
+        { texto: 'Rechazar postulación', accion: () => this.onRechazarPostulacion() }
+      ],
 
-    // ---------------- FASE DIRECTOR ----------------
-    6: [
-      { texto: 'Aprobar director de programa', accion: () => this.onAprobarDirector() },
-      // { texto: 'Rechazar director de programa', accion: () => this.onRechazarDirector() }
-    ],
-    7: [
-      { texto: 'Rechazar director programa', accion: () => this.onConfirmarRechazoDirector() }
-    ],
+      // ---------------- FASE DIRECTOR ----------------
+      6: [
+        { texto: 'Aprobar director de programa', accion: () => this.onAprobarDirector() },
+        // { texto: 'Rechazar director de programa', accion: () => this.onRechazarDirector() }
+      ],
+      7: [
+        { texto: 'Rechazar director programa', accion: () => this.onConfirmarRechazoDirector() }
+      ],
 
-    // ---------------- FASE DECANATURA ----------------
-    8: [
-      { texto: 'Aprobado Decanatura', accion: () => this.onAprobarDecanatura() }
-    ],
-    9: [
-      { texto: 'Rechazo Decanatura', accion: () => this.onRechazarDecanatura() }
-    ],
+      // ---------------- FASE DECANATURA ----------------
+      8: [
+        { texto: 'Aprobado Decanatura', accion: () => this.onAprobarDecanatura() }
+      ],
+      9: [
+        { texto: 'Rechazo Decanatura', accion: () => this.onRechazarDecanatura() }
+      ],
 
-    // ---------------- FASE VICERRECTORÍA ----------------
-    10: [
-      { texto: 'Aprobado Vicerrectoría Académica', accion: () => this.onAprobarVicerrectoria() }
-    ],
-    11: [
-      { texto: 'Rechazo Vicerrectoría Académica', accion: () => this.onRechazarVicerrectoria() }
-    ],
+      // ---------------- FASE VICERRECTORÍA ----------------
+      10: [
+        { texto: 'Aprobado Vicerrectoría Académica', accion: () => this.onAprobarVicerrectoria() }
+      ],
+      11: [
+        { texto: 'Rechazo Vicerrectoría Académica', accion: () => this.onRechazarVicerrectoria() }
+      ],
 
-    // ---------------- JEFE INMEDIATO ----------------
-    12: [
-      { texto: 'Aprobado Jefe Inmediato', accion: () => this.onAprobarJefe() }
-    ],
-    13: [
-      { texto: 'Rechazado Jefe Inmediato', accion: () => this.onRechazarJefe() }
-    ],
+      // ---------------- JEFE INMEDIATO ----------------
+      12: [
+        { texto: 'Aprobado Jefe Inmediato', accion: () => this.onAprobarJefe() }
+      ],
+      13: [
+        { texto: 'Rechazado Jefe Inmediato', accion: () => this.onRechazarJefe() }
+      ],
 
-    // ---------------- RECTORÍA ----------------
-    14: [
-      { texto: 'Aprobado Rectoría', accion: () => this.onAprobarRectoria() }
-    ],
-    15: [
-      { texto: 'Rechazo Rectoría', accion: () => this.onRechazarRectoria() }
-    ],
+      // ---------------- RECTORÍA ----------------
+      14: [
+        { texto: 'Aprobado Rectoría', accion: () => this.onAprobarRectoria() }
+      ],
+      15: [
+        { texto: 'Rechazo Rectoría', accion: () => this.onRechazarRectoria() }
+      ],
 
-    // ---------------- UNIVERSIDAD DESTINO ----------------
-    16: [
-      { texto: 'Postulado Universidad Destino', accion: () => this.onPostularUniversidad() },
-      { texto: 'Cancelar postulación', accion: () => this.onCancelar() }
-    ],
-    17: [
-      { texto: 'Aceptado Universidad Destino', accion: () => this.onAprobarUniversidad() }
-    ],
-    18: [
-      { texto: 'Rechazado Universidad Destino', accion: () => this.onRechazarUniversidad() }
-    ],
+      // ---------------- UNIVERSIDAD DESTINO ----------------
+      16: [
+        { texto: 'Postulado Universidad Destino', accion: () => this.onPostularUniversidad() },
+        { texto: 'Cancelar postulación', accion: () => this.onCancelar() }
+      ],
+      17: [
+        { texto: 'Aceptado Universidad Destino', accion: () => this.onAprobarUniversidad() }
+      ],
+      18: [
+        { texto: 'Rechazado Universidad Destino', accion: () => this.onRechazarUniversidad() }
+      ],
 
-    // ---------------- ETAPA FINAL ----------------
-    19: [
-      { texto: 'En movilidad', accion: () => this.onEnMovilidad() }
-    ],
-    20: [
-      { texto: 'Finalizado', accion: () => this.onFinalizado() }
-    ]
-  };
+      // ---------------- ETAPA FINAL ----------------
+      19: [
+        { texto: 'En movilidad', accion: () => this.onEnMovilidad() }
+      ],
+      20: [
+        { texto: 'Finalizado', accion: () => this.onFinalizado() }
+      ]
+    };
+  }
 
   // onPrepostular() {
   //   const payload = {

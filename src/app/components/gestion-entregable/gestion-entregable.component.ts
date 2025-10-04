@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, Input, SimpleChanges } from '@angular/core';
-import { SidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
