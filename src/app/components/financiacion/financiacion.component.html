@@ -3,16 +3,16 @@
     <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;font-size: 13px">
       <div class="row g-4 flex-grow-1">
         <!-- Formulario -->
-        <section class="col-12 col-lg-4 d-flex flex-column" style="height: 80vh;">
+        <section class="col-12 col-lg-4 d-flex flex-column" style="height: 73vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
-            <div class="card-header text-white" style="background: #E2E6F7;">
+            <!-- <div class="card-header text-white" style="background: #E2E6F7;">
               <p class="mb-0" style="color: #0D133F;font-size: 14px">Administrar Financiación</p>
-            </div>
+            </div> -->
 
             <div class="card-body d-flex flex-column flex-grow-1">
               <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
 
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                   <label for="postulacionId" class="form-label fw-bold">ID Postulación</label>
                   <input
                     type="number"
@@ -27,7 +27,7 @@
                   <div class="text-danger small mt-1" *ngIf="postulacionCtrl.invalid && (postulacionCtrl.touched || postulacionCtrl.dirty)">
                     <div *ngIf="postulacionCtrl.errors?.['required']">La postulación es obligatoria.</div>
                   </div>
-                </div>
+                </div> -->
 
                 <div class="row g-3" style="margin-bottom: 20px;">
                   <div class="col-12 col-md-6">
@@ -125,7 +125,7 @@
 
                 <div class="row g-3" style="margin-bottom: 20px;">
                   <div class="col-12 col-md-6">
-                    <label for="tipoFinanciacionExterna" class="form-label fw-bold">Tipo Financiación Externa</label>
+                    <label for="tipoFinanciacionExterna" class="form-label fw-bold">Financiación Externa</label>
                     <select
                       class="form-select"
                       id="tipoFinanciacionExterna"
@@ -142,7 +142,7 @@
                     </div>
                   </div>
                   <div class="col-12 col-md-6">
-                    <label for="tipoFinanciacion" class="form-label fw-bold">Tipo Financiación</label>
+                    <label for="tipoFinanciacion" class="form-label fw-bold">Financiación</label>
                     <select
                       class="form-select"
                       id="tipoFinanciacion"
@@ -183,7 +183,7 @@
         </section>
 
         <!-- Tabla -->
-        <section class="col-12 col-lg-8 d-flex flex-column" style="height: 80vh;">
+        <section class="col-12 col-lg-8 d-flex flex-column" style="height: 73vh;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchFinanciaciones(); filtro=''">

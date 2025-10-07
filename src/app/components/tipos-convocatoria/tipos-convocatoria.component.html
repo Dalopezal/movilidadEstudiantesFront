@@ -1,25 +1,57 @@
 <app-sidebar></app-sidebar>
+
 <div style="padding: 20px;">
   <ul class="nav nav-tabs custom-tabs" id="convocatoriaTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">
+    <li class="nav-item" role="presentation" *ngIf="isInternal">
+      <button
+        class="nav-link"
+        [class.active]="activeTab === 'general'"
+        (click)="setActiveTab('general')"
+        id="general-tab"
+        type="button"
+        role="tab"
+        aria-controls="general"
+        [attr.aria-selected]="activeTab === 'general'">
         <i class="fas fa-circle-arrow-right me-1"></i>Convocatoria - Entrantes
       </button>
     </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="condiciones-tab" data-bs-toggle="tab" data-bs-target="#condiciones" type="button" role="tab" aria-controls="condiciones" aria-selected="false">
-        <i class="fas fa-circle-arrow-left me-1"></i>Convocatoria Salientes
+
+    <li class="nav-item" role="presentation" *ngIf="isExternal">
+      <button
+        class="nav-link"
+        [class.active]="activeTab === 'condiciones'"
+        (click)="setActiveTab('condiciones')"
+        id="condiciones-tab"
+        type="button"
+        role="tab"
+        aria-controls="condiciones"
+        [attr.aria-selected]="activeTab === 'condiciones'">
+        <i class="fas fa-circle-arrow-left me-1"></i>Convocatoria - Salientes
       </button>
     </li>
   </ul>
 
   <div class="tab-content p-3 custom-tab-content" id="convocatoriaTabContent">
-    <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+    <div
+      *ngIf="isInternal"
+      class="tab-pane fade"
+      [class.show]="activeTab === 'general'"
+      [class.active]="activeTab === 'general'"
+      id="general"
+      role="tabpanel"
+      aria-labelledby="general-tab">
       <app-convocatorias-general [categoria]="'Entrante'"></app-convocatorias-general>
     </div>
-    <div class="tab-pane fade" id="condiciones" role="tabpanel" aria-labelledby="condiciones-tab">
+
+    <div
+      *ngIf="isExternal"
+      class="tab-pane fade"
+      [class.show]="activeTab === 'condiciones'"
+      [class.active]="activeTab === 'condiciones'"
+      id="condiciones"
+      role="tabpanel"
+      aria-labelledby="condiciones-tab">
       <app-convocatorias-general [categoria]="'Saliente'"></app-convocatorias-general>
     </div>
   </div>
-
 </div>

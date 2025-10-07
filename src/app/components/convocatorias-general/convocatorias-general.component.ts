@@ -13,7 +13,6 @@ import { CondicionComponent } from '../condicion/condicion.component';
 import { BeneficioConvocatoriaComponent } from '../beneficio-convocatoria/beneficio-convocatoria.component';
 import { EntregableComponent } from '../entregable/entregable.component';
 import { Router } from '@angular/router';
-import { PostulacionTipoConsultaModel } from '../../models/PostulacionTipoModel';
 
 @Component({
   selector: 'app-convocatorias-general',

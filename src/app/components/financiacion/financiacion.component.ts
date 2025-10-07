@@ -71,7 +71,7 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.tiposFinanciacionExterna = items.map(i => ({ id: Number(i.id), descripcion: i.descripcion }));
+          this.tiposFinanciacionExterna = items.map(i => ({ id: Number(i.id), descripcion: i.nombre }));
         },
         error: (err) => { console.error('Error cargando tipos financiacion externa', err); this.tiposFinanciacionExterna = []; }
       });
@@ -92,7 +92,7 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.tiposFinanciacion = items.map(i => ({ id: Number(i.id), descripcion: i.descripcion }));
+          this.tiposFinanciacion = items.map(i => ({ id: Number(i.id), descripcion: i.nombre }));
         },
         error: (err) => { console.error('Error cargando tipos financiacion', err); this.tiposFinanciacion = []; }
       });

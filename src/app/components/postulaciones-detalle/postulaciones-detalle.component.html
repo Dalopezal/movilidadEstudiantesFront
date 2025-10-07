@@ -93,9 +93,9 @@
                         <i class="fas fa-bell"></i>
                       </button>
 
-                      <button class="btn-notif-round" title="Ver Histórico">
+                      <!-- <button class="btn-notif-round" title="Ver Histórico">
                         <i class="fas fa-history"></i>
-                      </button>
+                      </button> -->
 
                       <button class="btn-notif-round"
                               (click)="onGestioDocumental(step)"
@@ -120,13 +120,14 @@
                         <!-- Botón Encuenta satisfacción -->
                         <button class="btn-notif-round"
                                 (click)="onGestioEncuesta(step)"
-                                title="Gestión de Beneficios">
+                                title="Encuesta de satisfacción movilidad">
                           <i class="fas fa-file"></i>
                         </button>
 
                       <div class="estado-circle" [style.background]="getColorEstado(step.id)"></div>
                     </div>
                   </div>
+                  <strong style="color: grey;">{{this.nombreCompleto}}, {{this.documento}}</strong>
 
                   <!-- Barra de progreso -->
                   <div class="progress my-2" style="height: 6px;">
@@ -323,11 +324,11 @@
     <div class="modal-content">
       <div class="modal-header" style="background: #E2E6F7;">
         <p class="modal-title" id="FinanciacionModelLabel" style="color: #0D133F;">
-          Administrar Beneficios - Postulaciones
+          Administrar Financiación - Postulaciones
         </p>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="overflow-x: scroll;">
         <app-financiacion [postulacionId]="idPostulacion" ></app-financiacion>
       </div>
     </div>

@@ -77,6 +77,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   loading = false;
   idPostulacion: any;
   documento: any;
+  nombreCompleto: any;
   convocatoria: any;
   convocatoriaId: any;
   usuario: any = {};
@@ -498,7 +499,8 @@ private fetchListaInstituciones() {
             bitacora.forEach(entry => {
               fieldsForThisStep.forEach(field => {
                 if (field.name === 'usuarioId' && this.usuario?.nombre) {
-                  stepData[field.name] = this.usuario.nombre;
+                  //stepData[field.name] = this.usuario.nombre;
+                  stepData[field.name] = entry[field.name];
                 }else
 
                 if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
@@ -533,6 +535,7 @@ private fetchListaInstituciones() {
             if (index >= 0) {
               this.currentStep = index;
               this.documento = ultimo.documento;
+              this.nombreCompleto = ultimo.nombreCompleto;
               this.convocatoria = ultimo.nombreConvocatoria;
               this.convocatoriaId = ultimo.convocatoriaId;
               this.focusCurrentStep();
