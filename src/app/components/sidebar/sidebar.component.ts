@@ -1,9 +1,10 @@
-import { Component, ElementRef, HostListener } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MsalService } from '@azure/msal-angular';
 import { GenericApiService } from '../../services/generic-api.service';
 import { Subject, takeUntil } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -12,39 +13,61 @@ import { Subject, takeUntil } from 'rxjs';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit, OnDestroy {
   isCollapsed = true;
-  ismovilidadOpen = false; // Controla submenú
+  ismovilidadOpen = false;
   usuario: any = {};
   isUserMenuOpen = false;
   menu: any[] = [];
   maestros: any[] = [];
 
   private destroy$ = new Subject<void>();
+  private storageHandler = this.onStorageChange.bind(this);
 
-  constructor(private elementRef: ElementRef, private router: Router, private msalService: MsalService, private api: GenericApiService) {}
+  constructor(
+    private elementRef: ElementRef,
+    private router: Router,
+    private msalService: MsalService,
+    private api: GenericApiService,
+    private auth: AuthService
+  ) {}
 
   ngOnInit() {
-    window.addEventListener("storage", this.onStorageChange.bind(this));
+    // Escuchar cambios en localStorage
+    window.addEventListener('storage', this.storageHandler);
+
     const data = localStorage.getItem('usuario');
     this.usuario = data ? JSON.parse(data) : {};
 
-    // Validar antes de llamar API
     if (this.usuario?.rolId && this.usuario.rolId > 0) {
       this.fetchMenu(this.usuario.rolId);
     } else {
-      console.warn('RolId no definido, aún no se carga menú');
+      // Si no hay rol aún, intentamos cargar cuando llegue
+      // console.warn('RolId no definido, aún no se carga menú');
     }
   }
 
   ngOnDestroy() {
-    window.removeEventListener("storage", this.onStorageChange.bind(this));
+    window.removeEventListener('storage', this.storageHandler);
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private onStorageChange() {
-    const user = JSON.parse(localStorage.getItem("usuario") || "{}");
-    if (user?.rolId) {
-      this.fetchMenu(user.rolId);
+    try {
+      const userRaw = localStorage.getItem('usuario');
+      const user = userRaw ? JSON.parse(userRaw) : null;
+      if (user?.rolId) {
+        this.fetchMenu(user.rolId);
+        this.usuario = user;
+      } else {
+        // limpiar menú si no hay usuario
+        this.menu = [];
+        this.maestros = [];
+        this.usuario = {};
+      }
+    } catch (err) {
+      console.error('Error parsing usuario from storage event', err);
     }
   }
 
@@ -64,7 +87,6 @@ export class SidebarComponent {
   onDocumentClick(event: MouseEvent) {
     const clickedInside = this.elementRef.nativeElement.contains(event.target);
     if (!clickedInside) {
-      // Cierra sidebar y submenú si se hace click fuera
       if (!this.isCollapsed) this.isCollapsed = true;
       if (this.ismovilidadOpen) this.ismovilidadOpen = false;
     }
@@ -73,11 +95,6 @@ export class SidebarComponent {
   toggleUserMenu() {
     this.isUserMenuOpen = !this.isUserMenuOpen;
   }
-
-  // logout() {
-  //   localStorage.clear();
-  //   this.router.navigate(['/login']);
-  // }
 
   decodeUtf8(str: string): string {
     try {
@@ -96,25 +113,22 @@ export class SidebarComponent {
   }
 
   logout() {
-    const usuario = localStorage.getItem('usuario');
-    if (usuario) {
-      const { tipo } = JSON.parse(usuario);
+    // Delegar a AuthService que ya maneja MS y Google
+    this.auth.logout();
 
-      if (tipo === 'microsoft') {
-        this.logoutMicrosoft();
-      } else if (tipo === 'google') {
-        this.logoutGoogle();
-      } else {
-        // otro caso o custom logout
-        localStorage.clear();
-        this.router.navigate(['/login']);
-      }
-    }
+    // Asegurar limpieza local
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('usuario');
+
+    // Navegar a la ruta de login (tu login está en path: ''), ir a raíz
+    this.router.navigateByUrl('/');
   }
 
   logoutMicrosoft() {
+    // Si por alguna razón quieres llamarlo directamente:
     this.msalService.logoutRedirect({
-      postLogoutRedirectUri: 'http://localhost:4200/login'
+      // Usa la raíz o la URL que tengas registrada en Azure como postLogoutRedirectUri
+      postLogoutRedirectUri: 'http://localhost:4200'
     });
   }
 
@@ -123,10 +137,9 @@ export class SidebarComponent {
     if (win.google && win.google.accounts && win.google.accounts.id) {
       win.google.accounts.id.disableAutoSelect();
     }
-
     localStorage.removeItem('auth_token');
     localStorage.removeItem('usuario');
-    this.router.navigate(['/login']);
+    this.router.navigateByUrl('/');
   }
 
   private fetchMenu(rol: any) {
@@ -145,17 +158,14 @@ export class SidebarComponent {
             }
           }
 
-          // 👌 Mapear permisos → url + nombre
           this.menu = items.map(item => ({
             url: item.paginaUrl,
             nombre: item.nombre
           }));
 
-          // Filtrar: dashboard siempre fijo, tipos-convocatorias fijo
           this.maestros = this.menu.filter(m =>
             m.url !== '/dashboard' && m.url !== '/tipos-convocatorias'
           );
-
         },
         error: (err) => {
           console.error('Error al cargar menús dinámicos', err);
@@ -164,5 +174,4 @@ export class SidebarComponent {
         }
       });
   }
-
 }

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+
 import { LoginComponent } from './components/login/login.component';
 import { HomeComponent } from './components/home/home.component';
 import { BeneficioConvocatoriaComponent } from './components/beneficio-convocatoria/beneficio-convocatoria.component';
@@ -16,22 +17,31 @@ import { FinanciacionExternaComponent } from './components/financiacion-externa/
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { InstitucionConvenioComponent } from './components/institucion-convenio/institucion-convenio.component';
 
+// Guards funcionales (ruta relativa desde app.routes.ts)
+import { authGuard } from './guards/auth.guard';
+import { redirectIfAuthenticatedGuard } from './guards/redirectIfAuthenticated.guard';
+
 export const routes: Routes = [
-  { path: '', component: LoginComponent },
-  { path: 'home', component: HomeComponent },
-  { path: 'beneficios-convocatoria', component: BeneficioConvocatoriaComponent },
-  { path: 'condicion', component: CondicionComponent },
-  { path: 'condicion-convocatoria', component: CondicionConvocatoriaComponent },
-  { path: 'convenios', component: ConveniosComponent },
-  { path: 'entregables', component: EntregableComponent },
-  { path: 'instituciones', component: InstitucionesComponent },
-  { path: 'postulacion-detalle', component: PostulacionesDetalleComponent },
-  { path: 'convocatorias-general', component: ConvocatoriasGeneralComponent },
-  { path: 'tipos-convocatorias', component: TiposConvocatoriaComponent },
-  { path: 'postulacion-convocatoria', component: PostulcionesEntrantesComponent },
-  { path: 'administracion-convocatoria', component: AdminConvocatoriaComponent },
-  { path: 'financiacion-externa', component: FinanciacionExternaComponent },
-  { path: 'dashboard', component: DashboardComponent },
-  { path: 'institucion-convenio', component: InstitucionConvenioComponent },
+  // Login: si ya está autenticado redirige a /home
+  { path: '', component: LoginComponent, canActivate: [redirectIfAuthenticatedGuard] },
+
+  // Rutas protegidas por authGuard
+  { path: 'home', component: HomeComponent, canActivate: [authGuard] },
+  { path: 'beneficios-convocatoria', component: BeneficioConvocatoriaComponent, canActivate: [authGuard] },
+  { path: 'condicion', component: CondicionComponent, canActivate: [authGuard] },
+  { path: 'condicion-convocatoria', component: CondicionConvocatoriaComponent, canActivate: [authGuard] },
+  { path: 'convenios', component: ConveniosComponent, canActivate: [authGuard] },
+  { path: 'entregables', component: EntregableComponent, canActivate: [authGuard] },
+  { path: 'instituciones', component: InstitucionesComponent, canActivate: [authGuard] },
+  { path: 'postulacion-detalle', component: PostulacionesDetalleComponent, canActivate: [authGuard] },
+  { path: 'convocatorias-general', component: ConvocatoriasGeneralComponent, canActivate: [authGuard] },
+  { path: 'tipos-convocatorias', component: TiposConvocatoriaComponent, canActivate: [authGuard] },
+  { path: 'postulacion-convocatoria', component: PostulcionesEntrantesComponent, canActivate: [authGuard] },
+  { path: 'administracion-convocatoria', component: AdminConvocatoriaComponent, canActivate: [authGuard] },
+  { path: 'financiacion-externa', component: FinanciacionExternaComponent, canActivate: [authGuard] },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'institucion-convenio', component: InstitucionConvenioComponent, canActivate: [authGuard] },
+
+  // Wildcard -> login
   { path: '**', redirectTo: '' }
 ];

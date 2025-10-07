@@ -67,7 +67,6 @@ export class HomeComponent implements OnInit {
     const data = localStorage.getItem('usuario');
     if (data) {
       this.usuario = JSON.parse(data);
-
       if (!this.usuario.rol || this.usuario.rol === '') {
         this.fetchListaRoles(this.usuario.correo);
         this.showModalRol = true;

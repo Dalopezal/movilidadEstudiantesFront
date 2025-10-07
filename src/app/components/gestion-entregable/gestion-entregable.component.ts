@@ -10,12 +10,11 @@ import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { EntregableModel } from '../../models/EntregableModel';
 import { MatDialog } from '@angular/material/dialog';
 import { SharePointDriveComponent } from '../drive/drive.component';
-import { InstitucionConvenioComponent } from "../institucion-convenio/institucion-convenio.component";
 
 @Component({
   selector: 'app-gestion-entregable',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster, SharePointDriveComponent, InstitucionConvenioComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster, SharePointDriveComponent],
   templateUrl: './gestion-entregable.component.html',
   styleUrls: ['./gestion-entregable.component.css'],
   providers: [ConfirmationService]
