@@ -277,9 +277,17 @@
       <div class="modal-body">
         <app-gestion-entregable
           [idConvocatoria]="convocatoriaId"
+          [idPostulacion]="idPostulacion"
           [convocatoria]="convocatoria"
           [documento]="documento">
         </app-gestion-entregable>
+
+        <app-gestion-condicion
+          [idConvocatoria]="convocatoriaId"
+          [idPostulacion]="idPostulacion"
+          [convocatoria]="convocatoria"
+          [documento]="documento">
+        </app-gestion-condicion>
       </div>
     </div>
   </div>

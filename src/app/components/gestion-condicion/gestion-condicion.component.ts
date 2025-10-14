@@ -7,22 +7,22 @@ import { HttpClientModule } from '@angular/common/http';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
-import { EntregableModel } from '../../models/EntregableModel';
 import { MatDialog } from '@angular/material/dialog';
 import { SharePointDriveComponent } from '../drive/drive.component';
+import { CondicionModel } from '../../models/CondicionModel';
 
 @Component({
-  selector: 'app-gestion-entregable',
+  selector: 'app-gestion-condicion',
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster, SharePointDriveComponent],
-  templateUrl: './gestion-entregable.component.html',
-  styleUrls: ['./gestion-entregable.component.css'],
+  templateUrl: './gestion-condicion.component.html',
+  styleUrls: ['./gestion-condicion.component.css'],
   providers: [ConfirmationService]
 })
-export class GestionEntregableComponent implements OnInit, OnDestroy {
-  data: EntregableModel[] = [];
-  filteredData: EntregableModel[] = [];
-  pagedData: EntregableModel[] = [];
+export class GestionCondicionComponent implements OnInit, OnDestroy {
+  data: CondicionModel[] = [];
+  filteredData: CondicionModel[] = [];
+  pagedData: CondicionModel[] = [];
   convocatorias: any[] = [];
 
   currentPage = 1;
@@ -35,7 +35,7 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
   error: string | null = null;
   filtro: string = '';
 
-  model: EntregableModel = new EntregableModel();
+  model: CondicionModel = new CondicionModel();
   isEditing = false;
   @Input() idConvocatoria!: any;
   @Input() idPostulacion!: any;
@@ -48,7 +48,7 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
   EntregablesConvocatoria: number = 0;
   lstEntregablesConvocatoria: any[] = [];
 
-  selectedItemCard: EntregableModel | null = null;
+  selectedItemCard: CondicionModel | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -150,7 +150,7 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
           }
 
           this.data = items.map(item =>
-            EntregableModel.fromJSON ? EntregableModel.fromJSON(item) : Object.assign(new EntregableModel(), item)
+            CondicionModel.fromJSON ? CondicionModel.fromJSON(item) : Object.assign(new CondicionModel(), item)
           );
 
           this.filteredData = [...this.data];
@@ -198,7 +198,7 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
           }
 
           this.data = items.map(item =>
-            EntregableModel.fromJSON ? EntregableModel.fromJSON(item) : Object.assign(new EntregableModel(), item)
+            CondicionModel.fromJSON ? CondicionModel.fromJSON(item) : Object.assign(new CondicionModel(), item)
           );
 
           this.filteredData = [...this.data];
@@ -219,60 +219,8 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Form handlers
-  onSubmit(form: NgForm) {
-    if (form.invalid) {
-      form.control.markAllAsTouched();
-      return;
-    }
-
-    if (!this.model.nombre?.trim() || !this.model.descripcion?.trim() || !this.model.convocatoriaId || Number(this.model.convocatoriaId) <= 0) {
-      this.error = 'Todos los campos obligatorios deben ser completados.';
-      return;
-    }
-
-    this.loading = true;
-    this.error = null;
-
-    const isUpdate = this.isEditing && this.model.id && this.model.id > 0;
-    const payload: any = {
-      nombre: this.model.nombre,
-      descripcion: this.model.descripcion,
-      convocatoriaId: Number(this.model.convocatoriaId),
-      estadoId: this.model.estadoId
-    };
-
-    if (isUpdate) payload.id = this.model.id;
-
-    const endpoint = isUpdate ? 'Entregable/actualiza_Entregable' : 'Entregable/crear_Entregable';
-    const obs = isUpdate ? this.api.put<any>(endpoint, payload) : this.api.post<any>(endpoint, payload);
-
-    obs.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (response) => {
-        this.fetchEntregables();
-        this.resetForm(form);
-        this.loading = false;
-
-        if (response.exito && response.datos) {
-          this.showSuccess(response.exito);
-        } else if (response.error && response.datos === false) {
-          this.showError(response.error);
-        } else {
-          // fallback por si llega algo inesperado
-          this.showError('Respuesta desconocida del servidor.');
-        }
-      },
-      error: (err) => {
-        console.error(isUpdate ? 'Error al actualizar entregable' : 'Error al crear entregable', err);
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
-        this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
-      }
-    });
-  }
-
   resetForm(form?: NgForm) {
-    this.model = new EntregableModel();
+    this.model = new CondicionModel();
     this.isEditing = false;
     if (form) form.resetForm({
       nombre: '',
@@ -281,8 +229,8 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
     });
   }
 
-  startEdit(item: EntregableModel) {
-    this.model = Object.assign(new EntregableModel(), item);
+  startEdit(item: CondicionModel) {
+    this.model = Object.assign(new CondicionModel(), item);
     this.isEditing = true;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -335,7 +283,7 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
     this.updatePagedData();
   }
 
-  trackByIndex(_: number, item: EntregableModel) {
+  trackByIndex(_: number, item: CondicionModel) {
     return item?.id ?? _;
   }
 
@@ -398,7 +346,7 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
   cardPosition = { top: 100, left: 100 };
   isClosing = false;
 
-  toggleDetalleConvocatoria(item: EntregableModel) {
+  toggleDetalleConvocatoria(item: CondicionModel) {
     if (this.selectedItemCard && this.selectedItemCard.id === item.id) {
       this.closeCard();
     } else {

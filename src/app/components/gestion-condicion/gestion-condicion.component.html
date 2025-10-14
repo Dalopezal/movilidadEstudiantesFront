@@ -10,7 +10,7 @@
 
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;font-size: 14px">Entregables</p>
+              <p class="mb-0" style="color: #0D133F;font-size: 14px">Condiciones</p>
             </div>
             <div class="card-header d-flex align-items-center gap-3" style="background: white;">
               <select
@@ -23,7 +23,7 @@
                 name="filtro"
                 (change)="registrarEntregable(EntregablesConvocatoria)"
               >
-                <option value="0">Seleccione Entregable de la Convocatria</option>
+                <option value="0">Seleccione Condición de la Convocatria</option>
                 <option *ngFor="let m of lstEntregablesConvocatoria" [ngValue]="m.id">{{ m.nombre }}</option>
               </select>
             </div>
@@ -46,13 +46,13 @@
                   <p style="background: transparent;;">Cargando datos</p>
                   </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
-                    <td>{{ item.nombre }}</td>
+                    <td>{{ item.nombreCondicion }}</td>
                     <td
                       class="text-truncate-custom"
                       [title]="item.descripcion">
                       {{ item.descripcion }}
                     </td>
-                    <td>{{ item.nombreConvocatoria }}</td>
+                    <td></td>
                     <td> <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed">
                         <i class="fas fa-link"></i>
                       </button>

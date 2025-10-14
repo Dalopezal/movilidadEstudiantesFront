@@ -23,6 +23,7 @@ import { BeneficiosComponent } from "../beneficios-postulacion/beneficios-postul
 import { FinanciacionComponent } from "../financiacion/financiacion.component";
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
+import { GestionCondicionComponent } from '../gestion-condicion/gestion-condicion.component';
 
 interface FieldConfig {
   name: string;
@@ -61,7 +62,8 @@ interface Step {
     GestionEntregableComponent,
     BeneficiosComponent,
     FinanciacionComponent,
-    ConfirmDialogModule, NgxSonnerToaster
+    ConfirmDialogModule, NgxSonnerToaster,
+    GestionCondicionComponent
 ],
   templateUrl: './postulaciones-detalle.component.html',
   styleUrls: ['./postulaciones-detalle.component.css'],
