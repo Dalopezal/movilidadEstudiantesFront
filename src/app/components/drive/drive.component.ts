@@ -1,4 +1,4 @@
-import { Component, Inject, Input } from '@angular/core';
+import { Component, Inject, Input, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +14,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { HttpClient } from '@angular/common/http';
 import { MsalService } from '@azure/msal-angular';
+import { GenericApiService } from '../../services/generic-api.service';
+import { EntregablePostulacionModel } from '../../models/EntregableConvocatoriaModel';
 
 @Component({
   selector: 'app-sharepoint-drive',
@@ -44,6 +46,7 @@ export class SharePointDriveComponent {
 
   @Input() convocatoria!: any;
   @Input() documento!: any;
+  @Input() EntregablePostulacionModel!: EntregablePostulacionModel;
 
   // driveId de Procesos_Movilidad
   private driveId = "b!hxInP5NdSkWGDF706k5q4NgI4QHbbA9MuYfs3fRJTRQp2TIIFpMeSKgCChkFV0A1";
@@ -52,6 +55,7 @@ export class SharePointDriveComponent {
     private http: HttpClient,
     private msal: MsalService,
     private confirmationService: ConfirmationService,
+    private api: GenericApiService
   ) {}
 
   // Login con MSAL
@@ -124,7 +128,14 @@ export class SharePointDriveComponent {
             this.showSuccess('¡Archivo listo!', 'Subido exitosamente');
             this.uploading = false;
             this.loadFiles();
-          }
+
+            // event.body contiene el driveItem creado/actualizado
+            const driveItem = event.body;
+
+            // URL de SharePoint para abrir en navegador
+            const webUrl: string | undefined = driveItem?.webUrl;
+            this.registrarUrl(webUrl);
+            }
         },
         error: (err) => {
           this.showError('Error al subir', err.message);
@@ -135,6 +146,23 @@ export class SharePointDriveComponent {
       this.showError('Error inesperado', err.message);
       this.uploading = false;
     }
+  }
+
+  async registrarUrl(webUrl: any) {
+
+    let modelAux = this.EntregablePostulacionModel;
+    modelAux.url = webUrl;
+
+    this.api.post('EntregablePostulacion/Actualiza_EntregablePostulacion', modelAux).subscribe({
+      next: (resp) => {
+        this.showSuccess('Url Entregable registrado exitosamente');
+      },
+      error: (err) => {
+        // Asegúrate de extraer el mensaje correcto del error
+        const mensaje = err?.error?.message || err?.message || 'Error al registrar url del entregable';
+        this.showError(mensaje);
+      }
+    });
   }
 
   // Descargar archivo
@@ -348,5 +376,15 @@ export class SharePointDriveComponent {
     if (['ppt','pptx'].includes(extension)) return '#e65100';
     if (['jpg','jpeg','png','gif'].includes(extension)) return '#8e24aa';
     return '#424242';
+  }
+
+  getFechaActual(){
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+    const day = date.getDate().toString().padStart(2, '0');
+    const customFormat = `${year}-${month}-${day}`;
+
+    return customFormat;
   }
 }

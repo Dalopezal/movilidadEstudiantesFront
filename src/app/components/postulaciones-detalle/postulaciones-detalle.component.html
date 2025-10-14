@@ -275,19 +275,25 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <app-gestion-entregable
-          [idConvocatoria]="convocatoriaId"
-          [idPostulacion]="idPostulacion"
-          [convocatoria]="convocatoria"
-          [documento]="documento">
-        </app-gestion-entregable>
+        <div class="row">
+          <div class="col-12 col-lg-6">
+            <app-gestion-entregable
+              [idConvocatoria]="convocatoriaId"
+              [idPostulacion]="idPostulacion"
+              [convocatoria]="convocatoria"
+              [documento]="documento">
+            </app-gestion-entregable>
+          </div>
 
-        <app-gestion-condicion
-          [idConvocatoria]="convocatoriaId"
-          [idPostulacion]="idPostulacion"
-          [convocatoria]="convocatoria"
-          [documento]="documento">
-        </app-gestion-condicion>
+          <div class="col-12 col-lg-6">
+            <app-gestion-condicion
+              [idConvocatoria]="convocatoriaId"
+              [idPostulacion]="idPostulacion"
+              [convocatoria]="convocatoria"
+              [documento]="documento">
+            </app-gestion-condicion>
+          </div>
+        </div>
       </div>
     </div>
   </div>

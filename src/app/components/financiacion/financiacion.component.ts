@@ -186,7 +186,7 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
     const isUpdate = this.isEditing && this.model.id && this.model.id > 0;
     const payload = this.model.toJSON();
 
-    const endpoint = isUpdate ? 'Financiacion/Actualizar_Financiacion' : 'Financiacion/Crear_Financiacion';
+    const endpoint = isUpdate ? 'FinanciacionUCM/actualiza_Financiacion' : 'FinanciacionUCM/crear_Financiacion';
     const obs = isUpdate ? this.api.put<any>(endpoint, payload) : this.api.post<any>(endpoint, payload);
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({

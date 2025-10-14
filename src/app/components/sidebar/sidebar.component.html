@@ -62,7 +62,9 @@
       </div>
     </div>
   </nav>
-  <div class="sidebar-user" (click)="toggleUserMenu()" [class.open]="isUserMenuOpen">
+  <div class="sidebar-user"
+     (click)="onToggleUserMenu($event)"
+     [class.open]="isUserMenuOpen">
     <ng-container *ngIf="usuario?.foto && usuario.foto !== '' && usuario.foto !== 'null'; else userIcon">
       <img [src]="usuario?.foto" alt="Usuario" class="user-avatar" (error)="onImageError($event)" />
     </ng-container>
@@ -75,12 +77,12 @@
       <small>{{ usuario?.rol }}</small>
     </div>
     <i class="fas fa-chevron-down user-chevron" [class.rotate]="isUserMenuOpen"></i>
-    <div class="user-submenu" *ngIf="isUserMenuOpen">
+      <div class="user-submenu" *ngIf="isUserMenuOpen" (click)="$event.stopPropagation()">
       <a routerLink="/login"
-         routerLinkActive="active"
-         [routerLinkActiveOptions]="{ exact: true }"
-         (click)="logout()"
-         class="submenu-link">
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="onLogoutClick($event)"
+        class="submenu-link">
         <i class="fa fa-sign-out-alt"></i> Salir
       </a>
     </div>

@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, OnDestroy, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MsalService } from '@azure/msal-angular';
@@ -29,7 +29,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
     private router: Router,
     private msalService: MsalService,
     private api: GenericApiService,
-    private auth: AuthService
+    private auth: AuthService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -76,9 +78,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   togglemovilidadMenu() {
-    this.ismovilidadOpen = !this.ismovilidadOpen;
+    this.ngZone.run(() => {
+      this.ismovilidadOpen = !this.ismovilidadOpen;
+      this.cdr.markForCheck();
+    });
   }
-
   closemovilidadMenu() {
     this.ismovilidadOpen = false;
   }
@@ -89,6 +93,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (!clickedInside) {
       if (!this.isCollapsed) this.isCollapsed = true;
       if (this.ismovilidadOpen) this.ismovilidadOpen = false;
+      if (this.isUserMenuOpen) this.isUserMenuOpen = false; // añade esto
     }
   }
 
@@ -113,14 +118,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    // Delegar a AuthService que ya maneja MS y Google
     this.auth.logout();
 
-    // Asegurar limpieza local
     localStorage.removeItem('auth_token');
     localStorage.removeItem('usuario');
 
-    // Navegar a la ruta de login (tu login está en path: ''), ir a raíz
     this.router.navigateByUrl('/');
   }
 
@@ -173,5 +175,25 @@ export class SidebarComponent implements OnInit, OnDestroy {
           this.maestros = [];
         }
       });
+  }
+
+  onToggleUserMenu(event: MouseEvent) {
+    event.stopPropagation();
+    this.ngZone.run(() => {
+      this.isUserMenuOpen = !this.isUserMenuOpen;
+      this.cdr.markForCheck();
+    });
+  }
+
+  onLogoutClick(event: MouseEvent) {
+    // evita navegación del <a> antes de limpiar
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.ngZone.run(() => {
+      this.isUserMenuOpen = false; // cerrar el menú visualmente
+      this.logout();               // tu método existente
+      this.cdr.detectChanges();
+    });
   }
 }

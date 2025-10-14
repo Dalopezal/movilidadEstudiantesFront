@@ -6,7 +6,7 @@
         <section
           class="col-12 d-flex flex-column"
           [ngClass]="'col-lg-12'"
-          style="height: 37vh;">
+          style="height: 75vh;">
 
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header text-white" style="background: #E2E6F7;">
@@ -32,8 +32,8 @@
                 <thead class="table-primary">
                   <tr>
                     <th style="background: white !important;">Nombre</th>
-                    <th style="background: white !important;">Descripción</th>
-                    <th style="background: white !important;">Convocatoria</th>
+                    <!-- <th style="background: white !important;">Descripción</th>
+                    <th style="background: white !important;">Convocatoria</th> -->
                     <th style="background: white !important;">Url</th>
                     <th *ngIf="this.usuario.rolId != 7" style="background: white !important;">Aprobado Oficina Movilidad</th>
                     <th *ngIf="this.usuario.rolId == 7" style="background: white !important;">Aprobar</th>
@@ -46,13 +46,13 @@
                   <p style="background: transparent;;">Cargando datos</p>
                   </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
-                    <td>{{ item.nombreCondicion }}</td>
-                    <td
+                    <td>{{ item.descripcion }}</td>
+                    <!-- <td
                       class="text-truncate-custom"
                       [title]="item.descripcion">
                       {{ item.descripcion }}
                     </td>
-                    <td></td>
+                    <td></td> -->
                     <td> <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed">
                         <i class="fas fa-link"></i>
                       </button>
