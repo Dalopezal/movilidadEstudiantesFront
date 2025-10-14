@@ -33,8 +33,16 @@ export class TiposConvocatoriaComponent implements OnInit, OnDestroy {
     this.usuario = data ? JSON.parse(data) : {};
 
     const tipo = this.usuario?.tipoUsuario != null ? Number(this.usuario.tipoUsuario) : null;
-    this.isInternal = tipo === 1;
-    this.isExternal = tipo === 2;
+    const rol = this.usuario?.rolId != null ? Number(this.usuario.rolId) : null;
+
+    if(rol == 7){
+      this.isInternal = true;
+      this.isExternal = true;
+    }else{
+      this.isInternal = tipo === 2;
+    this.isExternal = tipo === 1;
+    }
+
 
     // Selecciona automáticamente el primer tab visible
     if (this.isInternal) this.activeTab = 'general';

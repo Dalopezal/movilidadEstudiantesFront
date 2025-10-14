@@ -362,7 +362,8 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   abrirPostulacionDetalle(item: ConvocatoriaGeneralModel) {
     this.router.navigate(['/postulacion-detalle'], {queryParams: {
       idConvocatoria: item.id,
-      nombre: item.nombre
+      nombre: item.nombre,
+      idPostulacion: 37,
     }
     });
   }

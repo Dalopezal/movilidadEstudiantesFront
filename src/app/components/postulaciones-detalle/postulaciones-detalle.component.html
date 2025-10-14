@@ -39,35 +39,32 @@
                 <div class="col-3 pe-2 border-end overflow-auto" style="max-height: 65vh;">
                   <ul class="list-group">
                     <li *ngFor="let step of steps; let i = index"
-                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                        [class.active]="i === currentStep"
-                        (click)="goToStep(i)"
-                        [attr.id]="'step-item-' + i"
-                        style="cursor:pointer;">
+                      class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                      [class.active]="i === selectedStepIndex"
+                      (click)="goToStep(i)"
+                      [attr.id]="'step-item-' + i"
+                      style="cursor:pointer;">
 
-                      <!-- Texto del paso -->
-                      <span>{{ i+1 }}. {{ step.nombre }}</span>
+                    <span>{{ i+1 }}. {{ step.nombre }}</span>
 
-                      <!-- Indicadores -->
-                      <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                      <!-- Pasos completados según la bitácora del postulado -->
+                      <ng-container *ngIf="i < postulantStepIndex">
+                        <i class="fas fa-check text-success"></i>
+                        <div class="estado-circle-lista" [style.background]="getColorEstado(step.id)"></div>
+                      </ng-container>
 
-                        <!-- Pasos anteriores -->
-                        <ng-container *ngIf="i < currentStep">
-                          <i class="fas fa-check text-success"></i>
-                          <div class="estado-circle-lista" [style.background]="getColorEstado(step.id)"></div>
-                        </ng-container>
+                      <!-- Paso actual del postulado -->
+                      <ng-container *ngIf="i === postulantStepIndex">
+                        <div class="estado-circle-lista" [style.background]="getColorEstado(step.id)"></div>
+                      </ng-container>
 
-                        <!-- Paso actual -->
-                        <ng-container *ngIf="i === currentStep">
-                          <div class="estado-circle-lista" [style.background]="getColorEstado(step.id)"></div>
-                        </ng-container>
-
-                        <!-- Pasos futuros -->
-                        <ng-container *ngIf="i > currentStep">
-                          <div class="estado-circle-lista" style="background:#e2e8f0;"></div>
-                        </ng-container>
-                      </div>
-                    </li>
+                      <!-- Pasos futuros -->
+                      <ng-container *ngIf="i > postulantStepIndex">
+                        <div class="estado-circle-lista" style="background:#e2e8f0;"></div>
+                      </ng-container>
+                    </div>
+                  </li>
                   </ul>
                 </div>
 
@@ -75,7 +72,7 @@
                 <div class="col-9 ps-3 d-flex flex-column">
 
                   <!-- Header del paso con botones superiores -->
-                  <div class="d-flex justify-content-between align-items-center mb-1 mt-1" *ngIf="steps[currentStep] as step">
+                  <div class="d-flex justify-content-between align-items-center mb-1 mt-1" *ngIf="steps.length && steps[selectedStepIndex] as step">
                     <h5 class="fw-bold m-0" style="color:#18206E;">
                       {{ step.nombre }}
                     </h5>
@@ -93,10 +90,6 @@
                         <i class="fas fa-bell"></i>
                       </button>
 
-                      <!-- <button class="btn-notif-round" title="Ver Histórico">
-                        <i class="fas fa-history"></i>
-                      </button> -->
-
                       <button class="btn-notif-round"
                               (click)="onGestioDocumental(step)"
                               title="Gestión Documental">
@@ -104,42 +97,43 @@
                       </button>
 
                       <!-- Botón Finanzas -->
-                        <button class="btn-notif-round"
-                                (click)="onGestioFinanciacion(step)"
-                                title="Gestión de Financiación">
-                          <i class="fas fa-hand-holding-usd"></i>
-                        </button>
+                      <button class="btn-notif-round"
+                              (click)="onGestioFinanciacion(step)"
+                              title="Gestión de Financiación">
+                        <i class="fas fa-hand-holding-usd"></i>
+                      </button>
 
-                        <!-- Botón Beneficios -->
-                        <button class="btn-notif-round"
-                                (click)="onGestioBeneficios(step)"
-                                title="Gestión de Beneficios">
-                          <i class="fas fa-gift"></i>
-                        </button>
+                      <!-- Botón Beneficios -->
+                      <button class="btn-notif-round"
+                              (click)="onGestioBeneficios(step)"
+                              title="Gestión de Beneficios">
+                        <i class="fas fa-gift"></i>
+                      </button>
 
-                        <!-- Botón Encuenta satisfacción -->
-                        <button class="btn-notif-round"
-                                (click)="onGestioEncuesta(step)"
-                                title="Encuesta de satisfacción movilidad">
-                          <i class="fas fa-file"></i>
-                        </button>
+                      <!-- Botón Encuesta satisfacción -->
+                      <button class="btn-notif-round"
+                              (click)="onGestioEncuesta(step)"
+                              title="Encuesta de satisfacción movilidad">
+                        <i class="fas fa-file"></i>
+                      </button>
 
                       <div class="estado-circle" [style.background]="getColorEstado(step.id)"></div>
                     </div>
                   </div>
-                  <strong style="color: grey;">{{this.nombreCompleto}}, {{this.documento}}</strong>
+
+                  <strong style="color: grey;">{{ nombreCompleto }}, {{ documento }}</strong>
 
                   <!-- Barra de progreso -->
                   <div class="progress my-2" style="height: 6px;">
                     <div class="progress-bar" role="progressbar"
-                         [style.width.%]="(currentStep+1)/steps.length*100"></div>
+                         [style.width.%]="steps.length ? ((selectedStepIndex + 1) / steps.length * 100) : 0"></div>
                   </div>
 
                   <form #form="ngForm" novalidate>
                     <div class="step-content flex-grow-1 p-3 border rounded bg-white overflow-auto">
                       <div class="row">
                         <div class="col-md-6 col-lg-4 mb-3"
-                            *ngFor="let field of (steps[currentStep] ? campoEstado[steps[currentStep].id] : []); let j = index">
+                            *ngFor="let field of (steps?.length && steps[selectedStepIndex] ? campoEstado[steps[selectedStepIndex].id] : []); let j = index">
 
                           <label class="form-label d-block">
                             {{ field.label }}
@@ -147,30 +141,30 @@
 
                           <!-- READONLY -->
                           <p *ngIf="field.tipo === 'readonly'" class="fw-bold mb-1 text-muted">
-                            {{ steps[currentStep].data[field.name] || '-' }}
+                            {{ steps[selectedStepIndex].data[field.name] || '-' }}
                           </p>
 
                           <!-- TEXT -->
                           <input *ngIf="field.tipo === 'text'" type="text"
                                 class="form-control form-control-sm"
-                                [name]="'ctrl-'+currentStep+'-'+j"
-                                [(ngModel)]="steps[currentStep].data[field.name]"
+                                [name]="'ctrl-'+selectedStepIndex+'-'+j"
+                                [(ngModel)]="steps[selectedStepIndex].data[field.name]"
                                 [readonly]="!field.editable"
                                 [required]="!!field.editable">
 
                           <!-- NUMBER -->
                           <input *ngIf="field.tipo === 'number'" type="number"
                                 class="form-control form-control-sm"
-                                [name]="'ctrl-'+currentStep+'-'+j"
-                                [(ngModel)]="steps[currentStep].data[field.name]"
+                                [name]="'ctrl-'+selectedStepIndex+'-'+j"
+                                [(ngModel)]="steps[selectedStepIndex].data[field.name]"
                                 [readonly]="!field.editable"
                                 [required]="!!field.editable">
 
                           <!-- TEXTAREA -->
                           <textarea *ngIf="field.tipo === 'textarea'"
                                     class="form-control form-control-sm"
-                                    [name]="'ctrl-'+currentStep+'-'+j"
-                                    [(ngModel)]="steps[currentStep].data[field.name]"
+                                    [name]="'ctrl-'+selectedStepIndex+'-'+j"
+                                    [(ngModel)]="steps[selectedStepIndex].data[field.name]"
                                     [readonly]="!field.editable"
                                     [required]="!!field.editable"
                                     rows="3"></textarea>
@@ -178,8 +172,8 @@
                           <!-- SELECT -->
                           <select *ngIf="field.tipo === 'select' || field.tipo === 'selectChange'"
                                   class="form-select form-select-sm"
-                                  [name]="'ctrl-'+currentStep+'-'+j"
-                                  [(ngModel)]="steps[currentStep].data[field.name]"
+                                  [name]="'ctrl-'+selectedStepIndex+'-'+j"
+                                  [(ngModel)]="steps[selectedStepIndex].data[field.name]"
                                   (ngModelChange)="field.tipo === 'selectChange' ? onFieldChange(field, $event) : null"
                                   [disabled]="!field.editable"
                                   [required]="!!field.editable">
@@ -190,26 +184,26 @@
                           <!-- DATE -->
                           <input *ngIf="field.tipo === 'date'" type="date"
                                 class="form-control form-control-sm"
-                                [name]="'ctrl-'+currentStep+'-'+j"
-                                [(ngModel)]="steps[currentStep].data[field.name]"
+                                [name]="'ctrl-'+selectedStepIndex+'-'+j"
+                                [(ngModel)]="steps[selectedStepIndex].data[field.name]"
                                 [readonly]="!field.editable"
                                 [required]="!!field.editable">
 
                           <!-- CHECKBOX -->
                           <div *ngIf="field.tipo === 'checkbox'" class="form-check">
                             <input type="checkbox" class="form-check-input"
-                                  [name]="'ctrl-'+currentStep+'-'+j"
-                                  [(ngModel)]="steps[currentStep].data[field.name]"
+                                  [name]="'ctrl-'+selectedStepIndex+'-'+j"
+                                  [(ngModel)]="steps[selectedStepIndex].data[field.name]"
                                   [disabled]="!field.editable"
                                   [required]="!!field.editable">
                             <span class="form-check-label small">
-                              {{ steps[currentStep].data[field.name] ? 'Sí' : 'No' }}
+                              {{ steps[selectedStepIndex].data[field.name] ? 'Sí' : 'No' }}
                             </span>
                           </div>
 
                           <div class="invalid-feedback d-block"
-                              *ngIf="form.controls['ctrl-'+currentStep+'-'+j]?.invalid &&
-                                      (form.controls['ctrl-'+currentStep+'-'+j]?.touched || form.submitted)">
+                              *ngIf="form.controls['ctrl-'+selectedStepIndex+'-'+j]?.invalid &&
+                                      (form.controls['ctrl-'+selectedStepIndex+'-'+j]?.touched || form.submitted)">
                             Este campo es obligatorio.
                           </div>
 
@@ -218,13 +212,8 @@
                     </div>
 
                     <!-- Footer (botones) -->
-                    <div class="d-flex justify-content-between align-items-center flex-wrap mt-2" *ngIf="steps[currentStep] as step">
-                      <small class="fw-bold">Paso {{ currentStep+1 }} de {{ steps.length }}</small>
-
-                      <div class="d-flex justify-content-between mt-3">
-                        <button class="btn btn-outline-primary" (click)="prevStep()" [disabled]="currentStep === 0">Anterior</button>
-                        <button class="btn btn-primary" (click)="nextStep()" [disabled]="currentStep === steps.length - 1">Siguiente</button>
-                      </div>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap mt-2" *ngIf="steps?.length && steps[selectedStepIndex] as step">
+                      <small class="fw-bold">Paso {{ selectedStepIndex + 1 }} de {{ steps.length }}</small>
 
                       <div class="d-flex align-items-center gap-2 flex-wrap step-actions" style="margin-right: 5px;">
                         <button *ngFor="let btn of accionesEstado[step.id] || []"
@@ -291,11 +280,6 @@
           [convocatoria]="convocatoria"
           [documento]="documento">
         </app-gestion-entregable>
-        <!-- <app-gestion-entregable
-          [idConvocatoria]="convocatoriaId"
-          [convocatoria]="convocatoria"
-          [documento]="documento">
-        </app-gestion-entregable> -->
       </div>
     </div>
   </div>
