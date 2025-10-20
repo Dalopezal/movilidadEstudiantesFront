@@ -18,6 +18,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ismovilidadOpen = false;
   usuario: any = {};
   isUserMenuOpen = false;
+  isInternacionalizacionOpen = false;
   menu: any[] = [];
   maestros: any[] = [];
 
@@ -195,5 +196,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.logout();               // tu método existente
       this.cdr.detectChanges();
     });
+  }
+
+  toggleInternacionalizacionMenu() {
+    this.isInternacionalizacionOpen = !this.isInternacionalizacionOpen;
   }
 }

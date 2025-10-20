@@ -195,19 +195,21 @@
             <!-- Programa -->
             <div class="col-md-4 mb-3">
               <label class="form-label fw-bold">Programa</label>
-              <input type="text" class="form-control" name="programa"
-                     [(ngModel)]="datosPerfil.programa"
-                     placeholder="Digite programa"
-                    style="font-size:13px;">
+              <select class="form-select" name="programa"
+                      [(ngModel)]="datosPerfil.programaId"
+                      required style="font-size:13px;">
+               <option *ngFor="let p of programas" [ngValue]="p.id">{{ p.nombre }}</option>
+              </select>
             </div>
 
             <!-- Facultad -->
             <div class="col-md-4 mb-3">
               <label class="form-label fw-bold">Facultad</label>
-              <input type="text" class="form-control" name="facultad"
-                     [(ngModel)]="datosPerfil.facultad"
-                     placeholder="Digite facultad"
-                    style="font-size:13px;">
+              <select class="form-select" name="facultad"
+                      [(ngModel)]="datosPerfil.facultadId"
+                      required style="font-size:13px;">
+               <option *ngFor="let p of facultades" [ngValue]="p.id">{{ p.nombre }}</option>
+              </select>
             </div>
 
             <!-- Dependencia -->

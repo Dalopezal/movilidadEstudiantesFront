@@ -26,6 +26,8 @@ export class HomeComponent implements OnInit {
   showModalDatos: boolean = false; // modal 2
   estados: any[] = [];
   paises: any[] = [];
+  programas: any[] = [];
+  facultades: any[] = [];
   ciudades: any[] = [];
   selectedPaisId: number | null = null;
   tiposDocumento: any[] = [];
@@ -58,7 +60,9 @@ export class HomeComponent implements OnInit {
     dependencia: '',
     nivelFormacion: '',
     promedio: '',
-    grupo: ''
+    grupo: '',
+    programaId: '',
+    facultadId: ''
   };
 
   loading = false;
@@ -92,6 +96,25 @@ export class HomeComponent implements OnInit {
       error: (err) => {
         console.error('Error al cargar tipos de documento', err);
         this.tiposDocumento = [];
+      }
+    });
+
+    // Inicializamos programas
+    this.fetchProgramas().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (p) => this.programas = p,
+      error: (err) => {
+        console.error('Error al cargar programas', err);
+        this.programas = [];
+      }
+    });
+
+
+    // Inicializamos facultades
+    this.fetchFacultades().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (p) => this.facultades = p,
+      error: (err) => {
+        console.error('Error al cargar facultades', err);
+        this.facultades = [];
       }
     });
   }
@@ -268,7 +291,9 @@ export class HomeComponent implements OnInit {
         dependencia: '',
         nivelFormacion: '',
         promedio: null,
-        grupo: ''
+        grupo: '',
+        programaId: null,
+        facultadId: null,
       };
       return;
     }
@@ -293,7 +318,9 @@ export class HomeComponent implements OnInit {
       dependencia: u.dependenciaNombre ?? u.dependencia ?? '',
       nivelFormacion: u.nivelFormacion ?? '',
       promedio: u.promedioAcademico ?? u.promedio ?? null,
-      grupo: u.grupoInvestigacionNombre ?? u.grupo ?? ''
+      grupo: u.grupoInvestigacionNombre ?? u.grupo ?? '',
+      programaId: u.programaId != null ? Number(u.programaId) : null,
+      facultadId: u.facultadId != null ? Number(u.facultadId) : null,
     };
 
     this.usuario.idUsuario = u.id ?? this.usuario.idUsuario;
@@ -323,6 +350,44 @@ export class HomeComponent implements OnInit {
 
   fetchPaises(): Observable<any[]> {
     return this.api.get<any>('Pais/Consultar_Pais').pipe(
+      map((response) => {
+        let items: any[] = [];
+        if (Array.isArray(response)) items = response;
+        else if (response && typeof response === 'object') {
+          if (Array.isArray(response.data)) items = response.data;
+          else if (Array.isArray(response.items)) items = response.items;
+          else {
+            const arr = Object.values(response).find(v => Array.isArray(v));
+            if (Array.isArray(arr)) items = arr;
+          }
+        }
+        const mapped = items.map(item => ({ id: item.id, nombre: item.nombre }));
+        return mapped;
+      })
+    );
+  }
+
+  fetchProgramas(): Observable<any[]> {
+    return this.api.get<any>('Programa/Consultar_Programas').pipe(
+      map((response) => {
+        let items: any[] = [];
+        if (Array.isArray(response)) items = response;
+        else if (response && typeof response === 'object') {
+          if (Array.isArray(response.data)) items = response.data;
+          else if (Array.isArray(response.items)) items = response.items;
+          else {
+            const arr = Object.values(response).find(v => Array.isArray(v));
+            if (Array.isArray(arr)) items = arr;
+          }
+        }
+        const mapped = items.map(item => ({ id: item.id, nombre: item.nombre }));
+        return mapped;
+      })
+    );
+  }
+
+  fetchFacultades(): Observable<any[]> {
+    return this.api.get<any>('Facultad/Consultar_Facultades').pipe(
       map((response) => {
         let items: any[] = [];
         if (Array.isArray(response)) items = response;

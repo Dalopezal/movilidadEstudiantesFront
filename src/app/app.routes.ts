@@ -20,6 +20,8 @@ import { InstitucionConvenioComponent } from './components/institucion-convenio/
 // Guards funcionales (ruta relativa desde app.routes.ts)
 import { authGuard } from './guards/auth.guard';
 import { redirectIfAuthenticatedGuard } from './guards/redirectIfAuthenticated.guard';
+import { HorariosUniversidadComponent } from './components/horarios-universidad/horarios-universidad.component';
+import { InsigniaDigitalComponent } from './components/insignia-digital/insignia-digital.component';
 
 export const routes: Routes = [
   // Login: si ya está autenticado redirige a /home
@@ -41,6 +43,8 @@ export const routes: Routes = [
   { path: 'financiacion-externa', component: FinanciacionExternaComponent, canActivate: [authGuard] },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'institucion-convenio', component: InstitucionConvenioComponent, canActivate: [authGuard] },
+  { path: 'horarios-universidad', component: HorariosUniversidadComponent, canActivate: [authGuard] },
+  { path: 'insignia-digital', component: InsigniaDigitalComponent, canActivate: [authGuard] },
 
   // Wildcard -> login
   { path: '**', redirectTo: '' }
