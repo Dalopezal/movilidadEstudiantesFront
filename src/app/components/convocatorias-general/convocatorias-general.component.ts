@@ -261,7 +261,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
 
   showError() {
     toast.error('Error al procesar', {
-      description: 'El registro se encuentra asociado',
+      description: 'No se puede consultar el id de postulación',
       unstyled: true,
       class: 'my-error-toast'
     });
@@ -295,29 +295,29 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   }
 
   private fetchListaMovilidad() {
-      this.api.get<any>('Modalidad/Consultar_Modalidad')
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (resp) => {
-            let items: any[] = [];
-            if (Array.isArray(resp)) items = resp;
-            else if (resp && typeof resp === 'object') {
-              if (Array.isArray(resp.data)) items = resp.data;
-              else if (Array.isArray(resp.items)) items = resp.items;
-              else {
-                const arr = Object.values(resp).find(v => Array.isArray(v));
-                if (Array.isArray(arr)) items = arr;
-              }
+    this.api.get<any>('Modalidad/Consultar_Modalidad')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          let items: any[] = [];
+          if (Array.isArray(resp)) items = resp;
+          else if (resp && typeof resp === 'object') {
+            if (Array.isArray(resp.data)) items = resp.data;
+            else if (Array.isArray(resp.items)) items = resp.items;
+            else {
+              const arr = Object.values(resp).find(v => Array.isArray(v));
+              if (Array.isArray(arr)) items = arr;
             }
-            this.movilidad = items.map(item => ({ id: item.id, nombre: item.nombre }));
-
-          },
-          error: (err) => {
-            console.error('Error al cargar movilidad para select', err);
-            this.movilidad = [];
           }
-        });
-    }
+          this.movilidad = items.map(item => ({ id: item.id, nombre: item.nombre }));
+
+        },
+        error: (err) => {
+          console.error('Error al cargar movilidad para select', err);
+          this.movilidad = [];
+        }
+      });
+  }
 
   selectedItem: ConvocatoriaGeneralModel | null = null;
 
@@ -360,11 +360,35 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   }
 
   abrirPostulacionDetalle(item: ConvocatoriaGeneralModel) {
-    this.router.navigate(['/postulacion-detalle'], {queryParams: {
-      idConvocatoria: item.id,
-      nombre: item.nombre,
-      idPostulacion: 37,
-    }
+
+    const endpoint = `Postulaciones/Consultar_PostulacionConvocatoriaUsuario?IdConvocatoria=${item.id}&IdUsuario=${this.usuario.idUsuario}`;
+
+    const obs = this.api.get<any>(endpoint);
+
+    obs.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        console.log("Respuesta...", response);
+
+        if(response.datos.length == 0){
+          this.router.navigate(['/postulacion-detalle'], {queryParams: {
+              idConvocatoria: item.id,
+              nombre: item.nombre,
+              idPostulacion: 0,
+            }
+          });
+        }else{
+          this.router.navigate(['/postulacion-detalle'], {queryParams: {
+              idConvocatoria: item.id,
+              nombre: item.nombre,
+              idPostulacion: response.datos[0].id,
+            }
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error al consultar la postulación', err);
+        this.showError();
+      }
     });
   }
 }
