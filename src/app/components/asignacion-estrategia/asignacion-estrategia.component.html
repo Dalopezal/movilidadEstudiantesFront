@@ -1,0 +1,279 @@
+<div class="container fuente" style="padding-top: 10px;">
+  <div class="row h-100">
+    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%; font-size: 13px;">
+      <div class="row g-4 flex-grow-1">
+
+        <!-- Formulario (izquierda) -->
+        <section class="col-12 col-lg-4 d-flex flex-column" style="height: 70vh;">
+          <div class="card shadow-sm flex-grow-1 d-flex flex-column">
+            <!-- <div class="card-header" style="background: #E2E6F7;">
+              <p class="mb-0" style="color:#0D133F; font-size:14px;">Asignación estrategias al proceso</p>
+            </div> -->
+
+            <div class="card-body d-flex flex-column flex-grow-1" style="font-size: 13px;">
+              <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
+
+              <!-- Fila 1: Proceso / Estrategia -->
+              <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="procesoId" class="form-label fw-bold">Proceso</label>
+                  <select
+                    id="procesoId"
+                    name="procesoId"
+                    class="form-select"
+                    required
+                    [(ngModel)]="model.procesoId"
+                    #procesoCtrl="ngModel"
+                    style="font-size: 13px;">
+                    <option [ngValue]="0">Seleccione</option>
+                    <option *ngFor="let p of procesos" [ngValue]="p.id">{{ p.nombre }}</option>
+                  </select>
+                  <div class="text-danger small mt-1" *ngIf="(procesoCtrl.touched || procesoCtrl.dirty) && (!procesoCtrl.valid || model.procesoId === 0)">
+                    Debe seleccionar un proceso.
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="estrategiaId" class="form-label fw-bold">Estrategia</label>
+                  <select
+                    id="estrategiaId"
+                    name="estrategiaId"
+                    class="form-select"
+                    required
+                    [(ngModel)]="model.estrategiaId"
+                    #estrategiaCtrl="ngModel"
+                    style="font-size: 13px;">
+                    <option [ngValue]="0">Seleccione</option>
+                    <option *ngFor="let e of estrategias" [ngValue]="e.id">{{ e.nombre }}</option>
+                  </select>
+                  <div class="text-danger small mt-1" *ngIf="(estrategiaCtrl.touched || estrategiaCtrl.dirty) && (!estrategiaCtrl.valid || model.estrategiaId === 0)">
+                    Debe seleccionar una estrategia.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Checks -->
+              <div class="row mb-2">
+                <div class="col-12 col-md-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="generaCertificado" name="generaCertificado" [(ngModel)]="model.generaCertificado">
+                    <label for="generaCertificado" class="form-check-label fw-bold">Genera certificado</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-12 col-md-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="obtuvoInsignia" name="obtuvoInsignia" [(ngModel)]="model.obtuvoInsignia">
+                    <label for="obtuvoInsignia" class="form-check-label fw-bold">Obtuvo Insignia digital</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fila 2: Docente / Componente -->
+              <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="docenteId" class="form-label fw-bold">Docente</label>
+                  <select
+                    id="docenteId"
+                    name="docenteId"
+                    class="form-select"
+                    required
+                    [(ngModel)]="model.docenteId"
+                    #docenteCtrl="ngModel"
+                    style="font-size: 13px;">
+                    <option [ngValue]="0">Seleccione</option>
+                    <option *ngFor="let d of docentes" [ngValue]="d.id">{{ d.nombre }}</option>
+                  </select>
+                  <div class="text-danger small mt-1" *ngIf="(docenteCtrl.touched || docenteCtrl.dirty) && (!docenteCtrl.valid || model.docenteId === 0)">
+                    Debe seleccionar un docente.
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="componenteId" class="form-label fw-bold">Selección componente</label>
+                  <select
+                    id="componenteId"
+                    name="componenteId"
+                    class="form-select"
+                    required
+                    [(ngModel)]="model.componenteId"
+                    #compCtrl="ngModel"
+                    style="font-size: 13px;">
+                    <option [ngValue]="0">Seleccione</option>
+                    <option *ngFor="let c of componentes" [ngValue]="c.id">{{ c.nombre }}</option>
+                  </select>
+                  <div class="text-danger small mt-1" *ngIf="(compCtrl.touched || compCtrl.dirty) && (!compCtrl.valid || model.componenteId === 0)">
+                    Debe seleccionar un componente.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fila 3: Fecha Trabajo / Fecha Evaluación -->
+              <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="fechaTrabajo" class="form-label fw-bold">Fecha de Trabajo</label>
+                  <div class="input-group">
+                    <input
+                      type="date"
+                      id="fechaTrabajo"
+                      name="fechaTrabajo"
+                      class="form-control"
+                      required
+                      [(ngModel)]="model.fechaTrabajo"
+                      #fTrabCtrl="ngModel"
+                      (ngModelChange)="validarRangoFechas()"
+                      style="font-size: 13px;">
+                  </div>
+                  <div class="text-danger small mt-1" *ngIf="fTrabCtrl.invalid && (fTrabCtrl.touched || fTrabCtrl.dirty)">
+                    La fecha de trabajo es obligatoria.
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="fechaEvaluacion" class="form-label fw-bold">Fecha de evaluación</label>
+                  <div class="input-group">
+                    <input
+                      type="date"
+                      id="fechaEvaluacion"
+                      name="fechaEvaluacion"
+                      class="form-control"
+                      required
+                      [(ngModel)]="model.fechaEvaluacion"
+                      #fEvalCtrl="ngModel"
+                      (ngModelChange)="validarRangoFechas()"
+                      style="font-size: 13px;">
+                  </div>
+                  <div class="text-danger small mt-1" *ngIf="fEvalCtrl.invalid && (fEvalCtrl.touched || fEvalCtrl.dirty)">
+                    La fecha de evaluación es obligatoria.
+                  </div>
+                  <div class="text-danger small mt-1" *ngIf="dateRangeInvalid">
+                    La fecha de evaluación debe ser mayor o igual a la fecha de trabajo.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botones -->
+              <div class="d-flex gap-3 mt-auto">
+                <button
+                  type="submit"
+                  class="btn btn-ucm flex-grow-1 text-white"
+                  [disabled]="loading || myForm.invalid || model.procesoId===0 || model.estrategiaId===0 || model.docenteId===0 || model.componenteId===0 || dateRangeInvalid"
+                  [ngStyle]="{ 'background': '#0D133F' }"
+                  style="font-size: 13px">
+                  <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
+                  <span *ngIf="loading">Guardando...</span>
+                </button>
+
+                <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading" style="font-size: 13px">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tabla (derecha) -->
+        <section class="col-12 col-lg-8 d-flex flex-column" style="height: 70vh;">
+          <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
+            <div class="card-header d-flex align-items-center gap-3" style="background: white;">
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background:#0D133F;border-color:#0D133F;font-size:13px;padding:5px 8px;" (click)="fetchAsignaciones(); filtro=''">
+                <i class="fas fa-sync-alt"></i> Actualizar
+              </button>
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite Estrategia/Proceso" [(ngModel)]="filtro" name="filtro"/>
+              <button class="btn btn-primary d-flex align-items-center gap-2" style="background:#0D133F;border-color:#0D133F;font-size:13px;padding:5px 8px;" (click)="filterAsignaciones()">
+                <i class="fas fa-search"></i> Buscar
+              </button>
+            </div>
+
+            <div class="table-responsive flex-grow-1" style="min-height: 0; overflow-y: auto;">
+              <table class="table table-striped mb-0">
+                <thead class="table-primary">
+                  <tr>
+                    <th style="background: white; color:#0D133F;">Nombre proceso</th>
+                    <th style="background: white; color:#0D133F;">Nombre estrategia</th>
+                    <th style="background: white; color:#0D133F;">Docente</th>
+                    <th style="background: white; color:#0D133F;">Fecha de Trabajo</th>
+                    <th style="background: white; color:#0D133F;">Fecha de evaluación</th>
+                    <th style="background: white; color:#0D133F;">Estado</th>
+                    <th style="background: white; color:#0D133F;">Opciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <div *ngIf="loadingTable" class="table-overlay">
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <p style="background: transparent;">Cargando datos</p>
+                  </div>
+
+                  <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
+                    <td>{{ item.nombreProceso }}</td>
+                    <td>{{ item.nombreEstrategia }}</td>
+                    <td>{{ item.nombreDocente }}</td>
+                    <td>{{ item.fechaTrabajo | date:'yyyy-MM-dd' }}</td>
+                    <td>{{ item.fechaEvaluacion | date:'yyyy-MM-dd' }}</td>
+                    <td>
+                      <button class="button-completed" *ngIf="(item.estado ?? '').toLowerCase()==='activo' || (item.estado ?? '').toLowerCase()==='completado'">
+                        {{ item.estado || 'Activo' }}
+                      </button>
+                      <button class="button-pending" *ngIf="(item.estado ?? '').toLowerCase()!=='activo' && (item.estado ?? '').toLowerCase()!=='completado'">
+                        {{ item.estado || 'Pendiente' }}
+                      </button>
+                    </td>
+                    <td>
+                      <button class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)" style="margin-bottom: 3px;">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-danger button-completed" (click)="deleteItem(item.id)">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+
+                  <tr *ngIf="!loadingTable && pagedData.length === 0">
+                    <td colspan="7" class="text-center">No hay registros.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
+              <div class="items-per-page d-flex align-items-center gap-2">
+                <label for="itemsPerPageSelectAsign" class="mb-0">Mostrar</label>
+                <select id="itemsPerPageSelectAsign" (change)="onPageSizeChange($event)" [value]="pageSize">
+                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+                <span>de {{ data.length }}</span>
+              </div>
+
+              <nav aria-label="Paginación asignaciones">
+                <ul class="pagination mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <button class="page-link text-white" (click)="goToPage(currentPage - 1)" aria-label="Previous" style="background:#0D133F;">
+                      <span aria-hidden="true">&laquo;</span>
+                    </button>
+                  </li>
+                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
+                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  </li>
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background:#0D133F;">
+                      <span aria-hidden="true">&raquo;</span>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Notificaciones -->
+<ngx-sonner-toaster />
+<!-- ConfirmDialog -->
+<p-confirmDialog appendTo="body"></p-confirmDialog>

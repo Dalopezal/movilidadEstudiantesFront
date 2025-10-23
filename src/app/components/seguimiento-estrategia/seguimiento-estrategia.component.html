@@ -1,0 +1,171 @@
+<div class="container fuente" style="padding-top: 10px;">
+  <div class="row h-100">
+    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%; font-size: 13px;">
+      <div class="row g-4 flex-grow-1">
+        <section class="col-12 col-lg-12 d-flex flex-column">
+          <div class="card shadow-sm flex-grow-1 d-flex flex-column">
+            <!-- <div class="card-header" style="background:#E2E6F7;">
+              <p class="mb-0" style="color:#0D133F; font-size:16px; font-weight:700;">Seguimiento a la Estrategia</p>
+            </div> -->
+
+            <div class="card-body d-flex flex-column flex-grow-1">
+              <form #myForm="ngForm" (ngSubmit)="onSubmit(myForm)" class="d-flex flex-column flex-grow-1">
+
+                <div class="row">
+                  <div class="col-12 col-md-6 mb-3">
+                    <label for="fechaInicio" class="form-label fw-bold">Fecha de Inicio</label>
+                    <div class="input-group">
+                      <input
+                        type="date"
+                        id="fechaInicio"
+                        name="fechaInicio"
+                        class="form-control"
+                        required
+                        [(ngModel)]="model.fechaInicio"
+                        #fiCtrl="ngModel"
+                        (ngModelChange)="validarRangoFechas()"
+                        style="font-size: 13px;">
+                    </div>
+                    <div class="text-danger small mt-1" *ngIf="fiCtrl.invalid && (fiCtrl.touched || fiCtrl.dirty)">
+                      La fecha de inicio es obligatoria.
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-md-6 mb-3">
+                    <label for="estrategiaEvaluacionId" class="form-label fw-bold">Estrategia de evaluación</label>
+                    <select
+                      id="estrategiaEvaluacionId"
+                      name="estrategiaEvaluacionId"
+                      class="form-select"
+                      required
+                      [(ngModel)]="model.estrategiaEvaluacionId"
+                      (change)="onEstrategiaChange()"
+                      #estEvalCtrl="ngModel"
+                      style="font-size: 13px;">
+                      <option [ngValue]="0">Seleccione</option>
+                      <option *ngFor="let e of estrategiasEvaluacion" [ngValue]="e.id">{{ e.nombre }}</option>
+                    </select>
+                    <div class="text-danger small mt-1" *ngIf="(estEvalCtrl.touched || estEvalCtrl.dirty) && (estEvalCtrl.invalid || model.estrategiaEvaluacionId===0)">
+                      Debe seleccionar la estrategia de evaluación.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12 col-md-6 mb-3">
+                    <label for="fechaFin" class="form-label fw-bold">Fecha de fin</label>
+                    <div class="input-group">
+                      <input
+                        type="date"
+                        id="fechaFin"
+                        name="fechaFin"
+                        class="form-control"
+                        required
+                        [(ngModel)]="model.fechaFin"
+                        #ffCtrl="ngModel"
+                        (ngModelChange)="validarRangoFechas()"
+                        style="font-size: 13px;">
+                    </div>
+                    <div class="text-danger small mt-1" *ngIf="ffCtrl.invalid && (ffCtrl.touched || ffCtrl.dirty)">
+                      La fecha de fin es obligatoria.
+                    </div>
+                    <div class="text-danger small mt-1" *ngIf="dateRangeInvalid">
+                      La fecha de fin debe ser mayor o igual a la de inicio.
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-md-6 mb-3">
+                    <label class="form-label fw-bold">Nombre estrategia</label>
+                    <input type="text" class="form-control" [value]="model.nombreEstrategia">
+                  </div>
+                </div>
+
+                <div class="row mb-3 align-items-center">
+                  <div class="col-12 col-md-6">
+                    <div class="form-check form-check-lg">
+                      <input class="form-check-input" type="checkbox" id="generaCertificado" name="generaCertificado" [(ngModel)]="model.generaCertificado">
+                      <label for="generaCertificado" class="form-check-label fw-bold">Generar Certificado</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row align-items-center mb-3 g-2">
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold">Subir listado estudiantes</label>
+                    <div class="input-group">
+                      <input class="form-control" type="text" [value]="model.archivoEstudiantesNombre" placeholder="Subir listado estudiantes" readonly>
+                      <button class="btn btn-outline-secondary" type="button" (click)="estudiantesInput.click()">...</button>
+                      <button class="btn btn-outline-danger" type="button" (click)="limpiarArchivo('estudiantes')" [disabled]="!model.archivoEstudiantesNombre">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                      <button class="btn btn-outline-success" type="button" (click)="descargarPlantilla('estudiantes')">
+                        <i class="fas fa-file-excel"></i>
+                      </button>
+                    </div>
+                    <input #estudiantesInput type="file" accept=".xls,.xlsx" class="d-none" (change)="onArchivoEstudiantesChange($event)">
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold">Subir Listado Docentes</label>
+                    <div class="input-group">
+                      <input class="form-control" type="text" [value]="model.archivoDocentesNombre" placeholder="Subir listado docentes" readonly>
+                      <button class="btn btn-outline-secondary" type="button" (click)="docentesInput.click()">...</button>
+                      <button class="btn btn-outline-danger" type="button" (click)="limpiarArchivo('docentes')" [disabled]="!model.archivoDocentesNombre">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                      <button class="btn btn-outline-success" type="button" (click)="descargarPlantilla('docentes')">
+                        <i class="fas fa-file-excel"></i>
+                      </button>
+                    </div>
+                    <input #docentesInput type="file" accept=".xls,.xlsx" class="d-none" (change)="onArchivoDocentesChange($event)">
+                  </div>
+                </div>
+
+                <div class="row mb-3 align-items-center">
+                  <div class="col-12 col-md-6 d-flex align-items-center gap-3">
+                    <div class="form-check form-check-lg">
+                      <input class="form-check-input" type="checkbox" id="obtuvoInsignia" name="obtuvoInsignia" [(ngModel)]="model.obtuvoInsignia">
+                      <label for="obtuvoInsignia" class="form-check-label fw-bold">Obtuvo insignia</label>
+                    </div>
+                    <a class="ms-2" href="javascript:void(0)" (click)="verInsignia()">Ver insignia</a>
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <div class="form-check form-check-lg">
+                      <input class="form-check-input" type="checkbox" id="terminado" name="terminado" [(ngModel)]="model.terminado">
+                      <label for="terminado" class="form-check-label fw-bold">Terminado</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-flex gap-3 mt-auto">
+                  <button
+                    type="submit"
+                    class="btn btn-ucm flex-grow-1 text-white"
+                    [ngStyle]="{ 'background': '#0D133F' }"
+                    style="font-size: 13px"
+                    [disabled]="loading || myForm.invalid || model.estrategiaEvaluacionId===0 || dateRangeInvalid">
+                    <span *ngIf="!loading">Ingresar/Actualizar</span>
+                    <span *ngIf="loading">Guardando...</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn-secondary flex-grow-1"
+                    style="font-size: 13px;"
+                    (click)="resetForm(myForm)">
+                    Cancelar
+                  </button>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<ngx-sonner-toaster />
+<p-confirmDialog appendTo="body"></p-confirmDialog>

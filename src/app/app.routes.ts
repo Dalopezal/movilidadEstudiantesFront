@@ -22,6 +22,7 @@ import { authGuard } from './guards/auth.guard';
 import { redirectIfAuthenticatedGuard } from './guards/redirectIfAuthenticated.guard';
 import { HorariosUniversidadComponent } from './components/horarios-universidad/horarios-universidad.component';
 import { InsigniaDigitalComponent } from './components/insignia-digital/insignia-digital.component';
+import { EstrategiaPlanComponent } from './components/estrategia-plan/estrategia-plan.component';
 
 export const routes: Routes = [
   // Login: si ya está autenticado redirige a /home
@@ -45,6 +46,7 @@ export const routes: Routes = [
   { path: 'institucion-convenio', component: InstitucionConvenioComponent, canActivate: [authGuard] },
   { path: 'horarios-universidad', component: HorariosUniversidadComponent, canActivate: [authGuard] },
   { path: 'insignia-digital', component: InsigniaDigitalComponent, canActivate: [authGuard] },
+  { path: 'estrategia-plan', component: EstrategiaPlanComponent, canActivate: [authGuard] },
 
   // Wildcard -> login
   { path: '**', redirectTo: '' }
