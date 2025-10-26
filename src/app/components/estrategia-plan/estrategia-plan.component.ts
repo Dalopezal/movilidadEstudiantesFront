@@ -84,9 +84,6 @@ export class EstrategiaPlanComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.fetchPostulaciones();
-    this.fetchListaEstados();
-    this.fetchListaTipoMovilidad();
   }
 
   ngOnDestroy(): void {
