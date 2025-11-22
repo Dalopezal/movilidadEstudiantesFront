@@ -1,156 +1,109 @@
-import { Component, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, SimpleChanges } from '@angular/core';
+import { SidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
-import { Subject, takeUntil } from 'rxjs';
-
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
-import { NgxSonnerToaster, toast } from 'ngx-sonner';
-
+import { Subject, takeUntil, forkJoin } from 'rxjs';
 import { GenericApiService } from '../../services/generic-api.service';
-import { AsignacionEstrategiaModel } from '../../models/AsignacionEstrategiaModel';
+import { HttpClientModule } from '@angular/common/http';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { NgxSonnerToaster, toast } from 'ngx-sonner';
+import { EstrategiaPlanModel } from '../../models/EstrategiaPlanModel';
 
 @Component({
   selector: 'app-asignacion-estrategia',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
   templateUrl: './asignacion-estrategia.component.html',
   styleUrls: ['./asignacion-estrategia.component.css'],
   providers: [ConfirmationService]
 })
-export class AsignacionEstrategiaComponent implements OnInit, OnDestroy {
-  @Input() idConvocatoria!: any;
+export class EstrategiaComponent implements OnInit, OnDestroy {
+  data: EstrategiaPlanModel[] = [];
+  filteredData: EstrategiaPlanModel[] = [];
+  pagedData: EstrategiaPlanModel[] = [];
 
-  data: AsignacionEstrategiaModel[] = [];
-  filteredData: AsignacionEstrategiaModel[] = [];
-  pagedData: AsignacionEstrategiaModel[] = [];
+  // Listas para los combos
+  listaInsignias: any[] = [];
+  listaTiposEstrategia: any[] = [];
 
-  // catálogos
-  procesos: any[] = [];
-  estrategias: any[] = [];
-  docentes: any[] = [];
-  componentes: any[] = [];
-
-  // estado UI
-  loading = false;
-  loadingTable = false;
-  error: string | null = null;
-  filtro: string = '';
-
-  model: AsignacionEstrategiaModel = new AsignacionEstrategiaModel();
-  isEditing = false;
-
-  // paginación
   currentPage = 1;
   pageSize = 10;
   pageSizeOptions = [10, 20, 30, 50];
   totalPages = 0;
   pages: number[] = [];
-  dateRangeInvalid = false;
+
+  loading = false;
+  loadingTable = false;
+  error: string | null = null;
+  filtro: string = '';
+
+  model: EstrategiaPlanModel = new EstrategiaPlanModel();
+  isEditing = false;
+  @Input() idConvocatoria!: any;
 
   private destroy$ = new Subject<void>();
 
   constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
 
-  ngOnInit(): void {
-    // catálogos
-    this.fetchProcesos();
+  ngOnInit() {
+    this.fetchCatalogos();
     this.fetchEstrategias();
-    this.fetchDocentes();
-    this.fetchComponentes();
-
-    // tabla
-    this.fetchAsignaciones();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['idConvocatoria'] && this.idConvocatoria) {
-      this.fetchAsignaciones();
+      this.fetchEstrategias();
     }
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  // ---------- catálogos ----------
-  private fetchProcesos() {
-    this.api.get<any>('Proceso/Consultar_Procesos')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (resp) => {
-          let items: any[] = Array.isArray(resp) ? resp : (resp?.data || resp?.items || []);
-          if (!Array.isArray(items)) {
-            const arr = Object.values(resp || {}).find(v => Array.isArray(v));
-            if (Array.isArray(arr)) items = arr;
-          }
-          this.procesos = items.map(x => ({ id: x.id, nombre: x.nombre ?? x.descripcion ?? `Proceso ${x.id}` }));
-        },
-        error: () => { this.procesos = []; }
-      });
+  // -----------------------
+  // Cargar catálogos (insignias y tipos de estrategia)
+  // -----------------------
+  fetchCatalogos() {
+    // Ajusta los endpoints según tu API
+    forkJoin({
+      insignias: this.api.get<any>('InsigniaDigital/Consultar_InsigniaDigital'),
+      tiposEstrategia: this.api.get<any>('TipoEstrategia/Consultar_TipoEstrategia')
+    })
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (result) => {
+        // Procesar insignias
+        if (Array.isArray(result.insignias)) {
+          this.listaInsignias = result.insignias;
+        } else if (result.insignias && typeof result.insignias === 'object') {
+          const arr = Object.values(result.insignias).find(v => Array.isArray(v));
+          this.listaInsignias = Array.isArray(arr) ? arr : [];
+        }
+
+        // Procesar tipos de estrategia
+        if (Array.isArray(result.tiposEstrategia)) {
+          this.listaTiposEstrategia = result.tiposEstrategia;
+        } else if (result.tiposEstrategia && typeof result.tiposEstrategia === 'object') {
+          const arr = Object.values(result.tiposEstrategia).find(v => Array.isArray(v));
+          this.listaTiposEstrategia = Array.isArray(arr) ? arr : [];
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar catálogos', err);
+        this.showError('No se pudieron cargar los catálogos');
+      }
+    });
   }
 
-  private fetchEstrategias() {
-    this.api.get<any>('Estrategia/Consultar_Estrategias')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (resp) => {
-          let items: any[] = Array.isArray(resp) ? resp : (resp?.data || resp?.items || []);
-          if (!Array.isArray(items)) {
-            const arr = Object.values(resp || {}).find(v => Array.isArray(v));
-            if (Array.isArray(arr)) items = arr;
-          }
-          this.estrategias = items.map(x => ({ id: x.id, nombre: x.nombre ?? `Estrategia ${x.id}` }));
-        },
-        error: () => { this.estrategias = []; }
-      });
-  }
-
-  private fetchDocentes() {
-    this.api.get<any>('Docentes/Consultar_Docentes')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (resp) => {
-          let items: any[] = Array.isArray(resp) ? resp : (resp?.data || resp?.items || []);
-          if (!Array.isArray(items)) {
-            const arr = Object.values(resp || {}).find(v => Array.isArray(v));
-            if (Array.isArray(arr)) items = arr;
-          }
-          this.docentes = items.map(x => ({ id: x.id, nombre: x.nombre ?? x.nombreCompleto ?? `Docente ${x.id}` }));
-        },
-        error: () => { this.docentes = []; }
-      });
-  }
-
-  private fetchComponentes() {
-    this.api.get<any>('Componentes/Consultar_Componentes')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (resp) => {
-          let items: any[] = Array.isArray(resp) ? resp : (resp?.data || resp?.items || []);
-          if (!Array.isArray(items)) {
-            const arr = Object.values(resp || {}).find(v => Array.isArray(v));
-            if (Array.isArray(arr)) items = arr;
-          }
-          this.componentes = items.map(x => ({ id: x.id, nombre: x.nombre ?? `Componente ${x.id}` }));
-        },
-        error: () => { this.componentes = []; }
-      });
-  }
-
-  // ---------- CRUD / listado ----------
-  fetchAsignaciones() {
+  // -----------------------
+  // Consultar estrategias
+  // -----------------------
+  fetchEstrategias() {
     this.error = null;
     this.loadingTable = true;
-
-    const base = 'AsignacionEstrategia/Consultar_Asignaciones';
-    const url = (this.idConvocatoria == 'undefined' || this.idConvocatoria == null)
-      ? base
-      : `${base}?idConvocatoria=${this.idConvocatoria}`;
-
-    this.api.get<any>(url)
+    this.api.get<any>('Estrategia/Consultar_Estrategias')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -166,15 +119,18 @@ export class AsignacionEstrategiaComponent implements OnInit, OnDestroy {
           }
 
           this.data = items.map(item =>
-            AsignacionEstrategiaModel.fromJSON ? AsignacionEstrategiaModel.fromJSON(item) : Object.assign(new AsignacionEstrategiaModel(), item)
+            EstrategiaPlanModel.fromJSON
+              ? EstrategiaPlanModel.fromJSON(item)
+              : Object.assign(new EstrategiaPlanModel(), item)
           );
+
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
           this.loadingTable = false;
         },
         error: (err) => {
-          console.error('Error al consultar asignaciones', err);
+          console.error('Error al consultar estrategias', err);
           this.error = 'No se pudo cargar la información. Intenta de nuevo.';
           this.data = [];
           this.filteredData = [];
@@ -186,18 +142,20 @@ export class AsignacionEstrategiaComponent implements OnInit, OnDestroy {
       });
   }
 
-  filterAsignaciones() {
+  // -----------------------
+  // Buscar/filtrar por nombre
+  // -----------------------
+  filterEstrategias() {
     this.error = null;
 
     if (!this.filtro || this.filtro.trim() === '') {
       this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
       return;
     }
-
     this.loadingTable = true;
-    const q = encodeURIComponent(this.filtro.trim());
 
-    this.api.get<any>(`AsignacionEstrategia/Consultar_AsignacionPorNombre?nombre=${q}`)
+    const q = encodeURIComponent(this.filtro.trim());
+    this.api.get<any>(`Estrategia/Consultar_EstrategiaGeneral?nombreEstrategia=${q}&TipoEstrategiaNombre=${q}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -213,15 +171,16 @@ export class AsignacionEstrategiaComponent implements OnInit, OnDestroy {
           }
 
           this.data = items.map(item =>
-            AsignacionEstrategiaModel.fromJSON ? AsignacionEstrategiaModel.fromJSON(item) : Object.assign(new AsignacionEstrategiaModel(), item)
+            EstrategiaPlanModel.fromJSON ? EstrategiaPlanModel.fromJSON(item) : Object.assign(new EstrategiaPlanModel(), item)
           );
+
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
           this.loadingTable = false;
         },
         error: (err) => {
-          console.error('Error al filtrar asignaciones', err);
+          console.error('Error al filtrar estrategias', err);
           this.error = 'No se pudo cargar la información. Intenta de nuevo.';
           this.data = [];
           this.filteredData = [];
@@ -233,46 +192,58 @@ export class AsignacionEstrategiaComponent implements OnInit, OnDestroy {
       });
   }
 
+  // -----------------------
+  // Form handlers
+  // -----------------------
   onSubmit(form: NgForm) {
     if (form.invalid) {
       form.control.markAllAsTouched();
       return;
     }
 
-    if (!this.model.procesoId || !this.model.estrategiaId || !this.model.docenteId || !this.model.componenteId) {
-      this.showWarning('Debe seleccionar Proceso, Estrategia, Docente y Componente.');
-      return;
-    }
-    if (!this.model.fechaTrabajo?.trim() || !this.model.fechaEvaluacion?.trim()) {
-      this.showWarning('Debe seleccionar ambas fechas: Trabajo y Evaluación.');
+    // validaciones adicionales
+    if (!this.model.nombre?.trim()) {
+      this.error = 'El nombre es obligatorio.';
       return;
     }
 
     this.loading = true;
     this.error = null;
 
-    const isUpdate = this.isEditing && this.model.id > 0;
-    const payload = this.model.toJSON();
+    const isUpdate = this.isEditing && this.model.id && this.model.id > 0;
+    const payload: any = {
+      nombre: this.model.nombre,
+      reqDocenteAdicional: !!this.model.reqDocenteAdicional,
+      reqValidaSegIdioma: !!this.model.reqValidaSegIdioma,
+      tieneinsignea: !!this.model.tieneinsignea,
+      insigniaId: this.model.insigniaId,
+      reqValEstudiante: !!this.model.reqValEstudiante,
+      tipoestrategiaId: this.model.tipoestrategiaId,
+      reqGeneraCertificado: !!this.model.reqGeneraCertificado
+    };
 
-    const endpoint = isUpdate ? 'AsignacionEstrategia/Actualizar_Asignacion' : 'AsignacionEstrategia/Crear_Asignacion';
+    if (isUpdate) payload.id = this.model.id;
+
+    const endpoint = isUpdate ? 'Estrategia/actualiza_Estrategia' : 'Estrategia/crear_Estrategia';
+
     const obs = isUpdate ? this.api.put<any>(endpoint, payload) : this.api.post<any>(endpoint, payload);
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
-        this.fetchAsignaciones();
+        this.fetchEstrategias();
         this.resetForm(form);
         this.loading = false;
 
-        if (response?.exito && (response?.datos !== false)) {
+        if (response.exito && response.datos) {
           this.showSuccess(response.exito);
-        } else if (response?.error && response?.datos === false) {
+        } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          this.showSuccess('¡Operación exitosa!');
+          this.showError('Respuesta desconocida del servidor.');
         }
       },
       error: (err) => {
-        console.error(isUpdate ? 'Error al actualizar asignación' : 'Error al crear asignación', err);
+        console.error(isUpdate ? 'Error al actualizar estrategia' : 'Error al crear estrategia', err);
         this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
         this.loading = false;
         this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
@@ -280,12 +251,23 @@ export class AsignacionEstrategiaComponent implements OnInit, OnDestroy {
     });
   }
 
-  startEdit(item: AsignacionEstrategiaModel) {
-    this.model = new AsignacionEstrategiaModel(
-      item.id, item.procesoId, item.estrategiaId, item.docenteId, item.componenteId,
-      item.generaCertificado, item.obtuvoInsignia, item.fechaTrabajo, item.fechaEvaluacion,
-      item.estado, item.nombreProceso, item.nombreEstrategia, item.nombreDocente
-    );
+  resetForm(form?: NgForm) {
+    this.model = new EstrategiaPlanModel();
+    this.isEditing = false;
+    if (form) form.resetForm({
+      nombre: '',
+      reqDocenteAdicional: false,
+      reqValidaSegIdioma: false,
+      tieneinsignea: false,
+      insigniaId: null,
+      reqValEstudiante: false,
+      tipoestrategiaId: null,
+      reqGeneraCertificado: false
+    });
+  }
+
+  startEdit(item: EstrategiaPlanModel) {
+    this.model = Object.assign(new EstrategiaPlanModel(), item);
     this.isEditing = true;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -294,38 +276,23 @@ export class AsignacionEstrategiaComponent implements OnInit, OnDestroy {
     const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
     if (!confirmado) return;
 
-    this.api.delete(`AsignacionEstrategia/Eliminar_Asignacion/${id}`)
+    this.api.delete(`EstrategiaPlan/Eliminar_EstrategiaPlan/${id}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.fetchAsignaciones();
+          this.fetchEstrategias();
           this.showSuccess('Se eliminó el registro satisfactoriamente');
         },
         error: (err) => {
-          console.error('Error al eliminar asignación', err);
-          this.showError('Error al eliminar asignación, el registro se encuentra asociado');
+          console.error('Error al eliminar estrategia, el registro se encuentra asociado', err);
+          this.showError('Error al eliminar estrategia, el registro se encuentra asociado');
         }
       });
   }
 
-  resetForm(form?: NgForm) {
-    this.model = new AsignacionEstrategiaModel();
-    this.isEditing = false;
-    if (form) {
-      form.resetForm({
-        procesoId: 0,
-        estrategiaId: 0,
-        docenteId: 0,
-        componenteId: 0,
-        generaCertificado: false,
-        obtuvoInsignia: false,
-        fechaTrabajo: '',
-        fechaEvaluacion: ''
-      });
-    }
-  }
-
-  // ---------- paginación ----------
+  // -----------------------
+  // Paginación
+  // -----------------------
   calculateTotalPages() {
     const totalItems = Array.isArray(this.filteredData) ? this.filteredData.length : 0;
     this.totalPages = Math.max(1, Math.ceil(totalItems / this.pageSize));
@@ -355,11 +322,13 @@ export class AsignacionEstrategiaComponent implements OnInit, OnDestroy {
     this.updatePagedData();
   }
 
-  trackByIndex(_: number, item: AsignacionEstrategiaModel) {
+  trackByIndex(_: number, item: EstrategiaPlanModel) {
     return item?.id ?? _;
   }
 
-  // ---------- toasters / confirm ----------
+  // -----------------------
+  // Toasters / Confirm
+  // -----------------------
   showSuccess(mensaje: any) {
     toast.success('¡Operación exitosa!', {
       description: mensaje,
@@ -401,11 +370,5 @@ export class AsignacionEstrategiaComponent implements OnInit, OnDestroy {
         reject: () => resolve(false),
       });
     });
-  }
-
-  validarRangoFechas() {
-    const ft = this.model.fechaTrabajo ? new Date(this.model.fechaTrabajo) : null;
-    const fe = this.model.fechaEvaluacion ? new Date(this.model.fechaEvaluacion) : null;
-    this.dateRangeInvalid = !!(ft && fe && fe < ft);
   }
 }

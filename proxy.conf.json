@@ -4,5 +4,14 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
+  },
+  "/api-orisiga": {
+    "target": "https://integracionesucmdev.ucm.edu.co",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api-orisiga": "/api"
+    }
   }
 }

@@ -23,11 +23,11 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="componenteId" class="fw-bold">Código del Componente</label>
-                  <input type="number" id="componenteId" name="componenteId" required class="form-control"
-                         [(ngModel)]="model.componenteId" #compCtrl="ngModel" style="font-size: 13px;" />
+                  <label for="Observacion" class="fw-bold">Observción</label>
+                  <textarea type="number" id="Observacion" name="Observacion" required class="form-control"
+                         [(ngModel)]="model.observacion" #compCtrl="ngModel" style="font-size: 13px;" rows="10"> </textarea>
                   <div class="text-danger small mt-1" *ngIf="compCtrl.invalid && compCtrl.touched">
-                    <div *ngIf="compCtrl.errors?.['required']">Seleccione un ID válido.</div>
+                    <div *ngIf="compCtrl.errors?.['required']">El campo observación es obligatorio.</div>
                   </div>
                 </div>
 
@@ -62,16 +62,14 @@
                 <thead>
                   <tr>
                     <th>Fecha No Laboral</th>
-                    <th>Componente ID</th>
-                    <th>Nombre Componente</th>
+                    <th>Observacion</th>
                     <th>Opciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let item of pagedData">
                     <td>{{ item.fechaNoLaboral }}</td>
-                    <td>{{ item.componenteId }}</td>
-                    <td>{{ item.nombreComponente }}</td>
+                    <td>{{ item.observacion }}</td>
                     <td>
                       <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">
                         <i class="fas fa-edit"></i>

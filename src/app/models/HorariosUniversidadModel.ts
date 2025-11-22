@@ -1,27 +1,23 @@
 export class HorariosUniversidadModel {
   id: number;
   fechaNoLaboral: string;
-  componenteId: number;
-  nombreComponente: string;
+  observacion: string;
 
   constructor(
     id?: number,
     fechaNoLaboral?: string,
-    componenteId?: number,
-    nombreComponente?: string
+    observacion?: string
   ) {
     this.id = id ?? 0;
     this.fechaNoLaboral = fechaNoLaboral ?? '';
-    this.componenteId = componenteId ?? 0;
-    this.nombreComponente = nombreComponente ?? '';
+    this.observacion = observacion ?? '';
   }
 
   static fromJSON(json: any): HorariosUniversidadModel {
     return new HorariosUniversidadModel(
       Number(json.id ?? 0),
       json.fechaNoLaboral ?? '',
-      Number(json.componenteId ?? 0),
-      json.nombreComponente ?? ''
+      json.observacion ?? ''
     );
   }
 
@@ -29,8 +25,7 @@ export class HorariosUniversidadModel {
     return {
       id: this.id,
       fechaNoLaboral: this.fechaNoLaboral,
-      componenteId: this.componenteId,
-      nombreComponente: this.nombreComponente
+      observacion: this.observacion
     };
   }
 }
