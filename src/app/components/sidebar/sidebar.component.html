@@ -25,6 +25,9 @@
       </a>
 
       <div class="submenu" [class.open]="isInternacionalizacionOpen">
+        <a routerLink="/planeacion" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i><span class="link-text">Planeación</span>
+        </a>
         <a routerLink="/estrategia-plan" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i><span class="link-text">Admin. Estrategia Plan</span>
         </a>
@@ -86,7 +89,9 @@
       <i class="fas fa-user-circle user-icon"></i>
     </ng-template>
     <div class="user-info">
-      <strong style="font-size: 13.5px;">{{ decodeUtf8(usuario?.nombre) }}</strong>
+      <strong [style.fontSize.px]="(usuario?.nombre)?.length > 30 ? 10 : 13.5">
+      {{ decodeUtf8(usuario?.nombre) }}
+    </strong>
       <small>{{ usuario?.correo }}</small>
       <small>{{ usuario?.rol }}</small>
     </div>

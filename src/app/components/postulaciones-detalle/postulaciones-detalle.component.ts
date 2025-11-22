@@ -1393,6 +1393,10 @@ getColorEstado(id: number): string {
 
   onGestioDocumental(step: any) {
     this.idPostulacion = this.idPostulacion;
+    alert(this.idPostulacion);
+    alert(this.convocatoriaId);
+    alert(this.convocatoria);
+    alert(this.documento);
     const modalElement = document.getElementById('GestionDocumentalnModal');
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);

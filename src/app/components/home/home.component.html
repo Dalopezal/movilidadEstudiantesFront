@@ -197,7 +197,7 @@
               <label class="form-label fw-bold">Programa</label>
               <select class="form-select" name="programa"
                       [(ngModel)]="datosPerfil.programaId"
-                      required style="font-size:13px;">
+                      style="font-size:13px;">
                <option *ngFor="let p of programas" [ngValue]="p.id">{{ p.nombre }}</option>
               </select>
             </div>
@@ -207,7 +207,7 @@
               <label class="form-label fw-bold">Facultad</label>
               <select class="form-select" name="facultad"
                       [(ngModel)]="datosPerfil.facultadId"
-                      required style="font-size:13px;">
+                      style="font-size:13px;">
                <option *ngFor="let p of facultades" [ngValue]="p.id">{{ p.nombre }}</option>
               </select>
             </div>

@@ -195,7 +195,7 @@ export class HomeComponent implements OnInit {
           this.populateDatosPerfilFromResp(resp);
 
           this.showModalRol = false;
-          this.showModalDatos = true;
+          //this.showModalDatos = true;
 
           window.dispatchEvent(new Event("storage"));
         },
