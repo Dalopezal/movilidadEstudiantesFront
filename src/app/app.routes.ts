@@ -26,6 +26,7 @@ import { PlanComponent } from './components/plan/plan.component';
 import { EstrategiaComponent } from './components/asignacion-estrategia/asignacion-estrategia.component';
 import { AprobacionEstudiantesComponent } from './components/estrategia-plan/aprobacion-estudiantes.component';
 import { GeneracionCertificadoEstudianteComponent } from './components/generacion-certificado-estudiante-component/generacion-certificado-estudiante.component';
+import { AsignacionPlanComponenteComponent } from './components/asignacion-plan-componente/asignacion-plan-componente.component';
 
 export const routes: Routes = [
   // Login: si ya está autenticado redirige a /home
@@ -53,6 +54,7 @@ export const routes: Routes = [
   { path: 'planeacion', component: PlanComponent, canActivate: [authGuard] },
   { path: 'estrategia', component: EstrategiaComponent, canActivate: [authGuard] },
   { path: 'certificado-estudiantes', component: GeneracionCertificadoEstudianteComponent, canActivate: [authGuard] },
+  { path: 'asignacion-plan-componente', component: AsignacionPlanComponenteComponent, canActivate: [authGuard] },
 
   // Wildcard -> login
   { path: '**', redirectTo: '' }
