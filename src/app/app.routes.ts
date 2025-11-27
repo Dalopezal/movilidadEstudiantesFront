@@ -25,6 +25,7 @@ import { InsigniaDigitalComponent } from './components/insignia-digital/insignia
 import { PlanComponent } from './components/plan/plan.component';
 import { EstrategiaComponent } from './components/asignacion-estrategia/asignacion-estrategia.component';
 import { AprobacionEstudiantesComponent } from './components/estrategia-plan/aprobacion-estudiantes.component';
+import { GeneracionCertificadoEstudianteComponent } from './components/generacion-certificado-estudiante-component/generacion-certificado-estudiante.component';
 
 export const routes: Routes = [
   // Login: si ya está autenticado redirige a /home
@@ -51,6 +52,7 @@ export const routes: Routes = [
   { path: 'aprobacion-estudiante', component: AprobacionEstudiantesComponent, canActivate: [authGuard] },
   { path: 'planeacion', component: PlanComponent, canActivate: [authGuard] },
   { path: 'estrategia', component: EstrategiaComponent, canActivate: [authGuard] },
+  { path: 'certificado-estudiantes', component: GeneracionCertificadoEstudianteComponent, canActivate: [authGuard] },
 
   // Wildcard -> login
   { path: '**', redirectTo: '' }

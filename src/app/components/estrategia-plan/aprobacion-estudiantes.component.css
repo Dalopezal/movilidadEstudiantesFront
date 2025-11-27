@@ -85,9 +85,30 @@
   outline: none;
 }
 
+.button-pending {
+  background-color: #00ACD4; /* celeste */
+  color: #18206E; /* azul oscuro */
+  padding: 6px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: none;
+  cursor: default;
+  display: inline-block;
+  min-width: 90px;
+  text-align: center;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.button-pending:hover {
+  background-color: #18206E; /* celeste un poco más oscuro al hover */
+  color: white;
+}
+
 /* Quitar el fondo rayado de las filas */
 .table.table-striped tbody tr {
-  background-color: 18206E !important;
+  background-color: white !important;
 }
 
 /* Encabezado fijo */
@@ -119,172 +140,18 @@
   box-shadow: none;
 }
 
-.custom-card-float {
-  position: absolute;
-  z-index: 1050;
+/* Contenedor que scrollea la tabla dentro de la card */
+.table-wrapper {
+  /* ocupa el espacio libre en la card (que ya está a 75vh) */
+  flex: 1 1 auto;
+  /* altura máxima para que no se desborde la card;
+     ajusta 220px según veas el espacio que dejan los headers/footers */
+  max-height: calc(75vh - 220px);
+  overflow-y: auto;
 }
 
-.custom-card-float {
-  position: fixed;   /* 👈 cambia a fixed */
-  z-index: 1050;
-}
-
-/* Animación de entrada */
-.animate-slide-in {
-  animation: slideInBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  position: fixed;
-  z-index: 1050;
-}
-
-@keyframes slideInBounce {
-  0% {
-    transform: translateX(-100%) scale(0.8);
-    opacity: 0;
-  }
-  60% {
-    transform: translateX(10px) scale(1.05);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
-}
-
-/* Card con sombra brillante */
-.shadow-glow {
-  box-shadow:
-    0 0 20px rgba(13, 19, 63, 0.3),
-    0 8px 32px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(13, 19, 63, 0.2);
-  border-radius: 12px;
-  overflow: hidden;
-  width: 380px;
-  backdrop-filter: blur(10px);
-}
-
-/* Header con gradiente */
-.gradient-header {
-  background: #0D133F;
-  border: none;
-  position: relative;
-}
-
-.gradient-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  animation: rainbow 3s linear infinite;
-}
-
-@keyframes rainbow {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}
-
-/* Efecto cristal en el body */
-.glass-effect {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Filas de información con hover */
-.info-row {
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(13, 19, 63, 0.1);
-  transition: all 0.3s ease;
-  border-radius: 4px;
-  margin: 2px 0;
-}
-
-.info-row:hover {
-  background: rgba(13, 19, 63, 0.05);
-  transform: translateX(5px);
-  padding-left: 10px;
-}
-
-/* Labels con brillo */
-.label-glow {
-  font-weight: 600;
-  color: #0D133F;
-  display: inline-block;
-  min-width: 100px;
-}
-
-/* Botón de cerrar con pulso */
-.pulse-button {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-.pulse-button:hover {
-  animation: none;
-  transform: scale(1.2);
-  transition: transform 0.2s ease;
-}
-
-.scroll-body {
-  max-height: 73vh;      /* 📌 alto máximo de la card */
-  overflow-y: auto;       /* activa scroll vertical */
-  overflow-x: hidden;     /* evita scroll horizontal innecesario */
-  padding-right: 10px;    /* evita que tape el scroll */
-}
-
-/* Scrollbar moderno para navegadores que lo soporten */
-.scroll-body::-webkit-scrollbar {
-  width: 6px;
-}
-
-
-/* Animación de entrada (la que ya tienes) */
-.animate-slide-in {
-  animation: slideInBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  position: fixed;
-  z-index: 1050;
-}
-
-@keyframes slideInBounce {
-  0% {
-    transform: translateX(-100%) scale(0.8);
-    opacity: 0;
-  }
-  60% {
-    transform: translateX(10px) scale(1.05);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
-}
-
-/* 🔥 Nueva animación de salida */
-.animate-slide-out {
-  animation: slideOutBounce 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
-  position: fixed;
-  z-index: 1050;
-}
-
-@keyframes slideOutBounce {
-  0% {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
-  30% {
-    transform: translateX(-10px) scale(0.95);
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateX(-100%) scale(0.8);
-    opacity: 0;
-  }
+/* Que la tabla no cree márgenes raros dentro del wrapper */
+.table-wrapper table {
+  width: 100%;
+  margin-bottom: 0;
 }

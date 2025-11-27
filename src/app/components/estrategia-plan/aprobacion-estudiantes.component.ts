@@ -16,6 +16,18 @@ interface EstudianteAprobacion {
   idEstudiante?: number;
 }
 
+interface ProgramaDocente {
+  codigo: string;
+  nombre: string;
+}
+
+interface ComponenteDocente {
+  codigo: string;
+  nombre: string;
+  programaCodigo: string;
+  grupo: number;
+}
+
 @Component({
   selector: 'app-aprobacion-estudiantes',
   standalone: true,
@@ -64,6 +76,10 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   botonGuardarHabilitado: boolean = false;
 
   private destroy$ = new Subject<void>();
+  // Valores seleccionados
+  programaCodigo: string | null = null;      // en vez de programaId numérico
+  componenteCodigo: string | null = null;    // en vez de componenteId numérico
+  private _componentesRaw: ComponenteDocente[] = [];
 
   constructor(
     private api: GenericApiService,
@@ -98,65 +114,107 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   }
 
   fetchProgramas() {
-    this.api.getExterno<any>('orisiga/asignaciondocente/?identificacion=24341126')
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: (response) => {
-        console.log('Respuesta programas RAW:', response);
-        this.listaProgramas = this.extractArray(response);
-      },
-      error: (err) => {
-        console.error('Error al cargar programas', err);
-        this.showError('No se pudieron cargar los programas');
-      }
-    });
+    this.api.getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          console.log('Respuesta programas RAW:', response);
+
+          const asignaciones = this.extractArray(response);
+
+          if (asignaciones.length > 0) {
+            // Documento del docente (por si luego lo necesitas)
+            this.docenteId = asignaciones[0].documento ?? null;
+          }
+
+          const programasMap = new Map<string, ProgramaDocente>();
+          const componentes: ComponenteDocente[] = [];
+
+          for (const item of asignaciones) {
+            const prog = item.programa;
+
+            // Programas únicos
+            if (prog?.codigo) {
+              if (!programasMap.has(prog.codigo)) {
+                programasMap.set(prog.codigo, {
+                  codigo: prog.codigo,
+                  nombre: prog.nombre
+                });
+              }
+            }
+
+            // Cada fila tiene un componente y grupo asociado
+            if (item.componente_codigo) {
+              componentes.push({
+                codigo: item.componente_codigo,
+                nombre: item.componente_nombre,
+                programaCodigo: prog?.codigo,
+                grupo: item.grupo
+              });
+            }
+          }
+
+          this.listaProgramas = Array.from(programasMap.values());
+          this._componentesRaw = componentes;
+          this.listaComponentes = [];
+          this.listaGrupos = [];
+
+          console.log('Programas:', this.listaProgramas);
+          console.log('Componentes RAW:', this._componentesRaw);
+        },
+        error: (err) => {
+          console.error('Error al cargar programas', err);
+          this.showError('No se pudieron cargar los programas');
+        }
+      });
   }
 
   onProgramaChange() {
-    this.componenteId = null;
+    this.componenteCodigo = null;
     this.grupoId = null;
     this.listaComponentes = [];
     this.listaGrupos = [];
 
-    if (!this.programaId || !this.docenteId) return;
+    if (!this.programaCodigo) {
+      return;
+    }
 
-    this.api.get<any>(`asignaciondocente/consultar_componentes?docenteId=${this.docenteId}&programaId=${this.programaId}`)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          this.listaComponentes = this.extractArray(response);
-        },
-        error: (err) => {
-          console.error('Error al cargar componentes', err);
-          this.showError('No se pudieron cargar los componentes');
-        }
-      });
+    // Componentes solo del programa seleccionado
+    this.listaComponentes = this._componentesRaw
+      .filter(c => c.programaCodigo === this.programaCodigo);
+
+    // Grupos que existen para ese programa (evita duplicados)
+    const gruposSet = new Set<number>();
+    this.listaComponentes.forEach(c => {
+      if (c.grupo != null) {
+        gruposSet.add(c.grupo);
+      }
+    });
+    this.listaGrupos = Array.from(gruposSet.values()).sort();
   }
 
   onComponenteChange() {
     this.grupoId = null;
-    this.listaGrupos = [];
 
-    if (!this.componenteId || !this.docenteId) return;
+    if (!this.componenteCodigo || !this.programaCodigo) {
+      return;
+    }
 
-    this.api.get<any>(`asignaciondocente/consultar_grupos?docenteId=${this.docenteId}&componenteId=${this.componenteId}`)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          this.listaGrupos = this.extractArray(response);
-        },
-        error: (err) => {
-          console.error('Error al cargar grupos', err);
-          this.showError('No se pudieron cargar los grupos');
-        }
-      });
+    const comp = this._componentesRaw.find(c =>
+      c.codigo === this.componenteCodigo &&
+      c.programaCodigo === this.programaCodigo
+    );
+
+    if (comp && comp.grupo != null) {
+      this.grupoId = comp.grupo;
+    }
   }
 
   // -----------------------
   // Buscar estudiantes
   // -----------------------
   buscarEstudiantes() {
-    if (!this.planeacionId || !this.programaId || !this.componenteId || !this.grupoId) {
+    if (!this.planeacionId || !this.programaCodigo || !this.componenteCodigo || !this.grupoId) {
       this.showWarning('Debe seleccionar todos los filtros antes de buscar');
       return;
     }
@@ -165,7 +223,7 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
     this.error = null;
 
     // Paso 1: Consultar si ya existen aprobaciones
-    this.api.get<any>(`Aprobacion/Consultar_Aprobacionestudiante_Planeacion?planeacionId=${this.planeacionId}`)
+    this.api.get<any>(`AprobacionEstudiantes/Consultar_Aprobacionestudiante_Planeacion?IdPlaneacion=${this.planeacionId}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (responseAprobacion) => {
@@ -188,7 +246,7 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   }
 
   cargarListadoEstudiantes(habilitarGuardar: boolean, aprobaciones: any[] = []) {
-    this.api.get<any>(`Estudiante/listadoestudiantexgrupoxcomponente?grupoId=${this.grupoId}&componenteId=${this.componenteId}`)
+    this.api.getExterno<any>(`orisiga/listestgrucom/?identificacion=24341126&componente=${this.componenteCodigo}&grupo=${this.grupoId}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (responseEstudiantes) => {
@@ -197,22 +255,23 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
           if (aprobaciones.length > 0) {
             // Cruzar datos
             this.data = estudiantes.map((est: any) => {
-              const aprobacion = aprobaciones.find((ap: any) =>
-                ap.estudianteId === est.id || ap.cedula === est.cedula
-              );
+              const aprobacion = aprobaciones.find((ap: any) => {
+                const match = ap.estudianteId == est.documento_estudiante;
+                return match;
+              });
               return {
-                cedula: est.cedula || est.documento || '',
-                nombre: est.nombre || est.nombreCompleto || '',
+                cedula: est.documento_estudiante || '',
+                nombre: est.nombre_estudiante || '',
                 aprobo: aprobacion ? aprobacion.aprobo : false,
-                idEstudiante: est.id
+                idEstudiante: est.documento_estudiante
               };
             });
-            this.botonGuardarHabilitado = false; // Ya se guardó antes
+            this.botonGuardarHabilitado = false;
           } else {
             // Mapear estudiantes sin aprobaciones previas
             this.data = estudiantes.map((est: any) => ({
-              cedula: est.cedula || est.documento || '',
-              nombre: est.nombre || est.nombreCompleto || '',
+              cedula: est.cedula || est.documento_estudiante || '',
+              nombre: est.nombre || est.nombre_estudiante || '',
               aprobo: false,
               idEstudiante: est.id
             }));
@@ -236,22 +295,22 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   // Búsqueda por cédula
   // -----------------------
   buscarPorCedula() {
-    if (!this.filtroCedula || this.filtroCedula.trim() === '') {
-      this.showWarning('Debe digitar una cédula para buscar');
+    if (!this.filtroCedula || this.filtroCedula.trim() === '' && !this.planeacionId || !this.programaCodigo || !this.componenteCodigo || !this.grupoId) {
+      this.showWarning('Debe seleccionar todos los filtros antes de buscar Nombre, Componente, Grupo)');
       return;
     }
 
     this.loading = true;
 
-    this.api.get<any>(`Estudiante/listadoestudiantexgrupoxcomponente?grupoId=${this.grupoId}&componenteId=${this.componenteId}&cedula=${this.filtroCedula}`)
+    this.api.getExterno<any>(`orisiga/listestgrucom/?identificacion=${this.filtroCedula}&componente=${this.componenteCodigo}&grupo=${this.grupoId}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
           const estudiantes = this.extractArray(response);
 
           this.data = estudiantes.map((est: any) => ({
-            cedula: est.cedula || est.documento || '',
-            nombre: est.nombre || est.nombreCompleto || '',
+            cedula: est.cedula || est.documento_estudiante || '',
+            nombre: est.nombre || est.nombre_estudiante || '',
             aprobo: false,
             idEstudiante: est.id
           }));
@@ -285,14 +344,15 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
 
     this.loading = true;
 
+    console.log("este....", estudiantesAprobados);
+
     const payload = estudiantesAprobados.map(e => ({
       planeacionId: this.planeacionId,
-      estudianteId: e.idEstudiante,
-      cedula: e.cedula,
+      estudianteId: e.cedula,
       aprobo: true
     }));
 
-    this.api.post<any>('Aprobacion/Crear_aprobacion_estudiantes', payload)
+    this.api.post<any>('AprobacionEstudiantes/crear_AprobacionEstudiantes', payload)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -320,10 +380,11 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   // Refrescar tabla
   // -----------------------
   refrescarTabla() {
-    this.filtroCedula = '';
-    if (this.planeacionId && this.programaId && this.componenteId && this.grupoId) {
-      this.buscarEstudiantes();
-    }
+    // this.filtroCedula = '';
+    // if (this.planeacionId && this.programaId && this.componenteId && this.grupoId) {
+    //   this.buscarEstudiantes();
+    // }
+    window.location.reload();
   }
 
   // -----------------------

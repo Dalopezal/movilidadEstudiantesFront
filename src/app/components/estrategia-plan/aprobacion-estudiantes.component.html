@@ -1,11 +1,11 @@
 <app-sidebar></app-sidebar>
 <div class="container fuente" style="padding-top: 30px;">
   <div class="row h-100">
-    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;">
+    <main class="col-12 col-md-12 d-flex flex-column">
       <div class="row g-4 flex-grow-1">
 
         <!-- Tabla -->
-        <section class="col-12 col-lg-12 d-flex flex-column" style="height: 70vh;font-size: 14px;">
+        <section class="col-12 col-lg-12 d-flex flex-column" style="height: 75vh;font-size: 14px;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1">
             <div class="card-header d-flex align-items-center" style="background: #E2E6F7;">
               <p class="mb-0" style="color: #0D133F;font-weight: bold;">Aprobación estudiantes</p>
@@ -31,11 +31,13 @@
                 name="programaId"
                 required
                 style="font-size: 13px;"
-                [(ngModel)]="programaId"
+                [(ngModel)]="programaCodigo"
                 (change)="onProgramaChange()"
               >
                 <option [ngValue]="null">Programa</option>
-                <option *ngFor="let prog of listaProgramas" [ngValue]="prog.id">{{ prog.nombre }}</option>
+                <option *ngFor="let prog of listaProgramas" [ngValue]="prog.codigo">
+                  {{ prog.nombre }}
+                </option>
               </select>
 
               <select
@@ -44,11 +46,13 @@
                 name="componenteId"
                 required
                 style="font-size: 13px;"
-                [(ngModel)]="componenteId"
+                [(ngModel)]="componenteCodigo"
                 (change)="onComponenteChange()"
               >
                 <option [ngValue]="null">Componente</option>
-                <option *ngFor="let comp of listaComponentes" [ngValue]="comp.id">{{ comp.nombre }}</option>
+                <option *ngFor="let comp of listaComponentes" [ngValue]="comp.codigo">
+                  {{ comp.nombre }}
+                </option>
               </select>
 
               <select
@@ -60,7 +64,9 @@
                 [(ngModel)]="grupoId"
               >
                 <option [ngValue]="null">Grupo</option>
-                <option *ngFor="let grupo of listaGrupos" [ngValue]="grupo.id">{{ grupo.nombre }}</option>
+                <option *ngFor="let grupo of listaGrupos" [ngValue]="grupo">
+                  {{ grupo }}
+                </option>
               </select>
 
               <button
@@ -82,7 +88,7 @@
                   style="background:#0D133F;border-color:#0D133F;font-size:13px;padding:5px 8px;"
                   (click)="refrescarTabla()"
                 >
-                  <i class="fas fa-sync-alt"></i> Actualizar
+                  <i class="fas fa-sync-alt"></i> Limpiar
                 </button>
 
                 <!-- Búsqueda por cédula -->
@@ -113,7 +119,9 @@
             </div>
 
             <!-- Tabla -->
-            <div class="table-responsive flex-grow-1" style="overflow-y: auto;">
+            <div
+              class="table-responsive table-wrapper flex-grow-1"
+            >
               <table class="table table-striped mb-0">
                 <thead class="table-primary" style="font-size: 13px">
                   <tr align="center">
@@ -131,18 +139,22 @@
                           [disabled]="!botonGuardarHabilitado"
                           style="cursor: pointer;"
                         />
-                        <label class="form-check-label" for="seleccionarTodos" style="font-size: 11px;cursor: pointer;">
+                        <label class="form-check-label" for="seleccionarTodos" style="font-size: 13px;cursor: pointer;">
                           Seleccionar todos
                         </label>
                       </div>
                     </th>
                   </tr>
                 </thead>
-                <tbody style="font-size: 13px">
-                  <div *ngIf="loading" class="table-overlay">
-                    <i class="fas fa-spinner fa-spin fa-3x"></i>
-                    <p style="background: transparent;">Cargando datos</p>
-                  </div>
+                <tbody style="font-size: 13px;">
+                  <!-- Loader como fila válida -->
+                  <tr *ngIf="loading">
+                    <td colspan="3" class="text-center">
+                      <i class="fas fa-spinner fa-spin fa-3x"></i>
+                      <p style="background: transparent; margin: 0;">Cargando datos</p>
+                    </td>
+                  </tr>
+
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td align="center">{{ item.cedula }}</td>
                     <td>{{ item.nombre }}</td>
@@ -158,6 +170,7 @@
                       </div>
                     </td>
                   </tr>
+
                   <tr *ngIf="!loading && pagedData.length === 0">
                     <td colspan="3" class="text-center">No hay registros.</td>
                   </tr>

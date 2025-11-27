@@ -75,14 +75,18 @@ export class GenericApiService {
       password: 'Be,l2Z^*T548'
     };
 
+    // FIX: Usar la URL correcta con el proxy
     const url = `${environment.apiUrlExterna}/orisiga/token/`;
+
+    console.log('🔑 Solicitando token a:', url);
 
     return this.http.post<any>(url, body).pipe(
       map(res => {
-        console.log('RESPUESTA TOKEN:', res);
+        console.log('RESPUESTA TOKEN COMPLETA:', res);
 
-        const token = res?.access as string;   // <- este campo
+        const token = res?.access as string;
         if (!token) {
+          console.error('Estructura de respuesta:', res);
           throw new Error('No se recibió token.access válido del servicio externo');
         }
 
@@ -97,7 +101,7 @@ export class GenericApiService {
         return token;
       }),
       catchError(err => {
-        console.error('Error obteniendo token externo', err);
+        console.error('Error obteniendo token externo:', err);
         return throwError(() => err);
       })
     );
@@ -118,32 +122,21 @@ export class GenericApiService {
       switchMap(token => {
         const url = this.buildUrlExterno(endpoint);
 
-        let headers = new HttpHeaders({
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MzkzMzQ4LCJpYXQiOjE3NjM3ODg1NDgsImp0aSI6IjcyYWQ0MjE5YWQ1NzQ2YTQ4YzEyNzlmYTlmZjI0OWJmIiwidXNlcl9pZCI6IjIifQ._7j3_aVo_1RzEl1sbQ1ejxbCDi1ImJ5buwFdlB2z3aI`
-        });
-
-        if (options?.headers) {
-          headers = options.headers.set('Authorization', `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MzkzMzQ4LCJpYXQiOjE3NjM3ODg1NDgsImp0aSI6IjcyYWQ0MjE5YWQ1NzQ2YTQ4YzEyNzlmYTlmZjI0OWJmIiwidXNlcl9pZCI6IjIifQ._7j3_aVo_1RzEl1sbQ1ejxbCDi1ImJ5buwFdlB2z3aI`);
-        }
+        let headers = (options?.headers as HttpHeaders) || new HttpHeaders();
+        headers = headers.set('Authorization', `Bearer ${token}`);
 
         console.log('URL EXTERNA:', url);
-        console.log('HEADER AUTH:', headers.get('Authorization'));
+        console.log('HEADER AUTH FINAL:', headers.get('Authorization'));
 
         const httpOptions = {
           ...this.buildOptions(params, options),
           headers,
-          responseType: 'text' as const,
+          responseType: 'json' as const,
           observe: 'body' as const
         };
 
         return this.http.get<any>(url, httpOptions).pipe(
-          map((res: any) => {
-            try {
-              return this.extractData(JSON.parse(res)) as T;
-            } catch {
-              return res as T;
-            }
-          }),
+          map((res: any) => this.extractData(res) as T),
           catchError(err => this.handleError(err))
         );
       })
