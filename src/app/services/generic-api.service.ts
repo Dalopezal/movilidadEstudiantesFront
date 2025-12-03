@@ -38,12 +38,21 @@ export class GenericApiService {
       });
     }
 
+    // Obtener token interno desde sessionStorage o localStorage
+    const internalToken = sessionStorage.getItem('generalToken') || localStorage.getItem('generalToken');
+
+    let headers = (extraOptions?.headers as HttpHeaders) || new HttpHeaders();
+
+    // Si hay token interno, agregarlo al header
+    if (internalToken) {
+      headers = headers.set('Authorization', `Bearer ${internalToken}`);
+    }
+
     return {
       params: httpParams,
       responseType: 'json' as const,
       observe: 'body' as const,
-      headers: (extraOptions && extraOptions.headers) || undefined,
-      // withCredentials: extraOptions?.withCredentials ?? false, // activar si usas cookies de sesión
+      headers,
       ...extraOptions
     };
   }

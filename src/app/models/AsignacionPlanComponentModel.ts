@@ -58,7 +58,7 @@ export class AsignacionPlanComponenteModel {
     nombreEstado?: string,
     tipoEstrategiaNombre?: string
   ) {
-    this.id = id ?? 0;
+    this.id = id! ?? null;
     this.planId = planId ?? null;
     this.estrategiaId = estrategiaId ?? null;
     this.estadoId = estadoId ?? null;
@@ -123,7 +123,6 @@ export class AsignacionPlanComponenteModel {
 
   toJSON(): any {
     return {
-      id: this.id,
       planId: this.planId,
       estrategiaId: this.estrategiaId,
       estadoId: this.estadoId,

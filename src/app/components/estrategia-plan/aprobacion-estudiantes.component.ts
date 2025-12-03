@@ -8,6 +8,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { GenericApiService } from '../../services/generic-api.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { concatMap, from, toArray, catchError, of } from 'rxjs';
 
 interface EstudianteAprobacion {
   cedula: string;
@@ -344,28 +345,43 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
 
     this.loading = true;
 
-    console.log("este....", estudiantesAprobados);
+    // Crear un array de observables, uno por cada estudiante
+    const requests$ = estudiantesAprobados.map(est => {
+      const payload = {
+        planeacionId: this.planeacionId,
+        estudianteId: est.cedula,
+        aprobo: true
+      };
 
-    const payload = estudiantesAprobados.map(e => ({
-      planeacionId: this.planeacionId,
-      estudianteId: e.cedula,
-      aprobo: true
-    }));
+      return this.api.post<any>('AprobacionEstudiantes/crear_AprobacionEstudiantes', payload).pipe(
+        catchError(error => {
+          console.error(`Error al guardar estudiante ${est.cedula}`, error);
+          return of(null); // Continúa aunque falle uno
+        })
+      );
+    });
 
-    this.api.post<any>('AprobacionEstudiantes/crear_AprobacionEstudiantes', payload)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          this.loading = false;
-          this.botonGuardarHabilitado = false;
+    // Ejecutar uno tras otro
+    from(requests$).pipe(
+      concatMap(request => request),
+      toArray()
+    ).subscribe({
+      next: (responses) => {
+        this.loading = false;
+        this.botonGuardarHabilitado = false;
+        const errores = responses.filter(r => r === null).length;
+        if (errores > 0) {
+          this.showWarning(`Se guardaron con errores (${errores} estudiantes fallidos)`);
+        } else {
           this.showSuccess('Estudiantes guardados exitosamente');
-        },
-        error: (err) => {
-          console.error('Error al guardar estudiantes', err);
-          this.loading = false;
-          this.showError('Error al guardar estudiantes');
         }
-      });
+      },
+      error: (err) => {
+        console.error('Error general en guardado', err);
+        this.loading = false;
+        this.showError('Error al guardar estudiantes');
+      }
+    });
   }
 
   // -----------------------

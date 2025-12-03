@@ -27,6 +27,9 @@ import { EstrategiaComponent } from './components/asignacion-estrategia/asignaci
 import { AprobacionEstudiantesComponent } from './components/estrategia-plan/aprobacion-estudiantes.component';
 import { GeneracionCertificadoEstudianteComponent } from './components/generacion-certificado-estudiante-component/generacion-certificado-estudiante.component';
 import { AsignacionPlanComponenteComponent } from './components/asignacion-plan-componente/asignacion-plan-componente.component';
+import { ActividadesSeguimientoComponent } from './components/actividades-seguimiento/actividades-seguimiento.component';
+import { DesarrolloProfesionalComponent } from './components/desarrollo-profesional/desarrollo-profesional.component';
+import { TrayectoriaComponent } from './components/trayectoria/trayectoria.component';
 
 export const routes: Routes = [
   // Login: si ya está autenticado redirige a /home
@@ -55,6 +58,9 @@ export const routes: Routes = [
   { path: 'estrategia', component: EstrategiaComponent, canActivate: [authGuard] },
   { path: 'certificado-estudiantes', component: GeneracionCertificadoEstudianteComponent, canActivate: [authGuard] },
   { path: 'asignacion-plan-componente', component: AsignacionPlanComponenteComponent, canActivate: [authGuard] },
+  { path: 'actividades-seguimiento', component: ActividadesSeguimientoComponent, canActivate: [authGuard] },
+  { path: 'desarrollo-profesional', component: DesarrolloProfesionalComponent, canActivate: [authGuard] },
+  { path: 'trayectoria', component: TrayectoriaComponent, canActivate: [authGuard] },
 
   // Wildcard -> login
   { path: '**', redirectTo: '' }

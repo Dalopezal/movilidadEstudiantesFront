@@ -1,27 +1,39 @@
 import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler } from '@angular/common/http';
-import { AuthService } from '../services/auth.service';
-import { switchMap, of } from 'rxjs';
+import { MsalService } from '@azure/msal-angular';
+import { switchMap } from 'rxjs';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private auth: AuthService) {}
+  constructor(private msal: MsalService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler) {
-    const url = req.url;
+    const url = req.url.toLowerCase();
 
-    if (
-      url.includes('/api-orisiga') ||
-      url.includes('integracionesucmdev.ucm.edu.co')
-    ) {
+    // Rutas que requieren token de Azure AD
+    const protectedRoutes = [
+      '/api/protegida', // ajusta según tus rutas protegidas
+      '/secure'
+    ];
+
+    const isProtected = protectedRoutes.some(route => url.includes(route));
+
+    if (!isProtected) {
+      // No inyectar token de Azure AD
       return next.handle(req);
     }
 
-    return this.auth.getAccessTokenAsync().pipe(
-      switchMap(token => {
-        const authReq = token
-          ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-          : req;
+    // Solo para rutas protegidas, obtener e inyectar token
+    return this.msal.acquireTokenSilent({
+      scopes: ['user.read'] // ajusta según los scopes requeridos
+    }).pipe(
+      switchMap(response => {
+        const token = response.accessToken;
+        const authReq = req.clone({
+          setHeaders: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         return next.handle(authReq);
       })
     );

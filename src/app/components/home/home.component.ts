@@ -65,6 +65,24 @@ export class HomeComponent implements OnInit {
     facultadId: ''
   };
 
+  // propiedades (agregar cerca de showModalDatos, etc.)
+  showModalCrearExterno: boolean = false;
+
+  crearExternoData: any = {
+    identificacion: '',
+    nombre: '',
+    correo: '',
+    tipodoc: '',      // aquí se guardará el código tipo (ej: 'CC')
+    telefono: '',
+    pasaporte: '',
+    fechanacimiento: '', // 'YYYY-MM-DD'
+    direccion: '',
+    ciudadid: '',
+    procod: '0T4',
+    promedioacademico: null,
+    cargo: ''
+  };
+
   loading = false;
 
  ngOnInit(): void {
@@ -82,41 +100,41 @@ export class HomeComponent implements OnInit {
     }
 
     // Inicializamos paises
-    this.fetchPaises().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (p) => this.paises = p,
-      error: (err) => {
-        console.error('Error al cargar países', err);
-        this.paises = [];
-      }
-    });
+    // this.fetchPaises().pipe(takeUntil(this.destroy$)).subscribe({
+    //   next: (p) => this.paises = p,
+    //   error: (err) => {
+    //     console.error('Error al cargar países', err);
+    //     this.paises = [];
+    //   }
+    // });
 
-    // Inicializamos tipos de documento
-    this.fetchTipoDocumentos().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (t) => this.tiposDocumento = t,
-      error: (err) => {
-        console.error('Error al cargar tipos de documento', err);
-        this.tiposDocumento = [];
-      }
-    });
+    // // Inicializamos tipos de documento
+    // this.fetchTipoDocumentos().pipe(takeUntil(this.destroy$)).subscribe({
+    //   next: (t) => this.tiposDocumento = t,
+    //   error: (err) => {
+    //     console.error('Error al cargar tipos de documento', err);
+    //     this.tiposDocumento = [];
+    //   }
+    // });
 
-    // Inicializamos programas
-    this.fetchProgramas().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (p) => this.programas = p,
-      error: (err) => {
-        console.error('Error al cargar programas', err);
-        this.programas = [];
-      }
-    });
+    // // Inicializamos programas
+    // this.fetchProgramas().pipe(takeUntil(this.destroy$)).subscribe({
+    //   next: (p) => this.programas = p,
+    //   error: (err) => {
+    //     console.error('Error al cargar programas', err);
+    //     this.programas = [];
+    //   }
+    // });
 
 
-    // Inicializamos facultades
-    this.fetchFacultades().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (p) => this.facultades = p,
-      error: (err) => {
-        console.error('Error al cargar facultades', err);
-        this.facultades = [];
-      }
-    });
+    // // Inicializamos facultades
+    // this.fetchFacultades().pipe(takeUntil(this.destroy$)).subscribe({
+    //   next: (p) => this.facultades = p,
+    //   error: (err) => {
+    //     console.error('Error al cargar facultades', err);
+    //     this.facultades = [];
+    //   }
+    // });
   }
 
   seleccionarRol(rol: string) {
@@ -124,10 +142,20 @@ export class HomeComponent implements OnInit {
   }
 
   guardarRol() {
-    if (this.selectedRole) {
-      this.usuario.rolId = this.selectedRole;
-      this.fetchInfoUsuario(this.usuario.correo, this.usuario.rolId);
-    }
+    if (!this.selectedRole) return;
+
+    // Guardar id
+    this.usuario.rolId = this.selectedRole;
+
+    console.log("roles", this.roles);
+    const rolObj = Array.isArray(this.roles)
+      ? this.roles.find(r => r.id === this.selectedRole)
+      : null;
+
+    this.usuario.rolnombre = rolObj?.nombre ?? '';
+    this.usuario.tipoUsuarioRol = rolObj?.tipo ?? '';
+
+    this.fetchInfoUsuario(this.usuario.correo, this.usuario.rolId, this.usuario.rolnombre);
   }
 
   guardarDatos() {
@@ -178,26 +206,59 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  private fetchInfoUsuario(correo: any, rolId: any) {
-    this.api.get<any>(`Usuarios/Consultar_Usuario_Rol?Correo=${correo}&RolId=${rolId}`)
+  private fetchInfoUsuario(correo: any, rolId: any, nombreRol: any) {
+    this.api.getExterno<any>(`oriusaurios/infousuario/?correo=${correo}&rol=${rolId}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
+          // Si el servicio responde que no existe el usuario, abrir modal simple para crear
+          if (resp?.message === 'usuario no encontrado') {
+            // prellenar con lo mínimo (correo y ejemplo de identificacion vacía)
+            this.crearExternoData = {
+              identificacion: '',
+              nombre: '',
+              correo: correo ?? '',
+              tipodoc: '',      // se requiere seleccionar desde combo
+              telefono: '',
+              pasaporte: '',
+              fechanacimiento: '',
+              direccion: '',
+              ciudadid: '',
+              procod: '0T4',
+              promedioacademico: '',
+              cargo: ''
+            };
+
+            // cargar combos necesarios si no están cargados
+            this.fetchTipoDocumentos().pipe(takeUntil(this.destroy$)).subscribe(t => this.tiposDocumento = t);
+            this.fetchPaises().pipe(takeUntil(this.destroy$)).subscribe(p => this.paises = p);
+
+            this.showModalCrearExterno = true;
+            return;
+          }
+
+          // flujo normal si usuario existe
           const u = this.extractUserObject(resp);
           this.tipoUsuario = u?.tipoEstudianteId ?? 2;
           this.usuario.rol = this.getNombreRol(Number(this.selectedRole));
           this.usuario.tipoUsuario = this.tipoUsuario;
           this.usuario.idUsuario = u?.id ?? null;
           localStorage.setItem('usuario', JSON.stringify(this.usuario));
-          // preparar datosPerfil con datos previos
           this.datosPerfil = { ...this.usuario };
-
           this.populateDatosPerfilFromResp(resp);
-
           this.showModalRol = false;
-          //this.showModalDatos = true;
-
           window.dispatchEvent(new Event("storage"));
+
+          const datosUsuario = {
+            RolId: rolId,
+            RolNombre: nombreRol,
+            Documento: u.identificacion,
+            TipoUsuarioId: this.usuario.tipoUsuarioRol,
+            Correo: u.correo,
+            NombreCompleto: u.nombrecompleto
+          };
+
+          this.generarToken(datosUsuario);
         },
         error: (err) => {
           console.error('Error al cargar estado para select', err);
@@ -206,8 +267,71 @@ export class HomeComponent implements OnInit {
       });
   }
 
+  crearUsuarioExterno() {
+    // validaciones mínimas
+    if (!this.crearExternoData.identificacion || !this.crearExternoData.nombre || !this.crearExternoData.correo || !this.crearExternoData.tipodoc) {
+      this.showError('Complete identificación, nombre, correo y tipo de documento.');
+      return;
+    }
+
+    const payload = {
+      identificacion: String(this.crearExternoData.identificacion),
+      nombre: String(this.crearExternoData.nombre),
+      correo: String(this.crearExternoData.correo),
+      tipodoc: String(this.crearExternoData.tipodoc),
+      telefono: this.crearExternoData.telefono || '',
+      pasaporte: this.crearExternoData.pasaporte || '',
+      fechanacimiento: this.crearExternoData.fechanacimiento || '',
+      direccion: this.crearExternoData.direccion || '',
+      ciudadid: String(this.crearExternoData.ciudadid || ''),
+      procod: this.crearExternoData.procod || '0T4',
+      promedioacademico: this.crearExternoData.promedioacademico ?? null,
+      cargo: this.crearExternoData.cargo || ''
+    };
+
+    this.api.post<any>('oriusaurios/crearexterno/', payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          this.showSuccess('Usuario creado correctamente');
+          this.showModalCrearExterno = false;
+
+          // Reintentar fetchInfoUsuario para proseguir (generar token, guardar usuario, etc.)
+          // usamos selectedRole y rolnombre actuales
+          const rolId = this.usuario.rolId ?? this.selectedRole;
+          const rolNombre = this.usuario.rolnombre ?? this.getNombreRol(Number(this.selectedRole));
+          // reintentar la consulta para obtener el usuario creado
+          this.fetchInfoUsuario(payload.correo, rolId, rolNombre);
+        },
+        error: (err) => {
+          console.error('Error al crear usuario externo', err);
+          this.showError('Error al crear usuario. Intente nuevamente.');
+        }
+      });
+  }
+
+  generarToken(datos: any): void {
+    this.api.post<any>('Usuarios/Iniciar_Sesion', datos)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          if (resp?.exito && resp?.datos) {
+            const token = resp.datos;
+            sessionStorage.setItem('generalToken', token);
+            //this.showSuccess('Token generado y guardado correctamente');
+          } else {
+            this.showError('No se recibió token en la respuesta');
+          }
+        },
+        error: (err) => {
+          console.error('Error al generar token', err);
+          this.showError('Error al generar token');
+        }
+      });
+  }
+
   private fetchListaRoles(correo: any) {
-    this.api.get<any>('Roles/Consultar_Rol?correo=' + correo)
+    this.api.getExterno<any>('oriusaurios/roldependencia/?correo=' + correo)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
@@ -221,7 +345,7 @@ export class HomeComponent implements OnInit {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.roles = items.map(item => ({ id: item.idRol, nombre: item.nombreRol }));
+          this.roles = items.map(item => ({ id: item.rolid, nombre: item.rolnombre, tipo: item.tipousuario }));
 
         },
         error: (err) => {

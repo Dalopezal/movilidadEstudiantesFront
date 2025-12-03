@@ -1,0 +1,390 @@
+<app-sidebar></app-sidebar>
+
+<div class="container fuente" style="padding-top: 20px; font-size: 13px;">
+
+  <section class="mb-4">
+    <div class="card shadow-sm">
+      <div class="card-header" style="background: #f5f6ff;">
+        <span style="font-weight: 700; font-size: 15px;">Actividades</span>
+      </div>
+
+      <div class="card-body">
+        <form #filtroForm="ngForm" (ngSubmit)="onBuscarActividades(filtroForm)">
+          <div class="row g-3 align-items-end">
+            <!-- Selección Planeación -->
+            <div class="col-md-2">
+              <label class="form-label fw-bold" style="font-size: 13px;">Selección Planeación</label>
+              <select
+                class="form-select"
+                [(ngModel)]="filtro.planId"
+                name="planId"
+                style="font-size: 13px;"
+              >
+                <option [ngValue]="null">Seleccione</option>
+                <option *ngFor="let p of planeaciones" [ngValue]="p.id">
+                  {{ p.nombre ?? p.titulo ?? p.descripcion }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Selección Estrategia -->
+            <div class="col-md-2">
+              <label class="form-label fw-bold">Selección Estrategia</label>
+              <select
+                class="form-select"
+                [(ngModel)]="filtro.estrategiaId"
+                name="estrategiaId"
+                style="font-size: 13px;"
+              >
+                <option [ngValue]="null">Seleccione</option>
+                <option *ngFor="let e of estrategias" [ngValue]="e.id">
+                  {{ e.nombre ?? e.descripcion }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Selección Institución -->
+            <div class="col-md-2">
+              <label class="form-label fw-bold">Selección Institución</label>
+              <select
+                class="form-select"
+                [(ngModel)]="filtro.institucionId"
+                name="institucionId"
+                style="font-size: 13px;"
+              >
+                <option [ngValue]="null">Seleccione</option>
+                <option *ngFor="let i of instituciones" [ngValue]="i.id">
+                  {{ i.nombre ?? i.razonSocial }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Selección Programa -->
+            <div class="col-md-2">
+              <label class="form-label fw-bold">Selección Programa</label>
+              <select
+                class="form-select"
+                [(ngModel)]="filtro.programaUCM"
+                name="programaUCM"
+                style="font-size: 13px;"
+              >
+                <option [ngValue]="null">Seleccione</option>
+                <option *ngFor="let p of programasUCM" [ngValue]="p.programa.nombre">
+                  {{ p.programa?.nombre }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Selección Componente -->
+            <div class="col-md-2">
+              <label class="form-label fw-bold">Selección Componente</label>
+              <select
+                class="form-select"
+                [(ngModel)]="filtro.componenteCodigoUCM"
+                name="componenteCodigoUCM"
+                style="font-size: 13px;"
+              >
+                <option [ngValue]="null">Seleccione</option>
+                <option
+                  *ngFor="let c of componentesUCM"
+                  [ngValue]="c.componente_nombre"
+                >
+                  {{ c.componente_nombre }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Botón Ver actividades en la misma fila -->
+            <div class="col-md-2 d-flex justify-content-center">
+              <button
+                type="submit"
+                class="btn text-white px-4"
+                [disabled]="loading"
+                style="
+                  background: #0d133f;
+                  border-radius: 25px;
+                  font-size: 13px;
+                  margin-top: 8px;
+                "
+              >
+                <i class="fas fa-search me-2"></i>
+                Ver Actividades
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section
+  class="col-12 d-flex flex-column"
+  style="height: 55vh;"
+>
+  <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
+
+    <!-- Header: Agregar a la IZQUIERDA, Actualizar + filtro + Buscar a la DERECHA -->
+    <div
+      class="card-header d-flex align-items-center justify-content-between gap-3 text-white"
+      style="background-color: white;"
+    >
+      <!-- Izquierda: Agregar actividades -->
+      <div>
+        <button
+          type="button"
+          class="btn btn-primary d-flex align-items-center gap-2"
+          (click)="openModalCrear()"
+          style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;"
+        >
+          <i class="fas fa-plus"></i> Agregar actividades
+        </button>
+      </div>
+
+      <!-- Derecha: Actualizar + filtro + Buscar -->
+      <div class="d-flex align-items-center gap-3 flex-grow-1 justify-content-end">
+        <button
+          class="btn btn-primary d-flex align-items-center gap-2"
+          style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;"
+          (click)="recargarTabla(); filtroTexto=''"
+        >
+          <i class="fas fa-sync-alt"></i> Actualizar
+        </button>
+
+        <input
+          style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px; max-width: 460px;"
+          type="text"
+          class="form-control"
+          placeholder="Digite componente / estrategia / proceso"
+          [(ngModel)]="filtroTexto"
+          name="filtroTexto"
+        />
+
+        <button
+          class="btn btn-primary d-flex align-items-center gap-2"
+          style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;"
+          (click)="aplicarFiltroTexto()"
+        >
+          <i class="fas fa-search"></i> Buscar
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-responsive flex-grow-1" style="min-height: 0; overflow-y: auto;">
+      <table class="table table-striped mb-0">
+        <thead class="table-primary">
+          <tr>
+            <th style="background: white;">Programa</th>
+            <th style="background: white;">Componente</th>
+            <th style="background: white;">Estrategia</th>
+            <th style="background: white;">Fecha de inicio</th>
+            <th style="background: white;">Fecha final</th>
+            <th style="background: white;">Obtuvo insignia</th>
+            <th style="background: white;">Tiene Docente Adicional</th>
+            <th style="background: white;">Herramientas</th>
+            <th style="background: white;">Descripción</th>
+            <th style="background: white;">Horas de Internacionalización</th>
+            <th style="background: white;">Evaluación</th>
+            <th style="background: white;">Opciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <div *ngIf="loadingTable" class="table-overlay">
+            <i class="fas fa-spinner fa-spin fa-3x"></i>
+            <p style="background: transparent;">Cargando datos</p>
+          </div>
+
+          <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
+            <td>{{ item.programaUCM }}</td>
+            <td>{{ item.nombreComponenteUCM ?? item.componenteCodigoUCM }}</td>
+            <td>{{ item.estrategiaId }}</td>
+            <td>{{ item.fechainicio | date: 'yyyy-MM-dd' }}</td>
+            <td>{{ item.fechafin | date: 'yyyy-MM-dd' }}</td>
+            <td align="center">-</td>
+            <td align="center">-</td>
+            <td>{{ item.herramientas }}</td>
+            <td
+              class="text-truncate-custom"
+              [title]="item.descripcion"
+            >
+              {{ item.descripcion }}
+            </td>
+            <td align="center">-</td>
+            <td align="center">{{ item.evaluacion }}</td>
+            <td>
+              <button
+                style="margin-bottom: 3px;"
+                class="btn btn-sm btn-primary me-1 button-completed"
+                (click)="openModalEditar(item)"
+              >
+                <i class="fas fa-edit"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="!loadingTable && pagedData.length === 0">
+            <td colspan="12" class="text-center">No hay actividades para mostrar.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer / paginador igual a tu ejemplo -->
+    <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
+      <div class="items-per-page d-flex align-items-center gap-2">
+        <label for="itemsPerPageSelectAct" class="mb-0">Mostrar</label>
+        <select
+          id="itemsPerPageSelectAct"
+          (change)="onPageSizeChange($event)"
+          [value]="pageSize"
+        >
+          <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+        </select>
+        <span>de {{ data.length }}</span>
+      </div>
+
+      <nav aria-label="Page navigation example">
+        <ul class="pagination mb-0">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button
+              class="page-link text-white"
+              (click)="goToPage(currentPage - 1)"
+              aria-label="Previous"
+              style="background: #18206E;"
+            >
+              <span aria-hidden="true">&laquo;</span>
+            </button>
+          </li>
+          <li
+            class="page-item"
+            *ngFor="let page of pages"
+            [class.active]="page === currentPage"
+          >
+            <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button
+              class="page-link text-white"
+              (click)="goToPage(currentPage + 1)"
+              aria-label="Next"
+              style="background: #18206E;"
+            >
+              <span aria-hidden="true">&raquo;</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</section>
+</div>
+
+<!-- ================== MODAL ACTIVIDAD ================== -->
+<div
+  class="modal fade show"
+  tabindex="-1"
+  role="dialog"
+  style="display: block; background: rgba(0,0,0,0.5);"
+  *ngIf="modalVisible"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Actividades</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <form #actividadForm="ngForm" (ngSubmit)="onSubmitActividad(actividadForm)">
+
+          <!-- Descripción -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Descripción</label>
+            <textarea
+              class="form-control"
+              rows="3"
+              [(ngModel)]="actividad.descripcion"
+              name="descripcion"
+              required
+            ></textarea>
+          </div>
+
+          <!-- Fechas -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Fecha de inicio</label>
+              <input
+                type="date"
+                class="form-control"
+                [(ngModel)]="actividad.fechainicio"
+                name="fechainicio"
+                required
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Fecha de final</label>
+              <input
+                type="date"
+                class="form-control"
+                [(ngModel)]="actividad.fechafin"
+                name="fechafin"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Herramientas -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Herramientas</label>
+            <textarea
+              class="form-control"
+              rows="2"
+              [(ngModel)]="actividad.herramientas"
+              name="herramientas"
+            ></textarea>
+          </div>
+
+          <!-- Evaluación -->
+          <div class="mb-4" style="max-width: 260px;">
+            <label class="form-label fw-bold">Evaluación</label>
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="actividad.evaluacion"
+              name="evaluacion"
+              min="0"
+              max="5"
+            />
+          </div>
+
+          <div class="d-flex justify-content-center gap-4 mt-3">
+            <button
+              type="submit"
+              class="btn text-white px-4"
+              [disabled]="loadingModal || actividadForm.invalid"
+              style="background: #0d133f; font-size: 14px;"
+            >
+              {{ isEditing ? 'Editar' : 'Ingresar/Editar' }}
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-dark px-4"
+              (click)="closeModal()"
+              [disabled]="loadingModal"
+              style="font-size: 14px;"
+            >
+              Cancelar
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-sonner-toaster />
+<p-confirmDialog appendTo="body"></p-confirmDialog>

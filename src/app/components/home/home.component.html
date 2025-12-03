@@ -269,6 +269,95 @@
   </div>
 </div>
 
+<!-- Modal: Crear usuario externo (nuevo) -->
+<div class="modal-overlay" *ngIf="showModalCrearExterno">
+  <div class="modal-content-xl" style="font-size: 13px;">
+    <div class="sidebar-header">
+      <img src="../../../assets/logo-ucm.png" alt="Logo" class="sidebar-logo2" />
+    </div>
+    <h3>Usuario no encontrado - Crear usuario</h3>
+
+    <form (ngSubmit)="crearUsuarioExterno()" #crearForm="ngForm" novalidate>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">Tipo de documento</label>
+          <select class="form-select" required [(ngModel)]="crearExternoData.tipodoc" name="tipodoc" style="font-size: 13px;">
+            <option [ngValue]="''" disabled>Seleccione tipo documento</option>
+            <option *ngFor="let t of tiposDocumento" [ngValue]="t.nombre">{{ t.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">Identificación</label>
+          <input class="form-control" required [(ngModel)]="crearExternoData.identificacion" name="identificacion" style="font-size: 13px;" />
+        </div>
+
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">Nombre</label>
+          <input class="form-control" required [(ngModel)]="crearExternoData.nombre" name="nombre" style="font-size: 13px;" />
+        </div>
+
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">Correo</label>
+          <input class="form-control" type="email" required [(ngModel)]="crearExternoData.correo" name="correo" style="font-size: 13px;" />
+        </div>
+
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">Teléfono</label>
+          <input class="form-control" [(ngModel)]="crearExternoData.telefono" name="telefono" style="font-size: 13px;" />
+        </div>
+
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">Pasaporte</label>
+          <input class="form-control" [(ngModel)]="crearExternoData.pasaporte" name="pasaporte" style="font-size: 13px;" />
+        </div>
+
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">Fecha nacimiento</label>
+          <input class="form-control" type="date" [(ngModel)]="crearExternoData.fechanacimiento" name="fechanacimiento" style="font-size: 13px;" />
+        </div>
+
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">Dirección</label>
+          <input class="form-control" [(ngModel)]="crearExternoData.direccion" name="direccion" style="font-size: 13px;" />
+        </div>
+
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">País</label>
+          <select class="form-select" [(ngModel)]="datosPerfil.paisId" name="paisId" (change)="onPaisChange()" style="font-size: 13px;">
+            <option [ngValue]="null" disabled>Seleccione país</option>
+            <option *ngFor="let p of paises" [ngValue]="p.id">{{ p.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">Ciudad</label>
+          <select class="form-select" [(ngModel)]="crearExternoData.ciudadid" name="ciudadid" style="font-size: 13px;">
+            <option [ngValue]="''" disabled>Seleccione ciudad</option>
+            <option *ngFor="let c of ciudades" [ngValue]="c.id">{{ c.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">Cargo</label>
+          <input class="form-control" [(ngModel)]="crearExternoData.cargo" name="cargo" style="font-size: 13px;" />
+        </div>
+
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">Promedio académico</label>
+          <input class="form-control" type="number" step="0.01" min="0" max="5" [(ngModel)]="crearExternoData.promedioacademico" name="promedioacademico" style="font-size: 13px;" />
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="submit" class="btn-guardar" [disabled]="crearForm.invalid" style="font-size: 13px; min-width: 120px;">
+          Crear usuario
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Notificaciones -->
 <ngx-sonner-toaster />
 <!-- Confirm Dialog -->

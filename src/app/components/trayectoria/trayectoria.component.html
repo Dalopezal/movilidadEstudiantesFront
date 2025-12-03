@@ -1,0 +1,266 @@
+<app-sidebar *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null"></app-sidebar>
+
+<div class="container fuente" style="padding-top: 30px;">
+  <div class="row h-100">
+    <main class="col-12 col-md-12 d-flex flex-column"
+      [ngStyle]="(idConvocatoria == null || idConvocatoria === 'undefined')
+                  ? {'margin-bottom':'200px'}
+                  : {'width':'100%'}"
+      style="height: 100%; font-size: 13px;">
+
+      <div class="row mb-3" *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null">
+        <div class="col-12 d-flex align-items-center justify-content-between gap-3 flex-wrap">
+
+          <div class="d-flex gap-2 align-items-center flex-wrap" style="flex:1;">
+            <div class="d-flex flex-column" style="min-width: 260px;">
+              <label class="fw-bold mb-1">Selección Programa</label>
+              <select class="form-select form-select-sm"
+                      [(ngModel)]="selectedProgramaCodigo"
+                      name="selectedProgramaCodigo"
+                      (change)="onProgramaChange()"
+                      style="font-size: 12px;">
+                <option [ngValue]="null" disabled>Seleccione programa</option>
+                <option *ngFor="let prog of programas" [ngValue]="prog.programa_codigo">
+                  {{ prog.programa_nombre }}
+                </option>
+              </select>
+            </div>
+
+            <div class="d-flex flex-column" style="min-width: 240px;">
+              <label class="fw-bold mb-1">Selección Plan de estudio</label>
+              <input type="number"
+                     class="form-control form-control-sm"
+                     [(ngModel)]="selectedPlanEstudioId"
+                     name="selectedPlanEstudioId"
+                     (change)="onPlanEstudioChange()"
+                     placeholder="Id plan de estudio"
+                     style="font-size: 13px;">
+            </div>
+
+            <div class="d-flex flex-column" style="min-width: 260px;">
+              <label class="fw-bold mb-1">Selección Componente</label>
+              <select class="form-select form-select-sm"
+                      [(ngModel)]="selectedComponenteCodigo"
+                      name="selectedComponenteCodigo"
+                      style="font-size: 13px;">
+                <option [ngValue]="null" disabled>Seleccione componente</option>
+                <option *ngFor="let c of componentes" [ngValue]="c.componenteCodigo">
+                  {{ c.componenteNombre }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="ms-3" style="min-width: 150px;">
+            <button class="btn btn-primary btn-sm d-flex align-items-center justify-content-center gap-2"
+                    type="button"
+                    (click)="onConsultar()"
+                    [disabled]="loadingConsulta"
+                    style="background: #0D133F; color: white; padding: 8px 15px; font-size: 14px;">
+              <i class="fas fa-search" style="font-size:14px;"></i>
+              <span *ngIf="!loadingConsulta">Consultar</span>
+              <span *ngIf="loadingConsulta">Consultando...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row flex-grow-1" style="height: 70vh;">
+
+        <section class="col-12 col-lg-5 d-flex flex-column">
+          <div class="card shadow-sm flex-grow-1 d-flex flex-column" style="height: 100%;">
+            <div class="card-header text-center" style="background: #e9f0ff;">
+              <h5 class="mb-0" style="color: #0D133F;">Planeación</h5>
+            </div>
+
+            <div class="card-body d-flex flex-column flex-grow-1" style="overflow-y: auto;">
+              <div class="row gx-3 gy-3">
+                <div class="col-6" *ngFor="let field of planeacionFields">
+                  <div class="field-box p-2">
+                    <small class="text-muted">{{ field.label }}</small>
+                    <div class="field-value">{{ planeacionData?.[field.key] || '—' }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3">
+                <label class="fw-bold">Observación</label>
+                <div class="field-box p-2" style="min-height:60px;">
+                  <div class="field-value">{{ planeacionData?.observacion || '—' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="col-12 col-lg-7 d-flex flex-column">
+          <div class="card shadow-sm flex-grow-1 d-flex flex-column" style="height: 100%;">
+            <div class="card-header text-center" style="background: #e9f0ff;">
+              <h5 class="mb-0" style="color: #0D133F;">Ejecución</h5>
+            </div>
+
+            <div class="card-body d-flex flex-column flex-grow-1" style="overflow-y: auto;">
+              <form class="d-flex flex-column flex-grow-1"
+                  #myForm="ngForm"
+                  (ngSubmit)="onSubmit(myForm)"
+                  style="font-size: 13px;">
+
+              <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="estrategiaid" class="form-label fw-bold">Selección Estrategia</label>
+                  <select class="form-select form-select-sm"
+                          id="estrategiaid"
+                          name="estrategiaid"
+                          required
+                          [(ngModel)]="model.estrategiaid"
+                          #estrategiaCtrl="ngModel"
+                          style="font-size: 13px;">
+                    <option [ngValue]="0" disabled>Seleccione una estrategia</option>
+                    <option *ngFor="let e of estrategias" [ngValue]="e.id">
+                      {{ e.nombre }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="plaFacultad" class="form-label fw-bold">Selección Facultad</label>
+                  <select class="form-select form-select-sm"
+                          id="plaFacultad"
+                          name="plaFacultad"
+                          required
+                          [(ngModel)]="model.plaFacultad"
+                          #facultadCtrl="ngModel"
+                          style="font-size: 13px;">
+                    <option value="" disabled>Seleccione una facultad</option>
+                    <option *ngFor="let f of facultades" [ngValue]="f.codigo">
+                      {{ f.nombre }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="programa" class="form-label fw-bold">Programa</label>
+                  <input type="text"
+                        class="form-control form-control-sm"
+                        id="programa"
+                        name="programa"
+                        [(ngModel)]="model.programa"
+                        placeholder="Programa"
+                        style="font-size: 13px;">
+                </div>
+
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="planestudioid" class="form-label fw-bold">Plan de estudio</label>
+                  <select class="form-select form-select-sm"
+                          id="planestudioid"
+                          name="planestudioid"
+                          required
+                          [(ngModel)]="model.planestudioid"
+                          #planCtrl="ngModel"
+                          style="font-size: 13px;">
+                    <option [ngValue]="0" disabled>Seleccione un plan</option>
+                    <option *ngFor="let p of planesEstudio" [ngValue]="p.id">
+                      {{ p.nombre }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="componenteCodigo" class="form-label fw-bold">Selección componente</label>
+                  <select class="form-select form-select-sm"
+                          id="componenteCodigo"
+                          name="componenteCodigo"
+                          required
+                          [(ngModel)]="model.componenteCodigo"
+                          #componenteCtrl="ngModel"
+                          style="font-size: 13px;">
+                    <option value="" disabled>Seleccione un componente</option>
+                    <option *ngFor="let c of componentes" [ngValue]="c.componenteCodigo || c.codigo">
+                      {{ c.componenteNombre || c.nombre }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="periodo" class="form-label fw-bold">Periodo</label>
+                  <input type="number"
+                        class="form-control form-control-sm"
+                        id="periodo"
+                        name="periodo"
+                        required
+                        [(ngModel)]="model.periodo"
+                        #periodoCtrl="ngModel"
+                        style="font-size: 13px">
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="areaformacion" class="form-label fw-bold">Área formación</label>
+                  <input type="text"
+                        class="form-control form-control-sm"
+                        id="areaformacion"
+                        name="areaformacion"
+                        [(ngModel)]="model.areaformacion"
+                        style="font-size: 13px">
+                </div>
+
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="totalcreditosprograma" class="form-label fw-bold">Total de créditos</label>
+                  <input type="number"
+                        class="form-control form-control-sm"
+                        id="totalcreditosprograma"
+                        name="totalcreditosprograma"
+                        [(ngModel)]="model.totalcreditosprograma"
+                        style="font-size: 13px">
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="fecha" class="form-label fw-bold">Fecha</label>
+                  <input type="date"
+                        class="form-control form-control-sm"
+                        id="fecha"
+                        name="fecha"
+                        [(ngModel)]="model.fecha"
+                        style="font-size: 13px">
+                </div>
+              </div>
+
+              <div class="d-flex gap-2 mt-auto">
+                <button type="submit"
+                        class="btn btn-primary btn-sm"
+                        [disabled]="myForm.invalid || loading"
+                        style="background:#0D133F;color:white; font-size:13px; padding: 6px 12px;">
+                  <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
+                  <span *ngIf="loading">Guardando...</span>
+                </button>
+
+                <button type="button"
+                        class="btn btn-secondary btn-sm"
+                        (click)="resetForm(myForm)"
+                        [disabled]="loading"
+                        style="font-size:13px; padding: 6px 12px;">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Notificaciones de ngx-sonner -->
+<ngx-sonner-toaster />
+<!-- ConfirmDialog de PrimeNG -->
+<p-confirmDialog appendTo="body" styleClass="custom-confirm-dialog"></p-confirmDialog>

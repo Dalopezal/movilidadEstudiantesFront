@@ -165,8 +165,8 @@
                     style="font-size: 13px;"
                   >
                     <option [ngValue]="null">Seleccione</option>
-                    <option *ngFor="let p of planesEstudioUCM" [ngValue]="p.id">
-                      {{ p.nombre ?? p.descripcion }}
+                    <option *ngFor="let p of planesEstudioUCM" [ngValue]="p.plan_id">
+                      {{ p.plan_id }}
                     </option>
                   </select>
                   <input
@@ -191,8 +191,8 @@
                     style="font-size: 13px;"
                   >
                     <option [ngValue]="null">Seleccione</option>
-                    <option *ngFor="let g of gruposUCM" [ngValue]="g.numero ?? g.id">
-                      {{ g.nombre ?? g.numero }}
+                    <option *ngFor="let g of gruposUCM" [ngValue]="g.grupo">
+                      {{ g.grupo }}
                     </option>
                   </select>
                   <input
@@ -217,8 +217,8 @@
                     style="font-size: 13px;"
                   >
                     <option [ngValue]="''">Seleccione</option>
-                    <option *ngFor="let c of componentesUCM" [ngValue]="c.codigo ?? c.id">
-                      {{ c.nombre }}
+                    <option *ngFor="let c of componentesUCM" [ngValue]="c.componente_codigo">
+                      {{ c.componente_nombre }}
                     </option>
                   </select>
                   <input
@@ -253,7 +253,7 @@
                 </div>
 
                 <!-- Docente titular -->
-                <div class="form-item">
+                <!-- <div class="form-item">
                   <label class="form-label fw-bold">Docente titular</label>
                   <select
                     class="form-select"
@@ -266,10 +266,10 @@
                       {{ d.nombreCompleto ?? d.nombre }}
                     </option>
                   </select>
-                </div>
+                </div> -->
 
                 <!-- Docente auxiliar -->
-                <div class="form-item">
+                 <!-- <div class="form-item">
                   <label class="form-label fw-bold">Docente auxiliar</label>
                   <select
                     class="form-select"
@@ -283,6 +283,18 @@
                       {{ d.nombreCompleto ?? d.nombre }}
                     </option>
                   </select>
+                </div> -->
+                <div class="form-item">
+                  <label class="form-label fw-bold">Docente auxiliar</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [disabled]="!model.colaboracion"
+                    [(ngModel)]="model.docenteauxId"
+                    name="docenteauxId"
+                    placeholder="Digite docente auxiliar"
+                    style="font-size: 13px;"
+                  />
                 </div>
 
                 <!-- Fecha inicio -->
@@ -426,9 +438,6 @@
                   <th style="background: white;">Componente</th>
                   <th style="background: white;">Colaboración</th>
                   <th
-                    *ngIf="
-                      idConvocatoria == 'undefined' || idConvocatoria == null
-                    "
                     style="background: white;"
                   >
                     Opciones
@@ -470,9 +479,6 @@
                     </button>
                   </td>
                   <td
-                    *ngIf="
-                      idConvocatoria == 'undefined' || idConvocatoria == null
-                    "
                   >
                     <button
                       style="margin-bottom: 3px;"
@@ -481,12 +487,12 @@
                     >
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button
+                    <!-- <button
                       class="btn btn-sm btn-danger button-completed"
                       (click)="deleteItem(item.id)"
                     >
                       <i class="fas fa-trash"></i>
-                    </button>
+                    </button> -->
                   </td>
                 </tr>
 
