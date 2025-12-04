@@ -15,7 +15,6 @@ export interface ApiResponse<T> {
   providedIn: 'any' // mantiene la compatibilidad con standalone components
 })
 export class GenericApiService {
-  private externalBaseUrl = 'https://integracionesucmdev.ucm.edu.co/api/';
 
   constructor(private http: HttpClient) {}
 
@@ -86,8 +85,7 @@ export class GenericApiService {
 
     // FIX: Usar la URL correcta con el proxy
     const url = `${environment.apiUrlExterna}/orisiga/token/`;
-
-    console.log('🔑 Solicitando token a:', url);
+    //const url = `https://integracionesucmdev.ucm.edu.co/api/orisiga/token/`;
 
     return this.http.post<any>(url, body).pipe(
       map(res => {
@@ -121,6 +119,7 @@ export class GenericApiService {
       return endpoint;
     }
     const baseUrlExterna = environment.apiUrlExterna; // '/api-orisiga'
+    //const baseUrlExterna = `https://integracionesucmdev.ucm.edu.co/api`;
     const e = endpoint.replace(/^\//, '');
     // Resultado: /api-orisiga/orisiga/asignaciondocente/?...
     return `${baseUrlExterna}/${e}`;
