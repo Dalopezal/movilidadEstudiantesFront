@@ -59,12 +59,29 @@
     </div>
 
     <!-- Cooperación -->
-    <a routerLink="/"
-       routerLinkActive="active"
-       [routerLinkActiveOptions]="{ exact: true }"
-       class="nav-link">
-      <i class="fas fa-handshake"></i><span class="link-text">Cooperación</span>
-    </a>
+    <div class="has-submenu">
+      <a (click)="toggleCooperacionMenu()" class="nav-link submenu-toggle" role="button"
+        aria-haspopup="true" [attr.aria-expanded]="isCooperacionOpen">
+        <i class="fas fa-handshake"></i>
+        <span class="link-text">Cooperación</span>
+        <i class="fas fa-chevron-down submenu-icon" [class.rotate]="isCooperacionOpen"></i>
+      </a>
+
+      <div class="submenu" [class.open]="isCooperacionOpen">
+        <a routerLink="/solicitud-convenio" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i><span class="link-text">Solicitudes Convenio</span>
+        </a>
+        <a routerLink="/listsol-convenio" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i><span class="link-text">Admin Solicitudes Convenio</span>
+        </a>
+        <a routerLink="/convenios" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i><span class="link-text">Convenios</span>
+        </a>
+        <a routerLink="/institucion-convenio" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i><span class="link-text">Institución Convenios</span>
+        </a>
+      </div>
+    </div>
 
     <!-- Movilidad -->
     <div class="has-submenu">

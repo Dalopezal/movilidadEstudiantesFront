@@ -16,8 +16,8 @@ const pca = new PublicClientApplication({
   auth: {
     clientId: '31c32eb6-567f-4337-a7e9-577dc78a0bb9',
     authority: 'https://login.microsoftonline.com/c7ece3f9-5868-427d-a77f-e50bf0690a34',
-    redirectUri: 'http://localhost:4200'
-    //redirectUri: 'https://ucminternacionaldev.ucm.edu.co/'
+    //redirectUri: 'http://localhost:4200'
+    redirectUri: 'https://ucminternacionaldev.ucm.edu.co/'
   }
 });
 

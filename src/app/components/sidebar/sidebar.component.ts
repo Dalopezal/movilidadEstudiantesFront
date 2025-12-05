@@ -16,6 +16,7 @@ import { AuthService } from '../../services/auth.service';
 export class SidebarComponent implements OnInit, OnDestroy {
   isCollapsed = true;
   ismovilidadOpen = false;
+  isCooperacionOpen = false;
   usuario: any = {};
   isUserMenuOpen = false;
   isInternacionalizacionOpen = false;
@@ -200,5 +201,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   toggleInternacionalizacionMenu() {
     this.isInternacionalizacionOpen = !this.isInternacionalizacionOpen;
+  }
+
+  toggleCooperacionMenu() {
+    this.isCooperacionOpen = !this.isCooperacionOpen;
   }
 }
