@@ -1,0 +1,84 @@
+<app-sidebar></app-sidebar>
+<div class="container my-5">
+  <h3 class="text-center mb-5 report-title">REPORTE DE PLANEACIÓN VS EJECUTADO</h3>
+
+  <!-- Filtros -->
+  <div class="row mb-5 g-3 justify-content-center filter-section p-4 rounded-3 shadow-sm">
+    <div class="col-md-2">
+      <label class="form-label filter-label">Programa</label>
+      <select class="form-select filter-select" [(ngModel)]="filtros.programa" (change)="filtrar()">
+        <option value="">Todos</option>
+        <option *ngFor="let p of programas" [value]="p">{{p}}</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label filter-label">Plan</label>
+      <select class="form-select filter-select" [(ngModel)]="filtros.plan" (change)="filtrar()">
+        <option value="">Todos</option>
+        <option *ngFor="let p of planes" [value]="p">{{p}}</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label filter-label">Componente</label>
+      <select class="form-select filter-select" [(ngModel)]="filtros.componente" (change)="filtrar()">
+        <option value="">Todos</option>
+        <option *ngFor="let c of componentes" [value]="c">{{c}}</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label filter-label">Año</label>
+      <select class="form-select filter-select" [(ngModel)]="filtros.anio" (change)="filtrar()">
+        <option value="">Todos</option>
+        <option *ngFor="let a of anios" [value]="a">{{a}}</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label filter-label">Periodo</label>
+      <select class="form-select filter-select" [(ngModel)]="filtros.periodo" (change)="filtrar()">
+        <option value="">Todos</option>
+        <option *ngFor="let per of periodos" [value]="per">{{per}}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Contenedor de Tarjetas de Componentes -->
+  <div class="row g-4 component-cards-container">
+    <div class="col-lg-6 col-md-12" *ngFor="let r of registrosFiltrados">
+      <div class="component-card shadow-lg rounded-3 p-4">
+        <div class="card-header mb-3 d-flex justify-content-between align-items-center">
+          <h4 class="component-title mb-0">{{ r.componente }}</h4>
+          <span class="badge bg-primary-light text-primary-dark">{{ r.anio }} - {{ r.periodo }}</span>
+        </div>
+        <p class="card-subtitle text-muted mb-3">
+          <small>{{ r.programa }} | {{ r.plan }}</small>
+        </p>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="planned-section p-3 rounded-2 h-100">
+              <h5 class="section-title"><i class="fas fa-clipboard-list me-2"></i>Planeado</h5>
+              <ul class="list-unstyled planned-list">
+                <li *ngFor="let p of r.planeado" class="list-item">{{ p }}</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="executed-section p-3 rounded-2 h-100">
+              <h5 class="section-title"><i class="fas fa-check-circle me-2"></i>Ejecutado</h5>
+              <ul class="list-unstyled executed-list">
+                <li *ngFor="let e of r.ejecutado" class="list-item">{{ e }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12" *ngIf="registrosFiltrados.length === 0">
+      <div class="alert alert-info text-center p-4 rounded-3 shadow-sm">
+        <h4 class="alert-heading">¡No se encontraron resultados!</h4>
+        <p class="mb-0">Ajusta tus filtros para ver más registros.</p>
+      </div>
+    </div>
+  </div>
+</div>

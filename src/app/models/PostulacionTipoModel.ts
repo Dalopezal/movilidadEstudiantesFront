@@ -35,6 +35,11 @@ export class PostulacionTipoConsultaModel {
   promedioAcademico: number | null = null;
 
   nombreCompleto: string = '';
+  documento: string = '';
+  correo: string = '';
+  nombreConvenio: string = '';
+  nombreModalidad: string = '';
+  nombreMovilidad: string = '';
   nombreEstado: string = '';
   nombreInstitucion: string = '';
   codigoUcm: string = '';

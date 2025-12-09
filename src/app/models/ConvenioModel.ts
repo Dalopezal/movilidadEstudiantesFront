@@ -28,7 +28,7 @@ export class ConvenioModel {
     descripcion: string = '',
     fechaInicio: string = '',
     fechaVencimiento: string = '1900-01-01',
-    diasVigencia: number = 0,
+    diasVigencia: number = 1,
     estado: boolean = false,
     tipoConvenioId: string = '',
     clasificacionConvenioId: string = '',

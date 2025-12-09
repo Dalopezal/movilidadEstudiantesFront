@@ -1,5 +1,4 @@
 <app-sidebar></app-sidebar>
-
 <div class="container fuente" style="padding-top: 30px;">
   <div class="row h-100">
     <main class="col-12 d-flex flex-column" style="height: 100%; font-size: 13px;">
@@ -23,12 +22,53 @@
                   </div>
                 </div>
 
+                <!-- Campo URL bloqueado y con texto truncado -->
                 <div class="mb-3">
-                  <label for="url" class="fw-bold">URL</label>
-                  <input type="text" id="url" name="url" required placeholder="URL del recurso"
-                         class="form-control" [(ngModel)]="model.url" #urlCtrl="ngModel" style="font-size: 13px;"/>
-                  <div class="text-danger small mt-1" *ngIf="urlCtrl.invalid && urlCtrl.touched">
-                    <div *ngIf="urlCtrl.errors?.['required']">Campo obligatorio.</div>
+                  <label for="url" class="fw-bold">URL (se completará al subir)</label>
+                  <input type="text" id="url" name="url" placeholder="URL del recurso"
+                        class="form-control url-field" [(ngModel)]="model.url" readonly />
+                </div>
+
+                <!-- Selector de archivo con drag & drop -->
+                <div class="mb-3">
+                  <label class="fw-bold mb-2">Archivo (opcional)</label>
+
+                  <div class="file-drop-zone"
+                      (drop)="onFileDropped($event)"
+                      (dragover)="onDragOver($event)"
+                      (dragleave)="onDragLeave($event)"
+                      [class.file-drop-zone-active]="isDragOver">
+
+                    <input type="file" id="fileInput" #fileInput (change)="onFileSelected($event)" hidden />
+
+                    <button type="button" class="btn btn-outline-primary btn-upload" (click)="fileInput.click()" [disabled]="uploading">
+                      <i class="fas fa-file-upload"></i>
+                      <span *ngIf="!uploading">Seleccionar archivo</span>
+                      <span *ngIf="uploading">Subiendo... {{uploadProgress}}%</span>
+                    </button>
+
+                    <p class="file-drop-text" *ngIf="!selectedFile && !uploading">O arrastra y suelta el archivo aquí</p>
+
+                    <div *ngIf="selectedFile" class="selected-file-info">
+                      <i class="fas fa-file-alt file-icon"></i>
+                      <span class="selected-file-name" [title]="selectedFile.name">{{ selectedFile.name }}</span>
+                      <button type="button" class="btn btn-sm btn-link btn-remove-file" (click)="removeSelectedFile()" title="Quitar archivo">
+                        &times;
+                      </button>
+                    </div>
+                  </div>
+
+                  <div *ngIf="uploading" class="progress mt-2">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" [style.width.%]="uploadProgress"></div>
+                  </div>
+
+                  <div *ngIf="model.url" class="mt-2 small d-flex align-items-center gap-2">
+                    <strong>Archivo actual:</strong>
+                    <a [href]="model.url" target="_blank" rel="noopener noreferrer" class="url-link">{{ model.url }}</a>
+                    <button *ngIf="isEditing" type="button" class="btn btn-sm btn-danger button-completed"
+                            (click)="eliminarArchivoActual()" title="Eliminar archivo">
+                      <i class="fas fa-trash"></i>
+                    </button>
                   </div>
                 </div>
 
@@ -82,7 +122,10 @@
                   <tr *ngFor="let item of pagedData">
                     <td>{{ item.id }}</td>
                     <td>{{ item.nombre }}</td>
-                    <td>{{ item.url }}</td>
+                    <td class="text-truncate-custom"
+                      [title]="item.url">
+                      <a *ngIf="item.url" [href]="item.url" target="_blank">{{ item.url }}</a>
+                    </td>
                     <td align="center">
                       <button *ngIf="item.estado" class="button-completed">Activo</button>
                       <button *ngIf="!item.estado" class="button-pending">Inactivo</button>

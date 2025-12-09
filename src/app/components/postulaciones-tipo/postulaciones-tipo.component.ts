@@ -150,8 +150,8 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
     const fInicial = encodeURIComponent(this.fechaInicial.trim());
     const fFinal = encodeURIComponent(this.fechaFinal.trim());
     const estadoId = encodeURIComponent(this.estadoId);
-    this.api.get<any>(this.tipoPostulacion == 'entrante' ? `ConsulltaPostuladosTipo/Consultar_PostuladosTipoEntrante?idEstado=${estadoId}&IdTipo=${tipoMovilidad}&DocumentoPostulado=${nombre}l&FechaInicioConvocatoria=${fInicial}&FechaFinConvocatoria=${fFinal}`
-                                                         : `ConsulltaPostuladosTipo/Consultar_PostuladosTipoSaliente?idEstado=${estadoId}&IdTipo=${tipoMovilidad}&DocumentoPostulado=${nombre}l&FechaInicioConvocatoria=${fInicial}&FechaFinConvocatoria=${fFinal}`)
+    this.api.get<any>(this.tipoPostulacion == 'entrante' ? `ConsulltaPostuladosTipo/Consultar_PostuladosTipoEntrante?idEstado=${estadoId}&IdTipo=${tipoMovilidad}&DocumentoPostulado=${this.filtro}&FechaInicioConvocatoria=${fInicial}&FechaFinConvocatoria=${fFinal}`
+                                                         : `ConsulltaPostuladosTipo/Consultar_PostuladosTipoSaliente?idEstado=${estadoId}&IdTipo=${tipoMovilidad}&DocumentoPostulado=${this.filtro}&FechaInicioConvocatoria=${fInicial}&FechaFinConvocatoria=${fFinal}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {

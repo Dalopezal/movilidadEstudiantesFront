@@ -252,47 +252,28 @@
                   </div>
                 </div>
 
-                <!-- Docente titular -->
-                <!-- <div class="form-item">
-                  <label class="form-label fw-bold">Docente titular</label>
-                  <select
-                    class="form-select"
-                    [(ngModel)]="model.docentetitularId"
-                    name="docentetitularId"
-                    style="font-size: 13px;"
-                  >
-                    <option [ngValue]="null">Seleccione</option>
-                    <option *ngFor="let d of docentesTitulares" [ngValue]="d.id">
-                      {{ d.nombreCompleto ?? d.nombre }}
-                    </option>
-                  </select>
-                </div> -->
-
-                <!-- Docente auxiliar -->
-                 <!-- <div class="form-item">
-                  <label class="form-label fw-bold">Docente auxiliar</label>
-                  <select
-                    class="form-select"
-                    [disabled]="!model.colaboracion"
-                    [(ngModel)]="model.docenteauxId"
-                    name="docenteauxId"
-                    style="font-size: 13px;"
-                  >
-                    <option [ngValue]="null">Seleccione</option>
-                    <option *ngFor="let d of docentesAuxiliares" [ngValue]="d.id">
-                      {{ d.nombreCompleto ?? d.nombre }}
-                    </option>
-                  </select>
-                </div> -->
                 <div class="form-item">
-                  <label class="form-label fw-bold">Docente auxiliar</label>
+                  <label class="form-label fw-bold">Nombre Docente Auxiliar</label>
                   <input
                     type="text"
                     class="form-control"
                     [disabled]="!model.colaboracion"
-                    [(ngModel)]="model.docenteauxId"
-                    name="docenteauxId"
-                    placeholder="Digite docente auxiliar"
+                    [(ngModel)]="model.docenteauxNombre"
+                    name="docenteauxNombre"
+                    placeholder="Ingrese nombre completo"
+                    style="font-size: 13px;"
+                  />
+                </div>
+
+                <div class="form-item">
+                  <label class="form-label fw-bold">Correo Docente Auxiliar</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    [disabled]="!model.colaboracion"
+                    [(ngModel)]="model.docenteauxCorreo"
+                    name="docenteauxCorreo"
+                    placeholder="Ingrese correo electrónico"
                     style="font-size: 13px;"
                   />
                 </div>

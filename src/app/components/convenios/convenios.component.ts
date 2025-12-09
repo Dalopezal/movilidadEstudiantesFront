@@ -371,4 +371,49 @@ export class ConveniosComponent implements OnInit, OnDestroy {
       });
     });
   }
+
+  fechaInicioInvalida = false;
+
+  validateFechaInicio() {
+    if (!this.model.fechaInicio) {
+      this.fechaInicioInvalida = false;
+      return;
+    }
+    const hoy = new Date();
+    const fechaInicio = new Date(this.model.fechaInicio);
+    // Poner horas a 0 para comparar solo fechas
+    hoy.setHours(0, 0, 0, 0);
+    fechaInicio.setHours(0, 0, 0, 0);
+
+    this.fechaInicioInvalida = fechaInicio < hoy;
+  }
+
+  get formInvalidCustom(): boolean {
+    if (!this.model.fechaInicio) return false;
+    const hoy = new Date();
+    const fechaInicio = new Date(this.model.fechaInicio);
+    hoy.setHours(0, 0, 0, 0);
+    fechaInicio.setHours(0, 0, 0, 0);
+    if (fechaInicio > hoy) return true;
+    if (this.model.diasVigencia === null || this.model.diasVigencia <= 1) return true;
+    return false;
+  }
+
+  calculateDiasVigencia() {
+    if (!this.model.fechaInicio || !this.model.fechaVencimiento) {
+      this.model.diasVigencia = 0;
+      return;
+    }
+    const inicio = new Date(this.model.fechaInicio);
+    const fin = new Date(this.model.fechaVencimiento);
+    const diffTime = fin.getTime() - inicio.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    this.model.diasVigencia = diffDays > 0 ? diffDays : 0;
+  }
+
+  diasVigenciaInvalida = false;
+
+  validateDiasVigencia() {
+    this.diasVigenciaInvalida = this.model.diasVigencia !== null && this.model.diasVigencia < 1;
+  }
 }

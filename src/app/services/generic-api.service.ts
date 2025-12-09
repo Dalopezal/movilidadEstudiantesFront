@@ -84,8 +84,8 @@ export class GenericApiService {
     };
 
     // FIX: Usar la URL correcta con el proxy
-    //const url = `${environment.apiUrlExterna}/orisiga/token/`;
-    const url = `https://integracionesucmdev.ucm.edu.co/api/orisiga/token/`;
+    const url = `${environment.apiUrlExterna}/orisiga/token/`;
+    //const url = `https://integracionesucmdev.ucm.edu.co/api/orisiga/token/`;
 
     return this.http.post<any>(url, body).pipe(
       map(res => {
@@ -118,8 +118,8 @@ export class GenericApiService {
     if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
       return endpoint;
     }
-    //const baseUrlExterna = environment.apiUrlExterna; // '/api-orisiga'
-    const baseUrlExterna = `https://integracionesucmdev.ucm.edu.co/api`;
+    const baseUrlExterna = environment.apiUrlExterna; // '/api-orisiga'
+    //const baseUrlExterna = `https://integracionesucmdev.ucm.edu.co/api`;
     const e = endpoint.replace(/^\//, '');
     // Resultado: /api-orisiga/orisiga/asignaciondocente/?...
     return `${baseUrlExterna}/${e}`;
@@ -158,6 +158,32 @@ export class GenericApiService {
         map((res: ApiResponse<T> | any) => this.extractData(res)),
         catchError(err => this.handleError(err))
       );
+  }
+
+  postExterno<T>(endpoint: string, body: any, options?: any): Observable<T> {
+    return this.getExternalToken().pipe(
+      switchMap(token => {
+        const url = this.buildUrlExterno(endpoint);
+
+        let headers = (options?.headers as HttpHeaders) || new HttpHeaders();
+        headers = headers.set('Authorization', `Bearer ${token}`);
+
+        console.log('URL EXTERNA POST:', url);
+        console.log('HEADER AUTH FINAL POST:', headers.get('Authorization'));
+
+        const httpOptions = {
+          ...this.buildOptions(undefined, options),
+          headers,
+          responseType: 'json' as const,
+          observe: 'body' as const
+        };
+
+        return this.http.post<any>(url, body, httpOptions).pipe(
+          map((res: any) => this.extractData(res) as T),
+          catchError(err => this.handleError(err))
+        );
+      })
+    );
   }
 
   put<T>(endpoint: string, body: any, options?: any): Observable<T> {

@@ -63,10 +63,12 @@
                       required
                       [(ngModel)]="model.fechaInicio"
                       #inicioCtrl="ngModel"
-                    style="font-size: 13px;"
+                      (change)="validateFechaInicio(); calculateDiasVigencia()"
+                      style="font-size: 13px;"
                     />
-                    <div class="text-danger small mt-1" *ngIf="inicioCtrl.invalid && (inicioCtrl.touched || inicioCtrl.dirty)">
+                    <div class="text-danger small mt-1" *ngIf="(inicioCtrl.invalid && (inicioCtrl.touched || inicioCtrl.dirty)) || fechaInicioInvalida">
                       <div *ngIf="inicioCtrl.errors?.['required']">La fecha de inicio es obligatoria.</div>
+                      <div *ngIf="fechaInicioInvalida">La fecha de inicio no puede ser menor a la fecha actual.</div>
                     </div>
                   </div>
                   <div class="col-12 col-md-6">
@@ -137,10 +139,12 @@
                       required
                       [(ngModel)]="model.diasVigencia"
                       #diasCtrl="ngModel"
-                    style="font-size: 13px;"
+                      style="font-size: 13px;"
+                      (input)="validateDiasVigencia()"
                     />
-                    <div class="text-danger small mt-1" *ngIf="diasCtrl.invalid && (diasCtrl.touched || diasCtrl.dirty)">
+                    <div class="text-danger small mt-1" *ngIf="(diasCtrl.invalid && (diasCtrl.touched || diasCtrl.dirty)) || diasVigenciaInvalida">
                       <div *ngIf="diasCtrl.errors?.['required']">Ingrese los días de vigencia.</div>
+                      <div *ngIf="diasVigenciaInvalida">Los días de vigencia deben ser mayor o igual a 1.</div>
                     </div>
                   </div>
 
@@ -161,7 +165,7 @@
                   <button
                     type="submit"
                     class="btn btn-ucm flex-grow-1 text-white"
-                    [disabled]="myForm.invalid || loading || dateRangeInvalid"
+                    [disabled]="myForm.invalid || loading || dateRangeInvalid || fechaInicioInvalida || diasVigenciaInvalida"
                     [ngStyle]="{ 'background': '#0D133F' }"
                     style="font-size: 13px;"
                   >

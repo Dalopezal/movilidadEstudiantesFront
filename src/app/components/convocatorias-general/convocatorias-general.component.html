@@ -157,11 +157,11 @@
 <p-confirmDialog appendTo="body"></p-confirmDialog>
 
 <!-- Modal Beneficios -->
-<div class="modal fade" id="BeneficioModal" tabindex="-1" aria-labelledby="BeneficioModalLabel" aria-hidden="true">
+<div class="modal fade" [id]="'BeneficioModal' + categoria" tabindex="-1" [attr.aria-labelledby]="'BeneficioModalLabel' + categoria" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header" style="background: #E2E6F7;">
-        <p class="modal-title" id="BeneficioModalLabel" style="color: #0D133F;">
+        <p class="modal-title" [id]="'BeneficioModalLabel' + categoria" style="color: #0D133F;">
           Beneficios de la Convocatoria
         </p>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -178,11 +178,11 @@
 </div>
 
 <!-- Modal Condiciones -->
-<div class="modal fade" id="CondicionModal" tabindex="-1" aria-labelledby="CondicionModalLabel" aria-hidden="true">
+<div class="modal fade" [id]="'CondicionModal' + categoria" tabindex="-1" [attr.aria-labelledby]="'CondicionModalLabel' + categoria" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header" style="background: #E2E6F7;">
-        <p class="modal-title" id="CondicionModalLabel" style="color: #0D133F;">
+        <p class="modal-title" [id]="'CondicionModalLabel' + categoria" style="color: #0D133F;">
           Condiciones de la Convocatoria
         </p>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -199,11 +199,11 @@
 </div>
 
 <!-- Modal Entregables -->
-<div class="modal fade" id="EntregableModal" tabindex="-1" aria-labelledby="EntregableModalLabel" aria-hidden="true">
+<div class="modal fade" [id]="'EntregableModal' + categoria" tabindex="-1" [attr.aria-labelledby]="'EntregableModalLabel' + categoria" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header" style="background: #E2E6F7;">
-        <p class="modal-title" id="EntregableModalLabel" style="color: #0D133F;">
+        <p class="modal-title" [id]="'EntregableModalLabel' + categoria" style="color: #0D133F;">
           Entregables de la Convocatoria
         </p>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

@@ -32,6 +32,7 @@ import { DesarrolloProfesionalComponent } from './components/desarrollo-profesio
 import { TrayectoriaComponent } from './components/trayectoria/trayectoria.component';
 import { SolicitudConvenioComponent } from './components/solicitud-convenio/solicitud-convenio.component';
 import { ListsolConvenioComponent } from './components/listsol-convenio/listsol-convenio.component';
+import { PlaneacionVsEjecucionComponent } from './components/planeacion-vs-ejecucion/planeacion-vs-ejecucion.component';
 
 export const routes: Routes = [
   // Login: si ya está autenticado redirige a /home
@@ -63,6 +64,7 @@ export const routes: Routes = [
   { path: 'actividades-seguimiento', component: ActividadesSeguimientoComponent, canActivate: [authGuard] },
   { path: 'desarrollo-profesional', component: DesarrolloProfesionalComponent, canActivate: [authGuard] },
   { path: 'trayectoria', component: TrayectoriaComponent, canActivate: [authGuard] },
+  { path: 'vs', component: PlaneacionVsEjecucionComponent, canActivate: [authGuard] },
 
   { path: 'solicitud-convenio', component: SolicitudConvenioComponent, canActivate: [authGuard] },
   { path: 'listsol-convenio', component: ListsolConvenioComponent, canActivate: [authGuard] },

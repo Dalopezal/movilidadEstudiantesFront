@@ -37,7 +37,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // Escuchar cambios en localStorage
     window.addEventListener('storage', this.storageHandler);
 
     const data = localStorage.getItem('usuario');
@@ -46,8 +45,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (this.usuario?.rolId && this.usuario.rolId > 0) {
       this.fetchMenu(this.usuario.rolId);
     } else {
-      // Si no hay rol aún, intentamos cargar cuando llegue
-      // console.warn('RolId no definido, aún no se carga menú');
     }
   }
 
@@ -126,14 +123,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
     localStorage.removeItem('usuario');
 
     this.router.navigateByUrl('/');
-  }
-
-  logoutMicrosoft() {
-    // Si por alguna razón quieres llamarlo directamente:
-    this.msalService.logoutRedirect({
-      // Usa la raíz o la URL que tengas registrada en Azure como postLogoutRedirectUri
-      postLogoutRedirectUri: 'http://localhost:4200'
-    });
   }
 
   logoutGoogle() {

@@ -278,7 +278,7 @@ export class HomeComponent implements OnInit {
       identificacion: String(this.crearExternoData.identificacion),
       nombre: String(this.crearExternoData.nombre),
       correo: String(this.crearExternoData.correo),
-      tipodoc: String(this.crearExternoData.tipodoc),
+      tipodoc: String(this.mapTipoDocumento(this.crearExternoData.tipodoc)),
       telefono: this.crearExternoData.telefono || '',
       pasaporte: this.crearExternoData.pasaporte || '',
       fechanacimiento: this.crearExternoData.fechanacimiento || '',
@@ -289,7 +289,7 @@ export class HomeComponent implements OnInit {
       cargo: this.crearExternoData.cargo || ''
     };
 
-    this.api.post<any>('oriusaurios/crearexterno/', payload)
+    this.api.postExterno<any>('oriusaurios/crearexterno/', payload)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
@@ -372,12 +372,15 @@ export class HomeComponent implements OnInit {
   }
 
   private mapTipoDocumento(tipoDocumentoId: number | null | undefined): string {
-    // Ajusta el mapping según tu backend
     switch (tipoDocumentoId) {
-      case 1: return 'CC';  // Cédula de ciudadanía
-      case 2: return 'TI';  // Tarjeta de identidad
-      case 3: return 'CE';  // Cédula de extranjería
-      case 4: return 'PAS'; // Pasaporte
+      case 1: return 'CC';  // Cédula de Ciudadanía
+      case 2: return 'CE';  // Cédula de Extranjería
+      case 3: return 'DE';  // Documento de identidad extranjera (abreviatura personalizada)
+      case 4: return 'NIT'; // Nit
+      case 5: return 'PAS'; // Pasaporte
+      case 6: return 'PPT'; // Permiso por Protección Temporal (abreviatura personalizada)
+      case 7: return 'RC';  // Registro Civil (abreviatura personalizada)
+      case 8: return 'TI';  // Tarjeta de Identidad
       default: return '';   // sin datos / desconocido
     }
   }

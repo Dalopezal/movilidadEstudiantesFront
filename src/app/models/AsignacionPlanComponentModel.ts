@@ -28,6 +28,9 @@ export class AsignacionPlanComponenteModel {
   nombreEstado: string;
   tipoEstrategiaNombre: string;
 
+  docenteauxNombre: string | null;
+  docenteauxCorreo: string | null;
+
   constructor(
     id?: number,
     planId?: number,
@@ -56,7 +59,9 @@ export class AsignacionPlanComponenteModel {
     planTitulo?: string,
     estrategiaNombre?: string,
     nombreEstado?: string,
-    tipoEstrategiaNombre?: string
+    tipoEstrategiaNombre?: string,
+    docenteauxNombre?: string,
+    docenteauxCorreo?: string
   ) {
     this.id = id! ?? null;
     this.planId = planId ?? null;
@@ -86,6 +91,8 @@ export class AsignacionPlanComponenteModel {
     this.estrategiaNombre = estrategiaNombre ?? '';
     this.nombreEstado = nombreEstado ?? '';
     this.tipoEstrategiaNombre = tipoEstrategiaNombre ?? '';
+    this.docenteauxNombre = docenteauxNombre ?? null;
+    this.docenteauxCorreo = docenteauxCorreo ?? null;
   }
 
   static fromJSON(json: any): AsignacionPlanComponenteModel {
@@ -117,7 +124,9 @@ export class AsignacionPlanComponenteModel {
       json.planTitulo ?? '',
       json.estrategiaNombre ?? '',
       json.nombreEstado ?? '',
-      json.tipoEstrategiaNombre ?? ''
+      json.tipoEstrategiaNombre ?? '',
+      json.docenteauxNombre ?? null,
+      json.docenteauxCorreo ?? null
     );
   }
 
@@ -149,7 +158,9 @@ export class AsignacionPlanComponenteModel {
       planTitulo: this.planTitulo,
       estrategiaNombre: this.estrategiaNombre,
       nombreEstado: this.nombreEstado,
-      tipoEstrategiaNombre: this.tipoEstrategiaNombre
+      tipoEstrategiaNombre: this.tipoEstrategiaNombre,
+      docenteauxNombre: this.docenteauxNombre,
+      docenteauxCorreo: this.docenteauxCorreo
     };
   }
 }

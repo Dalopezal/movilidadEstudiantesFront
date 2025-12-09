@@ -8,13 +8,13 @@ import { CommonModule } from '@angular/common';
   selector: 'app-tipos-convocatoria',
   imports: [SidebarComponent, ConvocatoriasGeneralComponent, CommonModule],
   templateUrl: './tipos-convocatoria.component.html',
-  styleUrls: ['./tipos-convocatoria.component.css']  // corregido
+  styleUrls: ['./tipos-convocatoria.component.css']
 })
 export class TiposConvocatoriaComponent implements OnInit, OnDestroy {
 
   usuario: any = {};
-  isInternal = false;
-  isExternal = false;
+  isInternal = false;  // Para mostrar tab "Saliente"
+  isExternal = false;  // Para mostrar tab "Entrante"
   activeTab: 'general' | 'condiciones' | null = null;
 
   private storageHandler = this.onStorageChange.bind(this);
@@ -35,23 +35,35 @@ export class TiposConvocatoriaComponent implements OnInit, OnDestroy {
     const tipo = this.usuario?.tipoUsuario != null ? Number(this.usuario.tipoUsuario) : null;
     const rol = this.usuario?.rolId != null ? Number(this.usuario.rolId) : null;
 
-    if(rol == 7){
-      this.isInternal = true;
+    if (rol === 7) {
+      // ORI: mostrar ambos tabs
+      this.isInternal = true;  // Saliente
+      this.isExternal = true;  // Entrante
+    } else if (tipo === 1) {
+      // Usuario externo: solo Entrante
+      this.isInternal = false;
       this.isExternal = true;
-    }else{
-      this.isInternal = tipo === 2;
-    this.isExternal = tipo === 1;
+    } else if (tipo === 2) {
+      // Usuario interno: solo Saliente
+      this.isInternal = true;
+      this.isExternal = false;
+    } else {
+      // Otros casos: no mostrar tabs
+      this.isInternal = false;
+      this.isExternal = false;
     }
 
-
     // Selecciona automáticamente el primer tab visible
-    if (this.isInternal) this.activeTab = 'general';
-    else if (this.isExternal) this.activeTab = 'condiciones';
-    else this.activeTab = null;
+    if (this.isExternal) {
+      this.activeTab = 'general';  // Entrante
+    } else if (this.isInternal) {
+      this.activeTab = 'condiciones';  // Saliente
+    } else {
+      this.activeTab = null;
+    }
   }
 
   private onStorageChange(): void {
-    // Cuando localStorage cambie (login, logout, cambio de rol...) recargamos
     this.loadUsuarioFromStorage();
   }
 

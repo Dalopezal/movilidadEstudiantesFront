@@ -90,6 +90,10 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   fetchConvocatorias() {
     this.error = null;
     this.loading = true;
+
+    // Verificar si el usuario es ORI
+    const esORI = this.usuario?.rolId === 7;
+
     this.api.get<any>('Convocatoria/ConsultarConvocatoria_Tipo?NombreTipo=' + this.categoria)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -105,11 +109,17 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
             }
           }
 
+          // Filtrar según el rol del usuario
+          if (!esORI) {
+            // Si no es ORI, solo mostrar convocatorias activas
+            items = items.filter(item => item.esActiva === true);
+          }
+
           this.data = items.map(item => ConvocatoriaGeneralModel.fromJSON(item));
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
-           this.loading = false;
+          this.loading = false;
         },
         error: (err) => {
           console.error('Error al consultar convocatorias', err);
@@ -119,7 +129,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
-           this.loading = false;
+          this.loading = false;
         }
       });
   }
@@ -321,20 +331,22 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
 
   selectedItem: ConvocatoriaGeneralModel | null = null;
 
-  openModalCondicion(item: ConvocatoriaGeneralModel) {
+  openModalBeneficio(item: ConvocatoriaGeneralModel) {
     this.selectedItem = item;
     this.convocatoriaId = item.id;
-    const modalElement = document.getElementById('CondicionModal');
+    const modalId = 'BeneficioModal' + this.categoria;
+    const modalElement = document.getElementById(modalId);
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();
     }
   }
 
-  openModalBeneficio(item: ConvocatoriaGeneralModel) {
+  openModalCondicion(item: ConvocatoriaGeneralModel) {
     this.selectedItem = item;
     this.convocatoriaId = item.id;
-    const modalElement = document.getElementById('BeneficioModal');
+    const modalId = 'CondicionModal' + this.categoria;
+    const modalElement = document.getElementById(modalId);
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();
@@ -344,7 +356,8 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   openModalEntregable(item: ConvocatoriaGeneralModel) {
     this.selectedItem = item;
     this.convocatoriaId = item.id;
-    const modalElement = document.getElementById('EntregableModal');
+    const modalId = 'EntregableModal' + this.categoria;
+    const modalElement = document.getElementById(modalId);
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();

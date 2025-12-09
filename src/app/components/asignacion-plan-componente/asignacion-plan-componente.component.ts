@@ -124,7 +124,7 @@ facultadUCM: any;
 
     // Estados (usa 'id')
     this.api
-      .get<any>('EstadosPostulacion/Consultar_Estado')
+      .get<any>('Estado/Consultar_Estados')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
@@ -206,7 +206,6 @@ facultadUCM: any;
         }
       });
 
-    // Componentes UCM (usa 'componente_codigo')
     this.api
       .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
       .pipe(takeUntil(this.destroy$))
@@ -220,35 +219,6 @@ facultadUCM: any;
         }
       });
 
-
-    // Asignaciondocente para combos UCM (facultad, programa, plan, grupo, componente, docente titular)
-    // this.api
-    //   .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe({
-    //     next: (resp) => {
-    //       const items = this.mapArray(resp);
-    //       // aquí asumo que el backend te manda colecciones separadas;
-    //       // si no, ajustas según la respuesta real
-    //       this.facultadesUCM = items.filter((x) => x.tipo === 'facultad');
-    //       this.programasUCM = items.filter((x) => x.tipo === 'programa');
-    //       this.planesEstudioUCM = items.filter((x) => x.tipo === 'plan');
-    //       this.gruposUCM = items.filter((x) => x.tipo === 'grupo');
-    //       this.componentesUCM = items.filter((x) => x.tipo === 'componente');
-    //       this.docentesTitulares = items.filter((x) => x.tipo === 'docenteTitular');
-    //     },
-    //     error: (err) => {
-    //       console.error('Error al cargar combos de asignación docente', err);
-    //       this.facultadesUCM = [];
-    //       this.programasUCM = [];
-    //       this.planesEstudioUCM = [];
-    //       this.gruposUCM = [];
-    //       this.componentesUCM = [];
-    //       this.docentesTitulares = [];
-    //     }
-    //   });
-
-    // Docente auxiliar (déjalo listo, endpoint pendiente)
     this.api
       .get<any>('Docentes/Consultar_DocentesAuxiliares') // cuando exista
       .pipe(takeUntil(this.destroy$))

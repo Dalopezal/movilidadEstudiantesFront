@@ -33,7 +33,6 @@
                   required
                   style="font-size: 13px;"
                   [(ngModel)]="estadoId"
-                  name="filtro"
                 >
                   <option value="0">Estado</option>
                   <option *ngFor="let m of estados" [ngValue]="m.id">{{ m.nombre }}</option>
@@ -45,7 +44,6 @@
                   required
                   style="font-size: 13px;"
                   [(ngModel)]="tipoMovilidadIdId"
-                  name="filtro"
                 >
                   <option value="0">Tipo Movilidad</option>
                   <option *ngFor="let m of tipoMovilidad" [ngValue]="m.id">{{ m.nombre }}</option>
@@ -64,7 +62,7 @@
                 class="form-control"
                 placeholder="Fecha Inicio"
                 [(ngModel)]="fechaInicial"
-                name="filtro"
+                name="fechaInicial"
               />
               <input
                 style="border-radius: 22px; background: rgb(242, 240, 240);font-size: 13px;"
@@ -72,7 +70,7 @@
                 class="form-control"
                 placeholder="Fecha Fin"
                 [(ngModel)]="fechaFinal"
-                name="filtro"
+                name="fechaFinal"
               />
               <button
                 class="btn btn-primary d-flex align-items-center gap-2"
@@ -108,11 +106,11 @@
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td align="center">{{ item.id }}</td>
                     <td>{{ item.nombreCompleto }}</td>
-                    <td></td>
-                    <td></td>
+                    <td>{{ item.documento }}</td>
+                    <td>{{ item.correo }}</td>
                     <td align="center">{{ item.fechaPostulacion }}</td>
                     <td align="center">{{ item.periodo }}</td>
-                    <td align="center"></td>
+                    <td>{{ item.nombreConvenio }}</td>
                     <td align="center">
                       <button class="button-completed">{{item.nombreEstado}}</button>
                     </td>
@@ -236,10 +234,10 @@
         <span class="label-glow">Categoría:</span> {{ selectedItem.nombreConvocatoria }}
       </div>
       <div class="info-row">
-        <span class="label-glow">Movilidad:</span> {{ selectedItem.nombreModalidad }}
+        <span class="label-glow">Movilidad:</span> {{ selectedItem.nombreMovilidad }}
       </div>
       <div class="info-row">
-        <span class="label-glow">Modalidad Convocatoria:</span> {{ selectedItem.nombreModalidadConvocatoria }}
+        <span class="label-glow">Modalidad Convocatoria:</span> {{ selectedItem.nombreModalidad }}
       </div>
   </div>
 </div>
