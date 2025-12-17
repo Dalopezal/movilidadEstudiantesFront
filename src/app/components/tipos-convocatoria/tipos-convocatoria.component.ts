@@ -55,9 +55,9 @@ export class TiposConvocatoriaComponent implements OnInit, OnDestroy {
 
     // Selecciona automáticamente el primer tab visible
     if (this.isExternal) {
-      this.activeTab = 'general';  // Entrante
+      this.activeTab = 'general';       // Entrantes
     } else if (this.isInternal) {
-      this.activeTab = 'condiciones';  // Saliente
+      this.activeTab = 'condiciones';   // Salientes
     } else {
       this.activeTab = null;
     }

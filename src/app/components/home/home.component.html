@@ -283,7 +283,15 @@
           <label class="fw-bold d-block text-start mb-1">Tipo de documento</label>
           <select class="form-select" required [(ngModel)]="crearExternoData.tipodoc" name="tipodoc" style="font-size: 13px;">
             <option [ngValue]="''" disabled>Seleccione tipo documento</option>
+            <option [ngValue]="'CC'">Cédula de Ciudadania</option>
             <option *ngFor="let t of tiposDocumento" [ngValue]="t.id">{{ t.nombre }}</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="fw-bold d-block text-start mb-1">Programa</label>
+          <select class="form-select" required [(ngModel)]="crearExternoData.procod" name="tipodoc" style="font-size: 13px;">
+            <option [ngValue]="''" disabled>Seleccione programa</option>
+            <option *ngFor="let t of programas" [ngValue]="t.id">{{ t.nombre }}</option>
           </select>
         </div>
 

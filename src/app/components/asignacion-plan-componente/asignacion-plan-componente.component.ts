@@ -2,6 +2,7 @@ import {
   Component,
   OnInit,
   OnDestroy,
+  OnChanges,
   Input,
   SimpleChanges
 } from '@angular/core';
@@ -32,7 +33,7 @@ import { AsignacionPlanComponenteModel } from '../../models/AsignacionPlanCompon
   providers: [ConfirmationService]
 })
 export class AsignacionPlanComponenteComponent
-  implements OnInit, OnDestroy
+  implements OnInit, OnDestroy, OnChanges
 {
   data: AsignacionPlanComponenteModel[] = [];
   filteredData: AsignacionPlanComponenteModel[] = [];
@@ -56,8 +57,8 @@ export class AsignacionPlanComponenteComponent
   gruposUCM: any[] = [];
   componentesUCM: any[] = [];
 
-  docentesTitulares: any[] = [];   // asignaciondocente
-  docentesAuxiliares: any[] = [];  // API futuro
+  docentesTitulares: any[] = [];
+  docentesAuxiliares: any[] = [];
 
   loading = false;
   loadingTable = false;
@@ -69,7 +70,6 @@ export class AsignacionPlanComponenteComponent
   @Input() idConvocatoria!: any;
 
   private destroy$ = new Subject<void>();
-facultadUCM: any;
 
   constructor(
     private api: GenericApiService,
@@ -79,6 +79,8 @@ facultadUCM: any;
   ngOnInit() {
     this.fetchCombosIniciales();
     this.fetchAsignaciones();
+    // Institución por defecto: Universidad Católica = 3
+    this.model.institucionId = 3;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -94,7 +96,7 @@ facultadUCM: any;
 
   // -------- Combos iniciales ----------
   private fetchCombosIniciales() {
-    // Planeaciones (usa 'id')
+    // Planeaciones
     this.api
       .get<any>('Planeacion/Consultar_Planeacion')
       .pipe(takeUntil(this.destroy$))
@@ -108,7 +110,7 @@ facultadUCM: any;
         }
       });
 
-    // Estrategias (usa 'id')
+    // Estrategias
     this.api
       .get<any>('Estrategia/Consultar_Estrategias')
       .pipe(takeUntil(this.destroy$))
@@ -122,7 +124,7 @@ facultadUCM: any;
         }
       });
 
-    // Estados (usa 'id')
+    // Estados
     this.api
       .get<any>('Estado/Consultar_Estados')
       .pipe(takeUntil(this.destroy$))
@@ -136,13 +138,15 @@ facultadUCM: any;
         }
       });
 
-    // Instituciones (usa 'id')
+    // Instituciones (EXCLUYENDO Universidad Católica id = 3 del listado)
     this.api
       .get<any>('Institucion/Consultar_Institucion')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
-          this.instituciones = this.uniqueByKey(this.mapArray(resp), 'id');
+          this.instituciones = this
+            .uniqueByKey(this.mapArray(resp), 'id')
+            .filter((i) => i.id !== 3); // excluir U. Católica del combo
         },
         error: (err) => {
           console.error('Error al cargar instituciones', err);
@@ -150,13 +154,16 @@ facultadUCM: any;
         }
       });
 
-    // Facultades UCM (usa 'facultad_codigo')
+    // Facultades UCM
     this.api
       .getExterno<any[]>('orisiga/facultades/')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
-          this.facultadesUCM = this.uniqueByKey(this.mapArray(resp), 'facultad_codigo');
+          this.facultadesUCM = this.uniqueByKey(
+            this.mapArray(resp),
+            'facultad_codigo'
+          );
         },
         error: (err) => {
           console.error('Error al cargar facultades', err);
@@ -164,13 +171,16 @@ facultadUCM: any;
         }
       });
 
-    // Programas UCM (usa 'programa.codigo' - anidado)
+    // Programas UCM
     this.api
       .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
-          this.programasUCM = this.uniqueByNestedKey(this.mapArray(resp), 'programa.codigo');
+          this.programasUCM = this.uniqueByNestedKey(
+            this.mapArray(resp),
+            'programa.codigo'
+          );
         },
         error: (err) => {
           console.error('Error al cargar programas', err);
@@ -178,7 +188,7 @@ facultadUCM: any;
         }
       });
 
-    // Grupos UCM (usa 'grupo')
+    // Grupos UCM
     this.api
       .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
       .pipe(takeUntil(this.destroy$))
@@ -192,13 +202,16 @@ facultadUCM: any;
         }
       });
 
-    // Planes de Estudio UCM (usa 'plan_id')
+    // Planes de estudio UCM
     this.api
       .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
-          this.planesEstudioUCM = this.uniqueByKey(this.mapArray(resp), 'plan_id');
+          this.planesEstudioUCM = this.uniqueByKey(
+            this.mapArray(resp),
+            'plan_id'
+          );
         },
         error: (err) => {
           console.error('Error al cargar planes de estudio', err);
@@ -206,12 +219,16 @@ facultadUCM: any;
         }
       });
 
+    // Componentes UCM
     this.api
       .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
-          this.componentesUCM = this.uniqueByKey(this.mapArray(resp), 'componente_codigo');
+          this.componentesUCM = this.uniqueByKey(
+            this.mapArray(resp),
+            'componente_codigo'
+          );
         },
         error: (err) => {
           console.error('Error al cargar componentes', err);
@@ -219,8 +236,9 @@ facultadUCM: any;
         }
       });
 
+    // Docentes auxiliares (cuando exista)
     this.api
-      .get<any>('Docentes/Consultar_DocentesAuxiliares') // cuando exista
+      .get<any>('Docentes/Consultar_DocentesAuxiliares')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => (this.docentesAuxiliares = this.mapArray(resp)),
@@ -228,11 +246,6 @@ facultadUCM: any;
       });
   }
 
-  /**
-   * Filtra duplicados por una propiedad específica
-   * @param arr Array a filtrar
-   * @param key Nombre de la propiedad que actúa como identificador único
-   */
   private uniqueByKey(arr: any[], key: string): any[] {
     const seen = new Set<any>();
     return arr.filter((item) => {
@@ -245,11 +258,6 @@ facultadUCM: any;
     });
   }
 
-  /**
-   * Para objetos anidados (ej: item.programa.codigo)
-   * @param arr Array a filtrar
-   * @param keyPath Ruta de la propiedad, ej: 'programa.codigo'
-   */
   private uniqueByNestedKey(arr: any[], keyPath: string): any[] {
     const seen = new Set<any>();
     return arr.filter((item) => {
@@ -281,7 +289,7 @@ facultadUCM: any;
     this.error = null;
     this.loadingTable = true;
 
-    const url =  `AsignacionPlanComponente/Consultar_AsignacionPlanComponente`;
+    const url = `AsignacionPlanComponente/Consultar_AsignacionPlanComponente`;
 
     this.api
       .get<any>(url)
@@ -314,6 +322,48 @@ facultadUCM: any;
       });
   }
 
+  // -------- Cargar info de componente (créditos y semestre) --------
+  private cargarInfoComponente(planId: any, componenteCodigo: any) {
+    // Solo llamamos si ambos existen
+    if (!planId || !componenteCodigo) {
+      return;
+    }
+
+    const url = `orisiga/infcomponente/?planestudio=${planId}&componente=${componenteCodigo}`;
+
+    this.api
+      .getExterno<any>(url)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          const items = this.mapArray(resp);
+          if (!items || items.length === 0) {
+            // Si el servicio no devuelve nada, dejamos campos en blanco
+            this.model.creditosUCM = undefined as any;
+            this.model.semestreUCM = undefined as any;
+            return;
+          }
+
+          const info = items[0];
+
+          // Ajusta estos nombres según lo que devuelva realmente tu servicio
+          // Ejemplos: info.creditos, info.creditos_ucm, info.semestre, info.semestre_ucm
+          this.model.creditosUCM = info.creditos ?? info.creditos_ucm ?? this.model.creditosUCM;
+          this.model.semestreUCM = info.semestre ?? info.semestre_ucm ?? this.model.semestreUCM;
+        },
+        error: (err) => {
+          console.error('Error al cargar info de componente', err);
+          // En error, opcionalmente limpias o dejas lo que haya
+          // this.model.creditosUCM = undefined as any;
+          // this.model.semestreUCM = undefined as any;
+        }
+      });
+  }
+
+  onPlanOrComponenteChange() {
+    this.cargarInfoComponente(this.model.planestudioId, this.model.componenteCodigoUCM);
+  }
+
   // -------- Form --------
   onSubmit(form: NgForm) {
     if (form.invalid) {
@@ -332,6 +382,11 @@ facultadUCM: any;
         'La fecha final no puede ser menor a la fecha inicial.'
       );
       return;
+    }
+
+    // Si no hay institución seleccionada, poner por defecto 3
+    if (!this.model.institucionId) {
+      this.model.institucionId = 3;
     }
 
     this.loading = true;
@@ -378,6 +433,7 @@ facultadUCM: any;
 
   resetForm(form?: NgForm) {
     this.model = new AsignacionPlanComponenteModel();
+    this.model.institucionId = 3; // por defecto U. Católica
     this.isEditing = false;
     if (form) form.resetForm({});
   }
@@ -385,6 +441,12 @@ facultadUCM: any;
   startEdit(item: AsignacionPlanComponenteModel) {
     this.model = Object.assign(new AsignacionPlanComponenteModel(), item);
     this.isEditing = true;
+
+    // Cargar info de créditos y semestre con los valores del item
+    if (this.model.planestudioId && this.model.componenteCodigoUCM) {
+      this.cargarInfoComponente(this.model.planestudioId, this.model.componenteCodigoUCM);
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -494,26 +556,30 @@ facultadUCM: any;
     });
   }
 
-  // ------- Helpers de lógica de UCM -------
-  get esInstitucionUCM(): boolean {
-    const instId = Number(this.model.institucionId);
-    return instId === 3;
+  // ------- Lógica de colaboración -------
+  get mostrarCamposColaboracion(): boolean {
+    return !!this.model.colaboracion;
   }
 
-  onInstitucionChange() {
-    // cuando cambia institución y NO es UCM, limpiamos combos UCM
-    if (!this.esInstitucionUCM) {
-      this.model.facultadoUCM = '';
-      this.model.programaUCM = '';
-      this.model.planestudioId = null;
-      this.model.numerogrupo = null;
-      this.model.componenteCodigoUCM = '';
-      this.model.nombreComponenteUCM = '';
+  onColaboracionChange() {
+    if (this.model.colaboracion) {
+      // Al activar colaboración, limpiar campos externos por si vienen de una edición previa
+      this.model.facultaExterno = '';
+      this.model.programaExterno = '';
+      this.model.componenteExterno = '';
+      this.model.docenteauxNombre = '';
+      this.model.docenteauxCorreo = '';
     } else {
-      // si es UCM, limpiamos campos externos
-      this.model.facultaExterno = null;
-      this.model.programaExterno = null;
-      this.model.componenteExterno = null;
+      // Al desactivar colaboración, limpiar igualmente campos externos
+      this.model.facultaExterno = '';
+      this.model.programaExterno = '';
+      this.model.componenteExterno = '';
+      this.model.docenteauxNombre = '';
+      this.model.docenteauxCorreo = '';
     }
+  }
+
+  tieneColaboracion(item: AsignacionPlanComponenteModel): boolean {
+    return !!item.colaboracion;
   }
 }

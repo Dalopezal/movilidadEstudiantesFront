@@ -16,6 +16,18 @@ interface EstudianteCertificado {
   idEstudiante?: number | string;
   programaNombre?: string;
   estrategiaNombre?: string;
+
+  // ====== NUEVOS CAMPOS (para texto requerido en el certificado) ======
+  rolParticipacion?: string; // "Estudiante" | "Profesor" (u otro)
+  tipoEstrategia?: string;
+  institucionOrigen?: string;
+  paisOrigen?: string;
+  ciudadOrigen?: string;
+  institucionExterna?: string;
+  paisDestino?: string | null;
+  ciudadDestino?: string;
+  anio?: number;
+  periodo?: string;
 }
 
 interface ProgramaDocente {
@@ -28,6 +40,32 @@ interface ComponenteDocente {
   nombre: string;
   programaCodigo: string;
   grupo: number;
+}
+
+interface ConsultarEstudiantesGenerarCertificadoItem {
+  id: number;
+  estudianteId: number;
+  planeacionId: number;
+  aprobo: boolean;
+  estrategiaId: number;
+  planId: number;
+  programaUCM: string;
+  creditosUCM: number;
+  grupoUCM: number;
+  nombreComponenteUCM: string;
+  docentetitularId: number;
+  componenteCodigoUCM: string;
+  estrategiaNombre: string;
+  institucionExterna: string;
+  institucionOrigen: string;
+  tipoEstrategia: string;
+  paisOrigen: string;
+  ciudadOrigen: string;
+  ciudadDestino: string;
+  paisDestino: string | null;
+  periodo: string;
+  anio: number;
+  docenteaux_nombre: string;
 }
 
 @Component({
@@ -78,11 +116,9 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
   filtroCedula = '';
   seleccionarTodos = false;
 
-  // para combos dependientes
   private destroy$ = new Subject<void>();
   private _componentesRaw: ComponenteDocente[] = [];
 
-  // estudiante seleccionado para visor derecho
   estudianteSeleccionado: EstudianteCertificado | null = null;
 
   today: Date = new Date();
@@ -90,6 +126,12 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
   // ========== CANVAS ==========
   private certCanvas?: HTMLCanvasElement;
   private certCtx?: CanvasRenderingContext2D;
+
+  private mostrarDocumentoEnCertificado = false;
+
+  private usarTextoRequerimientoNuevo = true;
+
+  private readonly NA = 'N/A';
 
   constructor(
     private api: GenericApiService,
@@ -103,7 +145,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
   }
 
   ngAfterViewInit(): void {
-    // Intentar inicializar el canvas después de que la vista esté lista
     setTimeout(() => this.initCanvasIfNeeded(), 100);
   }
 
@@ -113,10 +154,8 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
   }
 
   // ----------------- catálogos -----------------
-
-  // Cargar estrategias (combo independiente)
   fetchEstrategias() {
-    this.api.get<any>('AsignacionPlanComponente/Consultar_AsignacionComponenteEstrategia?IdEstrategia=1')
+    this.api.get<any>('AsignacionPlanComponente/Consultar_AsignacionComponenteEstrategia')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -129,7 +168,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
       });
   }
 
-  // Cargar planeaciones (combo independiente)
   fetchPlaneaciones() {
     this.api.get<any>('Planeacion/Consultar_Planeacion')
       .pipe(takeUntil(this.destroy$))
@@ -144,7 +182,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
       });
   }
 
-  // Cargar programas del docente (desde orisiga)
   fetchProgramas() {
     this.api.getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
       .pipe(takeUntil(this.destroy$))
@@ -191,7 +228,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
       });
   }
 
-  // Cambio de programa → actualiza componentes y grupos
   onProgramaChange() {
     this.componenteCodigo = null;
     this.grupoId = null;
@@ -210,7 +246,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
     this.listaGrupos = Array.from(gruposSet.values()).sort();
   }
 
-  // Cambio de componente → actualiza grupo
   onComponenteChange() {
     this.grupoId = null;
     if (!this.componenteCodigo || !this.programaCodigo) return;
@@ -222,9 +257,9 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
     if (comp && comp.grupo != null) this.grupoId = comp.grupo;
   }
 
-  // ----------------- buscar estudiantes -----------------
 
   buscarEstudiantes() {
+    this.filtroCedula = '';
     if (!this.estrategiaId || !this.planeacionId || !this.programaCodigo || !this.componenteCodigo || !this.grupoId) {
       this.showWarning('Debe seleccionar Estrategia, Planeación, Programa, Componente y Grupo');
       return;
@@ -233,7 +268,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
     this.loading = true;
     this.error = null;
 
-    // 1. Consultar aprobaciones por planeación
     this.api.get<any>(`AprobacionEstudiantes/Consultar_Aprobacionestudiante_Planeacion?IdPlaneacion=${this.planeacionId}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -249,13 +283,10 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
             this.showWarning('No hay estudiantes aprobados para esta planeación');
             return;
           }
-
-          // 2. Por cada aprobación, consultar nombreestudiante (API Externa)
           const requests = aprobaciones.map((ap: any) =>
             this.api.getExterno<any>(`orisiga/nombrestudiante/?idestudiante=${ap.estudianteId}`)
           );
 
-          // 3. Ejecutar todas las consultas en paralelo
           forkJoin(requests)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
@@ -273,7 +304,9 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
                     seleccionado: false,
                     idEstudiante: ap.estudianteId,
                     programaNombre,
-                    estrategiaNombre
+                    estrategiaNombre,
+
+                    rolParticipacion: 'Estudiante'
                   } as EstudianteCertificado;
                 });
 
@@ -300,101 +333,93 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
       });
   }
 
-  // búsqueda por cédula (usando orisiga)
   buscarPorCedula() {
-    if (!this.filtroCedula || this.filtroCedula.trim() === '' ||
-        !this.estrategiaId || !this.planeacionId || !this.programaCodigo || !this.componenteCodigo || !this.grupoId) {
-      this.showWarning('Debe seleccionar todos los filtros y digitar la cédula');
+    if (!this.filtroCedula || this.filtroCedula.trim() === '') {
+      this.showWarning('Debe ingresar una cédula para filtrar');
       return;
     }
 
-    this.loading = true;
+    const filtro = this.filtroCedula.trim().toLowerCase();
 
-    this.api.getExterno<any>(
-      `orisiga/listestgrucom/?identificacion=${this.filtroCedula}&componente=${this.componenteCodigo}&grupo=${this.grupoId}`
-    )
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          const estudiantes = this.extractArray(response);
-          const programaNombre = this.listaProgramas.find(p => p.codigo === this.programaCodigo)?.nombre;
-          const estrategiaNombre = this.listaEstrategias.find(e => e.estrategiaId === this.estrategiaId)?.estrategiaNombre;
+    this.filteredData = this.data.filter(est =>
+      (est.cedula ? est.cedula.toString().toLowerCase() : '').includes(filtro)
+    );
 
-          this.data = estudiantes.map((est: any) => ({
-            cedula: est.cedula || est.documento_estudiante || '',
-            nombre: est.nombre || est.nombre_estudiante || '',
-            seleccionado: false,
-            idEstudiante: est.id ?? est.documento_estudiante,
-            programaNombre,
-            estrategiaNombre
-          }));
-
-          this.filteredData = [...this.data];
-          this.currentPage = 1;
-          this.calculateTotalPages();
-          this.updatePagedData();
-          this.estudianteSeleccionado = null;
-          this.seleccionarTodos = false;
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error('Error al buscar estudiante', err);
-          this.loading = false;
-          this.showError('Error al buscar estudiante');
-        }
-      });
-  }
-
-  // marcar para generar certificado
-  toggleSeleccionarTodos() {
-    this.data.forEach(e => e.seleccionado = this.seleccionarTodos);
+    this.currentPage = 1;
+    this.calculateTotalPages();
     this.updatePagedData();
   }
 
   onSeleccionarEstudiante(item: EstudianteCertificado) {
+    this.data.forEach(e => {
+      if (e.cedula !== item.cedula) {
+        e.seleccionado = false;
+      }
+    });
+
+    this.filteredData = this.filteredData.map(e => {
+      if (e.cedula !== item.cedula) {
+        e.seleccionado = false;
+      }
+      return e;
+    });
+
     if (item.seleccionado) {
       this.estudianteSeleccionado = item;
-      // Redibujar canvas cuando se selecciona
-      setTimeout(() => this.renderCertificadoCanvas(item), 50);
-    } else if (this.estudianteSeleccionado?.cedula === item.cedula) {
+    } else {
       this.estudianteSeleccionado = null;
     }
+
+    this.updatePagedData();
   }
 
-  // Método para llamar cuando se abre el modal
   onAbrirModalVista() {
     if (this.estudianteSeleccionado) {
-      setTimeout(() => this.renderCertificadoCanvas(this.estudianteSeleccionado!), 100);
+      setTimeout(async () => {
+        this.certCanvas = undefined;
+        this.certCtx = undefined;
+
+        this.initCanvasIfNeeded();
+
+        const estEnriquecido = await this.consultarYEnriquecerDatosCertificado(this.estudianteSeleccionado!);
+
+        this.estudianteSeleccionado = estEnriquecido;
+
+        await this.renderCertificadoCanvas(this.estudianteSeleccionado!);
+      }, 150);
     }
   }
 
-  // ----------------- generar certificado(s) -----------------
   async generarCertificados() {
     const seleccionados = this.data.filter(e => e.seleccionado);
 
     if (seleccionados.length === 0) {
-      this.showWarning('Debe seleccionar al menos un estudiante');
+      this.showWarning('Debe seleccionar un estudiante');
+      return;
+    }
+
+    if (seleccionados.length > 1) {
+      this.showWarning('Solo puede generar un certificado a la vez');
       return;
     }
 
     const confirmado = await this.showConfirm(
-      `¿Desea generar certificado(s) para ${seleccionados.length} estudiante(s)?`
+      `¿Desea generar certificado para ${seleccionados[0].nombre}?`
     );
     if (!confirmado) return;
 
-    // Generar PNG para cada estudiante seleccionado
-    for (const est of seleccionados) {
-      await this.renderCertificadoCanvas(est);
-      if (this.certCanvas) {
-        const dataUrl = this.certCanvas.toDataURL('image/png');
-        const a = document.createElement('a');
-        a.href = dataUrl;
-        a.download = `certificado-${est.cedula}.png`;
-        a.click();
-      }
+    const est = await this.consultarYEnriquecerDatosCertificado(seleccionados[0]);
+
+    await this.renderCertificadoCanvas(est);
+    if (this.certCanvas) {
+      const dataUrl = this.certCanvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `certificado-${est.cedula}.png`;
+      a.click();
     }
 
-    this.showSuccess(`Se generaron ${seleccionados.length} certificado(s)`);
+    this.showSuccess(`Certificado generado para ${est.nombre}`);
   }
 
   // ----------------- paginación -----------------
@@ -433,10 +458,91 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
     if (response && typeof response === 'object') {
       if (Array.isArray(response.data)) return response.data;
       if (Array.isArray(response.items)) return response.items;
+      if (Array.isArray((response as any).datos)) return (response as any).datos; // soporte para { datos: [...] }
       const arr = Object.values(response).find(v => Array.isArray(v));
       if (Array.isArray(arr)) return arr;
     }
     return [];
+  }
+
+  // ========== NUEVO: CONSULTA para requerimiento de vista previa ==========
+  private getProgramaNombreSeleccionado(): string {
+    const nombre = this.listaProgramas.find(p => p.codigo === this.programaCodigo)?.nombre;
+    return nombre ?? '';
+  }
+
+  private getComponenteNombreSeleccionado(): string {
+    const nombre = this.listaComponentes.find(c => c.codigo === this.componenteCodigo)?.nombre;
+    return nombre ?? '';
+  }
+
+  private buildConsultarEstudiandosGenerarCertificadoUrl(): string | null {
+    if (!this.estrategiaId || !this.planeacionId || !this.grupoId) return null;
+
+    const idEstrategia = this.estrategiaId;
+    const idPlan = this.planeacionId;
+
+    const programaNombre = this.getProgramaNombreSeleccionado();
+    const componenteNombre = this.getComponenteNombreSeleccionado();
+
+    const qs =
+      `idEstrategia=${encodeURIComponent(String(idEstrategia))}` +
+      `&idPlan=${encodeURIComponent(String(idPlan))}` +
+      `&ProgramaUCM=${encodeURIComponent(programaNombre)}` +
+      `&ComponenteUCm=${encodeURIComponent(componenteNombre)}` +
+      `&GrupoUCM=${encodeURIComponent(String(this.grupoId))}`;
+
+    return `GenerarCertificado/Consultar_EstudiandosGenerarCertificado?${qs}`;
+  }
+
+  private consultarYEnriquecerDatosCertificado(est: EstudianteCertificado): Promise<EstudianteCertificado> {
+    return new Promise<EstudianteCertificado>((resolve) => {
+      const url = this.buildConsultarEstudiandosGenerarCertificadoUrl();
+      if (!url) {
+        resolve(est);
+        return;
+      }
+
+      this.api.get<any>(url)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (resp) => {
+            const items = this.extractArray(resp) as ConsultarEstudiantesGenerarCertificadoItem[];
+
+            const estudianteId = typeof est.idEstudiante === 'string' ? Number(est.idEstudiante) : (est.idEstudiante as number);
+            const match = items.find(x => x.estudianteId === estudianteId);
+
+            if (!match) {
+              resolve(est);
+              return;
+            }
+
+            const enriquecido: EstudianteCertificado = {
+              ...est,
+              estrategiaNombre: match.estrategiaNombre ?? est.estrategiaNombre,
+
+              // Requerimiento: si viene vacío/null -> N/A
+              tipoEstrategia: match.tipoEstrategia ?? this.NA,
+              institucionOrigen: match.institucionOrigen ?? this.NA,
+              paisOrigen: match.paisOrigen ?? this.NA,
+              ciudadOrigen: match.ciudadOrigen ?? this.NA,
+              institucionExterna: match.institucionExterna ?? this.NA,
+              paisDestino: (match.paisDestino ?? this.NA) as any,
+              ciudadDestino: match.ciudadDestino ?? this.NA,
+              anio: match.anio ?? (this.NA as any),
+              periodo: match.periodo ?? this.NA,
+
+              rolParticipacion: est.rolParticipacion ?? 'Estudiante'
+            };
+
+            resolve(enriquecido);
+          },
+          error: (err) => {
+            console.error('Error al consultar Consultar_EstudiandosGenerarCertificado', err);
+            resolve(est);
+          }
+        });
+    });
   }
 
   // ========== CANVAS: DIBUJAR CERTIFICADO ==========
@@ -445,32 +551,122 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
     if (this.certCanvas && this.certCtx) return;
 
     const canvas = document.getElementById('certCanvas') as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (!canvas) {
+      console.warn('Canvas #certCanvas no encontrado en el DOM');
+      return;
+    }
 
-    // Inicialmente sin tamaño fijo: se ajustará con la imagen
     this.certCanvas = canvas;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('No se pudo obtener contexto 2D del canvas');
+      return;
+    }
     this.certCtx = ctx;
+  }
+
+  private na(v: any): string {
+    // Requerimiento: cuando no venga info, mostrar N/A
+    if (v === null || v === undefined) return this.NA;
+    const s = String(v).trim();
+    if (!s || s.toLowerCase() === 'null' || s.toLowerCase() === 'undefined') return this.NA;
+    return s;
+  }
+
+  private buildTextoNarrativo(est: EstudianteCertificado): string {
+    const rol = this.na(est.rolParticipacion ?? 'Estudiante');
+    const estrategia = this.na(est.estrategiaNombre);
+    const tipo = this.na(est.tipoEstrategia);
+
+    const origenU = this.na(est.institucionOrigen);
+    const origenCiudad = this.na(est.ciudadOrigen);
+    const origenPais = this.na(est.paisOrigen);
+
+    const externaU = this.na(est.institucionExterna);
+    const externaCiudad = this.na(est.ciudadDestino);
+    const externaPais = this.na(est.paisDestino);
+
+    const anio = this.na(est.anio);
+    const periodo = this.na(est.periodo);
+
+    const partes: string[] = [
+      `Participó como: ${rol}`,
+      `En el desarrollo de: ${estrategia}`,
+      `Estrategia de: ${tipo}`,
+
+      `Universidad de origen: ${origenU} (Ciudad: ${origenCiudad}, País: ${origenPais})`,
+      `Universidad externa: ${externaU} (Ciudad: ${externaCiudad}, País: ${externaPais})`,
+
+      `Año: ${anio}`,
+      `Periodo de desarrollo: ${periodo}`
+    ];
+
+    return partes.join('\n');
+  }
+
+  private drawWrappedText(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    maxWidth: number,
+    lineHeight: number
+  ): number {
+    const paragraphs = (text || '').split(/\r?\n/);
+    let cursorY = y;
+
+    for (const paragraph of paragraphs) {
+      const words = paragraph.split(/\s+/).filter(Boolean);
+
+      // Línea vacía => salto
+      if (words.length === 0) {
+        cursorY += lineHeight;
+        continue;
+      }
+
+      let line = '';
+      for (const word of words) {
+        const testLine = line ? `${line} ${word}` : word;
+        const testWidth = ctx.measureText(testLine).width;
+
+        if (testWidth > maxWidth && line) {
+          ctx.fillText(line, x, cursorY);
+          cursorY += lineHeight;
+          line = word;
+        } else {
+          line = testLine;
+        }
+      }
+
+      if (line) {
+        ctx.fillText(line, x, cursorY);
+        cursorY += lineHeight;
+      }
+    }
+
+    return cursorY;
   }
 
   private async renderCertificadoCanvas(est: EstudianteCertificado) {
     this.initCanvasIfNeeded();
-    if (!this.certCanvas || !this.certCtx) return;
+    if (!this.certCanvas || !this.certCtx) {
+      console.error('Canvas o contexto no disponible para renderizar');
+      return;
+    }
 
     const ctx = this.certCtx;
 
     // 1. Cargar imagen base
-    const backgroundUrl = 'assets/plantilla-certificado.jpeg'; // tu archivo en assets
+    const backgroundUrl = 'assets/plantilla-certificado.jpeg';
     let img: HTMLImageElement;
     try {
       img = await this.loadImage(backgroundUrl);
     } catch (err) {
       console.error('Error al cargar imagen base', err);
+      this.showError('Error al cargar la plantilla del certificado');
       return;
     }
 
-    // 2. Ajustar canvas al tamaño real de la imagen
     this.certCanvas.width = img.width;
     this.certCanvas.height = img.height;
 
@@ -486,39 +682,51 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
 
     // ========== POSICIONES AFINADAS (en proporción) ==========
 
-    // Columna de texto (un poco a la derecha del centro)
-    const baseX = W * 0.47; // 47% del ancho
+    // Columna de texto
+    const baseX = W * 0.47;
 
     // 1) NOMBRE (línea grande azul)
     ctx.font = `${H * 0.035}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
-    const nombre = est.nombre || '';
-    let y = H * 0.39; // algo por debajo de "Certifica que"
+    const nombre = this.na(est.nombre || '');
+    let y = H * 0.36; // algo por debajo de "Certifica que"
     ctx.fillText(nombre, baseX, y);
 
-    // 2) CÉDULA (debajo del nombre)
+    // 2) CÉDULA (debajo del nombre) -> REQUERIMIENTO: quitar documento (sin borrar lógica)
     ctx.font = `${H * 0.026}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
     y = H * 0.45;
-    const cc = `C.C. ${est.cedula}`;
-    ctx.fillText(cc, baseX, y);
+    const cc = `C.C. ${this.na(est.cedula)}`;
+    if (this.mostrarDocumentoEnCertificado) {
+      ctx.fillText(cc, baseX, y);
+    }
 
-    // 3) Evento / Estrategia (cursiva, línea "Evento Estratégico")
-    ctx.font = `italic ${H * 0.035}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
-    y = H * 0.51;
-    const estrategia = est.estrategiaNombre || 'Nombre del evento / estrategia';
-    ctx.fillText(estrategia, baseX, y);
+    // 3) BLOQUE NUEVO (REQUERIMIENTO) o bloque anterior (se conserva)
+    if (this.usarTextoRequerimientoNuevo) {
+      ctx.font = `${H * 0.018}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
+      const textoReq = this.buildTextoNarrativo(est);
 
-    // 4) Programa (línea "Estudiante del programa ...")
-    ctx.font = `${H * 0.018}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
-    y = H * 0.555;
-    const programa = `Estudiante del programa ${est.programaNombre || ''}`;
-    ctx.fillText(programa, baseX, y);
+      const textoY = this.mostrarDocumentoEnCertificado ? H * 0.48 : H * 0.42;
+      const maxWidth = W * 0.46;
+      const lineHeight = H * 0.028;
 
-    // 5) Fecha (centrada sobre "Dado en Manizales (Colombia) el")
+      y = this.drawWrappedText(ctx, textoReq, baseX, textoY, maxWidth, lineHeight);
+    } else {
+
+      ctx.font = `italic ${H * 0.035}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
+      y = H * 0.51;
+      const estrategia = this.na(est.estrategiaNombre || 'Nombre del evento / estrategia');
+      ctx.fillText(estrategia, baseX, y);
+
+      ctx.font = `${H * 0.018}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
+      y = H * 0.555;
+      const programa = `Estudiante del programa ${this.na(est.programaNombre || '')}`;
+      ctx.fillText(programa, baseX, y);
+    }
+
+    // 5) Fecha
     ctx.font = `${H * 0.023}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
 
-    // MÁS A LA DERECHA y MÁS ABAJO
-    const fechaX = baseX + W * 0.09;  // antes 0.03 o parecido
-    const fechaY = H * 0.646;         // antes 0.625 aprox
+    const fechaX = baseX + W * 0.09;
+    const fechaY = H * 0.646;
 
     const fecha = `${this.today.toLocaleDateString('es-CO', {
       day: '2-digit',

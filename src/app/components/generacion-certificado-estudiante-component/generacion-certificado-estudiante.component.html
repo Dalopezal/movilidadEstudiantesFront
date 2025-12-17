@@ -107,8 +107,9 @@
 
               <button class="btn btn-primary"
                       style="background:#0D133F;border-color:#0D133F;font-size:13px;padding:5px 15px;margin-left:auto;"
-                      (click)="generarCertificados()">
-                <i class="fas fa-file-pdf"></i> Generar Certificado(s)
+                      (click)="generarCertificados()"
+                      [disabled]="!estudianteSeleccionado">
+                <i class="fas fa-file-pdf"></i> Generar Certificado
               </button>
             </div>
 
@@ -121,19 +122,6 @@
                     <th style="background:white;color:#0D133F;">Nombre</th>
                     <th style="background:white;color:#0D133F;">
                       Generar Certificado
-                      <!-- <div class="form-check d-inline-block ms-2">
-                        <input type="checkbox"
-                               class="form-check-input"
-                               id="seleccionarTodos"
-                               [(ngModel)]="seleccionarTodos"
-                               (change)="toggleSeleccionarTodos()"
-                               style="cursor:pointer;">
-                        <label class="form-check-label"
-                               for="seleccionarTodos"
-                               style="font-size:11px;cursor:pointer;">
-                          Seleccionar todos
-                        </label>
-                      </div> -->
                     </th>
                   </tr>
                 </thead>

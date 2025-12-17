@@ -65,7 +65,7 @@ export class SolicitudConvenioComponent {
     { titulo: 'Acciones' },
     { titulo: 'Administradores Convenio' }
   ];
-  
+
 
   // ID QUEMADO temporalmente (cambiar cuando tengamos el id del usuario logueado)
   readonly SOLICITANTE_ID = 1053825186;  // ← ID quemado del solicitante
@@ -75,7 +75,7 @@ export class SolicitudConvenioComponent {
   // Array para almacenar múltiples acciones
   acciones: Accion[] = [
     {
-     
+
       descripcion: '',
       fechaInicio: '',
       fechaFin: '',
@@ -102,7 +102,7 @@ export class SolicitudConvenioComponent {
   tieneAdminExterno: boolean = false;
   usuario: any; // variable para el usuario
 
-  
+
 
   instituciones: any[] = [];
   institucionesFiltradas: any[] = [];
@@ -113,14 +113,14 @@ export class SolicitudConvenioComponent {
   selectedPais: number | null = null;
   selectedCiudad: number | null = null;
   selectedsnies: number | null = null;
-  // para convenios 
+  // para convenios
   tiposConvenio: any[] = [];
   clasificaciones: any[] = [];
   tiposActividad: any[] = [];
   categoriasnies: any[] = [];
   institucionIdConvenio: number = 0;  // ← Para guardar el ID de la institución
-  guardandoRenovacion: boolean = false;  
-   
+  guardandoRenovacion: boolean = false;
+
 
   formData = {
     institucion: '',
@@ -141,14 +141,14 @@ export class SolicitudConvenioComponent {
     descripcionRenovacion:'',
     descripcion:'',
     tipoSolicitud: 'Apertura'
-    
+
   }
 
   guardando: boolean = false;
 
   private destroy$ = new Subject<void>();
 
-  // simulacion de convenios existente 
+  // simulacion de convenios existente
   // Lista simulada de convenios existentes
   convenios: any[] = [];
 
@@ -159,13 +159,13 @@ export class SolicitudConvenioComponent {
   selectcategoriasnies: number | null = null;
 
 
-  convenioSeleccionado: any = null; // que hace esto 
-  
+  convenioSeleccionado: any = null; // que hace esto
+
   constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
 
   ngOnInit() {
 
-    // para el usuario 
+    // para el usuario
     window.addEventListener("storage", this.onStorageChange.bind(this));
     const data = localStorage.getItem('usuario');
     this.usuario = data ? JSON.parse(data) : {};
@@ -175,16 +175,16 @@ export class SolicitudConvenioComponent {
     this.fetchInstituciones();
     this.fetchPaises();
     this.fetchConvenios();
-    this.fetchTipos(); //tipo convenio 
-    this.fetchClasificaciones(); //clasificacion convenio 
-    this.fetchTiposActividad(); // tipo actividades 
+    this.fetchTipos(); //tipo convenio
+    this.fetchClasificaciones(); //clasificacion convenio
+    this.fetchTiposActividad(); // tipo actividades
     this.fetchCategoriaSnies();
 
-    
-   
+
+
   }
 
-  /// para el onstorage cargar variables del navegador 
+  /// para el onstorage cargar variables del navegador
   private onStorageChange() {
     const user = JSON.parse(localStorage.getItem("usuario") || "{}");
   }
@@ -232,7 +232,7 @@ export class SolicitudConvenioComponent {
       });
   }
 
-  // paises 
+  // paises
   fetchPaises() {
     this.api.get<any>('Pais/Consultar_Pais')
       .pipe(takeUntil(this.destroy$))
@@ -256,8 +256,8 @@ export class SolicitudConvenioComponent {
         }
       });
   }
- 
- // convenios 
+
+ // convenios
  fetchConvenios() {
   this.api.get<any>('Convenios/Consultar_Convenio')
     .pipe(takeUntil(this.destroy$))
@@ -273,7 +273,7 @@ export class SolicitudConvenioComponent {
             if (Array.isArray(arr)) items = arr;
           }
         }
-        this.convenios = items.map(i => ({ id: Number(i.id), 
+        this.convenios = items.map(i => ({ id: Number(i.id),
           nombre:  `${i.codigoUcm} - ${i.descripcion}`,
           codigoUcm: i.codigoUcm,
           tipoConvenioId: i.tipoConvenioId,
@@ -283,14 +283,14 @@ export class SolicitudConvenioComponent {
           fechaVencimiento: i.fechaVencimiento,
           descripcion: i.descripcion,
           estado: i.estado
-        
+
         }));
       },
       error: (err) => { console.error('Error cargando convenios', err); this.convenios = []; }
     });
   }
 
-  // tipos convenio 
+  // tipos convenio
   fetchTipos() {
     this.api.get<any>('TipoConvenio/Consultar_TipoConvenio')
       .pipe(takeUntil(this.destroy$))
@@ -312,7 +312,7 @@ export class SolicitudConvenioComponent {
       });
   }
 
-  // clasificacion del convenio 
+  // clasificacion del convenio
   fetchClasificaciones() {
     this.api.get<any>('ClasificacionConvenio/Consultar_ClasificacionConvenio')
       .pipe(takeUntil(this.destroy$))
@@ -427,11 +427,11 @@ export class SolicitudConvenioComponent {
 
 
 
- 
 
 
-   
-  /// metodos para manejar acciones 
+
+
+  /// metodos para manejar acciones
   agregarAccion(): void {
     const nuevaAccion: Accion = {
       descripcion: '',
@@ -455,20 +455,20 @@ export class SolicitudConvenioComponent {
     return index;
   }
 
- 
 
- 
+
+
 
   goBack() {
     window.history.back();
   }
 
-  
+
   onConvenioSeleccionado() {
     const convenio = this.convenios.find(c => c.id === this.selectedConvenio);
     if (convenio) {
       this.convenioSeleccionado = convenio;
-  
+
       this.formData.codigoRenovacion = convenio.codigoUcm;
       this.formData.tipoConvenio = convenio.tipoConvenioId;
       this.formData.fechaInicioRenovacion = convenio.fechaInicio;
@@ -478,7 +478,7 @@ export class SolicitudConvenioComponent {
       this.formData.descripcionRenovacion=convenio.descripcion;
       //this.formData.CategoriaSnies=
       this.consultarInstitucionConvenio(convenio.codigoUcm);
-      
+
     } else {
       this.convenioSeleccionado = null;
       // limpia los campos si se deselecciona
@@ -495,19 +495,19 @@ export class SolicitudConvenioComponent {
     console.log('cambio ciudad')
   }
 
-  // consultar la institucion del convenio 
+  // consultar la institucion del convenio
   consultarInstitucionConvenio(codigoUcm: string): void {
     const endpoint = `InstitucionConvenio/Consultar_InstitucionConvenioGeneral?nombreInstitucion=&nombreConvenio=${codigoUcm}`;
-    
+
     console.log('🔍 Consultando institución para convenio:', codigoUcm);
-  
+
     this.api.get<any>(endpoint)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
           // Manejar diferentes estructuras de respuesta
           let datos: any[] = [];
-          
+
           if (Array.isArray(response)) {
             datos = response;
           } else if (response && response.datos) {
@@ -515,20 +515,20 @@ export class SolicitudConvenioComponent {
           } else if (response && response.data) {
             datos = Array.isArray(response.data) ? response.data : [response.data];
           }
-  
+
           if (datos.length > 0) {
             const institucionConvenio = datos[0];
-            
+
             // Intenta obtener el ID de diferentes posibles nombres de propiedad
-            this.institucionIdConvenio = 
-              institucionConvenio.institucionId || 
-              institucionConvenio.InstitucionId || 
+            this.institucionIdConvenio =
+              institucionConvenio.institucionId ||
+              institucionConvenio.InstitucionId ||
               institucionConvenio.institucion_id ||
-              institucionConvenio.id || 
+              institucionConvenio.id ||
               0;
-            
+
             console.log(' Institución del convenio obtenida:', this.institucionIdConvenio);
-            
+
             if (this.institucionIdConvenio === 0) {
               console.warn(' No se pudo extraer el ID de la institución del response:', institucionConvenio);
               alert('Advertencia: No se pudo obtener el ID de la institución del convenio');
@@ -548,12 +548,12 @@ export class SolicitudConvenioComponent {
   }
 
 
-  
- 
-  
-  /// pasos del formulario ///// 
 
-  
+
+
+  /// pasos del formulario /////
+
+
   cambiarTipo(tipo: 'Apertura' | 'Renovacion' |'MisSolicitudes') {
     this.tipoSolicitud = tipo;
   }
@@ -577,8 +577,8 @@ export class SolicitudConvenioComponent {
     if (this.pasoActual > 0) this.pasoActual--;
   }
   ///////////////////////////////////////////////////////////////
-  
-  // vaidar los pasos del formulario 
+
+  // vaidar los pasos del formulario
   validarPasoActual(): boolean {
     switch (this.pasoActual) {
       case 0: // Institución
@@ -587,14 +587,14 @@ export class SolicitudConvenioComponent {
           return false;
         }
         break;
-      
+
       case 1: // Antecedentes y Objetivos
         if (!this.formData.antecedentes || !this.formData.objetivos) {
           alert('Debe completar antecedentes y objetivos');
           return false;
         }
         break;
-      
+
       case 2: // Acciones
         const accionesValidas = this.acciones.filter(
           a => a.descripcion.trim() !== '' && a.fechaInicio && a.fechaFin
@@ -604,18 +604,18 @@ export class SolicitudConvenioComponent {
           return false;
         }
         break;
-      
+
       case 3: // Administradores
-        
+
         // Validar admin externo solo si está marcado el checkbox
         if (this.tieneAdminExterno) {
-          if (!this.administradorExterno.nombre || 
-              !this.administradorExterno.cargo || 
+          if (!this.administradorExterno.nombre ||
+              !this.administradorExterno.cargo ||
               !this.administradorExterno.correo) {
             alert('Debe completar todos los datos del administrador externo');
             return false;
           }
-          
+
           // Validar email
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           if (!emailRegex.test(this.administradorExterno.correo)) {
@@ -627,9 +627,9 @@ export class SolicitudConvenioComponent {
     }
     return true;
   }
-  
 
-  // guardar el formulario de solicitud de apertura  
+
+  // guardar el formulario de solicitud de apertura
   guardar(form: NgForm): void {
     console.log("guardar");
     if (!form.valid) {
@@ -645,7 +645,7 @@ export class SolicitudConvenioComponent {
     // PASO 1: CREAR SOLICITUD
     // ============================================
     const tipoSolicitudId = this.tipoSolicitud === 'Apertura' ? 2 : 3;
-    
+
     const solicitudData = {
       solicitanteId: this.SOLICITANTE_ID,
       descripcion: this.formData.descripcion,
@@ -665,23 +665,23 @@ export class SolicitudConvenioComponent {
           if (response.exito && response.datos) {
             const solicitudId = response.datos;
             console.log('✅ Solicitud creada con ID:', solicitudId);
-            
+
             // Continuar con acciones
             this.guardarAcciones(solicitudId);
           } else {
             console.error('❌ Respuesta inesperada:', response);
             this.guardando = false;
-            alert('Error: No se pudo obtener el ID de la solicitud');
+            this.showError('Error al crear la solicitud. Intente nuevamente.');
           }
         },
         error: (error) => {
           console.error('❌ Error al crear solicitud:', error);
           this.guardando = false;
-          alert('Error al crear la solicitud. Intente nuevamente.');
+          this.showError('Error al crear la solicitud. Intente nuevamente.');
         }
       });
-  
-   
+
+
   }
 
     // ============================================
@@ -708,7 +708,7 @@ export class SolicitudConvenioComponent {
     console.log('📋 2. Guardando acciones:', accionesValidas);
 
     // Si tu API NO acepta array (una petición por acción):
-    
+
     let accionesGuardadas = 0;
     let errorEncontrado = false;
 
@@ -717,7 +717,7 @@ export class SolicitudConvenioComponent {
         next: (response) => {
           accionesGuardadas++;
           console.log(`✅ Acción ${index + 1} guardada:`, response);
-          
+
           if (accionesGuardadas === accionesValidas.length && !errorEncontrado) {
             this.guardarAdministradores(solicitudId);
           }
@@ -732,7 +732,7 @@ export class SolicitudConvenioComponent {
         }
       });
     });
-    
+
   }
 
   // ============================================
@@ -764,10 +764,10 @@ export class SolicitudConvenioComponent {
 
     console.log('👥 3. Guardando administradores:', administradores);
 
-  
+
 
     // Si tu API NO acepta array (una petición por administrador):
-    
+
     let adminsGuardados = 0;
     let errorEncontrado = false;
 
@@ -776,7 +776,7 @@ export class SolicitudConvenioComponent {
         next: (response) => {
           adminsGuardados++;
           console.log(`✅ Administrador ${index + 1} guardado:`, response);
-          
+
           if (adminsGuardados === administradores.length && !errorEncontrado) {
             this.finalizarGuardado(solicitudId);
           }
@@ -791,16 +791,16 @@ export class SolicitudConvenioComponent {
         }
       });
     });
-    
+
   }
 
   private finalizarGuardado(solicitudId: number): void {
     this.guardando = false;
     console.log('🎉 Proceso completado exitosamente');
-    alert(`✅ Solicitud de convenio creada exitosamente\n\nID de Solicitud: ${solicitudId}`);
-    
+    this.showSuccess(` Solicitud de convenio creada exitosamente\n\nID de Solicitud: ${solicitudId}`);
+
     this.limpiarFormulario();
-    
+
     // Opcional: Redireccionar
     // this.router.navigate(['/convenios', solicitudId]);
   }
@@ -857,14 +857,14 @@ export class SolicitudConvenioComponent {
     };
     this.tieneAdminExterno = false;
     this.selectedInstitucion = '';
-    
+
   }
 
-  // guardar las acciones del formulario de apertura 
- 
-  
+  // guardar las acciones del formulario de apertura
 
-  
+
+
+
 
 
 
@@ -879,7 +879,7 @@ export class SolicitudConvenioComponent {
       alert('Debe indicar los motivos de la renovación en antecedentes');
       return;
     }
-  
+
     if (this.institucionIdConvenio === 0) {
       alert('No se pudo obtener la institución del convenio. Por favor, seleccione el convenio nuevamente.');
       return;
@@ -887,7 +887,7 @@ export class SolicitudConvenioComponent {
 
     this.guardandoRenovacion = true;
 
-    // data para insertar las olicitud de renovacion 
+    // data para insertar las olicitud de renovacion
     const solicitudRenovacion = {
       solicitanteId: this.SOLICITANTE_ID,  // ← Tu ID quemado
       descripcion: this.formData.descripcionRenovacion || this.convenioSeleccionado.descripcion,
@@ -901,7 +901,7 @@ export class SolicitudConvenioComponent {
     console.log('Creando solicitud renovación:', solicitudRenovacion);
 
     // crer solicitud
-    
+
     this.api.post<any>('SolicitudConvenios/crear_SolicitudConvenios', solicitudRenovacion)
     .pipe(takeUntil(this.destroy$))
     .subscribe({
@@ -911,12 +911,12 @@ export class SolicitudConvenioComponent {
         if (response.exito && response.datos) {
           const solicitudId = response.datos;
           console.log('✅ Solicitud de renovación creada con ID:', solicitudId);
-          
+
           this.showSuccess(` Solicitud de renovación creada exitosamente\n\nID: ${solicitudId}\nConvenio: ${this.convenioSeleccionado.codigoUcm}\n\nNota: Cuando la ORI apruebe esta solicitud, el convenio se renovará automáticamente.`);
-          
+
           // Limpiar formulario
           this.limpiarFormularioRenovacion();
-          
+
         } else {
           console.error('❌ Respuesta inesperada:', response);
           alert('Error: No se pudo crear la solicitud de renovación. Respuesta inesperada del servidor.');
@@ -925,23 +925,23 @@ export class SolicitudConvenioComponent {
       error: (error) => {
         this.guardandoRenovacion = false;
         console.error('❌ Error al crear solicitud de renovación:', error);
-        
+
         let mensajeError = 'Error al crear la solicitud de renovación.';
         if (error.error && error.error.mensaje) {
           mensajeError += `\n${error.error.mensaje}`;
         }
-        
+
         alert(mensajeError);
       }
     });
-    
+
   }
 
   limpiarFormularioRenovacion(): void {
     this.selectedConvenio = null;
     this.convenioSeleccionado = null;
     this.institucionIdConvenio = 0;
-    
+
     this.formData.codigoRenovacion = '';
     this.formData.tipoConvenio = '';
     this.formData.fechaInicioRenovacion = '';
@@ -951,14 +951,33 @@ export class SolicitudConvenioComponent {
     this.formData.tipoactividad = '';
     this.formData.descripcionRenovacion = '';
   }
-  
 
   showSuccess(description: string = 'Operación completada correctamente') {
+
     toast.success('¡Operación exitosa!', {
+
       description: description,
+
       unstyled: true,
+
       class: 'my-success-toast'
+
     });
+
+  }
+
+  showError(description: string = 'Ocurrió un error al procesar la solicitud') {
+
+    toast.error('Error al procesar', {
+
+      description: description,
+
+      unstyled: true,
+
+      class: 'my-error-toast'
+
+    });
+
   }
 
 }

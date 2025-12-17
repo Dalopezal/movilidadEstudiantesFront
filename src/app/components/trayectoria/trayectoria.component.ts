@@ -54,7 +54,7 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
   constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
 
   ngOnInit() {
-    //this.fetchTrayectorias();
+    this.fetchTrayectorias();
     this.fetchCombos();
   }
 
@@ -65,8 +65,6 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
 
   fetchCombos() {
     this.fetchEstrategias();
-    this.fetchPeriodos();
-    this.fetchPlanesEstudio();
     this.fetchProgramas();
   }
 
@@ -90,54 +88,6 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('Error al cargar estrategias', err);
           this.estrategias = [];
-        }
-      });
-  }
-
-  private fetchPeriodos() {
-    this.api.get<any>('Periodos/Consultar_Periodos')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (resp) => {
-          let items: any[] = [];
-          if (Array.isArray(resp)) items = resp;
-          else if (resp && typeof resp === 'object') {
-            if (Array.isArray(resp.data)) items = resp.data;
-            else if (Array.isArray(resp.items)) items = resp.items;
-            else {
-              const arr = Object.values(resp).find(v => Array.isArray(v));
-              if (Array.isArray(arr)) items = arr;
-            }
-          }
-          this.periodos = items.map(item => ({ id: item.id, nombre: item.nombre }));
-        },
-        error: (err) => {
-          console.error('Error al cargar periodos', err);
-          this.periodos = [];
-        }
-      });
-  }
-
-  private fetchPlanesEstudio() {
-    this.api.get<any>('PlanesEstudio/Consultar_Planes')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (resp) => {
-          let items: any[] = [];
-          if (Array.isArray(resp)) items = resp;
-          else if (resp && typeof resp === 'object') {
-            if (Array.isArray(resp.data)) items = resp.data;
-            else if (Array.isArray(resp.items)) items = resp.items;
-            else {
-              const arr = Object.values(resp).find(v => Array.isArray(v));
-              if (Array.isArray(arr)) items = arr;
-            }
-          }
-          this.planesEstudio = items.map(item => ({ id: item.id, nombre: item.nombre }));
-        },
-        error: (err) => {
-          console.error('Error al cargar planes de estudio', err);
-          this.planesEstudio = [];
         }
       });
   }
@@ -277,7 +227,7 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
   fetchTrayectorias() {
     this.error = null;
     this.loadingTable = true;
-    this.api.get<any>('Trayectoria/Consultar_Trayectorias')
+    this.api.get<any>('Trayectoria/Consultar_Trayectoria')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -366,11 +316,6 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
   onSubmit(form: NgForm) {
     if (form.invalid) {
       form.control.markAllAsTouched();
-      return;
-    }
-
-    if (!this.model.componenteCodigo?.trim() || !this.model.componenteNombre?.trim()) {
-      this.error = 'Código y nombre del componente son obligatorios.';
       return;
     }
 

@@ -221,58 +221,6 @@
 
         <!-- Tabla -->
         <section class="col-12 d-flex flex-column col-lg-8" style="height: 75vh;">
-          <div class="row mb-3">
-          <div class="col-12 d-flex align-items-center justify-content-between gap-3 flex-wrap">
-
-            <div class="d-flex gap-2 align-items-center flex-wrap" style="flex:1;">
-              <div class="d-flex flex-column" style="min-width: 260px;">
-                <label class="fw-bold mb-1">Programa</label>
-                <select class="form-select form-select-sm"
-                        [(ngModel)]="selectedProgramaCodigo"
-                        name="selectedProgramaCodigo"
-                        style="font-size: 12px;max-width: 260px;">
-                  <option [ngValue]="''" disabled>Seleccione</option>
-                  <option *ngFor="let prog of programas" [ngValue]="prog.id">{{ prog.nombre }}</option>
-                </select>
-              </div>
-
-              <div class="d-flex flex-column" style="min-width: 240px;">
-                <label class="fw-bold mb-1">Plan de estudio</label>
-                <input type="number"
-                      class="form-control form-control-sm"
-                      [(ngModel)]="selectedPlanEstudioId"
-                      (change)="onPlanEstudioFiltroChange()"
-                      name="selectedPlanEstudioId"
-                      placeholder="Id plan de estudio"
-                      style="font-size: 13px;">
-              </div>
-
-              <div class="d-flex flex-column" style="min-width: 260px;">
-                <label class="fw-bold mb-1">Componente</label>
-                <select class="form-select form-select-sm"
-                        [(ngModel)]="selectedComponenteCodigo"
-                        name="selectedComponenteCodigo"
-                        style="font-size: 13px;max-width: 260px;">
-                  <option [ngValue]="''" disabled>Seleccione</option>
-                  <option *ngFor="let c of componentesFiltro" [ngValue]="c.codigo">
-                    {{ c.nombre }}
-                  </option>
-                </select>
-              </div>
-            </div>
-
-            <div class="ms-3">
-              <button class="btn btn-primary btn-sm d-flex align-items-center justify-content-center gap-2"
-                      type="button"
-                      [disabled]="loadingConsulta"
-                      style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;">
-                <i class="fas fa-search" style="font-size:14px;"></i>
-                <span *ngIf="!loadingConsulta">Consultar</span>
-                <span *ngIf="loadingConsulta">Consultando...</span>
-              </button>
-            </div>
-          </div>
-        </div>
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchTrayectorias(); filtro=''">
@@ -321,9 +269,9 @@
                       <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="btn btn-sm btn-danger button-completed" (click)="deleteItem(item.id!)">
+                      <!-- <button class="btn btn-sm btn-danger button-completed" (click)="deleteItem(item.id!)">
                         <i class="fas fa-trash"></i>
-                      </button>
+                      </button> -->
                     </td>
                   </tr>
                   <tr *ngIf="!loadingTable && pagedData.length === 0">

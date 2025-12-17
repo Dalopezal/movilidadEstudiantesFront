@@ -31,7 +31,7 @@ export class CursoModel {
   programaCodigo: string;
   planestuId: number;
   codigo: string;
-  nombre: string;
+  nombreCurso: string;
   descripcion: string;
   instuducionid: number;
 
@@ -39,7 +39,7 @@ export class CursoModel {
     this.programaCodigo = '';
     this.planestuId = 0;
     this.codigo = '';
-    this.nombre = '';
+    this.nombreCurso = '';
     this.descripcion = '';
     this.instuducionid = 0;
   }
@@ -49,7 +49,7 @@ export class CursoModel {
     model.programaCodigo = json.programaCodigo || json.ProgramaCodigo || '';
     model.planestuId = json.planestuId || json.PlanestuId || 0;
     model.codigo = json.codigo || json.Codigo || '';
-    model.nombre = json.nombre || json.Nombre || '';
+    model.nombreCurso = json.nombreCurso || json.NombreCurso || '';
     model.descripcion = json.descripcion || json.Descripcion || '';
     model.instuducionid = json.instuducionid || json.Instuducionid || 0;
     return model;
@@ -61,11 +61,11 @@ export interface DesarrolloProfesionalRow {
   programaCodigo: number;
   planEstudio: number;
   codigoCurso: number;
-  nombre: string;
+  nombreCurso: string;
   descripcion: string;
   institucionId: number;
   usuarioId: number;
   fechainicio: string;
   fechafinal: string;
-  costoCurso: number;
+  costocurso: number;
 }

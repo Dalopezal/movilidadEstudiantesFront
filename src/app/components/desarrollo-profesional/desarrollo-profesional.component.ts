@@ -190,7 +190,7 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
         curso.programaCodigo = String(row.programaCodigo);
         curso.planestuId = row.planEstudio;
         curso.codigo = String(row.codigoCurso);
-        curso.nombre = row.nombre;
+        curso.nombreCurso = row.nombreCurso;
         curso.descripcion = row.descripcion;
         curso.instuducionid = row.institucionId;
         cursosMap.set(cursoKey, curso);
@@ -203,7 +203,7 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
       cursoPersona.periodo = 1; // Valor por defecto
       cursoPersona.fechainicio = row.fechainicio;
       cursoPersona.fechafinal = row.fechafinal;
-      cursoPersona.costocurso = row.costoCurso;
+      cursoPersona.costocurso = row.costocurso;
       cursoPersonas.push(cursoPersona);
     });
 
@@ -317,7 +317,7 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
 
     const filtroLower = this.filtro.toLowerCase().trim();
     this.filteredData = this.data.filter(item =>
-      item.nombre?.toLowerCase().includes(filtroLower) ||
+      item.nombreCurso?.toLowerCase().includes(filtroLower) ||
       item.descripcion?.toLowerCase().includes(filtroLower)
     );
 

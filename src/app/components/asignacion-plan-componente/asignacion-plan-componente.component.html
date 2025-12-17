@@ -12,7 +12,7 @@
       style="height: 100%; font-size: 13px;"
     >
 
-      <!-- ===================== FORMULARIO ARRIBA ===================== -->
+      <!-- ===================== FORMULARIO ===================== -->
       <section
         *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null"
         class="d-flex flex-column mb-3"
@@ -35,7 +35,7 @@
               <div class="form-grid-6">
                 <!-- Planeación -->
                 <div class="form-item">
-                  <label class="form-label fw-bold">Selección Planeación</label>
+                  <label class="form-label fw-bold">Planeación</label>
                   <select
                     class="form-select"
                     required
@@ -52,7 +52,7 @@
 
                 <!-- Estrategia -->
                 <div class="form-item">
-                  <label class="form-label fw-bold">Selección Estrategia</label>
+                  <label class="form-label fw-bold">Estrategia</label>
                   <select
                     class="form-select"
                     required
@@ -69,7 +69,7 @@
 
                 <!-- Estado -->
                 <div class="form-item">
-                  <label class="form-label fw-bold">Selección Estado</label>
+                  <label class="form-label fw-bold">Estado</label>
                   <select
                     class="form-select"
                     required
@@ -84,154 +84,6 @@
                   </select>
                 </div>
 
-                <!-- Institución -->
-                <div class="form-item">
-                  <label class="form-label fw-bold">Selección Institución</label>
-                  <select
-                    class="form-select"
-                    required
-                    [(ngModel)]="model.institucionId"
-                    name="institucionId"
-                    (change)="onInstitucionChange()"
-                    style="font-size: 13px;"
-                  >
-                    <option [ngValue]="null">Seleccione</option>
-                    <option *ngFor="let i of instituciones" [ngValue]="i.id">
-                      {{ i.nombre }}
-                    </option>
-                  </select>
-                </div>
-
-                <!-- Facultad -->
-                <div class="form-item">
-                  <label class="form-label fw-bold">Selección Facultad</label>
-                  <select
-                    *ngIf="esInstitucionUCM"
-                    class="form-select"
-                    [(ngModel)]="model.facultadoUCM"
-                    name="facultadUCM"
-                    style="font-size: 13px;"
-                  >
-                    <option [ngValue]="''">Seleccione</option>
-                    <option *ngFor="let f of facultadesUCM" [ngValue]="f.facultad_codigo">
-                      {{ f.facultad_nombre }}
-                    </option>
-                  </select>
-                  <input
-                    *ngIf="!esInstitucionUCM"
-                    type="text"
-                    class="form-control"
-                    [(ngModel)]="model.facultaExterno"
-                    name="facultaExterno"
-                    placeholder="Digite Facultad"
-                    style="font-size: 13px;"
-                  />
-                </div>
-
-                <!-- Programa -->
-                <div class="form-item">
-                  <label class="form-label fw-bold">Selección Programa</label>
-                  <select
-                    *ngIf="esInstitucionUCM"
-                    class="form-select"
-                    [(ngModel)]="model.programaUCM"
-                    name="programaUCM"
-                    style="font-size: 13px;"
-                  >
-                    <option [ngValue]="''">Seleccione</option>
-                    <option *ngFor="let p of programasUCM" [ngValue]="p.programa.codigo">
-                      {{ p.programa.nombre }}
-                    </option>
-                  </select>
-                  <input
-                    *ngIf="!esInstitucionUCM"
-                    type="text"
-                    class="form-control"
-                    [(ngModel)]="model.programaExterno"
-                    name="programaExterno"
-                    placeholder="Digite Programa"
-                    style="font-size: 13px;"
-                  />
-                </div>
-
-                <!-- Plan de estudio -->
-                <div class="form-item">
-                  <label class="form-label fw-bold">Selección Plan de estudio</label>
-                  <select
-                    *ngIf="esInstitucionUCM"
-                    class="form-select"
-                    [(ngModel)]="model.planestudioId"
-                    name="planestudioId"
-                    style="font-size: 13px;"
-                  >
-                    <option [ngValue]="null">Seleccione</option>
-                    <option *ngFor="let p of planesEstudioUCM" [ngValue]="p.plan_id">
-                      {{ p.plan_id }}
-                    </option>
-                  </select>
-                  <input
-                    *ngIf="!esInstitucionUCM"
-                    type="text"
-                    class="form-control"
-                    [(ngModel)]="model.planTitulo"
-                    name="planTitulo"
-                    placeholder="Digite Plan de estudio"
-                    style="font-size: 13px;"
-                  />
-                </div>
-
-                <!-- Grupo -->
-                <div class="form-item">
-                  <label class="form-label fw-bold">Selección Grupo</label>
-                  <select
-                    *ngIf="esInstitucionUCM"
-                    class="form-select"
-                    [(ngModel)]="model.numerogrupo"
-                    name="numerogrupo"
-                    style="font-size: 13px;"
-                  >
-                    <option [ngValue]="null">Seleccione</option>
-                    <option *ngFor="let g of gruposUCM" [ngValue]="g.grupo">
-                      {{ g.grupo }}
-                    </option>
-                  </select>
-                  <input
-                    *ngIf="!esInstitucionUCM"
-                    type="number"
-                    class="form-control"
-                    [(ngModel)]="model.numerogrupo"
-                    name="numerogrupoTxt"
-                    placeholder="Digite Grupo"
-                    style="font-size: 13px;"
-                  />
-                </div>
-
-                <!-- Componente -->
-                <div class="form-item">
-                  <label class="form-label fw-bold">Selección Componente</label>
-                  <select
-                    *ngIf="esInstitucionUCM"
-                    class="form-select"
-                    [(ngModel)]="model.componenteCodigoUCM"
-                    name="componenteCodigoUCM"
-                    style="font-size: 13px;"
-                  >
-                    <option [ngValue]="''">Seleccione</option>
-                    <option *ngFor="let c of componentesUCM" [ngValue]="c.componente_codigo">
-                      {{ c.componente_nombre }}
-                    </option>
-                  </select>
-                  <input
-                    *ngIf="!esInstitucionUCM"
-                    type="text"
-                    class="form-control"
-                    [(ngModel)]="model.componenteExterno"
-                    name="componenteExterno"
-                    placeholder="Digite Componente"
-                    style="font-size: 13px;"
-                  />
-                </div>
-
                 <!-- Colaboración -->
                 <div class="form-item d-flex align-items-end">
                   <div class="w-100">
@@ -243,6 +95,7 @@
                         id="colaboracion"
                         name="colaboracion"
                         [(ngModel)]="model.colaboracion"
+                        (change)="onColaboracionChange()"
                         style="font-size: 13px;"
                       />
                       <label for="colaboracion" class="form-check-label">
@@ -252,12 +105,162 @@
                   </div>
                 </div>
 
+                <!-- Institución Externa -->
                 <div class="form-item">
+                  <label class="form-label fw-bold">Institución externa</label>
+                  <select
+                    class="form-select"
+                    required
+                    [(ngModel)]="model.institucionId"
+                    name="institucionId"
+                    style="font-size: 13px;"
+                  >
+                    <option [ngValue]="null">Seleccione institución externa</option>
+                    <option *ngFor="let i of instituciones" [ngValue]="i.id">
+                      {{ i.nombre }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Facultad UCM -->
+                <div class="form-item">
+                  <label class="form-label fw-bold">Facultad (UCM)</label>
+                  <select
+                    class="form-select"
+                    [(ngModel)]="model.facultadoUCM"
+                    name="facultadUCM"
+                    style="font-size: 13px;"
+                  >
+                    <option [ngValue]="''">Seleccione</option>
+                    <option
+                      *ngFor="let f of facultadesUCM"
+                      [ngValue]="f.facultad_codigo"
+                    >
+                      {{ f.facultad_nombre }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Programa UCM  -->
+                <div class="form-item">
+                  <label class="form-label fw-bold">Programa (UCM)</label>
+                  <select
+                    class="form-select"
+                    [(ngModel)]="model.programaUCM"
+                    name="programaUCM"
+                    style="font-size: 13px;"
+                  >
+                    <option [ngValue]="''">Seleccione</option>
+                    <option
+                      *ngFor="let p of programasUCM"
+                      [ngValue]="p.programa.codigo"
+                    >
+                      {{ p.programa.nombre }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Plan de estudio UCM  -->
+                <div class="form-item">
+                  <label class="form-label fw-bold">Plan de estudio (UCM)</label>
+                  <select
+                    class="form-select"
+                    [(ngModel)]="model.planestudioId"
+                    name="planestudioId"
+                    (change)="onPlanOrComponenteChange()"
+                    style="font-size: 13px;"
+                  >
+                    <option [ngValue]="null">Seleccione</option>
+                    <option
+                      *ngFor="let p of planesEstudioUCM"
+                      [ngValue]="p.plan_id"
+                    >
+                      {{ p.plan_id }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Grupo UCM -->
+                <div class="form-item">
+                  <label class="form-label fw-bold">Grupo (UCM)</label>
+                  <select
+                    class="form-select"
+                    [(ngModel)]="model.numerogrupo"
+                    name="numerogrupo"
+                    style="font-size: 13px;"
+                  >
+                    <option [ngValue]="null">Seleccione</option>
+                    <option *ngFor="let g of gruposUCM" [ngValue]="g.grupo">
+                      {{ g.grupo }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Componente UCM -->
+                <div class="form-item">
+                  <label class="form-label fw-bold">Componente (UCM)</label>
+                  <select
+                    class="form-select"
+                    [(ngModel)]="model.componenteCodigoUCM"
+                    name="componenteCodigoUCM"
+                    (change)="onPlanOrComponenteChange()"
+                    style="font-size: 13px;"
+                  >
+                    <option [ngValue]="''">Seleccione</option>
+                    <option
+                      *ngFor="let c of componentesUCM"
+                      [ngValue]="c.componente_codigo"
+                    >
+                      {{ c.componente_nombre }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Facultad Externa (solo si colaboración) -->
+                <div class="form-item" *ngIf="model.colaboracion">
+                  <label class="form-label fw-bold">Facultad Externa</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="model.facultaExterno"
+                    name="facultaExterno"
+                    placeholder="Digite Facultad externa"
+                    style="font-size: 13px;"
+                  />
+                </div>
+
+                <!-- Programa Externo (solo si colaboración) -->
+                <div class="form-item" *ngIf="model.colaboracion">
+                  <label class="form-label fw-bold">Programa Externo</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="model.programaExterno"
+                    name="programaExterno"
+                    placeholder="Digite Programa externo"
+                    style="font-size: 13px;"
+                  />
+                </div>
+
+                <!-- Componente Externo (solo si colaboración) -->
+                <div class="form-item" *ngIf="model.colaboracion">
+                  <label class="form-label fw-bold">Componente Externo</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="model.componenteExterno"
+                    name="componenteExterno"
+                    placeholder="Digite Componente externo"
+                    style="font-size: 13px;"
+                  />
+                </div>
+
+                <!-- Nombre Docente Auxiliar (solo si colaboración) -->
+                <div class="form-item" *ngIf="model.colaboracion">
                   <label class="form-label fw-bold">Nombre Docente Auxiliar</label>
                   <input
                     type="text"
                     class="form-control"
-                    [disabled]="!model.colaboracion"
                     [(ngModel)]="model.docenteauxNombre"
                     name="docenteauxNombre"
                     placeholder="Ingrese nombre completo"
@@ -265,12 +268,12 @@
                   />
                 </div>
 
-                <div class="form-item">
+                <!-- Correo Docente Auxiliar (solo si colaboración) -->
+                <div class="form-item" *ngIf="model.colaboracion">
                   <label class="form-label fw-bold">Correo Docente Auxiliar</label>
                   <input
                     type="email"
                     class="form-control"
-                    [disabled]="!model.colaboracion"
                     [(ngModel)]="model.docenteauxCorreo"
                     name="docenteauxCorreo"
                     placeholder="Ingrese correo electrónico"
@@ -302,7 +305,7 @@
                   />
                 </div>
 
-                <!-- Créditos -->
+                <!-- Créditos (solo lectura) -->
                 <div class="form-item">
                   <label class="form-label fw-bold">Créditos</label>
                   <input
@@ -311,11 +314,12 @@
                     [(ngModel)]="model.creditosUCM"
                     name="creditosUCM"
                     min="0"
-                    style="font-size: 13px;"
+                    readonly
+                    style="font-size: 13px; background-color: #f5f5f5;"
                   />
                 </div>
 
-                <!-- Semestre -->
+                <!-- Semestre (solo lectura) -->
                 <div class="form-item">
                   <label class="form-label fw-bold">Semestre</label>
                   <input
@@ -324,7 +328,8 @@
                     [(ngModel)]="model.semestreUCM"
                     name="semestreUCM"
                     min="1"
-                    style="font-size: 13px;"
+                    readonly
+                    style="font-size: 13px; background-color: #f5f5f5;"
                   />
                 </div>
               </div>
@@ -359,51 +364,9 @@
         </div>
       </section>
 
-      <!-- ===================== TABLA ABAJO ===================== -->
+      <!-- ===================== TABLA ===================== -->
       <section class="d-flex flex-column" style="height: 35vh;">
         <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
-          <!-- <div
-            *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null"
-            class="card-header d-flex align-items-center gap-3 text-white"
-            style="background-color: white;"
-          >
-            <button
-              class="btn btn-primary d-flex align-items-center gap-2"
-              style="
-                background: #0d133f;
-                border-color: #0d133f;
-                font-size: 13px;
-                padding: 5px 8px;
-              "
-              (click)="fetchAsignaciones(); filtro = ''"
-            >
-              <i class="fas fa-sync-alt"></i> Actualizar
-            </button>
-            <input
-              style="
-                border-radius: 22px;
-                background: rgb(242, 240, 240);
-                font-size: 13px;
-              "
-              type="text"
-              class="form-control"
-              placeholder="Digite título del plan / componente"
-              [(ngModel)]="filtro"
-              name="filtro"
-            />
-            <button
-              class="btn btn-primary d-flex align-items-center gap-2"
-              style="
-                background: #0d133f;
-                border-color: #0d133f;
-                font-size: 13px;
-                padding: 5px 8px;
-              "
-            >
-              <i class="fas fa-search"></i> Buscar
-            </button>
-          </div> -->
-
           <div class="table-responsive flex-grow-1" style="min-height: 0; overflow-y: auto;">
             <table class="table table-striped mb-0">
               <thead class="table-primary">
@@ -412,45 +375,39 @@
                   <th style="background: white;">Estrategia</th>
                   <th style="background: white;">Estado</th>
                   <th style="background: white;">Institución</th>
-                  <th style="background: white;">Facultad</th>
-                  <th style="background: white;">Programa</th>
-                  <th style="background: white;">Plan de estudio</th>
+                  <th style="background: white;">Facultad UCM</th>
+                  <th style="background: white;">Programa UCM</th>
+                  <th style="background: white;">Plan estudio</th>
                   <th style="background: white;">Grupo</th>
-                  <th style="background: white;">Componente</th>
+                  <th style="background: white;">Componente UCM</th>
+                  <th style="background: white;">Facultad Ext.</th>
+                  <th style="background: white;">Prog. Ext.</th>
+                  <th style="background: white;">Comp. Ext.</th>
                   <th style="background: white;">Colaboración</th>
-                  <th
-                    style="background: white;"
-                  >
-                    Opciones
-                  </th>
+                  <th style="background: white;">Opciones</th>
                 </tr>
               </thead>
               <tbody>
-                <div *ngIf="loadingTable" class="table-overlay">
-                  <i class="fas fa-spinner fa-spin fa-3x"></i>
-                  <p style="background: transparent;">Cargando datos</p>
-                </div>
+                <tr *ngIf="loadingTable">
+                  <td colspan="14" class="text-center">
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <p style="background: transparent;">Cargando datos</p>
+                  </td>
+                </tr>
 
                 <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                   <td>{{ item.planTitulo }}</td>
                   <td>{{ item.estrategiaNombre }}</td>
                   <td>{{ item.nombreEstado }}</td>
                   <td>{{ item.institucionNombre }}</td>
-                  <td>
-                    {{ esInstitucionUCM ? item.facultadoUCM : item.facultaExterno }}
-                  </td>
-                  <td>
-                    {{ esInstitucionUCM ? item.programaUCM : item.programaExterno }}
-                  </td>
+                  <td>{{ item.facultadoUCM }}</td>
+                  <td>{{ item.programaUCM }}</td>
                   <td>{{ item.planTitulo }}</td>
                   <td>{{ item.numerogrupo }}</td>
-                  <td>
-                    {{
-                      esInstitucionUCM
-                        ? item.nombreComponenteUCM
-                        : item.componenteExterno
-                    }}
-                  </td>
+                  <td>{{ item.nombreComponenteUCM }}</td>
+                  <td>{{ item.facultaExterno }}</td>
+                  <td>{{ item.programaExterno }}</td>
+                  <td>{{ item.componenteExterno }}</td>
                   <td align="center">
                     <button *ngIf="item.colaboracion" class="button-completed">
                       Sí
@@ -459,8 +416,7 @@
                       No
                     </button>
                   </td>
-                  <td
-                  >
+                  <td>
                     <button
                       style="margin-bottom: 3px;"
                       class="btn btn-sm btn-primary me-1 button-completed"
@@ -468,17 +424,11 @@
                     >
                       <i class="fas fa-edit"></i>
                     </button>
-                    <!-- <button
-                      class="btn btn-sm btn-danger button-completed"
-                      (click)="deleteItem(item.id)"
-                    >
-                      <i class="fas fa-trash"></i>
-                    </button> -->
                   </td>
                 </tr>
 
                 <tr *ngIf="!loadingTable && pagedData.length === 0">
-                  <td colspan="11" class="text-center">No hay registros.</td>
+                  <td colspan="14" class="text-center">No hay registros.</td>
                 </tr>
               </tbody>
             </table>

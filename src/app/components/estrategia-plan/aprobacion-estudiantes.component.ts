@@ -81,6 +81,8 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   programaCodigo: string | null = null;      // en vez de programaId numérico
   componenteCodigo: string | null = null;    // en vez de componenteId numérico
   private _componentesRaw: ComponenteDocente[] = [];
+  private _backupData: EstudianteAprobacion[] = [];
+  isFilteredByCedula = false;
 
   constructor(
     private api: GenericApiService,
@@ -293,40 +295,24 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   }
 
   // -----------------------
-  // Búsqueda por cédula
+  // Búsqueda por cédula (filtrado local)
   // -----------------------
   buscarPorCedula() {
-    if (!this.filtroCedula || this.filtroCedula.trim() === '' && !this.planeacionId || !this.programaCodigo || !this.componenteCodigo || !this.grupoId) {
-      this.showWarning('Debe seleccionar todos los filtros antes de buscar Nombre, Componente, Grupo)');
+    if (!this.filtroCedula || this.filtroCedula.trim() === '') {
+      this.showWarning('Debe ingresar una cédula para filtrar');
       return;
     }
 
-    this.loading = true;
+    // Filtrar localmente en this.data
+    const filtro = this.filtroCedula.trim();
 
-    this.api.getExterno<any>(`orisiga/listestgrucom/?identificacion=${this.filtroCedula}&componente=${this.componenteCodigo}&grupo=${this.grupoId}`)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          const estudiantes = this.extractArray(response);
+    this.filteredData = this.data.filter(est =>
+      est.cedula.toLowerCase().includes(filtro.toLowerCase())
+    );
 
-          this.data = estudiantes.map((est: any) => ({
-            cedula: est.cedula || est.documento_estudiante || '',
-            nombre: est.nombre || est.nombre_estudiante || '',
-            aprobo: false,
-            idEstudiante: est.id
-          }));
-
-          this.filteredData = [...this.data];
-          this.calculateTotalPages();
-          this.updatePagedData();
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error('Error al buscar por cédula', err);
-          this.loading = false;
-          this.showError('Error al buscar estudiante');
-        }
-      });
+    this.currentPage = 1;
+    this.calculateTotalPages();
+    this.updatePagedData();
   }
 
   // -----------------------
@@ -396,11 +382,12 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   // Refrescar tabla
   // -----------------------
   refrescarTabla() {
-    // this.filtroCedula = '';
-    // if (this.planeacionId && this.programaId && this.componenteId && this.grupoId) {
-    //   this.buscarEstudiantes();
-    // }
-    window.location.reload();
+    // Limpiar filtro y mostrar todos los datos
+    this.filtroCedula = '';
+    this.filteredData = [...this.data];
+    this.currentPage = 1;
+    this.calculateTotalPages();
+    this.updatePagedData();
   }
 
   // -----------------------

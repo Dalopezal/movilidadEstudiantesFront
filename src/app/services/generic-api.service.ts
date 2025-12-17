@@ -12,7 +12,7 @@ export interface ApiResponse<T> {
 }
 
 @Injectable({
-  providedIn: 'any' // mantiene la compatibilidad con standalone components
+  providedIn: 'any'
 })
 export class GenericApiService {
 
