@@ -5,11 +5,19 @@ import { MsalService } from '@azure/msal-angular';
 import { GenericApiService } from '../../services/generic-api.service';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { LanguageSelectorComponent } from '../shared/language-selector/language-selector.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [
+    CommonModule,
+    RouterLink,
+    RouterLinkActive,
+    LanguageSelectorComponent,
+    TranslateModule
+  ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
@@ -82,6 +90,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
     });
   }
+
   closemovilidadMenu() {
     this.ismovilidadOpen = false;
   }
@@ -92,7 +101,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (!clickedInside) {
       if (!this.isCollapsed) this.isCollapsed = true;
       if (this.ismovilidadOpen) this.ismovilidadOpen = false;
-      if (this.isUserMenuOpen) this.isUserMenuOpen = false; // añade esto
+      if (this.isUserMenuOpen) this.isUserMenuOpen = false;
     }
   }
 
@@ -189,10 +198,16 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   toggleInternacionalizacionMenu() {
-    this.isInternacionalizacionOpen = !this.isInternacionalizacionOpen;
+    this.ngZone.run(() => {
+      this.isInternacionalizacionOpen = !this.isInternacionalizacionOpen;
+      this.cdr.markForCheck();
+    });
   }
 
   toggleCooperacionMenu() {
-    this.isCooperacionOpen = !this.isCooperacionOpen;
+    this.ngZone.run(() => {
+      this.isCooperacionOpen = !this.isCooperacionOpen;
+      this.cdr.markForCheck();
+    });
   }
 }

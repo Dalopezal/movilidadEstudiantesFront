@@ -1,0 +1,152 @@
+{
+  "SIDEBAR": {
+    "INICIO": "Home",
+    "INTERNACIONALIZACION": {
+      "TITULO": "Curriculum Internationalization",
+      "PLANEACION": "Planning",
+      "ESTRATEGIA": "Strategy",
+      "ACTIVIDADES": "Activities",
+      "APROBACION_ESTUDIANTE": "Student Approval",
+      "CERTIFICADO_ESTUDIANTES": "Student Certificates",
+      "ASIGNACION_PLAN_COMPONENTE": "Plan - Component Assignment",
+      "DESARROLLO_PROFESIONAL": "Professional Development",
+      "TRAYECTORIA": "Track",
+      "HORARIOS_UNIVERSIDAD": "University Schedules",
+      "INSIGNIA_DIGITAL": "Digital Badge",
+      "PLANEADO_VS_EJECUTADO": "Planned vs Executed"
+    },
+    "COOPERACION": {
+      "TITULO": "Cooperation",
+      "SOLICITUDES_CONVENIO": "Agreement Requests",
+      "ADMIN_SOLICITUDES_CONVENIO": "Manage Agreement Requests",
+      "CONVENIOS": "Agreements",
+      "INSTITUCION_CONVENIOS": "Institution Agreements"
+    },
+    "MOVILIDAD": {
+      "TITULO": "Mobility",
+      "DASHBOARD": "Dashboard",
+      "GENERAL": "GENERAL"
+    },
+    "USER": {
+      "SALIR": "Logout"
+    }
+  },
+  "CONDICIONES": {
+    "FORM": {
+      "TITULO": "Manage Conditions",
+      "NOMBRE_LABEL": "Name",
+      "NOMBRE_PLACEHOLDER": "Enter name",
+      "NOMBRE_REQUERIDO": "Name is required.",
+      "NOMBRE_MINLENGTH": "Minimum 3 characters.",
+      "DESCRIPCION_LABEL": "Description",
+      "DESCRIPCION_PLACEHOLDER": "Enter description",
+      "DESCRIPCION_REQUERIDA": "Description is required.",
+      "DESCRIPCION_MINLENGTH": "Minimum 10 characters.",
+      "TIPO_LABEL": "Condition Type",
+      "TIPO_PLACEHOLDER": "Enter condition type",
+      "TIPO_REQUERIDO": "You must select a type.",
+      "ESTADO_LABEL": "Application status",
+      "ESTADO_REQUERIDO": "You must select a status.",
+      "ES_OBLIGATORIA_LABEL": "Is Mandatory",
+      "BTN_ACTUALIZAR": "Update",
+      "BTN_INGRESAR": "Create",
+      "BTN_GUARDANDO": "Saving...",
+      "BTN_CANCELAR": "Cancel"
+    },
+    "TABLA": {
+      "BTN_ACTUALIZAR": "Refresh",
+      "FILTRO_PLACEHOLDER": "Enter condition name",
+      "BTN_BUSCAR": "Search",
+      "COL_NOMBRE": "Name",
+      "COL_DESCRIPCION": "Description",
+      "COL_TIPO": "Type",
+      "COL_ES_OBLIGATORIA": "Is Mandatory",
+      "COL_OPCIONES": "Options",
+      "CARGANDO": "Loading data",
+      "SIN_REGISTROS": "No records found.",
+      "SI": "Yes",
+      "NO": "No"
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Show",
+      "DE": "of"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "Operation successful!",
+      "ERROR_TITULO": "Processing error",
+      "WARNING_TITULO": "Warning"
+    },
+    "CONFIRM": {
+      "HEADER": "Confirm action",
+      "ACEPTAR": "Yes, confirm",
+      "CANCELAR": "Cancel"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "Could not load the information. Please try again.",
+      "FILTRO_VACIO": "You must type a value to run the search.",
+      "NOMBRE_DESC_REQUERIDOS": "Name and description are required.",
+      "RESPUESTA_DESCONOCIDA": "Unknown server response.",
+      "ERROR_PROCESAR": "The request could not be processed. Please try again.",
+      "CONFIRMAR_ELIMINAR": "Are you sure you want to delete this record?",
+      "ELIMINAR_OK": "The record was successfully deleted.",
+      "ELIMINAR_ERROR_ASOCIADO": "Error deleting condition, the record is associated to other data."
+    }
+  },
+  "INSTITUCIONES": {
+    "FORM": {
+      "TITULO": "Manage Institutions",
+      "NOMBRE_LABEL": "Name",
+      "NOMBRE_PLACEHOLDER": "Enter name",
+      "NOMBRE_REQUERIDO": "Name is required.",
+      "NOMBRE_MINLENGTH": "Minimum 3 characters.",
+      "DESCRIPCION_LABEL": "Contact Description",
+      "DESCRIPCION_PLACEHOLDER": "Enter contact description",
+      "DESCRIPCION_REQUERIDA": "Description is required.",
+      "DESCRIPCION_MINLENGTH": "Minimum 10 characters.",
+      "PAIS_LABEL": "Country",
+      "PAIS_REQUERIDO": "You must select a country.",
+      "CIUDAD_LABEL": "City",
+      "CIUDAD_REQUERIDA": "You must select a city.",
+      "BTN_ACTUALIZAR": "Update",
+      "BTN_INGRESAR": "Create",
+      "BTN_GUARDANDO": "Saving...",
+      "BTN_CANCELAR": "Cancel"
+    },
+    "TABLA": {
+      "BTN_ACTUALIZAR": "Refresh",
+      "FILTRO_PLACEHOLDER": "Enter institution name",
+      "BTN_BUSCAR": "Search",
+      "COL_NOMBRE": "Name",
+      "COL_DESCRIPCION": "Description",
+      "COL_PAIS": "Country",
+      "COL_CIUDAD": "City",
+      "COL_OPCIONES": "Options",
+      "CARGANDO": "Loading data",
+      "SIN_REGISTROS": "No records found."
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Show",
+      "DE": "of"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "Operation successful!",
+      "ERROR_TITULO": "Processing error",
+      "WARNING_TITULO": "Warning"
+    },
+    "CONFIRM": {
+      "HEADER": "Confirm action",
+      "ACEPTAR": "Yes, confirm",
+      "CANCELAR": "Cancel"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "Could not load the information. Please try again.",
+      "FILTRO_VACIO": "You must type a value to run the search.",
+      "NOMBRE_DESC_REQUERIDOS": "Name and description are required.",
+      "RESPUESTA_DESCONOCIDA": "Unknown server response.",
+      "ERROR_PROCESAR": "The request could not be processed. Please try again.",
+      "CONFIRMAR_ELIMINAR": "Are you sure you want to delete this record?",
+      "ELIMINAR_OK": "The record was successfully deleted.",
+      "ELIMINAR_ERROR_ASOCIADO": "Error deleting institution, the record is associated to other data."
+    }
+  }
+}

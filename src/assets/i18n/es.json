@@ -1,0 +1,152 @@
+{
+  "SIDEBAR": {
+    "INICIO": "Inicio",
+    "INTERNACIONALIZACION": {
+      "TITULO": "Internacionalización del Currículo",
+      "PLANEACION": "Planeación",
+      "ESTRATEGIA": "Estrategia",
+      "ACTIVIDADES": "Actividades",
+      "APROBACION_ESTUDIANTE": "Aprobación Estudiante",
+      "CERTIFICADO_ESTUDIANTES": "Certificado Estudiantes",
+      "ASIGNACION_PLAN_COMPONENTE": "Asignación Plan - Componente",
+      "DESARROLLO_PROFESIONAL": "Desarrollo Profesional",
+      "TRAYECTORIA": "Trayectoría",
+      "HORARIOS_UNIVERSIDAD": "Horarios Universidad",
+      "INSIGNIA_DIGITAL": "Insignia Digital",
+      "PLANEADO_VS_EJECUTADO": "Planeado vs Ejecutado"
+    },
+    "COOPERACION": {
+      "TITULO": "Cooperación",
+      "SOLICITUDES_CONVENIO": "Solicitudes Convenio",
+      "ADMIN_SOLICITUDES_CONVENIO": "Admin Solicitudes Convenio",
+      "CONVENIOS": "Convenios",
+      "INSTITUCION_CONVENIOS": "Institución Convenios"
+    },
+    "MOVILIDAD": {
+      "TITULO": "Movilidad",
+      "DASHBOARD": "Dashboard",
+      "GENERAL": "GENERAL"
+    },
+    "USER": {
+      "SALIR": "Salir"
+    }
+  },
+  "CONDICIONES": {
+    "FORM": {
+      "TITULO": "Administrar Condiciones",
+      "NOMBRE_LABEL": "Nombre",
+      "NOMBRE_PLACEHOLDER": "Digite Nombre",
+      "NOMBRE_REQUERIDO": "El nombre es obligatorio.",
+      "NOMBRE_MINLENGTH": "Mínimo 3 caracteres.",
+      "DESCRIPCION_LABEL": "Descripción",
+      "DESCRIPCION_PLACEHOLDER": "Digite Descripción",
+      "DESCRIPCION_REQUERIDA": "La descripción es obligatoria.",
+      "DESCRIPCION_MINLENGTH": "Mínimo 10 caracteres.",
+      "TIPO_LABEL": "Tipo Condición",
+      "TIPO_PLACEHOLDER": "Digite Tipo Condición",
+      "TIPO_REQUERIDO": "Debe seleccionar un tipo.",
+      "ESTADO_LABEL": "Estado de la postulación",
+      "ESTADO_REQUERIDO": "Debe seleccionar un estado.",
+      "ES_OBLIGATORIA_LABEL": "Es Obligatoria",
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_INGRESAR": "Ingresar",
+      "BTN_GUARDANDO": "Guardando...",
+      "BTN_CANCELAR": "Cancelar"
+    },
+    "TABLA": {
+      "BTN_ACTUALIZAR": "Actualizar",
+      "FILTRO_PLACEHOLDER": "Digite nombre condición",
+      "BTN_BUSCAR": "Buscar",
+      "COL_NOMBRE": "Nombre",
+      "COL_DESCRIPCION": "Descripción",
+      "COL_TIPO": "Tipo",
+      "COL_ES_OBLIGATORIA": "Es Obligatorio",
+      "COL_OPCIONES": "Opciones",
+      "CARGANDO": "Cargando datos",
+      "SIN_REGISTROS": "No hay registros.",
+      "SI": "Sí",
+      "NO": "No"
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Mostrar",
+      "DE": "de"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "¡Operación exitosa!",
+      "ERROR_TITULO": "Error al procesar",
+      "WARNING_TITULO": "Atención"
+    },
+    "CONFIRM": {
+      "HEADER": "Confirmar acción",
+      "ACEPTAR": "Sí, Confirmo",
+      "CANCELAR": "Cancelar"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "No se pudo cargar la información. Intenta de nuevo.",
+      "FILTRO_VACIO": "Debe digitar un valor para ejecutar la búsqueda",
+      "NOMBRE_DESC_REQUERIDOS": "Nombre y descripción son obligatorios.",
+      "RESPUESTA_DESCONOCIDA": "Respuesta desconocida del servidor.",
+      "ERROR_PROCESAR": "No se pudo procesar la solicitud. Intenta de nuevo.",
+      "CONFIRMAR_ELIMINAR": "¿Estás seguro de eliminar este registro?",
+      "ELIMINAR_OK": "Se eliminó el registro satisfactoriamente",
+      "ELIMINAR_ERROR_ASOCIADO": "Error al eliminar condición, el registro se encuentra asociado"
+    }
+  },
+  "INSTITUCIONES": {
+    "FORM": {
+      "TITULO": "Administrar Instituciones",
+      "NOMBRE_LABEL": "Nombre",
+      "NOMBRE_PLACEHOLDER": "Digite Nombre",
+      "NOMBRE_REQUERIDO": "El nombre es obligatorio.",
+      "NOMBRE_MINLENGTH": "Mínimo 3 caracteres.",
+      "DESCRIPCION_LABEL": "Descripción Contacto",
+      "DESCRIPCION_PLACEHOLDER": "Digite Descripción Contacto",
+      "DESCRIPCION_REQUERIDA": "La descripción es obligatoria.",
+      "DESCRIPCION_MINLENGTH": "Mínimo 10 caracteres.",
+      "PAIS_LABEL": "País",
+      "PAIS_REQUERIDO": "Debe seleccionar un país.",
+      "CIUDAD_LABEL": "Ciudad",
+      "CIUDAD_REQUERIDA": "Debe seleccionar una ciudad.",
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_INGRESAR": "Ingresar",
+      "BTN_GUARDANDO": "Guardando...",
+      "BTN_CANCELAR": "Cancelar"
+    },
+    "TABLA": {
+      "BTN_ACTUALIZAR": "Actualizar",
+      "FILTRO_PLACEHOLDER": "Digite nombre institución",
+      "BTN_BUSCAR": "Buscar",
+      "COL_NOMBRE": "Nombre",
+      "COL_DESCRIPCION": "Descripción",
+      "COL_PAIS": "País",
+      "COL_CIUDAD": "Ciudad",
+      "COL_OPCIONES": "Opciones",
+      "CARGANDO": "Cargando datos",
+      "SIN_REGISTROS": "No hay registros."
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Mostrar",
+      "DE": "de"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "¡Operación exitosa!",
+      "ERROR_TITULO": "Error al procesar",
+      "WARNING_TITULO": "Atención"
+    },
+    "CONFIRM": {
+      "HEADER": "Confirmar acción",
+      "ACEPTAR": "Sí, Confirmo",
+      "CANCELAR": "Cancelar"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "No se pudo cargar la información. Intenta de nuevo.",
+      "FILTRO_VACIO": "Debe digitar un valor para ejecutar la búsqueda",
+      "NOMBRE_DESC_REQUERIDOS": "Nombre y descripción son obligatorios.",
+      "RESPUESTA_DESCONOCIDA": "Respuesta desconocida del servidor.",
+      "ERROR_PROCESAR": "No se pudo procesar la solicitud. Intenta de nuevo.",
+      "CONFIRMAR_ELIMINAR": "¿Estás seguro de eliminar este registro?",
+      "ELIMINAR_OK": "Se eliminó el registro satisfactoriamente",
+      "ELIMINAR_ERROR_ASOCIADO": "Error al eliminar institución, el registro se encuentra asociado"
+    }
+  }
+}

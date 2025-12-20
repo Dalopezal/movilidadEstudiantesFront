@@ -178,7 +178,7 @@
   align-items: center;
   gap: 10px;
   height: 100%;
-  padding-left: 1rem;
+  padding-left: 0.5rem;
   border-left: 1px solid #ddd; /* separador opcional */
 }
 
@@ -213,7 +213,7 @@
   align-items: center;
   gap: 10px;
   height: 100%;
-  padding-left: 1rem;
+  padding-left: 0.3rem;
   border-left: 1px solid #ddd;
   position: relative; /* necesario para submenu absoluto */
   cursor: pointer;

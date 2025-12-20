@@ -243,7 +243,7 @@ export class HomeComponent implements OnInit {
 
           // flujo normal si usuario existe
           const u = this.extractUserObject(resp);
-          this.tipoUsuario = u?.tipoEstudianteId ?? 2;
+          this.tipoUsuario = u?.tipoEstudianteId ?? this.usuario.tipoUsuarioRol;
           this.usuario.rol = this.getNombreRol(Number(this.selectedRole));
           this.usuario.tipoUsuario = this.tipoUsuario;
           this.usuario.idUsuario = u?.identificacion ?? null;

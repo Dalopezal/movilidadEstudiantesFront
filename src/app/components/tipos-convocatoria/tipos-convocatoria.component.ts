@@ -39,12 +39,12 @@ export class TiposConvocatoriaComponent implements OnInit, OnDestroy {
       // ORI: mostrar ambos tabs
       this.isInternal = true;  // Saliente
       this.isExternal = true;  // Entrante
-    } else if (tipo === 1) {
-      // Usuario externo: solo Entrante
+    } else if (tipo === 2) {
+      // Usuario tipo 2: solo Entrante
       this.isInternal = false;
       this.isExternal = true;
-    } else if (tipo === 2) {
-      // Usuario interno: solo Saliente
+    } else if (tipo === 1) {
+      // Usuario tipo 1: solo Saliente
       this.isInternal = true;
       this.isExternal = false;
     } else {

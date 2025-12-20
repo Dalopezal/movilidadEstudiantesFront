@@ -105,23 +105,6 @@
                   </div>
                 </div>
 
-                <!-- Institución Externa -->
-                <div class="form-item">
-                  <label class="form-label fw-bold">Institución externa</label>
-                  <select
-                    class="form-select"
-                    required
-                    [(ngModel)]="model.institucionId"
-                    name="institucionId"
-                    style="font-size: 13px;"
-                  >
-                    <option [ngValue]="null">Seleccione institución externa</option>
-                    <option *ngFor="let i of instituciones" [ngValue]="i.id">
-                      {{ i.nombre }}
-                    </option>
-                  </select>
-                </div>
-
                 <!-- Facultad UCM -->
                 <div class="form-item">
                   <label class="form-label fw-bold">Facultad (UCM)</label>
@@ -212,6 +195,23 @@
                       [ngValue]="c.componente_codigo"
                     >
                       {{ c.componente_nombre }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Institución Externa -->
+                <div class="form-item" *ngIf="model.colaboracion">
+                  <label class="form-label fw-bold">Institución externa</label>
+                  <select
+                    class="form-select"
+                    required
+                    [(ngModel)]="model.institucionId"
+                    name="institucionId"
+                    style="font-size: 13px;"
+                  >
+                    <option [ngValue]="null">Seleccione institución externa</option>
+                    <option *ngFor="let i of instituciones" [ngValue]="i.id">
+                      {{ i.nombre }}
                     </option>
                   </select>
                 </div>
