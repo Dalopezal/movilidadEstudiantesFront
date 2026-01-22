@@ -2,11 +2,17 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { ConvocatoriasGeneralComponent } from '../convocatorias-general/convocatorias-general.component';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   standalone: true,
   selector: 'app-tipos-convocatoria',
-  imports: [SidebarComponent, ConvocatoriasGeneralComponent, CommonModule],
+  imports: [
+    SidebarComponent,
+    ConvocatoriasGeneralComponent,
+    CommonModule,
+    TranslateModule
+  ],
   templateUrl: './tipos-convocatoria.component.html',
   styleUrls: ['./tipos-convocatoria.component.css']
 })

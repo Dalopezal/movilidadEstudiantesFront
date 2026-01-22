@@ -9,11 +9,20 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { FinanciacionExternaModel } from '../../models/FinanciacionExternaModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-financiacion-externa',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './financiacion-externa.component.html',
   styleUrls: ['./financiacion-externa.component.css'],
   providers: [ConfirmationService]
@@ -41,7 +50,11 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit() {
     this.fetchFinanciacionExterna();
@@ -53,7 +66,7 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
   }
 
   // -----------------------
-  // Consultar condiciones
+  // Consultar financiación externa
   // -----------------------
   fetchFinanciacionExterna() {
     this.error = null;
@@ -85,13 +98,13 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
           this.loadingTable = false;
         },
         error: (err) => {
-          console.error('Error al consultar condiciones', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          console.error('Error al consultar financiación externa', err);
+          this.error = this.translate.instant('FINANCIACION_EXTERNA.MENSAJES.ERROR_CARGA');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(this.translate.instant('FINANCIACION_EXTERNA.MENSAJES.ERROR_CARGA'));
           this.loadingTable = false;
         }
       });
@@ -104,13 +117,13 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
     this.error = null;
 
     if (!this.filtro || this.filtro.trim() === '') {
-      this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
+      this.showWarning(this.translate.instant('FINANCIACION_EXTERNA.MENSAJES.FILTRO_VACIO'));
       return;
     }
     this.loadingTable = true;
 
     const q = encodeURIComponent(this.filtro.trim());
-    this.api.get<any>(`Condicion/Consultar_CondicionGeneral?nombreCondicion=${q}`)
+    this.api.get<any>(`TipoFinanciacionExterna/Consultar_FinanciacionExternaGeneral?nombre=${q}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -135,13 +148,13 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
           this.loadingTable = false;
         },
         error: (err) => {
-          console.error('Error al filtrar condiciones', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          console.error('Error al filtrar financiación externa', err);
+          this.error = this.translate.instant('FINANCIACION_EXTERNA.MENSAJES.ERROR_CARGA');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(this.translate.instant('FINANCIACION_EXTERNA.MENSAJES.ERROR_CARGA'));
           this.loadingTable = false;
         }
       });
@@ -157,8 +170,8 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
     }
 
     // validaciones adicionales
-    if (!this.model.nombre?.trim() || !this.model.nombre?.trim()) {
-      this.error = 'Nombre y descripción son obligatorios.';
+    if (!this.model.nombre?.trim()) {
+      this.error = this.translate.instant('FINANCIACION_EXTERNA.FORM.NOMBRE_REQUERIDO');
       return;
     }
 
@@ -173,7 +186,7 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
 
     if (isUpdate) payload.id = this.model.id;
 
-    const endpoint = isUpdate ? 'FinanciacionExterna/Actualiza_FinanciacionExterna' : 'FinanciacionExterna/crear_FinanciacionExterna';
+    const endpoint = isUpdate ? 'TipoFinanciacionExterna/Actualiza_FinanciacionExterna' : 'TipoFinanciacionExterna/crear_FinanciacionExterna';
 
     const obs = isUpdate ? this.api.put<any>(endpoint, payload) : this.api.post<any>(endpoint, payload);
 
@@ -188,15 +201,14 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          // fallback por si llega algo inesperado
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('FINANCIACION_EXTERNA.TOASTS.ERROR_DESC'));
         }
       },
       error: (err) => {
-        console.error(isUpdate ? 'Error al actualizar condicion' : 'Error al crear condicion', err);
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo';
+        console.error(isUpdate ? 'Error al actualizar financiación externa' : 'Error al crear financiación externa', err);
+        this.error = this.translate.instant('FINANCIACION_EXTERNA.MENSAJES.ERROR_CARGA');
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
+        this.showError(this.translate.instant('FINANCIACION_EXTERNA.MENSAJES.ERROR_CARGA'));
       }
     });
   }
@@ -205,35 +217,31 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
     this.model = new FinanciacionExternaModel();
     this.isEditing = false;
     if (form) form.resetForm({
-      nombreCondicion: '',
-      descripcion: '',
-      tipoCondicion: '',
-      esObligatoria: false,
-      momento: 0
+      nombre: '',
+      estado: false
     });
   }
 
   startEdit(item: FinanciacionExternaModel) {
     this.model = Object.assign(new FinanciacionExternaModel(), item);
     this.isEditing = true;
-    // bring user to top of form (optional)
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
+    const confirmado = await this.showConfirm(this.translate.instant('FINANCIACION_EXTERNA.CONFIRM.ELIMINAR'));
     if (!confirmado) return;
 
-    this.api.delete(`FinanciacionExterna/Eliminar_FinanciacionExterna/${id}`)
+    this.api.delete(`TipoFinanciacionExterna/Eliminar_FinanciacionExterna/${id}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.fetchFinanciacionExterna();
-          this.showSuccess('Se elimino el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('FINANCIACION_EXTERNA.TOASTS.EXITO_DESC'));
         },
         error: (err) => {
-          console.error('Error al eliminar condicion, el resgistro se encuentra asociado', err);
-          this.showError('Error al eliminar condicion, el resgistro se encuentra asociado');
+          console.error('Error al eliminar financiación externa', err);
+          this.showError(this.translate.instant('FINANCIACION_EXTERNA.TOASTS.ERROR_DESC'));
         }
       });
   }
@@ -278,7 +286,7 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
   // Toasters / Confirm
   // -----------------------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('FINANCIACION_EXTERNA.TOASTS.EXITO_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -286,7 +294,7 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('FINANCIACION_EXTERNA.TOASTS.ERROR_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -294,7 +302,7 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('FINANCIACION_EXTERNA.TOASTS.WARNING_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -304,11 +312,11 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
   showConfirm(mensaje: string): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
-        message: mensaje,
-        header: 'Confirmar acción',
+        message: `¿${mensaje}?`,
+        header: this.translate.instant('FINANCIACION_EXTERNA.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('FINANCIACION_EXTERNA.CONFIRM.ACEPTAR'),
+        rejectLabel: this.translate.instant('FINANCIACION_EXTERNA.CONFIRM.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

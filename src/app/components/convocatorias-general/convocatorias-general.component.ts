@@ -13,6 +13,7 @@ import { CondicionComponent } from '../condicion/condicion.component';
 import { BeneficioConvocatoriaComponent } from '../beneficio-convocatoria/beneficio-convocatoria.component';
 import { EntregableComponent } from '../entregable/entregable.component';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-convocatorias-general',
@@ -25,7 +26,8 @@ import { Router } from '@angular/router';
     NgxSonnerToaster,
     CondicionComponent,
     BeneficioConvocatoriaComponent,
-    EntregableComponent
+    EntregableComponent,
+    TranslateModule
   ],
   templateUrl: './convocatorias-general.component.html',
   styleUrl: './convocatorias-general.component.css',
@@ -66,7 +68,8 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   constructor(
     private api: GenericApiService,
     private confirmationService: ConfirmationService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -123,7 +126,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar convocatorias', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('CONVOCATORIAS_GENERAL.MENSAJES.ERROR_CARGA');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
@@ -137,7 +140,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   filterConvocatorias() {
     this.error = null;
     if ((!this.filtro || this.filtro.trim() === '') && (!this.fechaInicial || this.fechaInicial.trim() === '') && (!this.fechaFinal || this.fechaFinal.trim() === '') && (!this.movilidadId || this.movilidadId == 0)) {
-      this.showWarning('Debe digitar o seleccionar un valor para ejecutar la búsqueda');
+      this.showWarning(this.translate.instant('CONVOCATORIAS_GENERAL.MENSAJES.FILTRO_VACIO'));
       return;
     }
     this.loading = true;
@@ -209,7 +212,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar esta convocatoria?');
+    const confirmado = await this.showConfirm(this.translate.instant('CONVOCATORIAS_GENERAL.CONFIRM.ELIMINAR'));
     if (!confirmado) return;
 
     this.api.delete(`Convocatorias/Eliminar/${id}`)
@@ -220,7 +223,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
           this.showSuccess();
         },
         error: (err) => {
-          console.error('Error al eliminar convocatoria, el resgistro se encuentra asociado', err);
+          console.error('Error al eliminar convocatoria', err);
           this.showError();
         }
       });
@@ -262,23 +265,23 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
 
   // ---------- Toasters / Confirm ----------
   showSuccess() {
-    toast.success('¡Operación exitosa!', {
-      description: 'Tus datos se procesaron correctamente',
+    toast.success(this.translate.instant('CONVOCATORIAS_GENERAL.TOASTS.EXITO_TITULO'), {
+      description: this.translate.instant('CONVOCATORIAS_GENERAL.TOASTS.EXITO_DESC'),
       unstyled: true,
       class: 'my-success-toast'
     });
   }
 
   showError() {
-    toast.error('Error al procesar', {
-      description: 'No se puede consultar el id de postulación',
+    toast.error(this.translate.instant('CONVOCATORIAS_GENERAL.TOASTS.ERROR_TITULO'), {
+      description: this.translate.instant('CONVOCATORIAS_GENERAL.TOASTS.ERROR_DESC'),
       unstyled: true,
       class: 'my-error-toast'
     });
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('CONVOCATORIAS_GENERAL.TOASTS.WARNING_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -288,11 +291,11 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   showConfirm(mensaje: string): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
-        message: mensaje,
-        header: 'Confirmar acción',
+        message: `¿${mensaje}?`,
+        header: this.translate.instant('CONVOCATORIAS_GENERAL.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('CONVOCATORIAS_GENERAL.CONFIRM.ACEPTAR'),
+        rejectLabel: this.translate.instant('CONVOCATORIAS_GENERAL.CONFIRM.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

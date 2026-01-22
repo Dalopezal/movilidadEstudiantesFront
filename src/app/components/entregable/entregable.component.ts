@@ -9,11 +9,20 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { EntregableModel } from '../../models/EntregableModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-entregable',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './entregable.component.html',
   styleUrls: ['./entregable.component.css'],
   providers: [ConfirmationService]
@@ -42,7 +51,11 @@ export class EntregableComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit() {
     this.fetchConvocatorias();
@@ -141,23 +154,23 @@ export class EntregableComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar entregables', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('ENTREGABLES.MENSAJES.ERROR_CARGA');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(this.translate.instant('ENTREGABLES.MENSAJES.ERROR_CARGA'));
           this.loadingTable = false;
         }
       });
   }
 
-  // Filtrar por nombre / convocatoria (usa endpoint similar)
+  // Filtrar por nombre / convocatoria
   filterEntregables() {
     this.error = null;
 
     if (!this.filtro || this.filtro.trim() === '') {
-      this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
+      this.showWarning(this.translate.instant('ENTREGABLES.MENSAJES.FILTRO_VACIO'));
       return;
     }
     this.loadingTable = true;
@@ -189,12 +202,12 @@ export class EntregableComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al filtrar entregables', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('ENTREGABLES.MENSAJES.ERROR_CARGA');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(this.translate.instant('ENTREGABLES.MENSAJES.ERROR_CARGA'));
           this.loadingTable = false;
         }
       });
@@ -208,7 +221,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
     }
 
     if (!this.model.nombre?.trim() || !this.model.descripcion?.trim() || !this.model.convocatoriaId || Number(this.model.convocatoriaId) <= 0) {
-      this.error = 'Todos los campos obligatorios deben ser completados.';
+      this.error = this.translate.instant('ENTREGABLES.MENSAJES.CAMPOS_OBLIGATORIOS');
       return;
     }
 
@@ -239,15 +252,14 @@ export class EntregableComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          // fallback por si llega algo inesperado
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('ENTREGABLES.TOASTS.ERROR_DESC'));
         }
       },
       error: (err) => {
         console.error(isUpdate ? 'Error al actualizar entregable' : 'Error al crear entregable', err);
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
+        this.error = this.translate.instant('ENTREGABLES.MENSAJES.ERROR_CARGA');
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
+        this.showError(this.translate.instant('ENTREGABLES.MENSAJES.ERROR_CARGA'));
       }
     });
   }
@@ -269,7 +281,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
+    const confirmado = await this.showConfirm(this.translate.instant('ENTREGABLES.CONFIRM.ELIMINAR'));
     if (!confirmado) return;
 
     this.api.delete(`Entregable/Eliminar_Entregable/${id}`)
@@ -277,11 +289,11 @@ export class EntregableComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchEntregables();
-          this.showSuccess('Se elimino el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('ENTREGABLES.TOASTS.EXITO_DESC'));
         },
         error: (err) => {
-          console.error('Error al eliminar entregable, el resgistro se encuentra asociado', err);
-          this.showError('Error al eliminar entregable, el resgistro se encuentra asociado');
+          console.error('Error al eliminar entregable', err);
+          this.showError(this.translate.instant('ENTREGABLES.TOASTS.ERROR_DESC'));
         }
       });
   }
@@ -322,7 +334,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
 
   // Toasters / Confirm
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('ENTREGABLES.TOASTS.EXITO_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -330,7 +342,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('ENTREGABLES.TOASTS.ERROR_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -338,7 +350,7 @@ export class EntregableComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('ENTREGABLES.TOASTS.WARNING_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -348,11 +360,11 @@ export class EntregableComponent implements OnInit, OnDestroy {
   showConfirm(mensaje: string): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
-        message: mensaje,
-        header: 'Confirmar acción',
+        message: `¿${mensaje}?`,
+        header: this.translate.instant('ENTREGABLES.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('ENTREGABLES.CONFIRM.ACEPTAR'),
+        rejectLabel: this.translate.instant('ENTREGABLES.CONFIRM.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

@@ -73,8 +73,8 @@ export class LoginComponent implements OnInit {
 
   initializeGoogleSignIn() {
     google.accounts.id.initialize({
-      client_id: '462807364747-ck4b0a6j1hfhf648aqid7gv8dvvj2rqt.apps.googleusercontent.com', // UCM
-      //client_id: '399159101800-stm3ke3chlvtscr9mkde7rli01ao621q.apps.googleusercontent.com', // LOCAL
+      //client_id: '462807364747-ck4b0a6j1hfhf648aqid7gv8dvvj2rqt.apps.googleusercontent.com', // UCM
+      client_id: '399159101800-stm3ke3chlvtscr9mkde7rli01ao621q.apps.googleusercontent.com', // LOCAL
       callback: (response: any) => this.handleCredentialResponse(response)
     });
 

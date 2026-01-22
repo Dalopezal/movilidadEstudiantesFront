@@ -148,5 +148,359 @@
       "ELIMINAR_OK": "Se eliminó el registro satisfactoriamente",
       "ELIMINAR_ERROR_ASOCIADO": "Error al eliminar institución, el registro se encuentra asociado"
     }
+  },
+  "CONVOCATORIAS": {
+    "FORM": {
+      "TITULO": "Administración Convocatorias",
+      "NOMBRE_LABEL": "Nombre",
+      "NOMBRE_PLACEHOLDER": "Digite Nombre",
+      "NOMBRE_REQUERIDO": "El nombre es obligatorio.",
+      "NOMBRE_MINLENGTH": "Mínimo 3 caracteres.",
+      "DESCRIPCION_LABEL": "Descripción",
+      "DESCRIPCION_PLACEHOLDER": "Digite Descripción",
+      "DESCRIPCION_REQUERIDA": "La descripción es obligatoria.",
+      "DESCRIPCION_MINLENGTH": "Mínimo 3 caracteres.",
+      "FECHA_INICIO_LABEL": "Fecha Inicio",
+      "FECHA_INICIO_REQUERIDA": "La fecha de inicio es obligatoria.",
+      "FECHA_CIERRE_LABEL": "Fecha Cierre",
+      "FECHA_CIERRE_REQUERIDA": "La fecha de cierre es obligatoria.",
+      "CATEGORIA_MOVILIDAD_LABEL": "Categoría Movilidad",
+      "CATEGORIA_MOVILIDAD_REQUERIDA": "La categoría de movilidad es obligatoria.",
+      "MODALIDAD_LABEL": "Modalidad",
+      "MODALIDAD_REQUERIDA": "La modalidad es obligatoria.",
+      "REQUISITOS_LABEL": "Requisitos",
+      "REQUISITOS_PLACEHOLDER": "Digite Requisitos",
+      "REQUISITOS_REQUERIDOS": "Los requisitos son obligatorios.",
+      "REQUISITOS_MINLENGTH": "Mínimo 3 caracteres.",
+      "ESTADO_ACTIVO_LABEL": "Estado Activo",
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_INGRESAR": "Ingresar",
+      "BTN_GUARDANDO": "Guardando...",
+      "BTN_CANCELAR": "Cancelar"
+    },
+    "TABLA": {
+      "BTN_ACTUALIZAR": "Actualizar",
+      "FILTRO_PLACEHOLDER": "Digite nombre convocatoria",
+      "BTN_BUSCAR": "Buscar",
+      "COL_NOMBRE": "Nombre",
+      "COL_ESTADO": "Estado",
+      "COL_BENEFICIOS": "Beneficios",
+      "COL_CONDICIONES": "Condiciones",
+      "COL_ENTREGABLES": "Entregables",
+      "COL_DETALLE": "Detalle",
+      "COL_OPCIONES": "Opciones",
+      "CARGANDO": "Cargando datos",
+      "SIN_REGISTROS": "No hay registros.",
+      "ESTADO_ACTIVA": "Activa",
+      "ESTADO_INACTIVA": "Inactiva"
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Mostrar",
+      "DE": "de"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "¡Operación exitosa!",
+      "ERROR_TITULO": "Error al procesar",
+      "WARNING_TITULO": "Atención"
+    },
+    "CONFIRM": {
+      "HEADER": "Confirmar acción",
+      "ACEPTAR": "Sí, Confirmo",
+      "CANCELAR": "Cancelar"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "No se pudo cargar la información. Intenta de nuevo.",
+      "FILTRO_VACIO": "Debe digitar un valor para ejecutar la búsqueda",
+      "NOMBRE_REQUERIDO": "El nombre es obligatorio.",
+      "RESPUESTA_DESCONOCIDA": "Respuesta desconocida del servidor.",
+      "ERROR_PROCESAR": "No se pudo procesar la solicitud. Intenta de nuevo.",
+      "ERROR_FILTRAR": "Error al filtrar convocatorias",
+      "CONFIRMAR_ELIMINAR": "¿Estás seguro de eliminar este registro?",
+      "ELIMINAR_OK": "Se eliminó el registro satisfactoriamente",
+      "ELIMINAR_ERROR_ASOCIADO": "Error al eliminar convocatoria, el registro se encuentra asociado"
+    },
+    "DETALLE": {
+      "TITULO": "Detalle Convocatoria",
+      "ID": "ID",
+      "NOMBRE": "Nombre",
+      "SIN_NOMBRE": "Sin nombre",
+      "DESCRIPCION": "Descripción",
+      "SIN_DESCRIPCION": "Sin descripción",
+      "FECHA_INICIO": "Fecha Inicio",
+      "FECHA_CIERRE": "Fecha Cierre",
+      "NO_DEFINIDA": "No definida",
+      "PERIODO": "Periodo",
+      "FECHAS_NO_DEFINIDAS": "Fechas no definidas",
+      "REQUISITOS": "Requisitos",
+      "SIN_REQUISITOS": "Sin requisitos especificados",
+      "CATEGORIA_MOVILIDAD": "Categoría Movilidad",
+      "NO_ASIGNADA": "No asignada",
+      "MODALIDAD": "Modalidad",
+      "ESTADO": "Estado",
+      "ESTADO_ACTIVA": "Activa",
+      "ESTADO_INACTIVA": "Inactiva"
+    },
+    "MODAL": {
+      "BENEFICIOS_TITULO": "Beneficios de la Convocatoria",
+      "CONDICIONES_TITULO": "Condiciones de la Convocatoria",
+      "ENTREGABLES_TITULO": "Entregables de la Convocatoria"
+    }
+  },
+  "BENEFICIOS_CONVOCATORIA": {
+    "FORM": {
+      "TITULO": "Administrar Beneficios - Convocatoria",
+      "NOMBRE_LABEL": "Nombre",
+      "NOMBRE_PLACEHOLDER": "Digite Nombre",
+      "NOMBRE_REQUERIDO": "El nombre es obligatorio.",
+      "NOMBRE_MINLENGTH": "Mínimo 3 caracteres.",
+      "DESCRIPCION_LABEL": "Descripción",
+      "DESCRIPCION_PLACEHOLDER": "Digite Descripción",
+      "DESCRIPCION_REQUERIDA": "La descripción es obligatoria.",
+      "DESCRIPCION_MINLENGTH": "Mínimo 10 caracteres.",
+      "CONVOCATORIA_LABEL": "Convocatoria",
+      "CONVOCATORIA_REQUERIDA": "Debe seleccionar una convocatoria.",
+      "BTN_INGRESAR": "Ingresar",
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_GUARDANDO": "Guardando...",
+      "BTN_CANCELAR": "Cancelar"
+    },
+    "TABLE": {
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_BUSCAR": "Buscar",
+      "FILTRO_PLACEHOLDER": "Digite nombre beneficio / nombre convocatoria",
+      "COL_NOMBRE": "Nombre",
+      "COL_DESCRIPCION": "Descripción",
+      "COL_CONVOCATORIA": "Convocatoria",
+      "COL_OPCIONES": "Opciones",
+      "CARGANDO": "Cargando datos",
+      "SIN_REGISTROS": "No hay registros."
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Mostrar",
+      "DE": "de"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "No se pudo cargar la información. Intenta de nuevo.",
+      "FILTRO_VACIO": "Debe digitar un valor para ejecutar la búsqueda"
+    },
+    "CONFIRM": {
+      "ELIMINAR": "Estas seguro de eliminar este registro",
+      "HEADER": "Confirmar acción",
+      "ACEPTAR": "Sí, Confirmo",
+      "CANCELAR": "Cancelar"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "¡Operación exitosa!",
+      "EXITO_DESC": "Tus datos se guardaron correctamente",
+      "ERROR_TITULO": "Error al procesar",
+      "ERROR_DESC": "El registro se encuentra asociado",
+      "WARNING_TITULO": "Atención"
+    }
+  },
+  "FINANCIACION_EXTERNA": {
+    "FORM": {
+      "TITULO": "Administrar Financiación Externa",
+      "NOMBRE_LABEL": "Nombre",
+      "NOMBRE_PLACEHOLDER": "Digite Nombre",
+      "NOMBRE_REQUERIDO": "El nombre es obligatorio.",
+      "NOMBRE_MINLENGTH": "Mínimo 3 caracteres.",
+      "ESTADO_LABEL": "Es Obligatoria",
+      "BTN_INGRESAR": "Ingresar",
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_GUARDANDO": "Guardando...",
+      "BTN_CANCELAR": "Cancelar"
+    },
+    "TABLE": {
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_BUSCAR": "Buscar",
+      "FILTRO_PLACEHOLDER": "Digite nombre financiamiento externo",
+      "COL_NOMBRE": "Nombre",
+      "COL_ESTADO": "Estado",
+      "COL_OPCIONES": "Opciones",
+      "ESTADO_ACTIVO": "Activo",
+      "ESTADO_INACTIVO": "Inactivo",
+      "CARGANDO": "Cargando datos",
+      "SIN_REGISTROS": "No hay registros."
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Mostrar",
+      "DE": "de"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "No se pudo cargar la información. Intenta de nuevo.",
+      "FILTRO_VACIO": "Debe digitar un valor para ejecutar la búsqueda"
+    },
+    "CONFIRM": {
+      "ELIMINAR": "Estás seguro de eliminar este registro",
+      "HEADER": "Confirmar acción",
+      "ACEPTAR": "Sí, Confirmo",
+      "CANCELAR": "Cancelar"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "¡Operación exitosa!",
+      "EXITO_DESC": "Se elimino el registro satisfactoriamente",
+      "ERROR_TITULO": "Error al procesar",
+      "ERROR_DESC": "Error al eliminar financiación externa, el registro se encuentra asociado",
+      "WARNING_TITULO": "Atención"
+    }
+  },
+  "ENTREGABLES": {
+    "FORM": {
+      "TITULO": "Administrar Entregables - Convocatoria",
+      "NOMBRE_LABEL": "Nombre",
+      "NOMBRE_PLACEHOLDER": "Digite Nombre",
+      "NOMBRE_REQUERIDO": "El nombre es obligatorio.",
+      "NOMBRE_MINLENGTH": "Mínimo 3 caracteres.",
+      "DESCRIPCION_LABEL": "Descripción",
+      "DESCRIPCION_PLACEHOLDER": "Digite Descripción",
+      "DESCRIPCION_REQUERIDA": "La descripción es obligatoria.",
+      "DESCRIPCION_MINLENGTH": "Mínimo 10 caracteres.",
+      "CONVOCATORIA_LABEL": "Convocatoria",
+      "CONVOCATORIA_REQUERIDA": "Debe seleccionar una convocatoria.",
+      "ESTADO_LABEL": "Estado de la postulación",
+      "ESTADO_REQUERIDO": "Debe seleccionar un estado.",
+      "BTN_INGRESAR": "Ingresar",
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_GUARDANDO": "Guardando...",
+      "BTN_CANCELAR": "Cancelar"
+    },
+    "TABLE": {
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_BUSCAR": "Buscar",
+      "FILTRO_PLACEHOLDER": "Digite nombre entregable / Nombre convocatoria",
+      "COL_NOMBRE": "Nombre",
+      "COL_DESCRIPCION": "Descripción",
+      "COL_CONVOCATORIA": "Convocatoria",
+      "COL_OPCIONES": "Opciones",
+      "CARGANDO": "Cargando datos",
+      "SIN_REGISTROS": "No hay registros."
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Mostrar",
+      "DE": "de"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "No se pudo cargar la información. Intenta de nuevo.",
+      "FILTRO_VACIO": "Debe digitar un valor para ejecutar la búsqueda",
+      "CAMPOS_OBLIGATORIOS": "Todos los campos obligatorios deben ser completados."
+    },
+    "CONFIRM": {
+      "ELIMINAR": "Estás seguro de eliminar este registro",
+      "HEADER": "Confirmar acción",
+      "ACEPTAR": "Sí, Confirmo",
+      "CANCELAR": "Cancelar"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "¡Operación exitosa!",
+      "EXITO_DESC": "Se elimino el registro satisfactoriamente",
+      "ERROR_TITULO": "Error al procesar",
+      "ERROR_DESC": "Error al eliminar entregable, el registro se encuentra asociado",
+      "WARNING_TITULO": "Atención"
+    }
+  },
+  "CONDICION_CONVOCATORIA": {
+    "FORM": {
+      "TITULO": "Administrar Condiciones - Convocatoria",
+      "CONDICION_LABEL": "Condición",
+      "CONDICION_REQUERIDA": "Seleccione una condición.",
+      "CONVOCATORIA_LABEL": "Convocatoria",
+      "CONVOCATORIA_REQUERIDA": "Seleccione una convocatoria.",
+      "BTN_INGRESAR": "Ingresar",
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_GUARDANDO": "Guardando...",
+      "BTN_CANCELAR": "Cancelar"
+    },
+    "TABLE": {
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_BUSCAR": "Buscar",
+      "FILTRO_PLACEHOLDER": "Digite nombre condición / Nombre convocatoria",
+      "COL_CONDICION": "Condición",
+      "COL_CONVOCATORIA": "Convocatoria",
+      "COL_OPCIONES": "Opciones",
+      "CARGANDO": "Cargando datos",
+      "SIN_REGISTROS": "No hay registros."
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Mostrar",
+      "DE": "de"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "No se pudo cargar la información. Intenta de nuevo.",
+      "FILTRO_VACIO": "Debe digitar un valor para ejecutar la búsqueda",
+      "CAMPOS_OBLIGATORIOS": "Debe seleccionar una condición y una convocatoria."
+    },
+    "CONFIRM": {
+      "ELIMINAR": "Estás seguro de eliminar este registro",
+      "HEADER": "Confirmar acción",
+      "ACEPTAR": "Sí, Confirmo",
+      "CANCELAR": "Cancelar"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "¡Operación exitosa!",
+      "EXITO_DESC": "Se elimino el registro satisfactoriamente",
+      "ERROR_TITULO": "Error al procesar",
+      "ERROR_DESC": "Error al eliminar relación, el registro se encuentra asociado",
+      "WARNING_TITULO": "Atención"
+    }
+  },
+  "TIPOS_CONVOCATORIA": {
+    "TABS": {
+      "ENTRANTES": "Convocatoria - Entrantes",
+      "SALIENTES": "Convocatoria - Salientes"
+    }
+  },
+  "CONVOCATORIAS_GENERAL": {
+    "TABLE": {
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_BUSCAR": "Buscar",
+      "FILTRO_NOMBRE": "Buscar por nombre",
+      "FECHA_INICIO": "Fecha Inicio",
+      "FECHA_FIN": "Fecha Fin",
+      "MOVILIDAD": "Movilidad",
+      "COL_NOMBRE": "Nombre",
+      "COL_DESCRIPCION": "Descripción",
+      "COL_INICIO": "Inicio",
+      "COL_CIERRE": "Cierre",
+      "COL_REQUISITOS": "Requisitos",
+      "COL_CATEGORIA": "Categoría",
+      "COL_BENEFICIOS": "Beneficios",
+      "COL_MODALIDAD": "Modalidad",
+      "COL_CONDICIONES": "Condiciones",
+      "COL_ENTREGABLES": "Entregables",
+      "COL_ESTADO": "Estado",
+      "COL_POSTULARME": "Postularme",
+      "COL_POSTULACIONES": "Postulaciones",
+      "ESTADO_ACTIVO": "Activo",
+      "ESTADO_INACTIVO": "Inactivo",
+      "TOOLTIP_POSTULACION": "Ir a postulación",
+      "CARGANDO": "Cargando datos",
+      "SIN_REGISTROS": "No hay registros."
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Mostrar",
+      "DE": "de"
+    },
+    "MODALS": {
+      "BENEFICIOS_TITULO": "Beneficios de la Convocatoria",
+      "CONDICIONES_TITULO": "Condiciones de la Convocatoria",
+      "ENTREGABLES_TITULO": "Entregables de la Convocatoria"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "No se pudo cargar la información. Intenta de nuevo.",
+      "FILTRO_VACIO": "Debe digitar o seleccionar un valor para ejecutar la búsqueda"
+    },
+    "CONFIRM": {
+      "ELIMINAR": "Estás seguro de eliminar esta convocatoria",
+      "HEADER": "Confirmar acción",
+      "ACEPTAR": "Sí, Confirmo",
+      "CANCELAR": "Cancelar"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "¡Operación exitosa!",
+      "EXITO_DESC": "Tus datos se procesaron correctamente",
+      "ERROR_TITULO": "Error al procesar",
+      "ERROR_DESC": "No se puede consultar el id de postulación",
+      "WARNING_TITULO": "Atención"
+    }
   }
 }

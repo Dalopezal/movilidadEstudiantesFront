@@ -12,12 +12,22 @@ import { ConvocatoriaGeneralModel } from '../../models/ConvocatoriaGeneralModel'
 import { CondicionComponent } from '../condicion/condicion.component';
 import { BeneficioConvocatoriaComponent } from '../beneficio-convocatoria/beneficio-convocatoria.component';
 import { EntregableComponent } from '../entregable/entregable.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-admin-convocatoria',
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster, CondicionComponent,
-      BeneficioConvocatoriaComponent,
-      EntregableComponent],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    CondicionComponent,
+    BeneficioConvocatoriaComponent,
+    EntregableComponent,
+    TranslateModule
+  ],
   templateUrl: './admin-convocatoria.component.html',
   styleUrl: './admin-convocatoria.component.css',
   providers: [ConfirmationService]
@@ -48,7 +58,11 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit() {
     this.fetchCategoriasMovilidad();
@@ -137,12 +151,13 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar convocatorias', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          const msg = this.translate.instant('CONVOCATORIAS.MENSAJES.ERROR_CARGA');
+          this.error = msg;
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo.');
+          this.showError(msg);
           this.loadingTable = false;
         }
       });
@@ -151,7 +166,8 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
   filterConvocatorias() {
     this.error = null;
     if (!this.filtro || this.filtro.trim() === '') {
-      this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
+      const msg = this.translate.instant('CONVOCATORIAS.MENSAJES.FILTRO_VACIO');
+      this.showWarning(msg);
       return;
     }
     this.loadingTable = true;
@@ -179,7 +195,8 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al filtrar convocatorias', err);
-          this.showError('Error al filtrar convocatorias');
+          const msg = this.translate.instant('CONVOCATORIAS.MENSAJES.ERROR_FILTRAR');
+          this.showError(msg);
           this.loadingTable = false;
         }
       });
@@ -196,7 +213,8 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
     if (this.dateRangeInvalid) return;
 
     if (!this.model.nombre?.trim()) {
-      this.error = 'El nombre es obligatorio.';
+      const msg = this.translate.instant('CONVOCATORIAS.MENSAJES.NOMBRE_REQUERIDO');
+      this.error = msg;
       return;
     }
 
@@ -220,15 +238,15 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          // fallback por si llega algo inesperado
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('CONVOCATORIAS.MENSAJES.RESPUESTA_DESCONOCIDA'));
         }
       },
       error: (err) => {
         console.error(isUpdate ? 'Error al actualizar convocatoria' : 'Error al crear convocatoria', err);
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
+        const msg = this.translate.instant('CONVOCATORIAS.MENSAJES.ERROR_PROCESAR');
+        this.error = msg;
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo.');
+        this.showError(msg);
       }
     });
   }
@@ -267,7 +285,8 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
+    const question = this.translate.instant('CONVOCATORIAS.MENSAJES.CONFIRMAR_ELIMINAR');
+    const confirmado = await this.showConfirm(question);
     if (!confirmado) return;
 
     this.api.delete(`Convocatoria/Eliminar_Convocatoria/${id}`)
@@ -275,11 +294,11 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchConvocatorias();
-          this.showSuccess('Se elimino el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('CONVOCATORIAS.MENSAJES.ELIMINAR_OK'));
         },
         error: (err) => {
           console.error('Error al eliminar convocatoria, el resgistro se encuentra asociado', err);
-          this.showError('Error al eliminar relación, el resgistro se encuentra asociado');
+          this.showError(this.translate.instant('CONVOCATORIAS.MENSAJES.ELIMINAR_ERROR_ASOCIADO'));
         }
       });
   }
@@ -320,7 +339,8 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
 
   // ---------- Toasters / Confirm ----------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    const title = this.translate.instant('CONVOCATORIAS.TOASTS.EXITO_TITULO');
+    toast.success(title, {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -328,7 +348,8 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    const title = this.translate.instant('CONVOCATORIAS.TOASTS.ERROR_TITULO');
+    toast.error(title, {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -336,7 +357,8 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    const title = this.translate.instant('CONVOCATORIAS.TOASTS.WARNING_TITULO');
+    toast.warning(title, {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -347,10 +369,10 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('CONVOCATORIAS.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('CONVOCATORIAS.CONFIRM.ACEPTAR'),
+        rejectLabel: this.translate.instant('CONVOCATORIAS.CONFIRM.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',
@@ -366,52 +388,52 @@ export class AdminConvocatoriaComponent implements OnInit, OnDestroy {
   selectedItem: ConvocatoriaGeneralModel | null = null;
 
   openModalCondicion(item: ConvocatoriaGeneralModel) {
-      this.selectedItem = item;
-      this.convocatoriaId = item.id;
-      const modalElement = document.getElementById('CondicionModal');
-      if (modalElement) {
-        const modal = new (window as any).bootstrap.Modal(modalElement);
-        modal.show();
-      }
+    this.selectedItem = item;
+    this.convocatoriaId = item.id;
+    const modalElement = document.getElementById('CondicionModal');
+    if (modalElement) {
+      const modal = new (window as any).bootstrap.Modal(modalElement);
+      modal.show();
     }
+  }
 
-    openModalBeneficio(item: ConvocatoriaGeneralModel) {
-      this.selectedItem = item;
-      this.convocatoriaId = item.id;
-      const modalElement = document.getElementById('BeneficioModal');
-      if (modalElement) {
-        const modal = new (window as any).bootstrap.Modal(modalElement);
-        modal.show();
-      }
+  openModalBeneficio(item: ConvocatoriaGeneralModel) {
+    this.selectedItem = item;
+    this.convocatoriaId = item.id;
+    const modalElement = document.getElementById('BeneficioModal');
+    if (modalElement) {
+      const modal = new (window as any).bootstrap.Modal(modalElement);
+      modal.show();
     }
+  }
 
-    openModalEntregable(item: ConvocatoriaGeneralModel) {
-      this.selectedItem = item;
-      this.convocatoriaId = item.id;
-      const modalElement = document.getElementById('EntregableModal');
-      if (modalElement) {
-        const modal = new (window as any).bootstrap.Modal(modalElement);
-        modal.show();
-      }
+  openModalEntregable(item: ConvocatoriaGeneralModel) {
+    this.selectedItem = item;
+    this.convocatoriaId = item.id;
+    const modalElement = document.getElementById('EntregableModal');
+    if (modalElement) {
+      const modal = new (window as any).bootstrap.Modal(modalElement);
+      modal.show();
     }
+  }
 
-    cardPosition = { top: 100, left: 100 };
-    isClosing = false;
+  cardPosition = { top: 100, left: 100 };
+  isClosing = false;
 
-    toggleDetalleConvocatoria(item: ConvocatoriaGeneralModel) {
-      if (this.selectedItemCard && this.selectedItemCard.id === item.id) {
-        this.closeCard();
-      } else {
-        this.selectedItemCard = item;
-        this.isClosing = false;
-      }
+  toggleDetalleConvocatoria(item: ConvocatoriaGeneralModel) {
+    if (this.selectedItemCard && this.selectedItemCard.id === item.id) {
+      this.closeCard();
+    } else {
+      this.selectedItemCard = item;
+      this.isClosing = false;
     }
+  }
 
-    closeCard() {
-      this.isClosing = true;
-      setTimeout(() => {
-        this.selectedItemCard = null;
-        this.isClosing = false;
-      }, 400);
-    }
+  closeCard() {
+    this.isClosing = true;
+    setTimeout(() => {
+      this.selectedItemCard = null;
+      this.isClosing = false;
+    }, 400);
+  }
 }
