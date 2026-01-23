@@ -10,6 +10,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-actividades-seguimiento',
@@ -20,7 +21,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     FormsModule,
     HttpClientModule,
     ConfirmDialogModule,
-    NgxSonnerToaster
+    NgxSonnerToaster,
+    TranslateModule
   ],
   templateUrl: './actividades-seguimiento.component.html',
   styleUrls: ['./actividades-seguimiento.component.css'],
@@ -70,7 +72,8 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
 
   constructor(
     private api: GenericApiService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -96,7 +99,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('Error al cargar planeaciones', err);
           this.planeaciones = [];
-          this.showError('Error al cargar planeaciones');
+          this.showError(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_CARGAR_PLANEACIONES'));
         }
       });
 
@@ -111,7 +114,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('Error al cargar estrategias', err);
           this.estrategias = [];
-          this.showError('Error al cargar estrategias');
+          this.showError(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_CARGAR_ESTRATEGIAS'));
         }
       });
 
@@ -126,7 +129,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('Error al cargar instituciones', err);
           this.instituciones = [];
-          this.showError('Error al cargar instituciones');
+          this.showError(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_CARGAR_INSTITUCIONES'));
         }
       });
 
@@ -148,7 +151,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('Error al cargar programas', err);
           this.programasUCM = [];
-          this.showError('Error al cargar programas');
+          this.showError(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_CARGAR_PROGRAMAS'));
         }
       });
 
@@ -170,7 +173,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('Error al cargar componentes', err);
           this.componentesUCM = [];
-          this.showError('Error al cargar componentes');
+          this.showError(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_CARGAR_COMPONENTES'));
         }
       });
   }
@@ -188,53 +191,53 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
   // ================== BUSCAR ACTIVIDADES ==================
 
   onBuscarActividades(form: NgForm): void {
-  if (form.invalid) {
-    this.showWarning('Complete los filtros requeridos');
-    return;
-  }
+    if (form.invalid) {
+      this.showWarning(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.COMPLETE_FILTROS'));
+      return;
+    }
 
-  const params: any = {
-    PlaneacionId: this.filtro.planId,
-    EstrategiaId: this.filtro.estrategiaId,
-    InstitucionId: this.filtro.institucionId,
-    Programa: this.filtro.programaUCM,
-    ComponenteNombre: this.filtro.componenteCodigoUCM
-  };
+    const params: any = {
+      PlaneacionId: this.filtro.planId,
+      EstrategiaId: this.filtro.estrategiaId,
+      InstitucionId: this.filtro.institucionId,
+      Programa: this.filtro.programaUCM,
+      ComponenteNombre: this.filtro.componenteCodigoUCM
+    };
 
-  this.loadingTable = true;
+    this.loadingTable = true;
 
-  this.api
-    .get<any>('Actividad/Consulta_ActividadesSeguimiento', params)
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: (resp) => {
-        const lista = this.extraerLista(resp);
-        this.data = lista.map((x: any) =>
-          ActividadSeguimientoModel.fromJSON
-            ? ActividadSeguimientoModel.fromJSON(x)
-            : Object.assign(new ActividadSeguimientoModel(), x)
-        );
+    this.api
+      .get<any>('Actividad/Consulta_ActividadesSeguimiento', params)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          const lista = this.extraerLista(resp);
+          this.data = lista.map((x: any) =>
+            ActividadSeguimientoModel.fromJSON
+              ? ActividadSeguimientoModel.fromJSON(x)
+              : Object.assign(new ActividadSeguimientoModel(), x)
+          );
 
-        this.loadingTable = false;
-        this.currentPage = 1;
-        this.actualizarPaginacion();
+          this.loadingTable = false;
+          this.currentPage = 1;
+          this.actualizarPaginacion();
 
-        if (!this.data.length) {
-          this.showWarning('No se encontraron actividades para los filtros seleccionados');
-        } else {
-          this.showSuccess('Actividades cargadas correctamente');
+          if (!this.data.length) {
+            this.showWarning(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.NO_ACTIVIDADES_FILTROS'));
+          } else {
+            this.showSuccess(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ACTIVIDADES_CARGADAS'));
+          }
+        },
+        error: (err) => {
+          console.error('Error al consultar las actividades', err);
+          this.loadingTable = false;
+          this.data = [];
+          this.pagedData = [];
+          this.actualizarPaginacion();
+          this.showError(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_CONSULTAR_ACTIVIDADES'));
         }
-      },
-      error: (err) => {
-        console.error('Error al consultar las actividades', err);
-        this.loadingTable = false;
-        this.data = [];
-        this.pagedData = [];
-        this.actualizarPaginacion();
-        this.showError('Error al consultar las actividades');
-      }
-    });
-}
+      });
+  }
 
   recargarTabla(): void {
     if (
@@ -244,7 +247,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
       !this.filtro.programaUCM &&
       !this.filtro.componenteCodigoUCM
     ) {
-      this.showWarning('Seleccione al menos un filtro antes de recargar la tabla');
+      this.showWarning(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.SELECCIONE_FILTRO_RECARGAR'));
       return;
     }
     const dummyForm = { invalid: false } as NgForm;
@@ -309,7 +312,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
 
   onSubmitActividad(form: NgForm): void {
     if (form.invalid) {
-      this.showWarning('Complete los campos requeridos de la actividad');
+      this.showWarning(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.COMPLETE_CAMPOS_ACTIVIDAD'));
       form.control.markAllAsTouched();
       return;
     }
@@ -339,11 +342,10 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
           } else if (response?.error && response?.datos === false) {
             this.showError(response.error);
           } else {
-            // fallback
             this.showSuccess(
               esUpdate
-                ? 'Actividad actualizada correctamente'
-                : 'Actividad creada correctamente'
+                ? this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ACTIVIDAD_ACTUALIZADA')
+                : this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ACTIVIDAD_CREADA')
             );
           }
         },
@@ -352,8 +354,8 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
           this.loadingModal = false;
           this.showError(
             esUpdate
-              ? 'Error al actualizar la actividad'
-              : 'Error al crear la actividad'
+              ? this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_ACTUALIZAR_ACTIVIDAD')
+              : this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_CREAR_ACTIVIDAD')
           );
         }
       });
@@ -400,7 +402,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
 
   // ================== TOASTERS / CONFIRM ==================
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.OPERACION_EXITOSA'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -408,7 +410,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_PROCESAR'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -416,7 +418,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ATENCION'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -427,10 +429,10 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('ACTIVIDADES_SEGUIMIENTO.CONFIRMAR_ACCION'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('ACTIVIDADES_SEGUIMIENTO.SI_CONFIRMO'),
+        rejectLabel: this.translate.instant('ACTIVIDADES_SEGUIMIENTO.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

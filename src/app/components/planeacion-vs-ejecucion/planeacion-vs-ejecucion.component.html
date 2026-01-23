@@ -5,18 +5,18 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div class="d-flex align-items-center">
       <div class="ms-3">
-        <small class="text-muted" style="color: #00ACD4 !important;">INFORME INSTITUCIONAL</small>
-        <h1 class="title mb-0" style="color: #18206E;">Reporte de Planeación vs Ejecutado</h1>
+        <small class="text-muted" style="color: #00ACD4 !important;">{{ 'PLANEACION_VS_EJECUCION.SUBTITULO' | translate }}</small>
+        <h1 class="title mb-0" style="color: #18206E;">{{ 'PLANEACION_VS_EJECUCION.TITULO' | translate }}</h1>
       </div>
     </div>
 
     <!-- Leyenda colores -->
     <div class="legend d-flex align-items-center gap-3" style="font-size: 0.85rem; color: #444;">
       <div class="legend-item d-flex align-items-center gap-1">
-        <span class="legend-circle completed"></span> Ejecutado
+        <span class="legend-circle completed"></span> {{ 'PLANEACION_VS_EJECUCION.EJECUTADO' | translate }}
       </div>
       <div class="legend-item d-flex align-items-center gap-1">
-        <span class="legend-circle planned"></span> Planeado
+        <span class="legend-circle planned"></span> {{ 'PLANEACION_VS_EJECUCION.PLANEADO' | translate }}
       </div>
     </div>
   </div>
@@ -26,32 +26,32 @@
   <!-- Filtros -->
   <div class="row g-3 mb-4">
     <div class="col-12 col-md-3" style="font-size: 13px;">
-      <label class="form-label">Programa</label>
+      <label class="form-label">{{ 'PLANEACION_VS_EJECUCION.PROGRAMA' | translate }}</label>
       <select class="form-select" style="font-size: 13px;" [(ngModel)]="filtros.programa" (change)="filtrar()">
-        <option value="" disabled>Seleccione</option>
+        <option value="" disabled>{{ 'PLANEACION_VS_EJECUCION.SELECCIONE' | translate }}</option>
         <option *ngFor="let p of programasLst" [value]="p.nombre">{{ p.nombre }}</option>
       </select>
     </div>
 
     <div class="col-12 col-md-2" style="font-size: 13px;">
-      <label class="form-label">Plan Estudio</label>
+      <label class="form-label">{{ 'PLANEACION_VS_EJECUCION.PLAN_ESTUDIO' | translate }}</label>
       <select class="form-select" style="font-size: 13px;" [(ngModel)]="filtros.plan" (change)="filtrar()">
-        <option [ngValue]="null" disabled>Seleccione</option>
+        <option [ngValue]="null" disabled>{{ 'PLANEACION_VS_EJECUCION.SELECCIONE' | translate }}</option>
         <option *ngFor="let p of planes" [ngValue]="p">{{ p }}</option>
       </select>
     </div>
 
     <div class="col-12 col-md-2" style="font-size: 13px;">
-      <label class="form-label">Año</label>
+      <label class="form-label">{{ 'PLANEACION_VS_EJECUCION.ANIO' | translate }}</label>
       <select class="form-select" style="font-size: 13px;" [(ngModel)]="filtros.anio" (change)="filtrar()">
         <option *ngFor="let a of anios" [ngValue]="a">{{ a }}</option>
       </select>
     </div>
 
     <div class="col-12 col-md-2" style="font-size: 13px;">
-      <label class="form-label">Periodo</label>
+      <label class="form-label">{{ 'PLANEACION_VS_EJECUCION.PERIODO' | translate }}</label>
       <select class="form-select" style="font-size: 13px;" [(ngModel)]="filtros.periodo" (change)="filtrar()">
-        <option [ngValue]="null" disabled>Seleccione</option>
+        <option [ngValue]="null" disabled>{{ 'PLANEACION_VS_EJECUCION.SELECCIONE' | translate }}</option>
         <option *ngFor="let per of periodos" [ngValue]="per">{{ per }}</option>
       </select>
     </div>
@@ -90,7 +90,7 @@
         </ng-container>
 
         <ng-template #emptySem>
-          <div class="text-muted small">No hay datos</div>
+          <div class="text-muted small">{{ 'PLANEACION_VS_EJECUCION.NO_DATOS' | translate }}</div>
         </ng-template>
       </div>
     </div>

@@ -16,6 +16,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { AsignacionPlanComponenteModel } from '../../models/AsignacionPlanComponentModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core'; // ✅
 
 @Component({
   selector: 'app-asignacion-plan-componente',
@@ -26,7 +27,8 @@ import { AsignacionPlanComponenteModel } from '../../models/AsignacionPlanCompon
     FormsModule,
     HttpClientModule,
     ConfirmDialogModule,
-    NgxSonnerToaster
+    NgxSonnerToaster,
+    TranslateModule // ✅
   ],
   templateUrl: './asignacion-plan-componente.component.html',
   styleUrls: ['./asignacion-plan-componente.component.css'],
@@ -73,7 +75,8 @@ export class AsignacionPlanComponenteComponent
 
   constructor(
     private api: GenericApiService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService // ✅
   ) {}
 
   ngOnInit() {
@@ -308,15 +311,12 @@ export class AsignacionPlanComponenteComponent
         },
         error: (err) => {
           console.error('Error al consultar asignaciones', err);
-          this.error =
-            'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_CARGAR_INFO');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError(
-            'No se pudo cargar la información. Intenta de nuevo'
-          );
+          this.showError(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_CARGAR_INFO'));
           this.loadingTable = false;
         }
       });
@@ -378,9 +378,7 @@ export class AsignacionPlanComponenteComponent
       new Date(this.model.fechafinSemestreUCM) <
         new Date(this.model.fechainicioSemestreUCM)
     ) {
-      this.showWarning(
-        'La fecha final no puede ser menor a la fecha inicial.'
-      );
+      this.showWarning(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.FECHA_FINAL_MENOR'));
       return;
     }
 
@@ -414,7 +412,7 @@ export class AsignacionPlanComponenteComponent
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.RESPUESTA_DESCONOCIDA'));
         }
       },
       error: (err) => {
@@ -424,9 +422,9 @@ export class AsignacionPlanComponenteComponent
             : 'Error al crear asignación',
           err
         );
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
+        this.error = this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_PROCESAR_SOLICITUD');
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
+        this.showError(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_PROCESAR_SOLICITUD'));
       }
     });
   }
@@ -452,7 +450,7 @@ export class AsignacionPlanComponenteComponent
 
   async deleteItem(id: number) {
     const confirmado = await this.showConfirm(
-      '¿Estás seguro de eliminar este registro?'
+      this.translate.instant('ASIGNACION_PLAN_COMPONENTE.CONFIRMAR_ELIMINAR')
     );
     if (!confirmado) return;
 
@@ -462,16 +460,14 @@ export class AsignacionPlanComponenteComponent
       .subscribe({
         next: () => {
           this.fetchAsignaciones();
-          this.showSuccess('Se eliminó el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ELIMINADO_EXITOSO'));
         },
         error: (err) => {
           console.error(
             'Error al eliminar asignación, el registro se encuentra asociado',
             err
           );
-          this.showError(
-            'Error al eliminar asignación, el registro se encuentra asociado'
-          );
+          this.showError(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_ELIMINAR_ASOCIADO'));
         }
       });
   }
@@ -514,7 +510,7 @@ export class AsignacionPlanComponenteComponent
 
   // -------- Toasters / Confirm --------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.OPERACION_EXITOSA'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -522,7 +518,7 @@ export class AsignacionPlanComponenteComponent
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_PROCESAR'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -530,7 +526,7 @@ export class AsignacionPlanComponenteComponent
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ATENCION'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -541,10 +537,10 @@ export class AsignacionPlanComponenteComponent
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('ASIGNACION_PLAN_COMPONENTE.CONFIRMAR_ACCION'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('ASIGNACION_PLAN_COMPONENTE.SI_CONFIRMO'),
+        rejectLabel: this.translate.instant('ASIGNACION_PLAN_COMPONENTE.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

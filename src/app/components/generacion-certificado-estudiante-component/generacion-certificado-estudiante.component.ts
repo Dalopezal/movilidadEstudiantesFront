@@ -8,6 +8,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { GenericApiService } from '../../services/generic-api.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface EstudianteCertificado {
   cedula: string;
@@ -17,8 +18,7 @@ interface EstudianteCertificado {
   programaNombre?: string;
   estrategiaNombre?: string;
 
-  // ====== NUEVOS CAMPOS (para texto requerido en el certificado) ======
-  rolParticipacion?: string; // "Estudiante" | "Profesor" (u otro)
+  rolParticipacion?: string;
   tipoEstrategia?: string;
   institucionOrigen?: string;
   paisOrigen?: string;
@@ -77,7 +77,8 @@ interface ConsultarEstudiantesGenerarCertificadoItem {
     HttpClientModule,
     ConfirmDialogModule,
     NgxSonnerToaster,
-    SidebarComponent
+    SidebarComponent,
+    TranslateModule
   ],
   templateUrl: './generacion-certificado-estudiante.component.html',
   styleUrls: ['./generacion-certificado-estudiante.component.css'],
@@ -128,14 +129,13 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
   private certCtx?: CanvasRenderingContext2D;
 
   private mostrarDocumentoEnCertificado = false;
-
   private usarTextoRequerimientoNuevo = true;
-
   private readonly NA = 'N/A';
 
   constructor(
     private api: GenericApiService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -163,7 +163,7 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
         },
         error: (err) => {
           console.error('Error al cargar estrategias', err);
-          this.showError('No se pudieron cargar las estrategias');
+          this.showError(this.translate.instant('CERTIFICADO_ESTUDIANTES.ERROR_CARGAR_ESTRATEGIAS'));
         }
       });
   }
@@ -177,7 +177,7 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
         },
         error: (err) => {
           console.error('Error al cargar planeaciones', err);
-          this.showError('No se pudieron cargar las planeaciones');
+          this.showError(this.translate.instant('CERTIFICADO_ESTUDIANTES.ERROR_CARGAR_PLANEACIONES'));
         }
       });
   }
@@ -223,7 +223,7 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
         },
         error: (err) => {
           console.error('Error al cargar programas', err);
-          this.showError('No se pudieron cargar los programas');
+          this.showError(this.translate.instant('CERTIFICADO_ESTUDIANTES.ERROR_CARGAR_PROGRAMAS'));
         }
       });
   }
@@ -257,11 +257,10 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
     if (comp && comp.grupo != null) this.grupoId = comp.grupo;
   }
 
-
   buscarEstudiantes() {
     this.filtroCedula = '';
     if (!this.estrategiaId || !this.planeacionId || !this.programaCodigo || !this.componenteCodigo || !this.grupoId) {
-      this.showWarning('Debe seleccionar Estrategia, Planeación, Programa, Componente y Grupo');
+      this.showWarning(this.translate.instant('CERTIFICADO_ESTUDIANTES.DEBE_SELECCIONAR_FILTROS'));
       return;
     }
 
@@ -280,9 +279,10 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
             this.calculateTotalPages();
             this.updatePagedData();
             this.loading = false;
-            this.showWarning('No hay estudiantes aprobados para esta planeación');
+            this.showWarning(this.translate.instant('CERTIFICADO_ESTUDIANTES.NO_HAY_APROBADOS'));
             return;
           }
+
           const requests = aprobaciones.map((ap: any) =>
             this.api.getExterno<any>(`orisiga/nombrestudiante/?idestudiante=${ap.estudianteId}`)
           );
@@ -300,12 +300,11 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
 
                   return {
                     cedula: infoEst.cedula || infoEst.documento_estudiante || ap.estudianteId,
-                    nombre: infoEst.nombre || infoEst.nombre_estudiante || 'Sin nombre',
+                    nombre: infoEst.nombre || infoEst.nombre_estudiante || this.translate.instant('CERTIFICADO_ESTUDIANTES.SIN_NOMBRE'),
                     seleccionado: false,
                     idEstudiante: ap.estudianteId,
                     programaNombre,
                     estrategiaNombre,
-
                     rolParticipacion: 'Estudiante'
                   } as EstudianteCertificado;
                 });
@@ -321,21 +320,21 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
               error: (err) => {
                 console.error('Error al consultar nombreestudiante', err);
                 this.loading = false;
-                this.showError('Error al cargar nombres de estudiantes');
+                this.showError(this.translate.instant('CERTIFICADO_ESTUDIANTES.ERROR_CARGAR_NOMBRES'));
               }
             });
         },
         error: (err) => {
           console.error('Error al consultar aprobaciones', err);
           this.loading = false;
-          this.showError('Error al consultar aprobaciones');
+          this.showError(this.translate.instant('CERTIFICADO_ESTUDIANTES.ERROR_CONSULTAR_APROBACIONES'));
         }
       });
   }
 
   buscarPorCedula() {
     if (!this.filtroCedula || this.filtroCedula.trim() === '') {
-      this.showWarning('Debe ingresar una cédula para filtrar');
+      this.showWarning(this.translate.instant('CERTIFICADO_ESTUDIANTES.DEBE_INGRESAR_CEDULA'));
       return;
     }
 
@@ -394,17 +393,17 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
     const seleccionados = this.data.filter(e => e.seleccionado);
 
     if (seleccionados.length === 0) {
-      this.showWarning('Debe seleccionar un estudiante');
+      this.showWarning(this.translate.instant('CERTIFICADO_ESTUDIANTES.DEBE_SELECCIONAR_UN_ESTUDIANTE'));
       return;
     }
 
     if (seleccionados.length > 1) {
-      this.showWarning('Solo puede generar un certificado a la vez');
+      this.showWarning(this.translate.instant('CERTIFICADO_ESTUDIANTES.SOLO_UN_CERTIFICADO'));
       return;
     }
 
     const confirmado = await this.showConfirm(
-      `¿Desea generar certificado para ${seleccionados[0].nombre}?`
+      this.translate.instant('CERTIFICADO_ESTUDIANTES.CONFIRMAR_GENERAR', { nombre: seleccionados[0].nombre })
     );
     if (!confirmado) return;
 
@@ -419,7 +418,7 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
       a.click();
     }
 
-    this.showSuccess(`Certificado generado para ${est.nombre}`);
+    this.showSuccess(this.translate.instant('CERTIFICADO_ESTUDIANTES.CERTIFICADO_GENERADO', { nombre: est.nombre }));
   }
 
   // ----------------- paginación -----------------
@@ -456,16 +455,15 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
   extractArray(response: any): any[] {
     if (Array.isArray(response)) return response;
     if (response && typeof response === 'object') {
-      if (Array.isArray(response.data)) return response.data;
-      if (Array.isArray(response.items)) return response.items;
-      if (Array.isArray((response as any).datos)) return (response as any).datos; // soporte para { datos: [...] }
+      if (Array.isArray((response as any).data)) return (response as any).data;
+      if (Array.isArray((response as any).items)) return (response as any).items;
+      if (Array.isArray((response as any).datos)) return (response as any).datos;
       const arr = Object.values(response).find(v => Array.isArray(v));
       if (Array.isArray(arr)) return arr;
     }
     return [];
   }
 
-  // ========== NUEVO: CONSULTA para requerimiento de vista previa ==========
   private getProgramaNombreSeleccionado(): string {
     const nombre = this.listaProgramas.find(p => p.codigo === this.programaCodigo)?.nombre;
     return nombre ?? '';
@@ -521,7 +519,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
               ...est,
               estrategiaNombre: match.estrategiaNombre ?? est.estrategiaNombre,
 
-              // Requerimiento: si viene vacío/null -> N/A
               tipoEstrategia: match.tipoEstrategia ?? this.NA,
               institucionOrigen: match.institucionOrigen ?? this.NA,
               paisOrigen: match.paisOrigen ?? this.NA,
@@ -545,8 +542,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
     });
   }
 
-  // ========== CANVAS: DIBUJAR CERTIFICADO ==========
-
   private initCanvasIfNeeded() {
     if (this.certCanvas && this.certCtx) return;
 
@@ -566,7 +561,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
   }
 
   private na(v: any): string {
-    // Requerimiento: cuando no venga info, mostrar N/A
     if (v === null || v === undefined) return this.NA;
     const s = String(v).trim();
     if (!s || s.toLowerCase() === 'null' || s.toLowerCase() === 'undefined') return this.NA;
@@ -593,10 +587,8 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
       `Participó como: ${rol}`,
       `En el desarrollo de: ${estrategia}`,
       `Estrategia de: ${tipo}`,
-
       `Universidad de origen: ${origenU} (Ciudad: ${origenCiudad}, País: ${origenPais})`,
       `Universidad externa: ${externaU} (Ciudad: ${externaCiudad}, País: ${externaPais})`,
-
       `Año: ${anio}`,
       `Periodo de desarrollo: ${periodo}`
     ];
@@ -618,7 +610,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
     for (const paragraph of paragraphs) {
       const words = paragraph.split(/\s+/).filter(Boolean);
 
-      // Línea vacía => salto
       if (words.length === 0) {
         cursorY += lineHeight;
         continue;
@@ -656,21 +647,19 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
 
     const ctx = this.certCtx;
 
-    // 1. Cargar imagen base
     const backgroundUrl = 'assets/plantilla-certificado.jpeg';
     let img: HTMLImageElement;
     try {
       img = await this.loadImage(backgroundUrl);
     } catch (err) {
       console.error('Error al cargar imagen base', err);
-      this.showError('Error al cargar la plantilla del certificado');
+      this.showError(this.translate.instant('CERTIFICADO_ESTUDIANTES.ERROR_CARGAR_PLANTILLA'));
       return;
     }
 
     this.certCanvas.width = img.width;
     this.certCanvas.height = img.height;
 
-    // 3. Dibujar fondo
     ctx.clearRect(0, 0, this.certCanvas.width, this.certCanvas.height);
     ctx.drawImage(img, 0, 0, img.width, img.height);
 
@@ -680,18 +669,13 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
     ctx.fillStyle = '#18206E';
     ctx.textBaseline = 'top';
 
-    // ========== POSICIONES AFINADAS (en proporción) ==========
-
-    // Columna de texto
     const baseX = W * 0.47;
 
-    // 1) NOMBRE (línea grande azul)
     ctx.font = `${H * 0.035}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
     const nombre = this.na(est.nombre || '');
-    let y = H * 0.36; // algo por debajo de "Certifica que"
+    let y = H * 0.36;
     ctx.fillText(nombre, baseX, y);
 
-    // 2) CÉDULA (debajo del nombre) -> REQUERIMIENTO: quitar documento (sin borrar lógica)
     ctx.font = `${H * 0.026}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
     y = H * 0.45;
     const cc = `C.C. ${this.na(est.cedula)}`;
@@ -699,7 +683,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
       ctx.fillText(cc, baseX, y);
     }
 
-    // 3) BLOQUE NUEVO (REQUERIMIENTO) o bloque anterior (se conserva)
     if (this.usarTextoRequerimientoNuevo) {
       ctx.font = `${H * 0.018}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
       const textoReq = this.buildTextoNarrativo(est);
@@ -710,7 +693,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
 
       y = this.drawWrappedText(ctx, textoReq, baseX, textoY, maxWidth, lineHeight);
     } else {
-
       ctx.font = `italic ${H * 0.035}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
       y = H * 0.51;
       const estrategia = this.na(est.estrategiaNombre || 'Nombre del evento / estrategia');
@@ -722,7 +704,6 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
       ctx.fillText(programa, baseX, y);
     }
 
-    // 5) Fecha
     ctx.font = `${H * 0.023}px "Book Antiqua", "Palatino Linotype", Georgia, serif`;
 
     const fechaX = baseX + W * 0.09;
@@ -748,7 +729,7 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
 
   // ----------------- toasters / confirm -----------------
   showSuccess(mensaje: string) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('CERTIFICADO_ESTUDIANTES.OPERACION_EXITOSA'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -756,7 +737,7 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
   }
 
   showError(mensaje: string) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('CERTIFICADO_ESTUDIANTES.ERROR_PROCESAR'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -764,7 +745,7 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('CERTIFICADO_ESTUDIANTES.ATENCION'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -775,10 +756,10 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('CERTIFICADO_ESTUDIANTES.CONFIRMAR_ACCION'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('CERTIFICADO_ESTUDIANTES.SI_CONFIRMO'),
+        rejectLabel: this.translate.instant('CERTIFICADO_ESTUDIANTES.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

@@ -9,11 +9,20 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { TrayectoriaModel } from '../../models/TrayectoriaModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-trayectoria',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './trayectoria.component.html',
   styleUrls: ['./trayectoria.component.css'],
   providers: [ConfirmationService]
@@ -51,7 +60,11 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit() {
     this.fetchTrayectorias();
@@ -119,7 +132,7 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
   fetchComponentesPorPlan(programaId: string, planEstudioId: number) {
     if (!planEstudioId) {
       this.componentes = [];
-      this.showWarning('Debe seleccionar un plan de estudio válido.');
+      this.showWarning(this.translate.instant('TRAYECTORIAS.ADVERTENCIA_PLAN'));
       return;
     }
 
@@ -149,13 +162,13 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
           }));
 
           if (this.componentes.length === 0) {
-            this.showWarning('No se encontraron componentes para el plan seleccionado.');
+            this.showWarning(this.translate.instant('TRAYECTORIAS.NO_COMPONENTES'));
           }
         },
         error: (err) => {
           console.error('Error al cargar componentes por plan', err);
           this.componentes = [];
-          this.showError('Error al cargar componentes. Intente nuevamente.');
+          this.showError(this.translate.instant('TRAYECTORIAS.ERROR_COMPONENTES'));
         }
       });
   }
@@ -163,7 +176,7 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
   fetchComponentesPorPlanFiltro(programaId: string, planEstudioId: number) {
     if (!planEstudioId) {
       this.componentes = [];
-      this.showWarning('Debe seleccionar un plan de estudio válido.');
+      this.showWarning(this.translate.instant('TRAYECTORIAS.ADVERTENCIA_PLAN'));
       return;
     }
 
@@ -193,20 +206,20 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
           }));
 
           if (this.componentesFiltro.length === 0) {
-            this.showWarning('No se encontraron componentes para el plan seleccionado.');
+            this.showWarning(this.translate.instant('TRAYECTORIAS.NO_COMPONENTES'));
           }
         },
         error: (err) => {
           console.error('Error al cargar componentes por plan', err);
           this.componentesFiltro = [];
-          this.showError('Error al cargar componentes. Intente nuevamente.');
+          this.showError(this.translate.instant('TRAYECTORIAS.ERROR_COMPONENTES'));
         }
       });
   }
 
   onPlanEstudioChange() {
     if (this.model.planestudioid) {
-      this.fetchComponentesPorPlan(this.model.programa,this.model.planestudioid);
+      this.fetchComponentesPorPlan(this.model.programa, this.model.planestudioid);
       this.model.componenteCodigo = '';
     } else {
       this.componentes = [];
@@ -216,7 +229,7 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
 
   onPlanEstudioFiltroChange() {
     if (this.selectedPlanEstudioId) {
-      this.fetchComponentesPorPlanFiltro(this.selectedProgramaCodigo!,this.selectedPlanEstudioId);
+      this.fetchComponentesPorPlanFiltro(this.selectedProgramaCodigo!, this.selectedPlanEstudioId);
       this.selectedComponenteCodigo = '';
     } else {
       this.componentesFiltro = [];
@@ -255,12 +268,12 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar trayectorias', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('TRAYECTORIAS.ERROR_CARGAR');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(this.translate.instant('TRAYECTORIAS.ERROR_CARGAR'));
           this.loadingTable = false;
         }
       });
@@ -270,7 +283,7 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
     this.error = null;
 
     if (!this.filtro || this.filtro.trim() === '') {
-      this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
+      this.showWarning(this.translate.instant('TRAYECTORIAS.ADVERTENCIA_BUSQUEDA'));
       return;
     }
     this.loadingTable = true;
@@ -302,12 +315,12 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al filtrar trayectorias', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('TRAYECTORIAS.ERROR_CARGAR');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(this.translate.instant('TRAYECTORIAS.ERROR_CARGAR'));
           this.loadingTable = false;
         }
       });
@@ -354,14 +367,14 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('TRAYECTORIAS.RESPUESTA_DESCONOCIDA'));
         }
       },
       error: (err) => {
         console.error(isUpdate ? 'Error al actualizar trayectoria' : 'Error al crear trayectoria', err);
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
+        this.error = this.translate.instant('TRAYECTORIAS.ERROR_PROCESAR');
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
+        this.showError(this.translate.instant('TRAYECTORIAS.ERROR_PROCESAR'));
       }
     });
   }
@@ -391,7 +404,7 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
+    const confirmado = await this.showConfirm(this.translate.instant('TRAYECTORIAS.CONFIRMAR_ELIMINAR'));
     if (!confirmado) return;
 
     this.api.delete(`Trayectoria/Eliminar_Trayectoria/${id}`)
@@ -399,11 +412,11 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchTrayectorias();
-          this.showSuccess('Se eliminó el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('TRAYECTORIAS.ELIMINADO_EXITO'));
         },
         error: (err) => {
           console.error('Error al eliminar trayectoria, el registro se encuentra asociado', err);
-          this.showError('Error al eliminar trayectoria, el registro se encuentra asociado');
+          this.showError(this.translate.instant('TRAYECTORIAS.ERROR_ELIMINAR'));
         }
       });
   }
@@ -467,7 +480,7 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
   }
 
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('TRAYECTORIAS.OPERACION_EXITOSA'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -475,7 +488,7 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('TRAYECTORIAS.ERROR'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -483,7 +496,7 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('TRAYECTORIAS.ATENCION'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -494,10 +507,10 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('TRAYECTORIAS.CONFIRMAR_ACCION'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('TRAYECTORIAS.SI_CONFIRMO'),
+        rejectLabel: this.translate.instant('TRAYECTORIAS.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

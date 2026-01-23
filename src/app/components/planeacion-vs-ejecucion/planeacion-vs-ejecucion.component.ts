@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, forkJoin, takeUntil } from 'rxjs';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { GenericApiService } from '../../services/generic-api.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 type EstadoEjecutado = 'ejecutado';
 
@@ -48,7 +49,8 @@ interface EjecutadoApiItem {
   imports: [
     SidebarComponent,
     CommonModule,
-    FormsModule
+    FormsModule,
+    TranslateModule
   ],
   templateUrl: './planeacion-vs-ejecucion.component.html',
   styleUrls: ['./planeacion-vs-ejecucion.component.css']
@@ -74,10 +76,10 @@ export class PlaneacionVsEjecucionComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private api: GenericApiService) {}
-
   programasLst: any[] = [];
   anios: number[] = [];
+
+  constructor(private api: GenericApiService) {}
 
   ngOnInit(): void {
     this.populateYears();

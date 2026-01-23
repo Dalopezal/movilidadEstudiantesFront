@@ -7,31 +7,31 @@
         <section class="col-12 col-lg-3 d-flex flex-column" style="height: 75vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
             <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;font-size: 14px">Administrar Insignias Digitales</p>
+              <p class="mb-0" style="color: #0D133F;font-size: 14px">{{ 'INSIGNIA_DIGITAL.TITULO' | translate }}</p>
             </div>
 
             <div class="card-body d-flex flex-column flex-grow-1">
               <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
                 <div class="mb-3">
-                  <label for="nombre" class="fw-bold">Nombre</label>
-                  <input type="text" id="nombre" name="nombre" required minlength="3" placeholder="Nombre de la insignia"
+                  <label for="nombre" class="fw-bold">{{ 'INSIGNIA_DIGITAL.NOMBRE' | translate }}</label>
+                  <input type="text" id="nombre" name="nombre" required minlength="3" [placeholder]="'INSIGNIA_DIGITAL.NOMBRE_PLACEHOLDER' | translate"
                          class="form-control" [(ngModel)]="model.nombre" #nombreCtrl="ngModel" style="font-size: 13px;"/>
                   <div class="text-danger small mt-1" *ngIf="nombreCtrl.invalid && nombreCtrl.touched">
-                    <div *ngIf="nombreCtrl.errors?.['required']">Campo obligatorio.</div>
-                    <div *ngIf="nombreCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                    <div *ngIf="nombreCtrl.errors?.['required']">{{ 'INSIGNIA_DIGITAL.ERROR_NOMBRE_REQUERIDO' | translate }}</div>
+                    <div *ngIf="nombreCtrl.errors?.['minlength']">{{ 'INSIGNIA_DIGITAL.ERROR_NOMBRE_MIN' | translate }}</div>
                   </div>
                 </div>
 
                 <!-- Campo URL bloqueado y con texto truncado -->
                 <div class="mb-3">
-                  <label for="url" class="fw-bold">URL (se completará al subir)</label>
-                  <input type="text" id="url" name="url" placeholder="URL del recurso"
+                  <label for="url" class="fw-bold">{{ 'INSIGNIA_DIGITAL.URL_LABEL' | translate }}</label>
+                  <input type="text" id="url" name="url" [placeholder]="'INSIGNIA_DIGITAL.URL_PLACEHOLDER' | translate"
                         class="form-control url-field" [(ngModel)]="model.url" readonly />
                 </div>
 
                 <!-- Selector de archivo con drag & drop -->
                 <div class="mb-3">
-                  <label class="fw-bold mb-2">Archivo (opcional)</label>
+                  <label class="fw-bold mb-2">{{ 'INSIGNIA_DIGITAL.ARCHIVO_LABEL' | translate }}</label>
 
                   <div class="file-drop-zone"
                       (drop)="onFileDropped($event)"
@@ -43,16 +43,16 @@
 
                     <button type="button" class="btn btn-outline-primary btn-upload" (click)="fileInput.click()" [disabled]="uploading">
                       <i class="fas fa-file-upload"></i>
-                      <span *ngIf="!uploading">Seleccionar archivo</span>
-                      <span *ngIf="uploading">Subiendo... {{uploadProgress}}%</span>
+                      <span *ngIf="!uploading">{{ 'INSIGNIA_DIGITAL.SELECCIONAR_ARCHIVO' | translate }}</span>
+                      <span *ngIf="uploading">{{ 'INSIGNIA_DIGITAL.SUBIENDO' | translate }} {{uploadProgress}}%</span>
                     </button>
 
-                    <p class="file-drop-text" *ngIf="!selectedFile && !uploading">O arrastra y suelta el archivo aquí</p>
+                    <p class="file-drop-text" *ngIf="!selectedFile && !uploading">{{ 'INSIGNIA_DIGITAL.DRAG_DROP_TEXT' | translate }}</p>
 
                     <div *ngIf="selectedFile" class="selected-file-info">
                       <i class="fas fa-file-alt file-icon"></i>
                       <span class="selected-file-name" [title]="selectedFile.name">{{ selectedFile.name }}</span>
-                      <button type="button" class="btn btn-sm btn-link btn-remove-file" (click)="removeSelectedFile()" title="Quitar archivo">
+                      <button type="button" class="btn btn-sm btn-link btn-remove-file" (click)="removeSelectedFile()" [title]="'INSIGNIA_DIGITAL.QUITAR_ARCHIVO' | translate">
                         &times;
                       </button>
                     </div>
@@ -63,10 +63,10 @@
                   </div>
 
                   <div *ngIf="model.url" class="mt-2 small d-flex align-items-center gap-2">
-                    <strong>Archivo actual:</strong>
+                    <strong>{{ 'INSIGNIA_DIGITAL.ARCHIVO_ACTUAL' | translate }}:</strong>
                     <a [href]="model.url" target="_blank" rel="noopener noreferrer" class="url-link">{{ model.url }}</a>
                     <button *ngIf="isEditing" type="button" class="btn btn-sm btn-danger button-completed"
-                            (click)="eliminarArchivoActual()" title="Eliminar archivo">
+                            (click)="eliminarArchivoActual()" [title]="'INSIGNIA_DIGITAL.ELIMINAR_ARCHIVO' | translate">
                       <i class="fas fa-trash"></i>
                     </button>
                   </div>
@@ -75,18 +75,18 @@
                 <div class="form-check mb-4">
                   <input type="checkbox" id="estado" name="estado" class="form-check-input"
                          [(ngModel)]="model.estado" />
-                  <label for="estado" class="form-check-label fw-bold">Activo</label>
+                  <label for="estado" class="form-check-label fw-bold">{{ 'INSIGNIA_DIGITAL.ACTIVO' | translate }}</label>
                 </div>
 
                 <div class="d-flex gap-3 mt-auto">
                   <button type="submit" class="btn flex-grow-1 text-white"
                           [disabled]="myForm.invalid || loading" style="background:#0D133F;font-size: 13px;">
-                    <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
-                    <span *ngIf="loading">Guardando...</span>
+                    <span *ngIf="!loading">{{ isEditing ? ('INSIGNIA_DIGITAL.ACTUALIZAR' | translate) : ('INSIGNIA_DIGITAL.INGRESAR' | translate) }}</span>
+                    <span *ngIf="loading">{{ 'INSIGNIA_DIGITAL.GUARDANDO' | translate }}</span>
                   </button>
 
                   <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" style="font-size: 13px;">
-                    Cancelar
+                    {{ 'INSIGNIA_DIGITAL.CANCELAR' | translate }}
                   </button>
                 </div>
               </form>
@@ -99,11 +99,11 @@
           <div class="card shadow-sm d-flex flex-column flex-grow-1">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchInsignias(); filtro=''">
-                <i class="fas fa-sync-alt"></i> Actualizar
+                <i class="fas fa-sync-alt"></i> {{ 'INSIGNIA_DIGITAL.ACTUALIZAR_BTN' | translate }}
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite nombre" [(ngModel)]="filtro" name="filtro"/>
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" [placeholder]="'INSIGNIA_DIGITAL.BUSCAR_PLACEHOLDER' | translate" [(ngModel)]="filtro" name="filtro"/>
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterInsignias()">
-                <i class="fas fa-search"></i> Buscar
+                <i class="fas fa-search"></i> {{ 'INSIGNIA_DIGITAL.BUSCAR' | translate }}
               </button>
             </div>
 
@@ -111,14 +111,20 @@
               <table class="table table-striped mb-0">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>URL</th>
-                    <th>Estado</th>
-                    <th>Opciones</th>
+                    <th>{{ 'INSIGNIA_DIGITAL.ID' | translate }}</th>
+                    <th>{{ 'INSIGNIA_DIGITAL.NOMBRE' | translate }}</th>
+                    <th>{{ 'INSIGNIA_DIGITAL.URL' | translate }}</th>
+                    <th>{{ 'INSIGNIA_DIGITAL.ESTADO' | translate }}</th>
+                    <th>{{ 'INSIGNIA_DIGITAL.OPCIONES' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
+                  <tr *ngIf="loadingTable">
+                    <td colspan="5" class="text-center">
+                      <i class="fas fa-spinner fa-spin fa-2x"></i>
+                      <p>{{ 'INSIGNIA_DIGITAL.CARGANDO' | translate }}</p>
+                    </td>
+                  </tr>
                   <tr *ngFor="let item of pagedData">
                     <td>{{ item.id }}</td>
                     <td>{{ item.nombre }}</td>
@@ -127,8 +133,8 @@
                       <a *ngIf="item.url" [href]="item.url" target="_blank">{{ item.url }}</a>
                     </td>
                     <td align="center">
-                      <button *ngIf="item.estado" class="button-completed">Activo</button>
-                      <button *ngIf="!item.estado" class="button-pending">Inactivo</button>
+                      <button *ngIf="item.estado" class="button-completed">{{ 'INSIGNIA_DIGITAL.ACTIVO' | translate }}</button>
+                      <button *ngIf="!item.estado" class="button-pending">{{ 'INSIGNIA_DIGITAL.INACTIVO' | translate }}</button>
                     </td>
                     <td>
                       <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">
@@ -139,8 +145,8 @@
                       </button> -->
                      </td>
                   </tr>
-                  <tr *ngIf="!pagedData.length">
-                    <td colspan="5" class="text-center">No hay registros.</td>
+                  <tr *ngIf="!loadingTable && !pagedData.length">
+                    <td colspan="5" class="text-center">{{ 'INSIGNIA_DIGITAL.NO_REGISTROS' | translate }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -148,11 +154,11 @@
 
             <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
               <div class="items-per-page d-flex align-items-center gap-2">
-                <label for="itemsPerPageSelectIns" class="mb-0">Mostrar</label>
+                <label for="itemsPerPageSelectIns" class="mb-0">{{ 'INSIGNIA_DIGITAL.MOSTRAR' | translate }}</label>
                 <select id="itemsPerPageSelectIns" (change)="onPageSizeChange($event)" [value]="pageSize">
                   <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
                 </select>
-                <span>de {{ data.length }}</span>
+                <span>{{ 'INSIGNIA_DIGITAL.DE' | translate }} {{ data.length }}</span>
               </div>
 
               <nav>
@@ -160,8 +166,8 @@
                   <li class="page-item" [class.disabled]="currentPage === 1">
                     <button class="page-link text-white" (click)="goToPage(currentPage - 1)" style="background:#0D133F;">&laquo;</button>
                   </li>
-                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
-                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  <li class="page-item" *ngFor="let p of pages" [class.active]="p === currentPage">
+                    <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
                   </li>
                   <li class="page-item" [class.disabled]="currentPage === totalPages">
                     <button class="page-link text-white" (click)="goToPage(currentPage + 1)" style="background:#0D133F;">&raquo;</button>

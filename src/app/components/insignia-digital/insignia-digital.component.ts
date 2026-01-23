@@ -10,11 +10,19 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { InsigniaDigitalModel } from '../../models/InsigniaDigitalModel';
 import { MsalService } from '@azure/msal-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-insignia-digital',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './insignia-digital.component.html',
   styleUrls: ['./insignia-digital.component.css'],
   providers: [ConfirmationService]
@@ -46,11 +54,14 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
   // DriveId (usa el que compartiste)
   private driveId = "b!hxInP5NdSkWGDF706k5q4NgI4QHbbA9MuYfs3fRJTRQp2TIIFpMeSKgCChkFV0A1";
 
+  isDragOver = false;
+
   constructor(
     private api: GenericApiService,
     private confirmationService: ConfirmationService,
     private http: HttpClient,
-    private msal: MsalService
+    private msal: MsalService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -78,7 +89,7 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
   private async getToken(scopes: string[] = ['Sites.ReadWrite.All', 'Files.ReadWrite.All']): Promise<string> {
     const account = this.msal.instance.getActiveAccount();
     if (!account) {
-      throw new Error('No hay cuenta activa. Por favor autentícate.');
+      throw new Error(this.translate.instant('INSIGNIA_DIGITAL.ERROR_NO_CUENTA'));
     }
     const tokenResult = await this.msal.instance.acquireTokenSilent({ scopes, account });
     return tokenResult.accessToken;
@@ -121,7 +132,7 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
   // devuelve: { webUrl, id, name }
   // -----------------------
   private async uploadFileToInsignia(file: File): Promise<any> {
-    if (!file) throw new Error('No se proporcionó archivo.');
+    if (!file) throw new Error(this.translate.instant('INSIGNIA_DIGITAL.ERROR_NO_ARCHIVO'));
 
     await this.ensureSignedIn();
     const documentoFolderId = await this.getOrCreateFolder('Insignia'); // carpeta principal "Insignia"
@@ -288,31 +299,31 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
           } else if (response?.error) {
             this.showError(response.error);
           } else {
-            this.showSuccess('Operación realizada correctamente.');
+            this.showSuccess(this.translate.instant('INSIGNIA_DIGITAL.OPERACION_REALIZADA'));
           }
         },
         error: (err) => {
           console.error('Error al guardar insignia', err);
-          this.showError('No se pudo procesar la solicitud.');
+          this.showError(this.translate.instant('INSIGNIA_DIGITAL.ERROR_PROCESAR'));
           this.loading = false;
           this.uploading = false;
         }
       });
     } catch (err: any) {
       console.error('Error en flujo de subida/registro:', err);
-      this.showError(err?.message || 'Error inesperado al procesar el archivo.');
+      this.showError(err?.message || this.translate.instant('INSIGNIA_DIGITAL.ERROR_INESPERADO'));
       this.loading = false;
       this.uploading = false;
     }
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Seguro que deseas eliminar esta insignia digital?');
+    const confirmado = await this.showConfirm(this.translate.instant('INSIGNIA_DIGITAL.CONFIRMAR_ELIMINAR'));
     if (!confirmado) return;
 
     const insigniaToDelete = this.data.find(i => i.id === id);
     if (!insigniaToDelete) {
-      this.showError('No se encontró la insignia a eliminar.');
+      this.showError(this.translate.instant('INSIGNIA_DIGITAL.ERROR_NO_ENCONTRADA'));
       return;
     }
 
@@ -332,11 +343,11 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchInsignias();
-          this.showSuccess('Insignia eliminada correctamente.');
+          this.showSuccess(this.translate.instant('INSIGNIA_DIGITAL.ELIMINADO_EXITO'));
         },
         error: (err) => {
           console.error('Error al eliminar insignia', err);
-          this.showError('Error al eliminar la insignia.');
+          this.showError(this.translate.instant('INSIGNIA_DIGITAL.ERROR_ELIMINAR'));
         }
       });
   }
@@ -391,7 +402,7 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar insignias', err);
-          this.showError('No se pudo cargar la información de insignias digitales.');
+          this.showError(this.translate.instant('INSIGNIA_DIGITAL.ERROR_CARGAR'));
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
@@ -402,7 +413,7 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
 
   filterInsignias() {
     if (!this.filtro.trim()) {
-      this.showWarning('Debe digitar un valor para buscar.');
+      this.showWarning(this.translate.instant('INSIGNIA_DIGITAL.ADVERTENCIA_BUSQUEDA'));
       return;
     }
 
@@ -430,7 +441,7 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error en búsqueda de insignias', err);
-          this.showError('No se pudieron cargar los resultados.');
+          this.showError(this.translate.instant('INSIGNIA_DIGITAL.ERROR_BUSQUEDA'));
           this.loadingTable = false;
         }
       });
@@ -465,7 +476,7 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
   // TOASTS / CONFIRMS
   // -----------------------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('INSIGNIA_DIGITAL.OPERACION_EXITOSA'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -473,7 +484,7 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('INSIGNIA_DIGITAL.ERROR'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -481,7 +492,7 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('INSIGNIA_DIGITAL.ATENCION'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -492,10 +503,10 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('INSIGNIA_DIGITAL.CONFIRMAR_ACCION'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('INSIGNIA_DIGITAL.SI_CONFIRMO'),
+        rejectLabel: this.translate.instant('INSIGNIA_DIGITAL.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',
@@ -508,19 +519,17 @@ export class InsigniaDigitalComponent implements OnInit, OnDestroy {
   }
 
   async eliminarArchivoActual() {
-    const ok = await this.showConfirm('¿Eliminar archivo asociado de SharePoint?');
+    const ok = await this.showConfirm(this.translate.instant('INSIGNIA_DIGITAL.CONFIRMAR_ELIMINAR_ARCHIVO'));
     if (!ok) return;
 
     try {
       await this.deleteFileByUrl(this.model.url);
       this.model.url = '';
-      this.showSuccess('Archivo eliminado');
+      this.showSuccess(this.translate.instant('INSIGNIA_DIGITAL.ARCHIVO_ELIMINADO'));
     } catch (e) {
-      this.showError('No se pudo eliminar archivo');
+      this.showError(this.translate.instant('INSIGNIA_DIGITAL.ERROR_ELIMINAR_ARCHIVO'));
     }
   }
-
-  isDragOver = false;
 
   onDragOver(event: DragEvent) {
     event.preventDefault();

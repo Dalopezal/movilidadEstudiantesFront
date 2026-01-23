@@ -7,7 +7,7 @@
         <section class="col-12 col-lg-4 d-flex flex-column" style="height: 75vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
             <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;font-size: 14px">Administrar Trayectorias</p>
+              <p class="mb-0" style="color: #0D133F;font-size: 14px">{{ 'TRAYECTORIAS.TITULO' | translate }}</p>
             </div>
 
             <div class="card-body d-flex flex-column flex-grow-1">
@@ -15,7 +15,7 @@
 
                 <div class="mb-3">
                   <div class="flex-grow-1">
-                    <label for="programa" class="form-label fw-bold">Programa</label>
+                    <label for="programa" class="form-label fw-bold">{{ 'TRAYECTORIAS.PROGRAMA' | translate }}</label>
                     <select
                       class="form-select"
                       id="programa"
@@ -25,11 +25,11 @@
                       #programaCtrl="ngModel"
                       style="font-size: 13px"
                     >
-                      <option [ngValue]="''" disabled>Seleccione</option>
+                      <option [ngValue]="''" disabled>{{ 'TRAYECTORIAS.SELECCIONE' | translate }}</option>
                       <option *ngFor="let prog of programas" [ngValue]="prog.id">{{ prog.nombre }}</option>
                     </select>
                     <div class="text-danger small mt-1" *ngIf="programaCtrl.invalid && (programaCtrl.touched || programaCtrl.dirty)">
-                      <div *ngIf="programaCtrl.errors?.['required']">Debe seleccionar un programa.</div>
+                      <div *ngIf="programaCtrl.errors?.['required']">{{ 'TRAYECTORIAS.ERROR_PROGRAMA' | translate }}</div>
                     </div>
                   </div>
                 </div>
@@ -37,7 +37,7 @@
                 <div class="mb-3 d-flex gap-3">
 
                   <div class="flex-grow-1">
-                    <label for="planestudioid" class="form-label fw-bold">Plan de Estudio</label>
+                    <label for="planestudioid" class="form-label fw-bold">{{ 'TRAYECTORIAS.PLAN_ESTUDIO' | translate }}</label>
                     <input
                       type="number"
                       class="form-control"
@@ -47,18 +47,18 @@
                       [(ngModel)]="model.planestudioid"
                       #planCtrl="ngModel"
                       (change)="onPlanEstudioChange()"
-                      placeholder="Ingrese ID del plan"
+                      [placeholder]="'TRAYECTORIAS.PLACEHOLDER_PLAN' | translate"
                       style="font-size: 13px"
                     />
                     <div class="text-danger small mt-1" *ngIf="planCtrl.invalid && (planCtrl.touched || planCtrl.dirty)">
-                      <div *ngIf="planCtrl.errors?.['required']">Debe ingresar un plan de estudio.</div>
+                      <div *ngIf="planCtrl.errors?.['required']">{{ 'TRAYECTORIAS.ERROR_PLAN' | translate }}</div>
                     </div>
                   </div>
                 </div>
 
                 <div class="mb-3 d-flex gap-3">
                   <div class="flex-grow-1">
-                    <label for="componenteCodigo" class="form-label fw-bold">Componente</label>
+                    <label for="componenteCodigo" class="form-label fw-bold">{{ 'TRAYECTORIAS.COMPONENTE' | translate }}</label>
                     <select
                       class="form-select"
                       id="componenteCodigo"
@@ -68,16 +68,16 @@
                       #componenteCtrl="ngModel"
                       style="font-size: 13px"
                     >
-                      <option [ngValue]="''" disabled>Seleccione</option>
+                      <option [ngValue]="''" disabled>{{ 'TRAYECTORIAS.SELECCIONE' | translate }}</option>
                       <option *ngFor="let comp of componentes" [ngValue]="comp.codigo">{{ comp.nombre }}</option>
                     </select>
                     <div class="text-danger small mt-1" *ngIf="componenteCtrl.invalid && (componenteCtrl.touched || componenteCtrl.dirty)">
-                      <div *ngIf="componenteCtrl.errors?.['required']">Debe seleccionar un componente.</div>
+                      <div *ngIf="componenteCtrl.errors?.['required']">{{ 'TRAYECTORIAS.ERROR_COMPONENTE' | translate }}</div>
                     </div>
                   </div>
 
                   <div class="flex-grow-1">
-                    <label for="estrategiaid" class="form-label fw-bold">Estrategia</label>
+                    <label for="estrategiaid" class="form-label fw-bold">{{ 'TRAYECTORIAS.ESTRATEGIA' | translate }}</label>
                     <select
                       class="form-select"
                       id="estrategiaid"
@@ -87,24 +87,24 @@
                       #estrCtrl="ngModel"
                       style="font-size: 13px"
                     >
-                      <option [ngValue]="0" disabled>Seleccione</option>
+                      <option [ngValue]="0" disabled>{{ 'TRAYECTORIAS.SELECCIONE' | translate }}</option>
                       <option *ngFor="let e of estrategias" [ngValue]="e.id">{{ e.nombre }}</option>
                     </select>
                     <div class="text-danger small mt-1" *ngIf="estrCtrl.invalid && (estrCtrl.touched || estrCtrl.dirty)">
-                      <div *ngIf="estrCtrl.errors?.['required']">Debe seleccionar una estrategia.</div>
+                      <div *ngIf="estrCtrl.errors?.['required']">{{ 'TRAYECTORIAS.ERROR_ESTRATEGIA' | translate }}</div>
                     </div>
                   </div>
                 </div>
 
                 <div class="mb-3 d-flex gap-3">
                   <div class="flex-grow-1">
-                    <label for="periodo" class="form-label fw-bold">Periodo</label>
+                    <label for="periodo" class="form-label fw-bold">{{ 'TRAYECTORIAS.PERIODO' | translate }}</label>
                     <input
                       type="number"
                       class="form-control"
                       id="periodo"
                       name="periodo"
-                      placeholder="Digite Periodo"
+                      [placeholder]="'TRAYECTORIAS.PLACEHOLDER_PERIODO' | translate"
                       required
                       min="1"
                       [(ngModel)]="model.periodo"
@@ -112,13 +112,13 @@
                       style="font-size: 13px"
                     />
                     <div class="text-danger small mt-1" *ngIf="periodoCtrl.invalid && (periodoCtrl.touched || periodoCtrl.dirty)">
-                      <div *ngIf="periodoCtrl.errors?.['required']">El periodo es obligatorio.</div>
-                      <div *ngIf="periodoCtrl.errors?.['min']">Debe ser al menos 1.</div>
+                      <div *ngIf="periodoCtrl.errors?.['required']">{{ 'TRAYECTORIAS.ERROR_PERIODO' | translate }}</div>
+                      <div *ngIf="periodoCtrl.errors?.['min']">{{ 'TRAYECTORIAS.ERROR_PERIODO_MIN' | translate }}</div>
                     </div>
                   </div>
 
                   <div class="flex-grow-1">
-                    <label for="fecha" class="form-label fw-bold">Fecha</label>
+                    <label for="fecha" class="form-label fw-bold">{{ 'TRAYECTORIAS.FECHA' | translate }}</label>
                     <input
                       type="date"
                       class="form-control"
@@ -130,20 +130,20 @@
                       style="font-size: 13px"
                     />
                     <div class="text-danger small mt-1" *ngIf="fechaCtrl.invalid && (fechaCtrl.touched || fechaCtrl.dirty)">
-                      <div *ngIf="fechaCtrl.errors?.['required']">La fecha es obligatoria.</div>
+                      <div *ngIf="fechaCtrl.errors?.['required']">{{ 'TRAYECTORIAS.ERROR_FECHA' | translate }}</div>
                     </div>
                   </div>
                 </div>
 
                 <div class="mb-3 d-flex gap-3">
                   <div class="flex-grow-1">
-                    <label for="areaformacion" class="form-label fw-bold">Área de Formación</label>
+                    <label for="areaformacion" class="form-label fw-bold">{{ 'TRAYECTORIAS.AREA_FORMACION' | translate }}</label>
                     <input
                       type="text"
                       class="form-control"
                       id="areaformacion"
                       name="areaformacion"
-                      placeholder="Digite Área de Formación"
+                      [placeholder]="'TRAYECTORIAS.PLACEHOLDER_AREA' | translate"
                       required
                       minlength="3"
                       [(ngModel)]="model.areaformacion"
@@ -151,13 +151,13 @@
                       style="font-size: 13px"
                     />
                     <div class="text-danger small mt-1" *ngIf="areaCtrl.invalid && (areaCtrl.touched || areaCtrl.dirty)">
-                      <div *ngIf="areaCtrl.errors?.['required']">El área es obligatoria.</div>
-                      <div *ngIf="areaCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                      <div *ngIf="areaCtrl.errors?.['required']">{{ 'TRAYECTORIAS.ERROR_AREA' | translate }}</div>
+                      <div *ngIf="areaCtrl.errors?.['minlength']">{{ 'TRAYECTORIAS.ERROR_AREA_MIN' | translate }}</div>
                     </div>
                   </div>
 
                   <div class="flex-grow-1">
-                    <label for="totalcreditosprograma" class="form-label fw-bold">Total Créditos</label>
+                    <label for="totalcreditosprograma" class="form-label fw-bold">{{ 'TRAYECTORIAS.TOTAL_CREDITOS' | translate }}</label>
                     <input
                       type="number"
                       class="form-control"
@@ -170,20 +170,20 @@
                       style="font-size: 13px"
                     />
                     <div class="text-danger small mt-1" *ngIf="creditosCtrl.invalid && (creditosCtrl.touched || creditosCtrl.dirty)">
-                      <div *ngIf="creditosCtrl.errors?.['required']">El total de créditos es obligatorio.</div>
-                      <div *ngIf="creditosCtrl.errors?.['min']">Debe ser al menos 1.</div>
+                      <div *ngIf="creditosCtrl.errors?.['required']">{{ 'TRAYECTORIAS.ERROR_CREDITOS' | translate }}</div>
+                      <div *ngIf="creditosCtrl.errors?.['min']">{{ 'TRAYECTORIAS.ERROR_CREDITOS_MIN' | translate }}</div>
                     </div>
                   </div>
                 </div>
 
                 <div class="mb-3">
-                  <label for="plaFacultad" class="form-label fw-bold">Facultad</label>
+                  <label for="plaFacultad" class="form-label fw-bold">{{ 'TRAYECTORIAS.FACULTAD' | translate }}</label>
                   <input
                     type="text"
                     class="form-control"
                     id="plaFacultad"
                     name="plaFacultad"
-                    placeholder="Digite Facultad"
+                    [placeholder]="'TRAYECTORIAS.PLACEHOLDER_FACULTAD' | translate"
                     required
                     minlength="3"
                     [(ngModel)]="model.plaFacultad"
@@ -191,8 +191,8 @@
                     style="font-size: 13px"
                   />
                   <div class="text-danger small mt-1" *ngIf="facultadCtrl.invalid && (facultadCtrl.touched || facultadCtrl.dirty)">
-                    <div *ngIf="facultadCtrl.errors?.['required']">La facultad es obligatoria.</div>
-                    <div *ngIf="facultadCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                    <div *ngIf="facultadCtrl.errors?.['required']">{{ 'TRAYECTORIAS.ERROR_FACULTAD' | translate }}</div>
+                    <div *ngIf="facultadCtrl.errors?.['minlength']">{{ 'TRAYECTORIAS.ERROR_FACULTAD_MIN' | translate }}</div>
                   </div>
                 </div>
 
@@ -205,13 +205,13 @@
                     [ngStyle]="{ 'background': '#0D133F' }"
                     style="font-size: 13px"
                   >
-                    <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
-                    <span *ngIf="loading">Guardando...</span>
+                    <span *ngIf="!loading">{{ isEditing ? ('TRAYECTORIAS.ACTUALIZAR' | translate) : ('TRAYECTORIAS.INGRESAR' | translate) }}</span>
+                    <span *ngIf="loading">{{ 'TRAYECTORIAS.GUARDANDO' | translate }}</span>
                   </button>
 
                   <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading"
                     style="font-size: 13px">
-                    Cancelar
+                    {{ 'TRAYECTORIAS.CANCELAR' | translate }}
                   </button>
                 </div>
               </form>
@@ -224,11 +224,11 @@
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchTrayectorias(); filtro=''">
-                <i class="fas fa-sync-alt"></i> Actualizar
+                <i class="fas fa-sync-alt"></i> {{ 'TRAYECTORIAS.ACTUALIZAR_BTN' | translate }}
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite nombre componente" [(ngModel)]="filtro" name="filtro"/>
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" [placeholder]="'TRAYECTORIAS.BUSCAR_COMPONENTE' | translate" [(ngModel)]="filtro" name="filtro"/>
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterTrayectorias()">
-                <i class="fas fa-search"></i> Buscar
+                <i class="fas fa-search"></i> {{ 'TRAYECTORIAS.BUSCAR' | translate }}
               </button>
             </div>
 
@@ -236,24 +236,26 @@
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
                   <tr>
-                    <th style="background: white">Código</th>
-                    <th style="background: white !important;">Nombre</th>
-                    <th style="background: white !important;">Estrategia</th>
-                    <th style="background: white !important;">Periodo</th>
-                    <th style="background: white !important;">Fecha</th>
-                    <th style="background: white !important;">Área Formación</th>
-                    <th style="background: white !important;">Total Créditos</th>
-                    <th style="background: white !important;">Programa</th>
-                    <th style="background: white !important;">Plan Estudio</th>
-                    <th style="background: white !important;">Facultad</th>
-                    <th style="background: white !important;">Opciones</th>
+                    <th style="background: white">{{ 'TRAYECTORIAS.CODIGO' | translate }}</th>
+                    <th style="background: white !important;">{{ 'TRAYECTORIAS.NOMBRE' | translate }}</th>
+                    <th style="background: white !important;">{{ 'TRAYECTORIAS.ESTRATEGIA' | translate }}</th>
+                    <th style="background: white !important;">{{ 'TRAYECTORIAS.PERIODO' | translate }}</th>
+                    <th style="background: white !important;">{{ 'TRAYECTORIAS.FECHA' | translate }}</th>
+                    <th style="background: white !important;">{{ 'TRAYECTORIAS.AREA_FORMACION' | translate }}</th>
+                    <th style="background: white !important;">{{ 'TRAYECTORIAS.TOTAL_CREDITOS' | translate }}</th>
+                    <th style="background: white !important;">{{ 'TRAYECTORIAS.PROGRAMA' | translate }}</th>
+                    <th style="background: white !important;">{{ 'TRAYECTORIAS.PLAN_ESTUDIO_TH' | translate }}</th>
+                    <th style="background: white !important;">{{ 'TRAYECTORIAS.FACULTAD' | translate }}</th>
+                    <th style="background: white !important;">{{ 'TRAYECTORIAS.OPCIONES' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
-                <div *ngIf="loadingTable" class="table-overlay">
-                  <i class="fas fa-spinner fa-spin fa-3x"></i>
-                  <p style="background: transparent;">Cargando datos</p>
-                </div>
+                  <tr *ngIf="loadingTable">
+                    <td colspan="11" class="text-center">
+                      <i class="fas fa-spinner fa-spin fa-3x"></i>
+                      <p style="background: transparent;">{{ 'TRAYECTORIAS.CARGANDO' | translate }}</p>
+                    </td>
+                  </tr>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.componenteCodigo }}</td>
                     <td>{{ item.componenteNombre }}</td>
@@ -275,7 +277,7 @@
                     </td>
                   </tr>
                   <tr *ngIf="!loadingTable && pagedData.length === 0">
-                    <td colspan="11" class="text-center">No hay registros.</td>
+                    <td colspan="11" class="text-center">{{ 'TRAYECTORIAS.NO_REGISTROS' | translate }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -283,11 +285,11 @@
 
             <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
               <div class="items-per-page d-flex align-items-center gap-2">
-                <label for="itemsPerPageSelectTray" class="mb-0">Mostrar</label>
+                <label for="itemsPerPageSelectTray" class="mb-0">{{ 'TRAYECTORIAS.MOSTRAR' | translate }}</label>
                 <select id="itemsPerPageSelectTray" (change)="onPageSizeChange($event)" [value]="pageSize">
                   <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
                 </select>
-                <span>de {{ data.length }}</span>
+                <span>{{ 'TRAYECTORIAS.DE' | translate }} {{ data.length }}</span>
               </div>
 
               <nav aria-label="Page navigation example">
@@ -297,8 +299,8 @@
                       <span aria-hidden="true">&laquo;</span>
                     </button>
                   </li>
-                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
-                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  <li class="page-item" *ngFor="let p of pages" [class.active]="p === currentPage">
+                    <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
                   </li>
                   <li class="page-item" [class.disabled]="currentPage === totalPages">
                     <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background: #0D133F;">

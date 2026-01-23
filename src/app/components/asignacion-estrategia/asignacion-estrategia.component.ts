@@ -9,11 +9,20 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { EstrategiaPlanModel } from '../../models/EstrategiaPlanModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-asignacion-estrategia',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './asignacion-estrategia.component.html',
   styleUrls: ['./asignacion-estrategia.component.css'],
   providers: [ConfirmationService]
@@ -44,7 +53,11 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit() {
     this.fetchCatalogos();
@@ -66,7 +79,6 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
   // Cargar catálogos (insignias y tipos de estrategia)
   // -----------------------
   fetchCatalogos() {
-    // Ajusta los endpoints según tu API
     forkJoin({
       insignias: this.api.get<any>('InsigniaDigital/Consultar_InsigniaDigital'),
       tiposEstrategia: this.api.get<any>('TipoEstrategia/Consultar_TipoEstrategia')
@@ -92,7 +104,7 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al cargar catálogos', err);
-        this.showError('No se pudieron cargar los catálogos');
+        this.showError(this.translate.instant('ESTRATEGIA_PLAN.ERROR_CARGAR_CATALOGOS'));
       }
     });
   }
@@ -131,12 +143,12 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar estrategias', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('ESTRATEGIA_PLAN.ERROR_CARGAR_INFORMACION');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(this.translate.instant('ESTRATEGIA_PLAN.ERROR_CARGAR_INFORMACION'));
           this.loadingTable = false;
         }
       });
@@ -149,7 +161,7 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
     this.error = null;
 
     if (!this.filtro || this.filtro.trim() === '') {
-      this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
+      this.showWarning(this.translate.instant('ESTRATEGIA_PLAN.DEBE_DIGITAR_VALOR_BUSQUEDA'));
       return;
     }
     this.loadingTable = true;
@@ -181,12 +193,12 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al filtrar estrategias', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('ESTRATEGIA_PLAN.ERROR_CARGAR_INFORMACION');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(this.translate.instant('ESTRATEGIA_PLAN.ERROR_CARGAR_INFORMACION'));
           this.loadingTable = false;
         }
       });
@@ -203,7 +215,7 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
 
     // validaciones adicionales
     if (!this.model.nombre?.trim()) {
-      this.error = 'El nombre es obligatorio.';
+      this.error = this.translate.instant('ESTRATEGIA_PLAN.NOMBRE_OBLIGATORIO');
       return;
     }
 
@@ -239,14 +251,14 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('ESTRATEGIA_PLAN.RESPUESTA_DESCONOCIDA'));
         }
       },
       error: (err) => {
         console.error(isUpdate ? 'Error al actualizar estrategia' : 'Error al crear estrategia', err);
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
+        this.error = this.translate.instant('ESTRATEGIA_PLAN.ERROR_PROCESAR_SOLICITUD');
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
+        this.showError(this.translate.instant('ESTRATEGIA_PLAN.ERROR_PROCESAR_SOLICITUD'));
       }
     });
   }
@@ -273,7 +285,7 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
+    const confirmado = await this.showConfirm(this.translate.instant('ESTRATEGIA_PLAN.CONFIRMAR_ELIMINAR'));
     if (!confirmado) return;
 
     this.api.delete(`EstrategiaPlan/Eliminar_EstrategiaPlan/${id}`)
@@ -281,11 +293,11 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchEstrategias();
-          this.showSuccess('Se eliminó el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('ESTRATEGIA_PLAN.REGISTRO_ELIMINADO'));
         },
         error: (err) => {
           console.error('Error al eliminar estrategia, el registro se encuentra asociado', err);
-          this.showError('Error al eliminar estrategia, el registro se encuentra asociado');
+          this.showError(this.translate.instant('ESTRATEGIA_PLAN.ERROR_ELIMINAR_ASOCIADO'));
         }
       });
   }
@@ -330,7 +342,7 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
   // Toasters / Confirm
   // -----------------------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('ESTRATEGIA_PLAN.OPERACION_EXITOSA'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -338,7 +350,7 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('ESTRATEGIA_PLAN.ERROR_PROCESAR'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -346,7 +358,7 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('ESTRATEGIA_PLAN.ATENCION'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -357,10 +369,10 @@ export class EstrategiaComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('ESTRATEGIA_PLAN.CONFIRMAR_ACCION'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('ESTRATEGIA_PLAN.SI_CONFIRMO'),
+        rejectLabel: this.translate.instant('ESTRATEGIA_PLAN.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

@@ -8,7 +8,7 @@
         <section class="col-12 col-lg-12 d-flex flex-column" style="height: 75vh;font-size: 14px;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1">
             <div class="card-header d-flex align-items-center" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;font-weight: bold;">Aprobación estudiantes</p>
+              <p class="mb-0" style="color: #0D133F;font-weight: bold;">{{ 'APROBACION_ESTUDIANTES.TITULO' | translate }}</p>
             </div>
 
             <!-- Fila de combos -->
@@ -21,7 +21,7 @@
                 style="font-size: 13px;"
                 [(ngModel)]="planeacionId"
               >
-                <option [ngValue]="null">Selección Planeación</option>
+                <option [ngValue]="null">{{ 'APROBACION_ESTUDIANTES.SELECCION_PLANEACION' | translate }}</option>
                 <option *ngFor="let p of listaPlaneaciones" [ngValue]="p.id">{{ p.titulo }}</option>
               </select>
 
@@ -34,7 +34,7 @@
                 [(ngModel)]="programaCodigo"
                 (change)="onProgramaChange()"
               >
-                <option [ngValue]="null">Programa</option>
+                <option [ngValue]="null">{{ 'APROBACION_ESTUDIANTES.PROGRAMA' | translate }}</option>
                 <option *ngFor="let prog of listaProgramas" [ngValue]="prog.codigo">
                   {{ prog.nombre }}
                 </option>
@@ -49,7 +49,7 @@
                 [(ngModel)]="componenteCodigo"
                 (change)="onComponenteChange()"
               >
-                <option [ngValue]="null">Componente</option>
+                <option [ngValue]="null">{{ 'APROBACION_ESTUDIANTES.COMPONENTE' | translate }}</option>
                 <option *ngFor="let comp of listaComponentes" [ngValue]="comp.codigo">
                   {{ comp.nombre }}
                 </option>
@@ -63,7 +63,7 @@
                 style="font-size: 13px;"
                 [(ngModel)]="grupoId"
               >
-                <option [ngValue]="null">Grupo</option>
+                <option [ngValue]="null">{{ 'APROBACION_ESTUDIANTES.GRUPO' | translate }}</option>
                 <option *ngFor="let grupo of listaGrupos" [ngValue]="grupo">
                   {{ grupo }}
                 </option>
@@ -75,7 +75,7 @@
                 (click)="buscarEstudiantes()"
                 [disabled]="loading"
               >
-                <i class="fas fa-search"></i> Buscar Estudiantes
+                <i class="fas fa-search"></i> {{ 'APROBACION_ESTUDIANTES.BUSCAR_ESTUDIANTES' | translate }}
               </button>
             </div>
 
@@ -88,14 +88,14 @@
                   style="background:#0D133F;border-color:#0D133F;font-size:13px;padding:5px 8px;"
                   (click)="refrescarTabla()"
                 >
-                  <i class="fas fa-sync-alt"></i> Limpiar
+                  <i class="fas fa-sync-alt"></i> {{ 'APROBACION_ESTUDIANTES.LIMPIAR' | translate }}
                 </button>
 
                 <!-- Búsqueda por cédula -->
                 <input
                   type="text"
                   class="form-control"
-                  placeholder="Digite cédula estudiante"
+                  [placeholder]="'APROBACION_ESTUDIANTES.DIGITE_CEDULA' | translate"
                   [(ngModel)]="filtroCedula"
                   name="filtroCedula"
                   style="border-radius:22px;background:#f2f0f0;font-size:13px;width:300px;"
@@ -105,7 +105,7 @@
                   style="background:#0D133F;border-color:#0D133F;font-size:13px;padding:5px 8px;"
                   (click)="buscarPorCedula()"
                 >
-                  <i class="fas fa-search"></i> Buscar
+                  <i class="fas fa-search"></i> {{ 'APROBACION_ESTUDIANTES.BUSCAR' | translate }}
                 </button>
                 <button
                   class="btn btn-primary"
@@ -113,7 +113,7 @@
                   (click)="guardarEstudiantes()"
                   [disabled]="!botonGuardarHabilitado || loading"
                 >
-                  <i class="fas fa-save"></i> Guardar Estudiantes
+                  <i class="fas fa-save"></i> {{ 'APROBACION_ESTUDIANTES.GUARDAR_ESTUDIANTES' | translate }}
                 </button>
               </div>
             </div>
@@ -125,10 +125,10 @@
               <table class="table table-striped mb-0">
                 <thead class="table-primary" style="font-size: 13px">
                   <tr align="left">
-                    <th style="background: white;color: #0D133F;">Cedula</th>
-                    <th style="background: white;color: #0D133F;">Nombre</th>
+                    <th style="background: white;color: #0D133F;">{{ 'APROBACION_ESTUDIANTES.CEDULA' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'APROBACION_ESTUDIANTES.NOMBRE' | translate }}</th>
                     <th style="background: white; color: #0D133F; vertical-align: middle;">
-                      Aprobó?
+                      {{ 'APROBACION_ESTUDIANTES.APROBO' | translate }}
                     </th>
                     <th style="background: white; color: #0D133F; vertical-align: middle; width: 180px;">
                       <div class="d-flex align-items-center justify-content-center gap-2" style="font-size: 13px;">
@@ -146,7 +146,7 @@
                           for="seleccionarTodos"
                           style="cursor: pointer; user-select: none;"
                         >
-                          Seleccionar todos
+                          {{ 'APROBACION_ESTUDIANTES.SELECCIONAR_TODOS' | translate }}
                         </label>
                       </div>
                     </th>
@@ -157,7 +157,7 @@
                   <tr *ngIf="loading">
                     <td colspan="4" class="text-center">
                       <i class="fas fa-spinner fa-spin fa-3x"></i>
-                      <p style="background: transparent; margin: 0;">Cargando datos</p>
+                      <p style="background: transparent; margin: 0;">{{ 'APROBACION_ESTUDIANTES.CARGANDO_DATOS' | translate }}</p>
                     </td>
                   </tr>
 
@@ -165,8 +165,8 @@
                     <td align="center">{{ item.cedula }}</td>
                     <td>{{ item.nombre }}</td>
                     <td>
-                      <button *ngIf="item.aprobo" class="button-completed">Si</button>
-                      <button *ngIf="!item.aprobo" class="button-pending">No</button>
+                      <button *ngIf="item.aprobo" class="button-completed">{{ 'APROBACION_ESTUDIANTES.SI' | translate }}</button>
+                      <button *ngIf="!item.aprobo" class="button-pending">{{ 'APROBACION_ESTUDIANTES.NO' | translate }}</button>
                     </td>
                     <td align="center">
                       <div class="form-check d-flex justify-content-center">
@@ -182,7 +182,7 @@
                   </tr>
 
                   <tr *ngIf="!loading && pagedData.length === 0">
-                    <td colspan="4" class="text-center">No hay registros.</td>
+                    <td colspan="4" class="text-center">{{ 'APROBACION_ESTUDIANTES.NO_HAY_REGISTROS' | translate }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -191,11 +191,11 @@
             <!-- Paginación -->
             <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
               <div class="items-per-page d-flex align-items-center gap-2">
-                <label for="itemsPerPageSelect" class="mb-0">Mostrar</label>
+                <label for="itemsPerPageSelect" class="mb-0">{{ 'APROBACION_ESTUDIANTES.MOSTRAR' | translate }}</label>
                 <select id="itemsPerPageSelect" (change)="onPageSizeChange($event)" [value]="pageSize">
                   <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
                 </select>
-                <span>de {{ data.length }}</span>
+                <span>{{ 'APROBACION_ESTUDIANTES.DE' | translate }} {{ data.length }}</span>
               </div>
 
               <nav>
@@ -205,8 +205,8 @@
                       &laquo;
                     </button>
                   </li>
-                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
-                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  <li class="page-item" *ngFor="let p of pages" [class.active]="p === currentPage">
+                    <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
                   </li>
                   <li class="page-item" [class.disabled]="currentPage === totalPages">
                     <button class="page-link text-white" (click)="goToPage(currentPage + 1)" style="background:#0D133F">

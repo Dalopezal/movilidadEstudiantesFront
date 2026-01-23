@@ -9,6 +9,7 @@ import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { GenericApiService } from '../../services/generic-api.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { concatMap, from, toArray, catchError, of } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core'; // ✅ Agregado
 
 interface EstudianteAprobacion {
   cedula: string;
@@ -38,7 +39,8 @@ interface ComponenteDocente {
     HttpClientModule,
     ConfirmDialogModule,
     NgxSonnerToaster,
-    SidebarComponent
+    SidebarComponent,
+    TranslateModule // ✅ Agregado
   ],
   templateUrl: './aprobacion-estudiantes.component.html',
   styleUrls: ['./aprobacion-estudiantes.component.css'],
@@ -86,7 +88,8 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
 
   constructor(
     private api: GenericApiService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService // ✅ Agregado
   ) {}
 
   ngOnInit(): void {
@@ -111,7 +114,7 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al cargar planeaciones', err);
-          this.showError('No se pudieron cargar las planeaciones');
+          this.showError(this.translate.instant('APROBACION_ESTUDIANTES.ERROR_CARGAR_PLANEACIONES'));
         }
       });
   }
@@ -167,7 +170,7 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al cargar programas', err);
-          this.showError('No se pudieron cargar los programas');
+          this.showError(this.translate.instant('APROBACION_ESTUDIANTES.ERROR_CARGAR_PROGRAMAS'));
         }
       });
   }
@@ -218,7 +221,7 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   // -----------------------
   buscarEstudiantes() {
     if (!this.planeacionId || !this.programaCodigo || !this.componenteCodigo || !this.grupoId) {
-      this.showWarning('Debe seleccionar todos los filtros antes de buscar');
+      this.showWarning(this.translate.instant('APROBACION_ESTUDIANTES.DEBE_SELECCIONAR_FILTROS'));
       return;
     }
 
@@ -243,7 +246,7 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('Error al consultar aprobaciones', err);
           this.loading = false;
-          this.showError('Error al consultar aprobaciones');
+          this.showError(this.translate.instant('APROBACION_ESTUDIANTES.ERROR_CONSULTAR_APROBACIONES'));
         }
       });
   }
@@ -289,7 +292,7 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('Error al cargar listado de estudiantes', err);
           this.loading = false;
-          this.showError('Error al cargar estudiantes');
+          this.showError(this.translate.instant('APROBACION_ESTUDIANTES.ERROR_CARGAR_ESTUDIANTES'));
         }
       });
   }
@@ -299,7 +302,7 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   // -----------------------
   buscarPorCedula() {
     if (!this.filtroCedula || this.filtroCedula.trim() === '') {
-      this.showWarning('Debe ingresar una cédula para filtrar');
+      this.showWarning(this.translate.instant('APROBACION_ESTUDIANTES.DEBE_INGRESAR_CEDULA'));
       return;
     }
 
@@ -322,11 +325,13 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
     const estudiantesAprobados = this.data.filter(e => e.aprobo);
 
     if (estudiantesAprobados.length === 0) {
-      this.showWarning('Debe seleccionar al menos un estudiante para guardar');
+      this.showWarning(this.translate.instant('APROBACION_ESTUDIANTES.DEBE_SELECCIONAR_ESTUDIANTE'));
       return;
     }
 
-    const confirmado = await this.showConfirm(`¿Está seguro de guardar ${estudiantesAprobados.length} estudiante(s) aprobado(s)?`);
+    const confirmado = await this.showConfirm(
+      this.translate.instant('APROBACION_ESTUDIANTES.CONFIRMAR_GUARDAR', { count: estudiantesAprobados.length })
+    );
     if (!confirmado) return;
 
     this.loading = true;
@@ -357,15 +362,15 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
         this.botonGuardarHabilitado = false;
         const errores = responses.filter(r => r === null).length;
         if (errores > 0) {
-          this.showWarning(`Se guardaron con errores (${errores} estudiantes fallidos)`);
+          this.showWarning(this.translate.instant('APROBACION_ESTUDIANTES.GUARDADO_CON_ERRORES', { count: errores }));
         } else {
-          this.showSuccess('Estudiantes guardados exitosamente');
+          this.showSuccess(this.translate.instant('APROBACION_ESTUDIANTES.ESTUDIANTES_GUARDADOS'));
         }
       },
       error: (err) => {
         console.error('Error general en guardado', err);
         this.loading = false;
-        this.showError('Error al guardar estudiantes');
+        this.showError(this.translate.instant('APROBACION_ESTUDIANTES.ERROR_GUARDAR_ESTUDIANTES'));
       }
     });
   }
@@ -440,7 +445,7 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   // Toasters / Confirm
   // -----------------------
   showSuccess(mensaje: string) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('APROBACION_ESTUDIANTES.OPERACION_EXITOSA'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -448,7 +453,7 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: string) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('APROBACION_ESTUDIANTES.ERROR_PROCESAR'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -456,7 +461,7 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('APROBACION_ESTUDIANTES.ATENCION'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -467,10 +472,10 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('APROBACION_ESTUDIANTES.CONFIRMAR_ACCION'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('APROBACION_ESTUDIANTES.SI_CONFIRMO'),
+        rejectLabel: this.translate.instant('APROBACION_ESTUDIANTES.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

@@ -11,7 +11,7 @@
         <section class="col-12 col-lg-4 d-flex flex-column" style="height: 75vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
             <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;font-size: 14px">Administrar Estrategia Plan</p>
+              <p class="mb-0" style="color: #0D133F;font-size: 14px">{{ 'ESTRATEGIA_PLAN.TITULO_FORMULARIO' | translate }}</p>
             </div>
 
             <div class="card-body d-flex flex-column flex-grow-1" style="overflow-y: auto;">
@@ -19,13 +19,13 @@
 
                 <!-- 1. Nombre -->
                 <div class="mb-3">
-                  <label for="nombre" class="form-label fw-bold">Nombre</label>
+                  <label for="nombre" class="form-label fw-bold">{{ 'ESTRATEGIA_PLAN.NOMBRE' | translate }}</label>
                   <input
                     type="text"
                     class="form-control"
                     id="nombre"
                     name="nombre"
-                    placeholder="Digite Nombre"
+                    [placeholder]="'ESTRATEGIA_PLAN.DIGITE_NOMBRE' | translate"
                     required
                     minlength="3"
                     [(ngModel)]="model.nombre"
@@ -33,8 +33,8 @@
                     style="font-size: 13px"
                   />
                   <div class="text-danger small mt-1" *ngIf="nombreCtrl.invalid && (nombreCtrl.touched || nombreCtrl.dirty)">
-                    <div *ngIf="nombreCtrl.errors?.['required']">El nombre es obligatorio.</div>
-                    <div *ngIf="nombreCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                    <div *ngIf="nombreCtrl.errors?.['required']">{{ 'ESTRATEGIA_PLAN.NOMBRE_OBLIGATORIO' | translate }}</div>
+                    <div *ngIf="nombreCtrl.errors?.['minlength']">{{ 'ESTRATEGIA_PLAN.MINIMO_3_CARACTERES' | translate }}</div>
                   </div>
                 </div>
 
@@ -47,7 +47,7 @@
                     name="reqDocenteAdicional"
                     [(ngModel)]="model.reqDocenteAdicional"
                   />
-                  <label for="reqDocenteAdicional" class="form-check-label fw-bold">Requiere Docente Adicional</label>
+                  <label for="reqDocenteAdicional" class="form-check-label fw-bold">{{ 'ESTRATEGIA_PLAN.REQ_DOCENTE_ADICIONAL' | translate }}</label>
                 </div>
 
                 <!-- 3. Req. validación segundo idioma -->
@@ -59,7 +59,7 @@
                     name="reqValidaSegIdioma"
                     [(ngModel)]="model.reqValidaSegIdioma"
                   />
-                  <label for="reqValidaSegIdioma" class="form-check-label fw-bold">Requiere Validación Segundo Idioma</label>
+                  <label for="reqValidaSegIdioma" class="form-check-label fw-bold">{{ 'ESTRATEGIA_PLAN.REQ_VALIDA_SEG_IDIOMA' | translate }}</label>
                 </div>
 
                 <!-- 4. Tiene insignia -->
@@ -71,12 +71,12 @@
                     name="tieneinsignea"
                     [(ngModel)]="model.tieneinsignea"
                   />
-                  <label for="tieneinsignea" class="form-check-label fw-bold">Tiene Insignia</label>
+                  <label for="tieneinsignea" class="form-check-label fw-bold">{{ 'ESTRATEGIA_PLAN.TIENE_INSIGNIA' | translate }}</label>
                 </div>
 
                 <!-- 5. Insignia (SELECT) -->
                 <div class="mb-3">
-                  <label for="insigniaId" class="form-label fw-bold">Insignia</label>
+                  <label for="insigniaId" class="form-label fw-bold">{{ 'ESTRATEGIA_PLAN.INSIGNIA' | translate }}</label>
                   <select
                     class="form-select"
                     id="insigniaId"
@@ -87,11 +87,11 @@
                     [disabled]="!model.tieneinsignea"
                     style="font-size: 13px"
                   >
-                    <option [ngValue]="null" disabled selected>Seleccione una insignia</option>
+                    <option [ngValue]="null" disabled selected>{{ 'ESTRATEGIA_PLAN.SELECCIONE_INSIGNIA' | translate }}</option>
                     <option *ngFor="let ins of listaInsignias" [ngValue]="ins.id">{{ ins.nombre }}</option>
                   </select>
                   <div class="text-danger small mt-1" *ngIf="insigniaCtrl.invalid && (insigniaCtrl.touched || insigniaCtrl.dirty)">
-                    <div *ngIf="insigniaCtrl.errors?.['required']">La insignia es obligatoria.</div>
+                    <div *ngIf="insigniaCtrl.errors?.['required']">{{ 'ESTRATEGIA_PLAN.INSIGNIA_OBLIGATORIA' | translate }}</div>
                   </div>
                 </div>
 
@@ -104,7 +104,7 @@
                     name="reqValEstudiante"
                     [(ngModel)]="model.reqValEstudiante"
                   />
-                  <label for="reqValEstudiante" class="form-check-label fw-bold">Requiere Validación Estudiante</label>
+                  <label for="reqValEstudiante" class="form-check-label fw-bold">{{ 'ESTRATEGIA_PLAN.REQ_VAL_ESTUDIANTE' | translate }}</label>
                 </div>
 
                 <!-- 7. Req. genera certificado -->
@@ -116,12 +116,12 @@
                     name="reqGeneraCertificado"
                     [(ngModel)]="model.reqGeneraCertificado"
                   />
-                  <label for="reqGeneraCertificado" class="form-check-label fw-bold">Requiere Generar Certificado</label>
+                  <label for="reqGeneraCertificado" class="form-check-label fw-bold">{{ 'ESTRATEGIA_PLAN.REQ_GENERA_CERTIFICADO' | translate }}</label>
                 </div>
 
                 <!-- 8. Tipo estrategia (SELECT) -->
                 <div class="mb-3">
-                  <label for="tipoestrategiaId" class="form-label fw-bold">Tipo Estrategia</label>
+                  <label for="tipoestrategiaId" class="form-label fw-bold">{{ 'ESTRATEGIA_PLAN.TIPO_ESTRATEGIA' | translate }}</label>
                   <select
                     class="form-select"
                     id="tipoestrategiaId"
@@ -131,11 +131,11 @@
                     #tipoEstrategiaCtrl="ngModel"
                     style="font-size: 13px"
                   >
-                    <option [ngValue]="null" disabled selected>Seleccione un tipo de estrategia</option>
+                    <option [ngValue]="null" disabled selected>{{ 'ESTRATEGIA_PLAN.SELECCIONE_TIPO_ESTRATEGIA' | translate }}</option>
                     <option *ngFor="let tipo of listaTiposEstrategia" [ngValue]="tipo.id">{{ tipo.nombre }}</option>
                   </select>
                   <div class="text-danger small mt-1" *ngIf="tipoEstrategiaCtrl.invalid && (tipoEstrategiaCtrl.touched || tipoEstrategiaCtrl.dirty)">
-                    <div *ngIf="tipoEstrategiaCtrl.errors?.['required']">El tipo de estrategia es obligatorio.</div>
+                    <div *ngIf="tipoEstrategiaCtrl.errors?.['required']">{{ 'ESTRATEGIA_PLAN.TIPO_ESTRATEGIA_OBLIGATORIO' | translate }}</div>
                   </div>
                 </div>
 
@@ -148,13 +148,13 @@
                     [ngStyle]="{ 'background': '#0D133F' }"
                     style="font-size: 13px"
                   >
-                    <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
-                    <span *ngIf="loading">Guardando...</span>
+                    <span *ngIf="!loading">{{ (isEditing ? 'ESTRATEGIA_PLAN.ACTUALIZAR' : 'ESTRATEGIA_PLAN.INGRESAR') | translate }}</span>
+                    <span *ngIf="loading">{{ 'ESTRATEGIA_PLAN.GUARDANDO' | translate }}</span>
                   </button>
 
                   <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading"
                     style="font-size: 13px">
-                    Cancelar
+                    {{ 'ESTRATEGIA_PLAN.CANCELAR' | translate }}
                   </button>
                 </div>
               </form>
@@ -170,11 +170,11 @@
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchEstrategias(); filtro=''">
-                <i class="fas fa-sync-alt"></i> Actualizar
+                <i class="fas fa-sync-alt"></i> {{ 'ESTRATEGIA_PLAN.ACTUALIZAR' | translate }}
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite nombre de la estrategia" [(ngModel)]="filtro" name="filtro"/>
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" [placeholder]="'ESTRATEGIA_PLAN.DIGITE_NOMBRE_ESTRATEGIA' | translate" [(ngModel)]="filtro" name="filtro"/>
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterEstrategias()">
-                <i class="fas fa-search"></i> Buscar
+                <i class="fas fa-search"></i> {{ 'ESTRATEGIA_PLAN.BUSCAR' | translate }}
               </button>
             </div>
 
@@ -182,30 +182,34 @@
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
                   <tr>
-                    <th style="background: white">Nombre</th>
-                    <th style="background: white !important;">Tipo Estrategia</th>
-                    <th style="background: white !important;">Insignia</th>
-                    <th style="background: white !important;">Req. Docente Adicional</th>
-                    <th style="background: white !important;">Req. Certificado</th>
-                    <th style="background: white !important;">Opciones</th>
+                    <th style="background: white">{{ 'ESTRATEGIA_PLAN.NOMBRE' | translate }}</th>
+                    <th style="background: white !important;">{{ 'ESTRATEGIA_PLAN.TIPO_ESTRATEGIA' | translate }}</th>
+                    <th style="background: white !important;">{{ 'ESTRATEGIA_PLAN.INSIGNIA' | translate }}</th>
+                    <th style="background: white !important;">{{ 'ESTRATEGIA_PLAN.REQ_DOCENTE_ADICIONAL' | translate }}</th>
+                    <th style="background: white !important;">{{ 'ESTRATEGIA_PLAN.REQ_CERTIFICADO' | translate }}</th>
+                    <th style="background: white !important;">{{ 'ESTRATEGIA_PLAN.OPCIONES' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
-                <div *ngIf="loadingTable" class="table-overlay">
-                  <i class="fas fa-spinner fa-spin fa-3x"></i>
-                  <p style="background: transparent;">Cargando datos</p>
-                </div>
+                  <tr *ngIf="loadingTable">
+                    <td colspan="6" class="text-center">
+                      <div class="table-overlay">
+                        <i class="fas fa-spinner fa-spin fa-3x"></i>
+                        <p style="background: transparent;">{{ 'ESTRATEGIA_PLAN.CARGANDO_DATOS' | translate }}</p>
+                      </div>
+                    </td>
+                  </tr>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.nombre }}</td>
                     <td>{{ item.tipoEstrategiaNombre }}</td>
                     <td>{{ item.insigniaNombre }}</td>
                     <td align="center">
-                      <button *ngIf="item.reqDocenteAdicional" class="button-completed">Si</button>
-                      <button *ngIf="!item.reqDocenteAdicional" class="button-pending">No</button>
+                      <button *ngIf="item.reqDocenteAdicional" class="button-completed">{{ 'ESTRATEGIA_PLAN.SI' | translate }}</button>
+                      <button *ngIf="!item.reqDocenteAdicional" class="button-pending">{{ 'ESTRATEGIA_PLAN.NO' | translate }}</button>
                     </td>
                     <td align="center">
-                      <button *ngIf="item.reqGeneraCertificado" class="button-completed">Si</button>
-                      <button *ngIf="!item.reqGeneraCertificado" class="button-pending">No</button>
+                      <button *ngIf="item.reqGeneraCertificado" class="button-completed">{{ 'ESTRATEGIA_PLAN.SI' | translate }}</button>
+                      <button *ngIf="!item.reqGeneraCertificado" class="button-pending">{{ 'ESTRATEGIA_PLAN.NO' | translate }}</button>
                     </td>
                     <td>
                       <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">
@@ -217,7 +221,7 @@
                     </td>
                   </tr>
                   <tr *ngIf="!loadingTable && pagedData.length === 0">
-                    <td colspan="6" class="text-center">No hay registros.</td>
+                    <td colspan="6" class="text-center">{{ 'ESTRATEGIA_PLAN.NO_HAY_REGISTROS' | translate }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -225,11 +229,11 @@
 
             <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
               <div class="items-per-page d-flex align-items-center gap-2">
-                <label for="itemsPerPageSelectEstrategia" class="mb-0">Mostrar</label>
+                <label for="itemsPerPageSelectEstrategia" class="mb-0">{{ 'ESTRATEGIA_PLAN.MOSTRAR' | translate }}</label>
                 <select id="itemsPerPageSelectEstrategia" (change)="onPageSizeChange($event)" [value]="pageSize">
                   <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
                 </select>
-                <span>de {{ data.length }}</span>
+                <span>{{ 'ESTRATEGIA_PLAN.DE' | translate }} {{ data.length }}</span>
               </div>
 
               <nav aria-label="Page navigation example">
@@ -239,8 +243,8 @@
                       <span aria-hidden="true">&laquo;</span>
                     </button>
                   </li>
-                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
-                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  <li class="page-item" *ngFor="let p of pages" [class.active]="p === currentPage">
+                    <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
                   </li>
                   <li class="page-item" [class.disabled]="currentPage === totalPages">
                     <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background: #0D133F;">

@@ -11,13 +11,13 @@
         <section *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null" class="col-12 col-lg-3 d-flex flex-column" style="height: 75vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
             <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;font-size: 14px">Cargar Desarrollo Profesional</p>
+              <p class="mb-0" style="color: #0D133F;font-size: 14px">{{ 'DESARROLLO_PROFESIONAL.TITULO_CARGA' | translate }}</p>
             </div>
 
             <div class="card-body d-flex flex-column flex-grow-1">
               <div class="d-flex flex-column flex-grow-1" style="font-size: 13px;">
                 <div class="mb-3">
-                  <label for="excelFileInput" class="form-label fw-bold">Seleccionar Archivo Excel</label>
+                  <label for="excelFileInput" class="form-label fw-bold">{{ 'DESARROLLO_PROFESIONAL.SELECCIONAR_ARCHIVO' | translate }}</label>
                   <input
                     type="file"
                     class="form-control"
@@ -26,7 +26,7 @@
                     (change)="onFileSelected($event)"
                     style="font-size: 13px"
                   />
-                  <small class="text-muted">Solo archivos .xls o .xlsx</small>
+                  <small class="text-muted">{{ 'DESARROLLO_PROFESIONAL.SOLO_ARCHIVOS_EXCEL' | translate }}</small>
                 </div>
 
                 <div class="mb-3" *ngIf="fileName">
@@ -37,20 +37,20 @@
                 </div>
 
                 <div class="mb-3">
-                  <label class="form-label fw-bold">Estructura del Excel</label>
+                  <label class="form-label fw-bold">{{ 'DESARROLLO_PROFESIONAL.ESTRUCTURA_EXCEL' | translate }}</label>
                   <div class="alert alert-secondary" style="font-size: 11px;">
-                    <p class="mb-1"><strong>Columnas requeridas:</strong></p>
+                    <p class="mb-1"><strong>{{ 'DESARROLLO_PROFESIONAL.COLUMNAS_REQUERIDAS' | translate }}</strong></p>
                     <ol class="mb-0 ps-3">
-                      <li>Programa Codigo</li>
-                      <li>Plan Estudio</li>
-                      <li>Codigo Curso</li>
-                      <li>Nombre</li>
-                      <li>Descripcion</li>
-                      <li>IntitucionId</li>
-                      <li>UsuarioId</li>
-                      <li>fechainicio</li>
-                      <li>fechafinal</li>
-                      <li>costo curso</li>
+                      <li>{{ 'DESARROLLO_PROFESIONAL.COL_PROGRAMA_CODIGO' | translate }}</li>
+                      <li>{{ 'DESARROLLO_PROFESIONAL.COL_PLAN_ESTUDIO' | translate }}</li>
+                      <li>{{ 'DESARROLLO_PROFESIONAL.COL_CODIGO_CURSO' | translate }}</li>
+                      <li>{{ 'DESARROLLO_PROFESIONAL.COL_NOMBRE' | translate }}</li>
+                      <li>{{ 'DESARROLLO_PROFESIONAL.COL_DESCRIPCION' | translate }}</li>
+                      <li>{{ 'DESARROLLO_PROFESIONAL.COL_INSTITUCION_ID' | translate }}</li>
+                      <li>{{ 'DESARROLLO_PROFESIONAL.COL_USUARIO_ID' | translate }}</li>
+                      <li>{{ 'DESARROLLO_PROFESIONAL.COL_FECHA_INICIO' | translate }}</li>
+                      <li>{{ 'DESARROLLO_PROFESIONAL.COL_FECHA_FINAL' | translate }}</li>
+                      <li>{{ 'DESARROLLO_PROFESIONAL.COL_COSTO_CURSO' | translate }}</li>
                     </ol>
                   </div>
                 </div>
@@ -64,13 +64,13 @@
                     style="font-size: 13px"
                     (click)="processExcelFile()"
                   >
-                    <span *ngIf="!loading"><i class="fas fa-upload me-1"></i> Procesar Archivo</span>
-                    <span *ngIf="loading"><i class="fas fa-spinner fa-spin me-1"></i> Procesando...</span>
+                    <span *ngIf="!loading"><i class="fas fa-upload me-1"></i> {{ 'DESARROLLO_PROFESIONAL.PROCESAR_ARCHIVO' | translate }}</span>
+                    <span *ngIf="loading"><i class="fas fa-spinner fa-spin me-1"></i> {{ 'DESARROLLO_PROFESIONAL.PROCESANDO' | translate }}</span>
                   </button>
 
                   <button type="button" class="btn btn-secondary flex-grow-1" (click)="clearFileSelection()" [disabled]="loading || !selectedFile"
                     style="font-size: 13px">
-                    Limpiar
+                    {{ 'DESARROLLO_PROFESIONAL.LIMPIAR' | translate }}
                   </button>
                 </div>
               </div>
@@ -86,11 +86,11 @@
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null" class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchDesarrolloProfesional(); filtro=''">
-                <i class="fas fa-sync-alt"></i> Actualizar
+                <i class="fas fa-sync-alt"></i> {{ 'DESARROLLO_PROFESIONAL.ACTUALIZAR' | translate }}
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite nombre del curso" [(ngModel)]="filtro" name="filtro"/>
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" [placeholder]="'DESARROLLO_PROFESIONAL.DIGITE_NOMBRE_CURSO' | translate" [(ngModel)]="filtro" name="filtro"/>
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterDesarrolloProfesional()">
-                <i class="fas fa-search"></i> Buscar
+                <i class="fas fa-search"></i> {{ 'DESARROLLO_PROFESIONAL.BUSCAR' | translate }}
               </button>
             </div>
 
@@ -98,20 +98,24 @@
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
                   <tr>
-                    <th style="background: white">Usuario ID</th>
-                    <th style="background: white !important;">Nombre Curso</th>
-                    <th style="background: white !important;">Descripción</th>
-                    <th style="background: white !important;">Fecha Inicio</th>
-                    <th style="background: white !important;">Fecha Final</th>
-                    <th style="background: white !important;">Costo</th>
-                    <th *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null" style="background: white !important;">Opciones</th>
+                    <th style="background: white">{{ 'DESARROLLO_PROFESIONAL.USUARIO_ID' | translate }}</th>
+                    <th style="background: white !important;">{{ 'DESARROLLO_PROFESIONAL.NOMBRE_CURSO' | translate }}</th>
+                    <th style="background: white !important;">{{ 'DESARROLLO_PROFESIONAL.DESCRIPCION' | translate }}</th>
+                    <th style="background: white !important;">{{ 'DESARROLLO_PROFESIONAL.FECHA_INICIO' | translate }}</th>
+                    <th style="background: white !important;">{{ 'DESARROLLO_PROFESIONAL.FECHA_FINAL' | translate }}</th>
+                    <th style="background: white !important;">{{ 'DESARROLLO_PROFESIONAL.COSTO' | translate }}</th>
+                    <th *ngIf="idConvocatoria == 'undefined' || idConvocatoria == null" style="background: white !important;">{{ 'DESARROLLO_PROFESIONAL.OPCIONES' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <div *ngIf="loadingTable" class="table-overlay">
-                    <i class="fas fa-spinner fa-spin fa-3x"></i>
-                    <p style="background: transparent;">Cargando datos</p>
-                  </div>
+                  <!-- ✅ FIX: Cambiar <div> por <tr> -->
+                  <tr *ngIf="loadingTable">
+                    <td [attr.colspan]="idConvocatoria == 'undefined' || idConvocatoria == null ? 7 : 6" class="text-center">
+                      <i class="fas fa-spinner fa-spin fa-3x"></i>
+                      <p style="background: transparent;">{{ 'DESARROLLO_PROFESIONAL.CARGANDO_DATOS' | translate }}</p>
+                    </td>
+                  </tr>
+
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.usuarioId }}</td>
                     <td>{{ item.nombreCurso }}</td>
@@ -131,7 +135,7 @@
                   </tr>
                   <tr *ngIf="!loadingTable && pagedData.length === 0">
                     <td [attr.colspan]="idConvocatoria == 'undefined' || idConvocatoria == null ? 7 : 6" class="text-center">
-                      No hay registros.
+                      {{ 'DESARROLLO_PROFESIONAL.NO_HAY_REGISTROS' | translate }}
                     </td>
                   </tr>
                 </tbody>
@@ -140,25 +144,26 @@
 
             <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
               <div class="items-per-page d-flex align-items-center gap-2">
-                <label for="itemsPerPageSelectDev" class="mb-0">Mostrar</label>
+                <label for="itemsPerPageSelectDev" class="mb-0">{{ 'DESARROLLO_PROFESIONAL.MOSTRAR' | translate }}</label>
                 <select id="itemsPerPageSelectDev" (change)="onPageSizeChange($event)" [value]="pageSize">
                   <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
                 </select>
-                <span>de {{ data.length }}</span>
+                <span>{{ 'DESARROLLO_PROFESIONAL.DE' | translate }} {{ data.length }}</span>
               </div>
 
               <nav aria-label="Page navigation example">
                 <ul class="pagination mb-0">
                   <li class="page-item" [class.disabled]="currentPage === 1">
-                    <button class="page-link text-white" (click)="goToPage(currentPage - 1)" aria-label="Previous" style="background: #0D133F;">
+                    <button class="page-link text-white" (click)="goToPage(currentPage - 1)" [attr.aria-label]="'DESARROLLO_PROFESIONAL.ANTERIOR' | translate" style="background: #0D133F;">
                       <span aria-hidden="true">&laquo;</span>
                     </button>
                   </li>
-                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
-                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  <!-- ✅ FIX: Cambiar 'page' por 'p' -->
+                  <li class="page-item" *ngFor="let p of pages" [class.active]="p === currentPage">
+                    <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
                   </li>
                   <li class="page-item" [class.disabled]="currentPage === totalPages">
-                    <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background: #0D133F;">
+                    <button class="page-link text-white" (click)="goToPage(currentPage + 1)" [attr.aria-label]="'DESARROLLO_PROFESIONAL.SIGUIENTE' | translate" style="background: #0D133F;">
                       <span aria-hidden="true">&raquo;</span>
                     </button>
                   </li>
