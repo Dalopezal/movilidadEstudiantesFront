@@ -502,5 +502,326 @@
       "ERROR_DESC": "Cannot query the application ID",
       "WARNING_TITULO": "Warning"
     }
+  },
+  "INSTITUCION_CONVENIO": {
+    "FORM": {
+      "TITULO": "Manage Institution - Agreement",
+      "LABEL_INSTITUCIONES": "Institutions",
+      "LABEL_CONVENIOS": "Agreements",
+      "ERROR_INSTITUCION": "Select an institution.",
+      "ERROR_CONVENIO": "Select an agreement.",
+      "BTN_ACTUALIZAR": "Update",
+      "BTN_INGRESAR": "Submit",
+      "BTN_GUARDANDO": "Saving...",
+      "BTN_CANCELAR": "Cancel"
+    },
+    "TABLE": {
+      "BTN_ACTUALIZAR": "Refresh",
+      "BTN_BUSCAR": "Search",
+      "FILTRO_PLACEHOLDER": "Enter institution name / UCM Code",
+      "COL_INSTITUCION": "Institution",
+      "COL_CODIGO_UCM": "UCM Code",
+      "COL_OPCIONES": "Options",
+      "CARGANDO": "Loading data",
+      "SIN_REGISTROS": "No records found."
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Show",
+      "DE": "of"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "Could not load the information. Please try again.",
+      "FILTRO_VACIO": "You must enter a value to search.",
+      "ERROR_FILTRO": "Error filtering relationships",
+      "ERROR_SELECCION": "You must select an institution and an agreement.",
+      "RESPUESTA_DESCONOCIDA": "Unknown server response.",
+      "ERROR_PROCESAR": "Could not process the request. Please try again.",
+      "ELIMINADO_EXITO": "Record deleted successfully",
+      "ERROR_ELIMINAR": "Error deleting relationship, the record is associated"
+    },
+    "CONFIRM": {
+      "ELIMINAR": "Are you sure you want to delete this record",
+      "HEADER": "Confirm action",
+      "ACEPTAR": "Yes, confirm",
+      "CANCELAR": "Cancel"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "Operation successful!",
+      "ERROR_TITULO": "Processing error",
+      "WARNING_TITULO": "Warning"
+    }
+  },
+  "CONVENIOS": {
+    "FORM": {
+      "TITULO": "Manage Agreements",
+      "CODIGO_UCM": "UCM Code",
+      "CODIGO_UCM_PLACEHOLDER": "Enter UCM Code",
+      "DESCRIPCION": "Description",
+      "DESCRIPCION_PLACEHOLDER": "Enter Description",
+      "FECHA_INICIO": "Start Date",
+      "TIPO_CONVENIO": "Agreement Type",
+      "CLASIFICACION": "Classification",
+      "TIPO_ACTIVIDAD": "Activity Type",
+      "DIAS_VIGENCIA": "Validity Days",
+      "ESTADO_ACTIVO": "Active Status",
+      "BTN_ACTUALIZAR": "Update",
+      "BTN_INGRESAR": "Submit",
+      "BTN_GUARDANDO": "Saving...",
+      "BTN_CANCELAR": "Cancel",
+      "ERROR_CODIGO_REQUERIDO": "Code is required.",
+      "ERROR_MIN_3": "Minimum 3 characters.",
+      "ERROR_DESCRIPCION_REQUERIDA": "Description is required.",
+      "ERROR_FECHA_REQUERIDA": "Start date is required.",
+      "ERROR_FECHA_MENOR": "Start date cannot be earlier than today.",
+      "ERROR_TIPO_CONVENIO": "Select an agreement type.",
+      "ERROR_CLASIFICACION": "Select a classification.",
+      "ERROR_TIPO_ACTIVIDAD": "Select an activity type.",
+      "ERROR_DIAS_REQUERIDO": "Enter validity days.",
+      "ERROR_DIAS_MINIMO": "Validity days must be greater than or equal to 1."
+    },
+    "TABLE": {
+      "BTN_ACTUALIZAR": "Refresh",
+      "BTN_BUSCAR": "Search",
+      "FILTRO_PLACEHOLDER": "Enter agreement code",
+      "COL_CODIGO_UCM": "UCM Code",
+      "COL_DESCRIPCION": "Description",
+      "COL_TIPO_CONVENIO": "Agreement Type",
+      "COL_CLASIFICACION": "Classification",
+      "COL_TIPO_ACTIVIDAD": "Activity Type",
+      "COL_FECHA_INICIO": "Start Date",
+      "COL_OPCIONES": "Options",
+      "CARGANDO": "Loading data",
+      "SIN_REGISTROS": "No records found."
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Show",
+      "DE": "of"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "Could not load the information. Please try again.",
+      "FILTRO_VACIO": "You must enter a value to search.",
+      "ERROR_FILTRO": "Error filtering agreements",
+      "DESCRIPCION_OBLIGATORIA": "Description is required.",
+      "RESPUESTA_DESCONOCIDA": "Unknown server response.",
+      "ERROR_PROCESAR": "Could not process the request. Please try again.",
+      "ELIMINADO_EXITO": "Record deleted successfully",
+      "ERROR_ELIMINAR": "Error deleting agreement, the record is associated"
+    },
+    "CONFIRM": {
+      "ELIMINAR": "Are you sure you want to delete this record?",
+      "HEADER": "Confirm action",
+      "ACEPTAR": "Yes, confirm",
+      "CANCELAR": "Cancel"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "Operation successful!",
+      "ERROR_TITULO": "Processing error",
+      "WARNING_TITULO": "Warning"
+    }
+  },
+  "SOLICITUDES_CONVENIO": {
+    "TITULO": "Agreement Requests Management",
+    "BTN_VOLVER": "Back",
+    "BTN_ACTUALIZAR": "Refresh",
+    "BTN_BUSCAR": "Search",
+    "CARGANDO": "Loading data",
+    "SIN_REGISTROS": "No records found.",
+
+    "FILTROS": {
+      "TIPO": "Request Type",
+      "ESTADO": "Status",
+      "INSTITUCION": "Institution"
+    },
+
+    "TABLE": {
+      "SOLICITUD": "Request",
+      "DESCRIPCION": "Description",
+      "SOLICITANTE": "Applicant",
+      "INSTITUCION": "Institution",
+      "FECHA": "Date",
+      "ESTADO": "Status",
+      "ADMINISTRADORES": "Managers",
+      "ACCIONES": "Actions",
+      "OPCIONES": "Options",
+      "VER_ADMINISTRADORES": "View Managers",
+      "VER_ACCIONES": "View Agreement Actions"
+    },
+
+    "ACCIONES": {
+      "APROBAR": "Approve Request",
+      "RECHAZAR": "Reject Request",
+      "APROBAR_ORI": "Approve as ORI",
+      "RECHAZAR_ORI": "Reject as ORI",
+      "SOLO_LECTURA": "Read only - Status"
+    },
+
+    "PAGINACION": {
+      "MOSTRAR": "Show",
+      "DE": "of"
+    },
+
+    "MODAL_ACCIONES": {
+      "TITULO": "Agreement Actions",
+      "SOLICITUD": "Request",
+      "APROBADO": "Approved",
+      "NO_APROBADO": "Not Approved",
+      "SIN_ACCIONES": "No actions registered for this agreement",
+      "BTN_GUARDAR": "Save Changes"
+    },
+
+    "MODAL_ADMIN": {
+      "TITULO": "Agreement Managers",
+      "SOLICITUD": "Request",
+      "BTN_AGREGAR": "Add Manager",
+      "NOMBRE": "Name",
+      "EMAIL": "Email",
+      "DOCUMENTO": "Document",
+      "BTN_ELIMINAR": "Remove Manager",
+      "SIN_ADMINISTRADORES": "No managers assigned"
+    },
+
+    "MENSAJES": {
+      "ERROR_FILTRO": "Could not apply filter",
+      "ERROR_FILTROS": "Could not apply filters",
+      "ERROR_ACCIONES": "Could not load agreement actions",
+      "ACCIONES_GUARDADAS": "Actions updated successfully",
+      "ERROR_GUARDAR_ACCIONES": "Could not save action changes",
+      "ERROR_ADMINISTRADORES": "Could not load agreement managers",
+      "APROBADO": "Request approved successfully",
+      "ERROR_APROBAR": "Could not approve request",
+      "RECHAZADO": "Request rejected",
+      "ERROR_RECHAZAR": "Could not reject request"
+    },
+
+    "CONFIRM": {
+      "HEADER": "Confirm action",
+      "HEADER_APROBAR": "Confirm Approval",
+      "HEADER_RECHAZAR": "Confirm Rejection",
+      "APROBAR": "Do you confirm you want to approve this request?",
+      "RECHAZAR": "Do you confirm you want to reject this request?",
+      "BTN_APROBAR": "Yes, Approve",
+      "BTN_RECHAZAR": "Yes, Reject",
+      "BTN_CANCELAR": "Cancel",
+      "BTN_CONFIRMAR": "Yes, Confirm"
+    },
+
+    "TOASTS": {
+      "EXITO": "Operation successful!",
+      "ERROR": "Processing error",
+      "WARNING": "Warning"
+    }
+  },
+  "SOLICITUD_CONVENIO": {
+    "TITULO": "Agreement Requests",
+    "BTN_VOLVER": "Back",
+
+    "TABS": {
+      "APERTURA": "Opening",
+      "RENOVACION": "Renewal",
+      "MIS_SOLICITUDES": "My Requests"
+    },
+
+    "PASO1": {
+      "TITULO": "1. Agreement Description and Institution",
+      "DESCRIPCION": "Agreement description",
+      "DESCRIPCION_PLACEHOLDER": "Enter the institution acronym followed by the country code e.g.: (UCM-CHL)",
+      "INSTITUCION": "Institution",
+      "SELECCIONE_INSTITUCION": "Select an institution",
+      "OTRA_INSTITUCION": "Other (not in the list)",
+      "NUEVA_INSTITUCION": "New Institution",
+      "PAIS": "Country",
+      "SELECCIONE_PAIS": "Select a country",
+      "CIUDAD": "City",
+      "SELECCIONE_CIUDAD": "Select a city",
+      "NOMBRE_INSTITUCION": "Institution name",
+      "NOMBRE_PLACEHOLDER": "Enter the full name"
+    },
+
+    "PASO2": {
+      "TITULO": "2. Background and Objectives",
+      "ANTECEDENTES": "Background",
+      "ANTECEDENTES_PLACEHOLDER": "Describe the agreement background...",
+      "OBJETIVOS": "Objectives",
+      "OBJETIVOS_PLACEHOLDER": "Define the agreement objectives..."
+    },
+
+    "PASO3": {
+      "TITULO": "3. Actions",
+      "BTN_AGREGAR": "Add Action",
+      "BTN_ELIMINAR": "Remove action",
+      "ACCION": "Action",
+      "DESCRIPCION_ACCION": "Action description",
+      "DESCRIPCION_PLACEHOLDER": "State the action to be performed...",
+      "FECHA_INICIO": "Start date",
+      "FECHA_FIN": "End date"
+    },
+
+    "PASO4": {
+      "TITULO": "4. Agreement Administrators",
+      "ADMIN_UCM": "UCM Administrator",
+      "NOMBRE_ADMIN_INTERNO": "Internal administrator name",
+      "ADMIN_EXTERNO": "Agreement Institution Administrator",
+      "TIENE_ADMIN_EXTERNO": "The agreement has an external administrator",
+      "NOMBRE_COMPLETO": "Full name",
+      "NOMBRE_EXTERNO_PLACEHOLDER": "External administrator name",
+      "CARGO": "Position",
+      "CARGO_PLACEHOLDER": "Position at the institution",
+      "CORREO": "Email",
+      "CORREO_PLACEHOLDER": "example@institution.edu.co",
+      "SIN_ADMIN_EXTERNO": "This agreement does not have an assigned external administrator"
+    },
+
+    "NAV": {
+      "ANTERIOR": "Previous",
+      "SIGUIENTE": "Next",
+      "GUARDAR": "Save Request",
+      "PASO": "Step",
+      "DE": "of"
+    },
+
+    "RENOVACION": {
+      "INFO": "Select the agreement you want to renew. Data will be loaded automatically.",
+      "TITULO": "Agreement Renewal",
+      "CONVENIO": "Agreement to renew",
+      "SELECCIONE_CONVENIO": "Select an agreement",
+      "CODIGO": "Code",
+      "TIPO_CONVENIO": "Agreement Type",
+      "CLASIFICACION": "Classification",
+      "TIPO_ACTIVIDAD": "Activity Type",
+      "CATEGORIA_SNIES": "SNIES Category",
+      "FECHA_INICIO": "Start date",
+      "FECHA_FIN": "End date",
+      "DESCRIPCION": "Description",
+      "ANTECEDENTES": "Background (reason for renewal)",
+      "ANTECEDENTES_PLACEHOLDER": "Describe the reasons to renew this agreement...",
+      "GUARDANDO": "Saving...",
+      "BTN_SOLICITAR": "Request Renewal"
+    },
+
+    "MENSAJES": {
+      "MIN_ACCION": "There must be at least one action",
+      "SELECCIONE_INSTITUCION": "You must select an institution",
+      "COMPLETE_ANTECEDENTES": "You must complete background and objectives",
+      "COMPLETE_ADMIN_EXTERNO": "You must complete all external administrator data",
+      "EMAIL_INVALIDO": "The email is not valid",
+      "COMPLETE_CAMPOS": "Please complete all required fields",
+      "ERROR_CREAR": "Error creating the request. Please try again.",
+      "ERROR_ACCIONES": "Error saving some actions. Check the data.",
+      "ERROR_ADMINS": "Error saving some administrators.",
+      "EXITO_CREAR": "Agreement request created successfully\n\nRequest ID: {{id}}",
+      "SELECCIONE_CONVENIO_RENOVAR": "You must select an agreement to renew",
+      "MOTIVOS_RENOVACION": "You must indicate the reasons for renewal in background",
+      "ERROR_ID_INSTITUCION": "Could not get the agreement institution. Please select the agreement again.",
+      "WARN_ID_INSTITUCION": "Warning: Could not get the institution ID from the agreement",
+      "WARN_NO_INSTITUCION": "Warning: No institution information found for this agreement",
+      "ERROR_CONSULTAR_INSTITUCION": "Error querying the agreement institution. Verify that the agreement has an assigned institution.",
+      "ERROR_RENOVACION": "Error: Could not create the renewal request. Unexpected server response.",
+      "EXITO_RENOVACION": "Renewal request created successfully\n\nID: {{id}}\nAgreement: {{codigo}}\n\nNote: When ORI approves this request, the agreement will be automatically renewed."
+    },
+
+    "TOASTS": {
+      "EXITO": "Operation successful!",
+      "ERROR": "Processing error"
+    }
   }
 }

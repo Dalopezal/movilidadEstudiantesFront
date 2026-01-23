@@ -9,11 +9,20 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { InstitucionConvenioModel } from '../../models/InstitucionConvenioModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-institucion-convenio',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './institucion-convenio.component.html',
   styleUrls: ['./institucion-convenio.component.css'],
   providers: [ConfirmationService]
@@ -42,7 +51,11 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   loadingTable: any;
 
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit() {
     this.fetchInstituciones();
@@ -128,12 +141,12 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar relaciones', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('INSTITUCION_CONVENIO.MENSAJES.ERROR_CARGA');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(this.translate.instant('INSTITUCION_CONVENIO.MENSAJES.ERROR_CARGA'));
           this.loadingTable = false;
         }
       });
@@ -142,7 +155,7 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
   filterRelaciones() {
     this.error = null;
     if (!this.filtro || this.filtro.trim() === '') {
-      this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
+      this.showWarning(this.translate.instant('INSTITUCION_CONVENIO.MENSAJES.FILTRO_VACIO'));
       return;
     }
     this.loadingTable = true;
@@ -170,7 +183,7 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al filtrar relaciones', err);
-          this.showError('Error al filtrar relacione');
+          this.showError(this.translate.instant('INSTITUCION_CONVENIO.MENSAJES.ERROR_FILTRO'));
           this.loadingTable = false;
         }
       });
@@ -184,7 +197,7 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
     }
 
     if (!this.model.institucionId || !this.model.convenioId) {
-      this.error = 'Debe seleccionar una condición y una convocatoria.';
+      this.error = this.translate.instant('INSTITUCION_CONVENIO.MENSAJES.ERROR_SELECCION');
       return;
     }
 
@@ -213,15 +226,14 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          // fallback por si llega algo inesperado
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('INSTITUCION_CONVENIO.MENSAJES.RESPUESTA_DESCONOCIDA'));
         }
       },
       error: (err) => {
         console.error(isUpdate ? 'Error al actualizar relación' : 'Error al crear relación', err);
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
+        this.error = this.translate.instant('INSTITUCION_CONVENIO.MENSAJES.ERROR_PROCESAR');
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
+        this.showError(this.translate.instant('INSTITUCION_CONVENIO.MENSAJES.ERROR_PROCESAR'));
       }
     });
   }
@@ -242,7 +254,7 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
+    const confirmado = await this.showConfirm(this.translate.instant('INSTITUCION_CONVENIO.CONFIRM.ELIMINAR'));
     if (!confirmado) return;
 
     this.api.delete(`CondicionConvocatoria/Eliminar/${id}`)
@@ -250,11 +262,11 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchRelaciones();
-          this.showSuccess('Se elimino el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('INSTITUCION_CONVENIO.MENSAJES.ELIMINADO_EXITO'));
         },
         error: (err) => {
-          console.error('Error al eliminar relación, el resgistro se encuentra asociado', err);
-          this.showError('Error al eliminar relación, el resgistro se encuentra asociado');
+          console.error('Error al eliminar relación', err);
+          this.showError(this.translate.instant('INSTITUCION_CONVENIO.MENSAJES.ERROR_ELIMINAR'));
         }
       });
   }
@@ -292,7 +304,7 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
 
   // ---------- Toasters / Confirm ----------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('INSTITUCION_CONVENIO.TOASTS.EXITO_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -300,14 +312,15 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('INSTITUCION_CONVENIO.TOASTS.ERROR_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
     });
   }
+
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('INSTITUCION_CONVENIO.TOASTS.WARNING_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -317,11 +330,11 @@ export class InstitucionConvenioComponent implements OnInit, OnDestroy {
   showConfirm(mensaje: string): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
-        message: mensaje,
-        header: 'Confirmar acción',
+        message: `¿${mensaje}?`,
+        header: this.translate.instant('INSTITUCION_CONVENIO.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('INSTITUCION_CONVENIO.CONFIRM.ACEPTAR'),
+        rejectLabel: this.translate.instant('INSTITUCION_CONVENIO.CONFIRM.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

@@ -13,6 +13,7 @@ import { PostulacionTipoConsultaModel } from '../../models/PostulacionTipoModel'
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-listsol-convenio',
@@ -24,7 +25,8 @@ import { MatButtonModule } from '@angular/material/button';
     NgxSonnerToaster,
     SidebarComponent,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    TranslateModule
   ],
   templateUrl: './listsol-convenio.component.html',
   styleUrl: './listsol-convenio.component.css',
@@ -265,7 +267,7 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
         },
         error: (err) => {
           console.error('❌ Error aplicando filtro simple', err);
-          this.showError('No se pudo aplicar el filtro');
+          this.showError(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.ERROR_FILTRO'));
           this.solicitudesConvenio = [];
           this.pagedData = [];
           this.loading = false;
@@ -300,7 +302,7 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
         },
         error: (err) => {
           console.error('❌ Error aplicando filtros múltiples', err);
-          this.showError('No se pudieron aplicar los filtros');
+          this.showError(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.ERROR_FILTROS'));
           this.solicitudesConvenio = [];
           this.pagedData = [];
           this.loading = false;
@@ -381,7 +383,7 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
       error: (err) => {
         console.error('Error cargando acciones convenio', err);
         this.accionesConvenio = [];
-        this.showError('No se pudieron cargar las acciones del convenio');
+        this.showError(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.ERROR_ACCIONES'));
       }
     });
 
@@ -413,12 +415,12 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
-          this.showSuccess('Las acciones se actualizaron correctamente');
+          this.showSuccess(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.ACCIONES_GUARDADAS'));
           this.closeCardAcciones();
         },
         error: (err) => {
           console.error('Error guardando acciones', err);
-          this.showError('No se pudieron guardar los cambios en las acciones');
+          this.showError(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.ERROR_GUARDAR_ACCIONES'));
         }
       });
   }
@@ -454,7 +456,7 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
       error: (err) => {
         console.error('Error cargando administradores', err);
         this.administradoresConvenio = [];
-        this.showError('No se pudieron cargar los administradores del convenio');
+        this.showError(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.ERROR_ADMINISTRADORES'));
       }
     });
   }
@@ -507,11 +509,11 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
     const nuevoEstado = tipo === 'jefe' ? 5 : 6;
 
     this.confirmationService.confirm({
-      message: `¿Confirma que desea aprobar esta solicitud?`,
-      header: 'Confirmar Aprobación',
+      message: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.APROBAR'),
+      header: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.HEADER_APROBAR'),
       icon: 'pi pi-check-circle custom-confirm-icon',
-      acceptLabel: 'Sí, Aprobar',
-      rejectLabel: 'Cancelar',
+      acceptLabel: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_APROBAR'),
+      rejectLabel: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_CANCELAR'),
       acceptIcon: 'pi pi-check',
       rejectIcon: 'pi pi-times',
       acceptButtonStyleClass: 'custom-accept-btn',
@@ -536,12 +538,12 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: (resp) => {
-              this.showSuccess('La solicitud fue aprobada exitosamente');
+              this.showSuccess(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.APROBADO'));
               this.fetchSolicitudesConvenio();
             },
             error: (err) => {
               console.error('Error aprobando solicitud', err);
-              this.showError('No se pudo aprobar la solicitud');
+              this.showError(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.ERROR_APROBAR'));
             }
           });
       }
@@ -552,11 +554,11 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
     const nuevoEstado = tipo === 'jefe' ? 9 : 10;
 
     this.confirmationService.confirm({
-      message: `¿Confirma que desea rechazar esta solicitud?`,
-      header: 'Confirmar Rechazo',
+      message: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.RECHAZAR'),
+      header: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.HEADER_RECHAZAR'),
       icon: 'pi pi-times-circle custom-confirm-icon',
-      acceptLabel: 'Sí, Rechazar',
-      rejectLabel: 'Cancelar',
+      acceptLabel: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_RECHAZAR'),
+      rejectLabel: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_CANCELAR'),
       acceptIcon: 'pi pi-times',
       rejectIcon: 'pi pi-ban',
       acceptButtonStyleClass: 'custom-reject-btn', // Botón rojo para rechazar
@@ -581,12 +583,12 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: (resp) => {
-              this.showWarning('La solicitud fue rechazada');
+              this.showWarning(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.RECHAZADO'));
               this.fetchSolicitudesConvenio();
             },
             error: (err) => {
               console.error('Error rechazando solicitud', err);
-              this.showError('No se pudo rechazar la solicitud');
+              this.showError(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.ERROR_RECHAZAR'));
             }
           });
       }
@@ -639,7 +641,8 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
     private confirmationService: ConfirmationService,
     private router: Router,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -703,7 +706,7 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
 
   // ---------- Toasters / Confirm ----------
   showSuccess(description: string = 'Operación completada correctamente') {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('SOLICITUDES_CONVENIO.TOASTS.EXITO'), {
       description: description,
       unstyled: true,
       class: 'my-success-toast'
@@ -711,7 +714,7 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
   }
 
   showError(description: string = 'Ocurrió un error al procesar la solicitud') {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('SOLICITUDES_CONVENIO.TOASTS.ERROR'), {
       description: description,
       unstyled: true,
       class: 'my-error-toast'
@@ -719,7 +722,7 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('SOLICITUDES_CONVENIO.TOASTS.WARNING'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -730,10 +733,10 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_CONFIRMAR'),
+        rejectLabel: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

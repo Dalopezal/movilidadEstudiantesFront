@@ -1,4 +1,3 @@
-
 <app-sidebar *ngIf="!embebido"></app-sidebar>
 <div class="container fuente" [style.padding-top]="embebido ? '0px' : '30px'">
   <div class="row h-100">
@@ -9,7 +8,7 @@
         <section class="col-12 col-lg-12 d-flex flex-column" style="height: 70vh;font-size: 14px;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1">
             <div class="card-header d-flex align-items-center" style="background: #E2E6F7;" *ngIf="!embebido" >
-              <button title="Atrás"
+              <button title="{{ 'SOLICITUDES_CONVENIO.BTN_VOLVER' | translate }}"
                 mat-icon-button
                 (click)="goBack()"
                 [disableRipple]="true"
@@ -17,7 +16,7 @@
                 style="background-color: transparent; width: 40px; height: 40px; padding: 0;">
                 <mat-icon style="font-size: 14px; width: 14px; height: 14px;">arrow_back</mat-icon>
               </button>
-              <p class="mb-0" style="color: #0D133F;">Administración Solicitudes Convenio</p>
+              <p class="mb-0" style="color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TITULO' | translate }}</p>
             </div>
             <div class="card-header d-flex align-items-center gap-3" style="background: white;">
               <button
@@ -25,7 +24,7 @@
                 style="background: #0D133F; border-color: #0D133F;font-size: 13px;padding: 5px 8px;"
                 (click)="tipoSolicitudId = 0; estadoConvenioId = 0; institucionId = 0; fetchSolicitudesConvenio()"
               >
-                <i class="fas fa-sync-alt"></i> Actualizar
+                <i class="fas fa-sync-alt"></i> {{ 'SOLICITUDES_CONVENIO.BTN_ACTUALIZAR' | translate }}
               </button>
                <select
                   class="form-select"
@@ -34,9 +33,9 @@
                   required
                   style="font-size: 13px;"
                   [(ngModel)]="tipoSolicitudId"
-                  
+
                 >
-                <option value="0">Tipo Solicitud</option>
+                <option value="0">{{ 'SOLICITUDES_CONVENIO.FILTROS.TIPO' | translate }}</option>
                 <option *ngFor="let t of tiposSolicitud" [value]="t.id">{{ t.nombre }}</option>
                 </select>
                <select
@@ -47,7 +46,7 @@
                   style="font-size: 13px;"
                   [(ngModel)]="estadoConvenioId"
                 >
-                <option value="0">Estado</option>
+                <option value="0">{{ 'SOLICITUDES_CONVENIO.FILTROS.ESTADO' | translate }}</option>
                 <option *ngFor="let e of estadosConvenio" [value]="e.id">{{ e.nombre }}</option>
                 </select>
                 <select
@@ -57,9 +56,9 @@
                   required
                   style="font-size: 13px;"
                   [(ngModel)]="institucionId"
-                  
+
                 >
-                <option value="0">Institución</option>
+                <option value="0">{{ 'SOLICITUDES_CONVENIO.FILTROS.INSTITUCION' | translate }}</option>
                 <option *ngFor="let i of instituciones" [value]="i.id">{{ i.nombre }}</option>
                 </select>
               <button
@@ -67,7 +66,7 @@
                 style="background: #0D133F; border-color: #0D133F;font-size: 13px;font-size: 13px;padding: 5px 8px;"
                 (click)="filterSolicitudesConvenio()"
               >
-                <i class="fas fa-search"></i> Buscar
+                <i class="fas fa-search"></i> {{ 'SOLICITUDES_CONVENIO.BTN_BUSCAR' | translate }}
               </button>
             </div>
 
@@ -76,23 +75,25 @@
               <table class="table table-striped mb-0">
                 <thead class="table-primary"  style="font-size: 13px">
                   <tr align="center">
-                    <th style="background: white;color: #0D133F;">Solicitud</th>
-                    <th style="background: white;color: #0D133F;">Descripción</th>
-                    <th style="background: white;color: #0D133F;">Solicitante</th>
-                    <th style="background: white;color: #0D133F;">Institución</th>
-                    <th style="background: white;color: #0D133F;">Fecha</th>
-                    <th style="background: white;color: #0D133F;">Estado</th>
-                    <th style="background: white;color: #0D133F;">Administradores</th>
-                    <th style="background: white;color: #0D133F;">Acciones</th>
-                    <th *ngIf="!embebido" style="background: white;color: #0D133F;">Opciones</th>
-                    
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.SOLICITUD' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.DESCRIPCION' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.SOLICITANTE' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.INSTITUCION' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.FECHA' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.ESTADO' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.ADMINISTRADORES' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.ACCIONES' | translate }}</th>
+                    <th *ngIf="!embebido" style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.OPCIONES' | translate }}</th>
+
                   </tr>
                 </thead>
                 <tbody style="font-size: 13px">
-                <div *ngIf="loading" class="table-overlay">
-                  <i class="fas fa-spinner fa-spin fa-3x"></i>
-                  <p style="background: transparent;;">Cargando datos</p>
-                </div>
+                  <tr *ngIf="loading">
+                    <td [attr.colspan]="embebido ? 8 : 9" class="text-center">
+                      <i class="fas fa-spinner fa-spin fa-3x"></i>
+                      <p style="background: transparent;">{{ 'SOLICITUDES_CONVENIO.CARGANDO' | translate }}</p>
+                    </td>
+                  </tr>
                   <tr *ngFor="let item of pagedData; trackBy: trackBySolicitudId">
                     <td align="center">{{ item.id }}</td>
                     <td>{{ item.descripcion }}</td>
@@ -100,57 +101,53 @@
                     <td>{{ item.institucionNombre}}</td>
                     <td align="center">{{ item.fechacreacion }}</td>
                     <td align="center"><button class="button-completed">{{item.estadoNombre}}</button></td>
-                    <td align="center" title="Ver Administradores" (click)="abrirModalAdministradores(item)">
+                    <td align="center" title="{{ 'SOLICITUDES_CONVENIO.TABLE.VER_ADMINISTRADORES' | translate }}" (click)="abrirModalAdministradores(item)">
                       <i class="fa-duotone fa-solid fa-users button-eye"></i>
                     </td>
-                    <td align="center" title="Ver Acciones del Convenio" (click)="abrirModalAccionesConvenio(item)">
+                    <td align="center" title="{{ 'SOLICITUDES_CONVENIO.TABLE.VER_ACCIONES' | translate }}" (click)="abrirModalAccionesConvenio(item)">
                       <i class="fa-duotone fa-solid fa-tasks button-eye"></i>
                     </td>
                     <td align="center" *ngIf="!embebido">
                       <div class="d-flex gap-2 justify-content-center align-items-center">
-                        
+
                         <!-- ========== JEFE INMEDIATO ========== -->
-                        <!-- Solo ve solicitudes en estado "Solicitado" -->
                         <ng-container *ngIf="usuarioRol === 'Jefe inmediato' && item.estadoNombre === 'Solicitado'">
-                          <i class="fa-solid fa-check button-eye btn-aprobar" 
-                             title="Aprobar Solicitud"
+                          <i class="fa-solid fa-check button-eye btn-aprobar"
+                             title="{{ 'SOLICITUDES_CONVENIO.ACCIONES.APROBAR' | translate }}"
                              (click)="aprobarSolicitud(item, 'jefe')">
                           </i>
-                          <i class="fa-solid fa-times button-eye btn-aprobar" 
-                             title="Rechazar Solicitud"
+                          <i class="fa-solid fa-times button-eye btn-aprobar"
+                             title="{{ 'SOLICITUDES_CONVENIO.ACCIONES.RECHAZAR' | translate }}"
                              (click)="rechazarSolicitud(item, 'jefe')">
                           </i>
                         </ng-container>
-                
+
                         <!-- ========== GESTOR ORI ========== -->
-                        <!-- Ve TODAS las solicitudes, pero solo puede aprobar/rechazar las que están "Aprobado jefe inmediato" -->
                         <ng-container *ngIf="usuarioRol === 'ORI interno'">
-                          <!-- Mostrar botones de aprobar/rechazar solo si está en el estado correcto -->
                           <ng-container *ngIf="item.estadoNombre === 'Aprobado jefe inmediato'">
-                            <i class="fa-solid fa-check button-eye btn-aprobar" 
-                               title="Aprobar como ORI"
+                            <i class="fa-solid fa-check button-eye btn-aprobar"
+                               title="{{ 'SOLICITUDES_CONVENIO.ACCIONES.APROBAR_ORI' | translate }}"
                                (click)="aprobarSolicitud(item, 'ori')">
                             </i>
-                            <i class="fa-solid fa-times button-eye btn-aprobar" 
-                               title="Rechazar como ORI"
+                            <i class="fa-solid fa-times button-eye btn-aprobar"
+                               title="{{ 'SOLICITUDES_CONVENIO.ACCIONES.RECHAZAR_ORI' | translate }}"
                                (click)="rechazarSolicitud(item, 'ori')">
                             </i>
                           </ng-container>
-                          
-                          <!-- Para otros estados, solo mostrar un ícono informativo -->
+
+                          <!-- CORRECCIÓN AQUÍ: Uso de interpolación para evitar error de Parser -->
                           <ng-container *ngIf="item.estadoNombre !== 'Aprobado jefe inmediato'">
-                            <i class="fa-solid fa-eye button-eye text-secondary" 
-                               title="Solo lectura - Estado: {{ item.estadoNombre }}">
+                            <i class="fa-solid fa-eye button-eye text-secondary"
+                               title="{{ 'SOLICITUDES_CONVENIO.ACCIONES.SOLO_LECTURA' | translate }}: {{ item.estadoNombre }}">
                             </i>
                           </ng-container>
                         </ng-container>
-                
-                     
+
                       </div>
                     </td>
                   </tr>
                   <tr *ngIf="!loading && pagedData.length === 0">
-                    <td [attr.colspan]="embebido ? 8 : 9" class="text-center">No hay registros.</td>
+                    <td [attr.colspan]="embebido ? 8 : 9" class="text-center">{{ 'SOLICITUDES_CONVENIO.SIN_REGISTROS' | translate }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -159,11 +156,11 @@
             <!-- Paginación -->
             <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
               <div class="items-per-page d-flex align-items-center gap-2">
-                <label for="itemsPerPageSelect" class="mb-0">Mostrar</label>
+                <label for="itemsPerPageSelect" class="mb-0">{{ 'SOLICITUDES_CONVENIO.PAGINACION.MOSTRAR' | translate }}</label>
                 <select id="itemsPerPageSelect" (change)="onPageSizeChange($event)" [value]="pageSize">
                   <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
                 </select>
-                <span>de {{ solicitudesConvenio.length }}</span>
+                <span>{{ 'SOLICITUDES_CONVENIO.PAGINACION.DE' | translate }} {{ solicitudesConvenio.length }}</span>
               </div>
               <nav>
                 <ul class="pagination mb-0">
@@ -172,8 +169,8 @@
                       &laquo;
                     </button>
                   </li>
-                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
-                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  <li class="page-item" *ngFor="let p of pages" [class.active]="p === currentPage">
+                    <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
                   </li>
                   <li class="page-item" [class.disabled]="currentPage === totalPages">
                     <button class="page-link text-white" (click)="goToPage(currentPage + 1)" style="background:#0D133F">
@@ -204,36 +201,34 @@
      [style.left.px]="cardPositionAcciones.left">
   <div class="card shadow-glow">
     <div class="card-header gradient-header text-white p-2">
-      <strong><i class="fas fa-tasks me-2"></i>Acciones del Convenio</strong>
+      <strong><i class="fas fa-tasks me-2"></i>{{ 'SOLICITUDES_CONVENIO.MODAL_ACCIONES.TITULO' | translate }}</strong>
       <button type="button" class="btn-close btn-close-white float-end pulse-button"
               (click)="closeCardAcciones()"></button>
     </div>
 
     <div class="card-body glass-effect scroll-body" style="font-size: 13px;">
-      <!-- Información de la solicitud -->
       <div class="info-row mb-3">
-        <span class="label-glow">Solicitud:</span> {{ selectedItemAcciones.id }} - {{ selectedItemAcciones.descripcion }}
+        <span class="label-glow">{{ 'SOLICITUDES_CONVENIO.MODAL_ACCIONES.SOLICITUD' | translate }}:</span> {{ selectedItemAcciones.id }} - {{ selectedItemAcciones.descripcion }}
       </div>
 
       <hr style="border-color: rgba(255,255,255,0.2);">
 
-      <!-- Lista de Acciones -->
       <div *ngIf="accionesConvenio.length > 0">
-        <div *ngFor="let accion of accionesConvenio" class="info-row mb-3 p-2" 
+        <div *ngFor="let accion of accionesConvenio" class="info-row mb-3 p-2"
              style="background: rgba(255,255,255,0.05); border-radius: 8px;">
           <div class="d-flex justify-content-between align-items-center">
             <div style="flex: 1;">
               <span class="label-glow">{{ accion.descripcion }}</span>
             </div>
             <div class="d-flex align-items-center gap-3">
-              <span class="badge" 
+              <span class="badge"
                     [ngClass]="accion.aprobado ? 'bg-success' : 'bg-secondary'">
-                {{ accion.aprobado ? 'Aprobado' : 'No Aprobado' }}
+                {{ accion.aprobado ? ('SOLICITUDES_CONVENIO.MODAL_ACCIONES.APROBADO' | translate) : ('SOLICITUDES_CONVENIO.MODAL_ACCIONES.NO_APROBADO' | translate) }}
               </span>
               <div class="form-check form-switch" *ngIf="puedeEditarAcciones()">
-                <input 
-                  class="form-check-input" 
-                  type="checkbox" 
+                <input
+                  class="form-check-input"
+                  type="checkbox"
                   [id]="'accion-' + accion.id"
                   [(ngModel)]="accion.aprobado"
                   style="cursor: pointer;">
@@ -245,21 +240,19 @@
 
       <div *ngIf="accionesConvenio.length === 0" class="text-center text-muted py-3">
         <i class="fas fa-inbox fa-2x mb-2"></i>
-        <p>No hay acciones registradas para este convenio</p>
+        <p>{{ 'SOLICITUDES_CONVENIO.MODAL_ACCIONES.SIN_ACCIONES' | translate }}</p>
       </div>
 
-      <!-- Botón Guardar (solo para Gestor ORI) -->
       <div class="text-end mt-3" *ngIf="puedeEditarAcciones()">
-        <button 
+        <button
           class="btn btn-sm btn-success"
           (click)="guardarAcciones()">
-          <i class="fas fa-save me-2"></i>Guardar Cambios
+          <i class="fas fa-save me-2"></i>{{ 'SOLICITUDES_CONVENIO.MODAL_ACCIONES.BTN_GUARDAR' | translate }}
         </button>
       </div>
     </div>
   </div>
 </div>
-
 
 <!-- Modal Administradores del Convenio -->
 <div *ngIf="selectedItemAdministradores"
@@ -270,48 +263,45 @@
      [style.left.px]="cardPositionAdministradores.left">
   <div class="card shadow-glow">
     <div class="card-header gradient-header text-white p-2">
-      <strong><i class="fas fa-users me-2"></i>Administradores del Convenio</strong>
+      <strong><i class="fas fa-users me-2"></i>{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.TITULO' | translate }}</strong>
       <button type="button" class="btn-close btn-close-white float-end pulse-button"
               (click)="closeCardAdministradores()"></button>
     </div>
 
     <div class="card-body glass-effect scroll-body" style="font-size: 13px;">
-      <!-- Información de la solicitud -->
       <div class="info-row mb-3">
-        <span class="label-glow">Solicitud:</span> {{ selectedItemAdministradores.id }} - {{ selectedItemAdministradores.descripcion }}
+        <span class="label-glow">{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.SOLICITUD' | translate }}:</span> {{ selectedItemAdministradores.id }} - {{ selectedItemAdministradores.descripcion }}
       </div>
 
-      <!-- Botón agregar (solo Gestor ORI) -->
       <div class="mb-3" *ngIf="usuarioRol === 'ORI interno'">
         <button class="btn btn-sm btn-success" (click)="agregarAdministrador()">
-          <i class="fas fa-plus me-2"></i>Agregar Administrador
+          <i class="fas fa-plus me-2"></i>{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.BTN_AGREGAR' | translate }}
         </button>
       </div>
 
       <hr style="border-color: rgba(255,255,255,0.2);">
 
-      <!-- Lista de Administradores -->
       <div *ngIf="administradoresConvenio.length > 0">
-        <div *ngFor="let admin of administradoresConvenio" 
-             class="info-row mb-3 p-3" 
+        <div *ngFor="let admin of administradoresConvenio"
+             class="info-row mb-3 p-3"
              style="background: rgba(255,255,255,0.05); border-radius: 8px;">
           <div class="d-flex justify-content-between align-items-start">
             <div style="flex: 1;">
               <div class="mb-2">
-                <span class="label-glow">Nombre:</span> {{ admin.nombre }}
+                <span class="label-glow">{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.NOMBRE' | translate }}:</span> {{ admin.nombre }}
               </div>
               <div class="mb-2">
-                <span class="label-glow">Email:</span> {{ admin.email }}
+                <span class="label-glow">{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.EMAIL' | translate }}:</span> {{ admin.email }}
               </div>
               <div>
-                <span class="label-glow">Documento:</span> {{ admin.documento }}
+                <span class="label-glow">{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.DOCUMENTO' | translate }}:</span> {{ admin.documento }}
               </div>
             </div>
             <div *ngIf="usuarioRol === 'ORI interno'">
-              <button 
+              <button
                 class="btn btn-sm btn-danger"
                 (click)="eliminarAdministrador(admin)"
-                title="Eliminar Administrador">
+                title="{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.BTN_ELIMINAR' | translate }}">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -321,7 +311,7 @@
 
       <div *ngIf="administradoresConvenio.length === 0" class="text-center text-muted py-3">
         <i class="fas fa-user-slash fa-2x mb-2"></i>
-        <p>No hay administradores asignados</p>
+        <p>{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.SIN_ADMINISTRADORES' | translate }}</p>
       </div>
     </div>
   </div>

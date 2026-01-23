@@ -7,19 +7,19 @@
         <section class="col-12 col-lg-4 d-flex flex-column" style="height: 80vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
             <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;font-size: 14px">Administrar Convenios</p>
+              <p class="mb-0" style="color: #0D133F;font-size: 14px">{{ 'CONVENIOS.FORM.TITULO' | translate }}</p>
             </div>
 
             <div class="card-body d-flex flex-column flex-grow-1">
               <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
                 <div class="mb-3">
-                  <label for="codigoUcm" class="form-label fw-bold">Código UCM</label>
+                  <label for="codigoUcm" class="form-label fw-bold">{{ 'CONVENIOS.FORM.CODIGO_UCM' | translate }}</label>
                   <input
                     type="text"
                     class="form-control"
                     id="codigoUcm"
                     name="codigoUcm"
-                    placeholder="Digite Código UCM"
+                    [placeholder]="'CONVENIOS.FORM.CODIGO_UCM_PLACEHOLDER' | translate"
                     required
                     minlength="3"
                     [(ngModel)]="model.codigoUcm"
@@ -27,17 +27,17 @@
                     style="font-size: 13px;"
                   />
                   <div class="text-danger small mt-1" *ngIf="codigoUcmCtrl.invalid && (codigoUcmCtrl.touched || codigoUcmCtrl.dirty)">
-                    <div *ngIf="codigoUcmCtrl.errors?.['required']">La descripción es obligatoria.</div>
-                    <div *ngIf="codigoUcmCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                    <div *ngIf="codigoUcmCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_CODIGO_REQUERIDO' | translate }}</div>
+                    <div *ngIf="codigoUcmCtrl.errors?.['minlength']">{{ 'CONVENIOS.FORM.ERROR_MIN_3' | translate }}</div>
                   </div>
                 </div>
                 <div class="mb-3">
-                  <label for="descripcion" class="form-label fw-bold">Descripción</label>
+                  <label for="descripcion" class="form-label fw-bold">{{ 'CONVENIOS.FORM.DESCRIPCION' | translate }}</label>
                   <textarea
                     class="form-control"
                     id="descripcion"
                     name="descripcion"
-                    placeholder="Digite Descripción"
+                    [placeholder]="'CONVENIOS.FORM.DESCRIPCION_PLACEHOLDER' | translate"
                     required
                     minlength="3"
                     rows="4"
@@ -46,15 +46,14 @@
                     style="font-size: 13px;"
                   ></textarea>
                   <div class="text-danger small mt-1" *ngIf="descripcionCtrl.invalid && (descripcionCtrl.touched || descripcionCtrl.dirty)">
-                    <div *ngIf="descripcionCtrl.errors?.['required']">La descripción es obligatoria.</div>
-                    <div *ngIf="descripcionCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                    <div *ngIf="descripcionCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_DESCRIPCION_REQUERIDA' | translate }}</div>
+                    <div *ngIf="descripcionCtrl.errors?.['minlength']">{{ 'CONVENIOS.FORM.ERROR_MIN_3' | translate }}</div>
                   </div>
                 </div>
 
-                <!-- <div class="mb-3"> -->
                 <div class="row g-3" style="margin-bottom: 20px;">
                   <div class="col-12 col-md-6">
-                    <label for="fechaInicio" class="form-label fw-bold">Fecha Inicio</label>
+                    <label for="fechaInicio" class="form-label fw-bold">{{ 'CONVENIOS.FORM.FECHA_INICIO' | translate }}</label>
                     <input
                       type="date"
                       class="form-control"
@@ -67,12 +66,12 @@
                       style="font-size: 13px;"
                     />
                     <div class="text-danger small mt-1" *ngIf="(inicioCtrl.invalid && (inicioCtrl.touched || inicioCtrl.dirty)) || fechaInicioInvalida">
-                      <div *ngIf="inicioCtrl.errors?.['required']">La fecha de inicio es obligatoria.</div>
-                      <div *ngIf="fechaInicioInvalida">La fecha de inicio no puede ser menor a la fecha actual.</div>
+                      <div *ngIf="inicioCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_FECHA_REQUERIDA' | translate }}</div>
+                      <div *ngIf="fechaInicioInvalida">{{ 'CONVENIOS.FORM.ERROR_FECHA_MENOR' | translate }}</div>
                     </div>
                   </div>
                   <div class="col-12 col-md-6">
-                    <label for="tipoConvenio" class="form-label fw-bold">Tipo Convenio</label>
+                    <label for="tipoConvenio" class="form-label fw-bold">{{ 'CONVENIOS.FORM.TIPO_CONVENIO' | translate }}</label>
                     <select
                       class="form-select"
                       id="tipoConvenio"
@@ -85,14 +84,14 @@
                       <option *ngFor="let t of tiposConvenio" [ngValue]="t.id">{{ t.descripcion }}</option>
                     </select>
                     <div class="text-danger small mt-1" *ngIf="tipoConvCtrl.invalid && (tipoConvCtrl.touched || tipoConvCtrl.dirty)">
-                      <div *ngIf="tipoConvCtrl.errors?.['required']">Seleccione un tipo de convenio.</div>
+                      <div *ngIf="tipoConvCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_TIPO_CONVENIO' | translate }}</div>
                     </div>
                   </div>
                 </div>
 
                 <div class="row g-3" style="margin-bottom: 20px;">
                   <div class="col-12 col-md-6">
-                    <label for="clasificacion" class="form-label fw-bold">Clasificación</label>
+                    <label for="clasificacion" class="form-label fw-bold">{{ 'CONVENIOS.FORM.CLASIFICACION' | translate }}</label>
                     <select
                       class="form-select"
                       id="clasificacion"
@@ -105,11 +104,11 @@
                       <option *ngFor="let c of clasificaciones" [ngValue]="c.id">{{ c.nombre }}</option>
                     </select>
                     <div class="text-danger small mt-1" *ngIf="clasificacionCtrl.invalid && (clasificacionCtrl.touched || clasificacionCtrl.dirty)">
-                      <div *ngIf="clasificacionCtrl.errors?.['required']">Seleccione una clasificación.</div>
+                      <div *ngIf="clasificacionCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_CLASIFICACION' | translate }}</div>
                     </div>
                   </div>
                   <div class="col-12 col-md-6">
-                    <label for="tipoActividad" class="form-label fw-bold">Tipo Actividad</label>
+                    <label for="tipoActividad" class="form-label fw-bold">{{ 'CONVENIOS.FORM.TIPO_ACTIVIDAD' | translate }}</label>
                     <select
                       class="form-select"
                       id="tipoActividad"
@@ -122,14 +121,14 @@
                       <option *ngFor="let a of tiposActividad" [ngValue]="a.id">{{ a.nombre }}</option>
                     </select>
                     <div class="text-danger small mt-1" *ngIf="tipoActCtrl.invalid && (tipoActCtrl.touched || tipoActCtrl.dirty)">
-                      <div *ngIf="tipoActCtrl.errors?.['required']">Seleccione un tipo de actividad.</div>
+                      <div *ngIf="tipoActCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_TIPO_ACTIVIDAD' | translate }}</div>
                     </div>
                   </div>
                 </div>
 
                 <div class="row g-3 align-items-center">
                   <div class="col-12 col-md-6">
-                    <label for="diasVigencia" class="form-label fw-bold">Días de Vigencia</label>
+                    <label for="diasVigencia" class="form-label fw-bold">{{ 'CONVENIOS.FORM.DIAS_VIGENCIA' | translate }}</label>
                     <input
                       type="number"
                       min="0"
@@ -143,8 +142,8 @@
                       (input)="validateDiasVigencia()"
                     />
                     <div class="text-danger small mt-1" *ngIf="(diasCtrl.invalid && (diasCtrl.touched || diasCtrl.dirty)) || diasVigenciaInvalida">
-                      <div *ngIf="diasCtrl.errors?.['required']">Ingrese los días de vigencia.</div>
-                      <div *ngIf="diasVigenciaInvalida">Los días de vigencia deben ser mayor o igual a 1.</div>
+                      <div *ngIf="diasCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_DIAS_REQUERIDO' | translate }}</div>
+                      <div *ngIf="diasVigenciaInvalida">{{ 'CONVENIOS.FORM.ERROR_DIAS_MINIMO' | translate }}</div>
                     </div>
                   </div>
 
@@ -155,9 +154,9 @@
                       id="estado"
                       name="estado"
                       [(ngModel)]="model.estado"
-                    style="font-size: 13px;"
+                      style="font-size: 13px;"
                     />
-                    <label for="estado" class="form-check-label fw-bold">Estado Activo</label>
+                    <label for="estado" class="form-check-label fw-bold">{{ 'CONVENIOS.FORM.ESTADO_ACTIVO' | translate }}</label>
                   </div>
                 </div>
 
@@ -169,13 +168,13 @@
                     [ngStyle]="{ 'background': '#0D133F' }"
                     style="font-size: 13px;"
                   >
-                    <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
-                    <span *ngIf="loading">Guardando...</span>
+                    <span *ngIf="!loading">{{ isEditing ? ('CONVENIOS.FORM.BTN_ACTUALIZAR' | translate) : ('CONVENIOS.FORM.BTN_INGRESAR' | translate) }}</span>
+                    <span *ngIf="loading">{{ 'CONVENIOS.FORM.BTN_GUARDANDO' | translate }}</span>
                   </button>
 
                   <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading"
                     style="font-size: 13px;">
-                    Cancelar
+                    {{ 'CONVENIOS.FORM.BTN_CANCELAR' | translate }}
                   </button>
                 </div>
               </form>
@@ -188,11 +187,11 @@
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchConvenios(); filtro=''">
-                <i class="fas fa-sync-alt"></i> Actualizar
+                <i class="fas fa-sync-alt"></i> {{ 'CONVENIOS.TABLE.BTN_ACTUALIZAR' | translate }}
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite código convenio" [(ngModel)]="filtro" name="filtro"/>
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" [placeholder]="'CONVENIOS.TABLE.FILTRO_PLACEHOLDER' | translate" [(ngModel)]="filtro" name="filtro"/>
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterConvenios()">
-                <i class="fas fa-search"></i> Buscar
+                <i class="fas fa-search"></i> {{ 'CONVENIOS.TABLE.BTN_BUSCAR' | translate }}
               </button>
             </div>
 
@@ -200,20 +199,22 @@
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
                   <tr>
-                    <th style="background: white !important;">Código UCM</th>
-                    <th style="background: white !important;">Descripción</th>
-                    <th style="background: white !important;">Tipo Convenio</th>
-                    <th style="background: white !important;">Clasificación</th>
-                    <th style="background: white !important;">Tipo Actividad</th>
-                    <th style="background: white !important;">Fecha Inicio</th>
-                    <th style="background: white !important;">Opciones</th>
+                    <th style="background: white !important;">{{ 'CONVENIOS.TABLE.COL_CODIGO_UCM' | translate }}</th>
+                    <th style="background: white !important;">{{ 'CONVENIOS.TABLE.COL_DESCRIPCION' | translate }}</th>
+                    <th style="background: white !important;">{{ 'CONVENIOS.TABLE.COL_TIPO_CONVENIO' | translate }}</th>
+                    <th style="background: white !important;">{{ 'CONVENIOS.TABLE.COL_CLASIFICACION' | translate }}</th>
+                    <th style="background: white !important;">{{ 'CONVENIOS.TABLE.COL_TIPO_ACTIVIDAD' | translate }}</th>
+                    <th style="background: white !important;">{{ 'CONVENIOS.TABLE.COL_FECHA_INICIO' | translate }}</th>
+                    <th style="background: white !important;">{{ 'CONVENIOS.TABLE.COL_OPCIONES' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <div *ngIf="loadingTable" class="table-overlay">
-                  <i class="fas fa-spinner fa-spin fa-3x"></i>
-                  <p style="background: transparent;">Cargando datos</p>
-                  </div>
+                  <tr *ngIf="loadingTable">
+                    <td colspan="7" class="text-center">
+                      <i class="fas fa-spinner fa-spin fa-3x"></i>
+                      <p class="mt-2">{{ 'CONVENIOS.TABLE.CARGANDO' | translate }}</p>
+                    </td>
+                  </tr>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.codigoUcm }}</td>
                     <td
@@ -235,7 +236,7 @@
                     </td>
                   </tr>
                   <tr *ngIf="!loadingTable && pagedData.length === 0">
-                    <td colspan="6" class="text-center">No hay registros.</td>
+                    <td colspan="7" class="text-center">{{ 'CONVENIOS.TABLE.SIN_REGISTROS' | translate }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -243,11 +244,11 @@
 
             <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
               <div class="items-per-page d-flex align-items-center gap-2">
-                <label for="itemsPerPageSelect" class="mb-0">Mostrar</label>
+                <label for="itemsPerPageSelect" class="mb-0">{{ 'CONVENIOS.PAGINACION.MOSTRAR' | translate }}</label>
                 <select id="itemsPerPageSelect" (change)="onPageSizeChange($event)" [value]="pageSize">
                   <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
                 </select>
-                <span>de {{ data.length }}</span>
+                <span>{{ 'CONVENIOS.PAGINACION.DE' | translate }} {{ data.length }}</span>
               </div>
 
               <nav aria-label="Page navigation example">
@@ -257,8 +258,8 @@
                       <span aria-hidden="true">&laquo;</span>
                     </button>
                   </li>
-                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
-                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  <li class="page-item" *ngFor="let p of pages" [class.active]="p === currentPage">
+                    <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
                   </li>
                   <li class="page-item" [class.disabled]="currentPage === totalPages">
                     <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background: #0D133F;">

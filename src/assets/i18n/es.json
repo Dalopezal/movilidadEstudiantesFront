@@ -502,5 +502,326 @@
       "ERROR_DESC": "No se puede consultar el id de postulación",
       "WARNING_TITULO": "Atención"
     }
+  },
+  "INSTITUCION_CONVENIO": {
+    "FORM": {
+      "TITULO": "Administrar Insitución - Convenio",
+      "LABEL_INSTITUCIONES": "Instituciones",
+      "LABEL_CONVENIOS": "Convenios",
+      "ERROR_INSTITUCION": "Seleccione una institución.",
+      "ERROR_CONVENIO": "Seleccione un convenio.",
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_INGRESAR": "Ingresar",
+      "BTN_GUARDANDO": "Guardando...",
+      "BTN_CANCELAR": "Cancelar"
+    },
+    "TABLE": {
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_BUSCAR": "Buscar",
+      "FILTRO_PLACEHOLDER": "Digite nombre institución / Código UCM",
+      "COL_INSTITUCION": "Institución",
+      "COL_CODIGO_UCM": "Código UCM",
+      "COL_OPCIONES": "Opciones",
+      "CARGANDO": "Cargando datos",
+      "SIN_REGISTROS": "No hay registros."
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Mostrar",
+      "DE": "de"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "No se pudo cargar la información. Intenta de nuevo.",
+      "FILTRO_VACIO": "Debe digitar un valor para ejecutar la búsqueda",
+      "ERROR_FILTRO": "Error al filtrar relaciones",
+      "ERROR_SELECCION": "Debe seleccionar una institución y un convenio.",
+      "RESPUESTA_DESCONOCIDA": "Respuesta desconocida del servidor.",
+      "ERROR_PROCESAR": "No se pudo procesar la solicitud. Intenta de nuevo.",
+      "ELIMINADO_EXITO": "Se eliminó el registro satisfactoriamente",
+      "ERROR_ELIMINAR": "Error al eliminar relación, el registro se encuentra asociado"
+    },
+    "CONFIRM": {
+      "ELIMINAR": "Estás seguro de eliminar este registro",
+      "HEADER": "Confirmar acción",
+      "ACEPTAR": "Sí, Confirmo",
+      "CANCELAR": "Cancelar"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "¡Operación exitosa!",
+      "ERROR_TITULO": "Error al procesar",
+      "WARNING_TITULO": "Atención"
+    }
+  },
+  "CONVENIOS": {
+    "FORM": {
+      "TITULO": "Administrar Convenios",
+      "CODIGO_UCM": "Código UCM",
+      "CODIGO_UCM_PLACEHOLDER": "Digite Código UCM",
+      "DESCRIPCION": "Descripción",
+      "DESCRIPCION_PLACEHOLDER": "Digite Descripción",
+      "FECHA_INICIO": "Fecha Inicio",
+      "TIPO_CONVENIO": "Tipo Convenio",
+      "CLASIFICACION": "Clasificación",
+      "TIPO_ACTIVIDAD": "Tipo Actividad",
+      "DIAS_VIGENCIA": "Días de Vigencia",
+      "ESTADO_ACTIVO": "Estado Activo",
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_INGRESAR": "Ingresar",
+      "BTN_GUARDANDO": "Guardando...",
+      "BTN_CANCELAR": "Cancelar",
+      "ERROR_CODIGO_REQUERIDO": "El código es obligatorio.",
+      "ERROR_MIN_3": "Mínimo 3 caracteres.",
+      "ERROR_DESCRIPCION_REQUERIDA": "La descripción es obligatoria.",
+      "ERROR_FECHA_REQUERIDA": "La fecha de inicio es obligatoria.",
+      "ERROR_FECHA_MENOR": "La fecha de inicio no puede ser menor a la fecha actual.",
+      "ERROR_TIPO_CONVENIO": "Seleccione un tipo de convenio.",
+      "ERROR_CLASIFICACION": "Seleccione una clasificación.",
+      "ERROR_TIPO_ACTIVIDAD": "Seleccione un tipo de actividad.",
+      "ERROR_DIAS_REQUERIDO": "Ingrese los días de vigencia.",
+      "ERROR_DIAS_MINIMO": "Los días de vigencia deben ser mayor o igual a 1."
+    },
+    "TABLE": {
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_BUSCAR": "Buscar",
+      "FILTRO_PLACEHOLDER": "Digite código convenio",
+      "COL_CODIGO_UCM": "Código UCM",
+      "COL_DESCRIPCION": "Descripción",
+      "COL_TIPO_CONVENIO": "Tipo Convenio",
+      "COL_CLASIFICACION": "Clasificación",
+      "COL_TIPO_ACTIVIDAD": "Tipo Actividad",
+      "COL_FECHA_INICIO": "Fecha Inicio",
+      "COL_OPCIONES": "Opciones",
+      "CARGANDO": "Cargando datos",
+      "SIN_REGISTROS": "No hay registros."
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Mostrar",
+      "DE": "de"
+    },
+    "MENSAJES": {
+      "ERROR_CARGA": "No se pudo cargar la información. Intenta de nuevo.",
+      "FILTRO_VACIO": "Debe digitar un valor para ejecutar la búsqueda",
+      "ERROR_FILTRO": "Error al filtrar convenios",
+      "DESCRIPCION_OBLIGATORIA": "La descripción es obligatoria.",
+      "RESPUESTA_DESCONOCIDA": "Respuesta desconocida del servidor.",
+      "ERROR_PROCESAR": "No se pudo procesar la solicitud. Intenta de nuevo.",
+      "ELIMINADO_EXITO": "Se eliminó el registro satisfactoriamente",
+      "ERROR_ELIMINAR": "Error al eliminar convenio, el registro se encuentra asociado"
+    },
+    "CONFIRM": {
+      "ELIMINAR": "¿Estás seguro de eliminar este registro?",
+      "HEADER": "Confirmar acción",
+      "ACEPTAR": "Sí, Confirmo",
+      "CANCELAR": "Cancelar"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "¡Operación exitosa!",
+      "ERROR_TITULO": "Error al procesar",
+      "WARNING_TITULO": "Atención"
+    }
+  },
+  "SOLICITUDES_CONVENIO": {
+    "TITULO": "Administración Solicitudes Convenio",
+    "BTN_VOLVER": "Atrás",
+    "BTN_ACTUALIZAR": "Actualizar",
+    "BTN_BUSCAR": "Buscar",
+    "CARGANDO": "Cargando datos",
+    "SIN_REGISTROS": "No hay registros.",
+
+    "FILTROS": {
+      "TIPO": "Tipo Solicitud",
+      "ESTADO": "Estado",
+      "INSTITUCION": "Institución"
+    },
+
+    "TABLE": {
+      "SOLICITUD": "Solicitud",
+      "DESCRIPCION": "Descripción",
+      "SOLICITANTE": "Solicitante",
+      "INSTITUCION": "Institución",
+      "FECHA": "Fecha",
+      "ESTADO": "Estado",
+      "ADMINISTRADORES": "Administradores",
+      "ACCIONES": "Acciones",
+      "OPCIONES": "Opciones",
+      "VER_ADMINISTRADORES": "Ver Administradores",
+      "VER_ACCIONES": "Ver Acciones del Convenio"
+    },
+
+    "ACCIONES": {
+      "APROBAR": "Aprobar Solicitud",
+      "RECHAZAR": "Rechazar Solicitud",
+      "APROBAR_ORI": "Aprobar como ORI",
+      "RECHAZAR_ORI": "Rechazar como ORI",
+      "SOLO_LECTURA": "Solo lectura - Estado"
+    },
+
+    "PAGINACION": {
+      "MOSTRAR": "Mostrar",
+      "DE": "de"
+    },
+
+    "MODAL_ACCIONES": {
+      "TITULO": "Acciones del Convenio",
+      "SOLICITUD": "Solicitud",
+      "APROBADO": "Aprobado",
+      "NO_APROBADO": "No Aprobado",
+      "SIN_ACCIONES": "No hay acciones registradas para este convenio",
+      "BTN_GUARDAR": "Guardar Cambios"
+    },
+
+    "MODAL_ADMIN": {
+      "TITULO": "Administradores del Convenio",
+      "SOLICITUD": "Solicitud",
+      "BTN_AGREGAR": "Agregar Administrador",
+      "NOMBRE": "Nombre",
+      "EMAIL": "Email",
+      "DOCUMENTO": "Documento",
+      "BTN_ELIMINAR": "Eliminar Administrador",
+      "SIN_ADMINISTRADORES": "No hay administradores asignados"
+    },
+
+    "MENSAJES": {
+      "ERROR_FILTRO": "No se pudo aplicar el filtro",
+      "ERROR_FILTROS": "No se pudieron aplicar los filtros",
+      "ERROR_ACCIONES": "No se pudieron cargar las acciones del convenio",
+      "ACCIONES_GUARDADAS": "Las acciones se actualizaron correctamente",
+      "ERROR_GUARDAR_ACCIONES": "No se pudieron guardar los cambios en las acciones",
+      "ERROR_ADMINISTRADORES": "No se pudieron cargar los administradores del convenio",
+      "APROBADO": "La solicitud fue aprobada exitosamente",
+      "ERROR_APROBAR": "No se pudo aprobar la solicitud",
+      "RECHAZADO": "La solicitud fue rechazada",
+      "ERROR_RECHAZAR": "No se pudo rechazar la solicitud"
+    },
+
+    "CONFIRM": {
+      "HEADER": "Confirmar acción",
+      "HEADER_APROBAR": "Confirmar Aprobación",
+      "HEADER_RECHAZAR": "Confirmar Rechazo",
+      "APROBAR": "¿Confirma que desea aprobar esta solicitud?",
+      "RECHAZAR": "¿Confirma que desea rechazar esta solicitud?",
+      "BTN_APROBAR": "Sí, Aprobar",
+      "BTN_RECHAZAR": "Sí, Rechazar",
+      "BTN_CANCELAR": "Cancelar",
+      "BTN_CONFIRMAR": "Sí, Confirmo"
+    },
+
+    "TOASTS": {
+      "EXITO": "¡Operación exitosa!",
+      "ERROR": "Error al procesar",
+      "WARNING": "Atención"
+    }
+  },
+  "SOLICITUD_CONVENIO": {
+    "TITULO": "Solicitudes de Convenios",
+    "BTN_VOLVER": "Atrás",
+
+    "TABS": {
+      "APERTURA": "Apertura",
+      "RENOVACION": "Renovación",
+      "MIS_SOLICITUDES": "Mis Solicitudes"
+    },
+
+    "PASO1": {
+      "TITULO": "1. Descripción e Institución de Convenio",
+      "DESCRIPCION": "Descripción del convenio",
+      "DESCRIPCION_PLACEHOLDER": "Ingrese la sigla de la institución seguida de la sigla del país eje: (UCM-CHL)",
+      "INSTITUCION": "Institución",
+      "SELECCIONE_INSTITUCION": "Seleccione una institución",
+      "OTRA_INSTITUCION": "Otra (no aparece en la lista)",
+      "NUEVA_INSTITUCION": "Nueva Institución",
+      "PAIS": "País",
+      "SELECCIONE_PAIS": "Seleccione un país",
+      "CIUDAD": "Ciudad",
+      "SELECCIONE_CIUDAD": "Seleccione una ciudad",
+      "NOMBRE_INSTITUCION": "Nombre de la institución",
+      "NOMBRE_PLACEHOLDER": "Escriba el nombre completo"
+    },
+
+    "PASO2": {
+      "TITULO": "2. Antecedentes y Objetivos",
+      "ANTECEDENTES": "Antecedentes",
+      "ANTECEDENTES_PLACEHOLDER": "Describa los antecedentes del convenio...",
+      "OBJETIVOS": "Objetivos",
+      "OBJETIVOS_PLACEHOLDER": "Defina los objetivos del convenio..."
+    },
+
+    "PASO3": {
+      "TITULO": "3. Acciones",
+      "BTN_AGREGAR": "Agregar Acción",
+      "BTN_ELIMINAR": "Eliminar acción",
+      "ACCION": "Acción",
+      "DESCRIPCION_ACCION": "Descripción de la acción",
+      "DESCRIPCION_PLACEHOLDER": "Enuncie la acción a realizar...",
+      "FECHA_INICIO": "Fecha de inicio",
+      "FECHA_FIN": "Fecha de finalización"
+    },
+
+    "PASO4": {
+      "TITULO": "4. Administradores del Convenio",
+      "ADMIN_UCM": "Administrador UCM",
+      "NOMBRE_ADMIN_INTERNO": "Nombre del administrador interno",
+      "ADMIN_EXTERNO": "Administrador de la Institución de Convenio",
+      "TIENE_ADMIN_EXTERNO": "El convenio tiene un administrador externo",
+      "NOMBRE_COMPLETO": "Nombre completo",
+      "NOMBRE_EXTERNO_PLACEHOLDER": "Nombre del administrador externo",
+      "CARGO": "Cargo",
+      "CARGO_PLACEHOLDER": "Cargo en la institución",
+      "CORREO": "Correo electrónico",
+      "CORREO_PLACEHOLDER": "ejemplo@institucion.edu.co",
+      "SIN_ADMIN_EXTERNO": "Este convenio no tiene un administrador externo asignado"
+    },
+
+    "NAV": {
+      "ANTERIOR": "Anterior",
+      "SIGUIENTE": "Siguiente",
+      "GUARDAR": "Guardar Solicitud",
+      "PASO": "Paso",
+      "DE": "de"
+    },
+
+    "RENOVACION": {
+      "INFO": "Seleccione el convenio que desea renovar. Los datos se cargarán automáticamente.",
+      "TITULO": "Renovación de Convenio",
+      "CONVENIO": "Convenio a renovar",
+      "SELECCIONE_CONVENIO": "Seleccione un convenio",
+      "CODIGO": "Código",
+      "TIPO_CONVENIO": "Tipo Convenio",
+      "CLASIFICACION": "Clasificación",
+      "TIPO_ACTIVIDAD": "Tipo Actividad",
+      "CATEGORIA_SNIES": "Categoria SNIES",
+      "FECHA_INICIO": "Fecha de inicio",
+      "FECHA_FIN": "Fecha de finalización",
+      "DESCRIPCION": "Descripción",
+      "ANTECEDENTES": "Antecedentes (motivo de renovación)",
+      "ANTECEDENTES_PLACEHOLDER": "Describa los motivos para renovar este convenio...",
+      "GUARDANDO": "Guardando...",
+      "BTN_SOLICITAR": "Solicitar Renovación"
+    },
+
+    "MENSAJES": {
+      "MIN_ACCION": "Debe haber al menos una acción",
+      "SELECCIONE_INSTITUCION": "Debe seleccionar una institución",
+      "COMPLETE_ANTECEDENTES": "Debe completar antecedentes y objetivos",
+      "COMPLETE_ADMIN_EXTERNO": "Debe completar todos los datos del administrador externo",
+      "EMAIL_INVALIDO": "El correo electrónico no es válido",
+      "COMPLETE_CAMPOS": "Por favor complete todos los campos requeridos",
+      "ERROR_CREAR": "Error al crear la solicitud. Intente nuevamente.",
+      "ERROR_ACCIONES": "Error al guardar algunas acciones. Revise los datos.",
+      "ERROR_ADMINS": "Error al guardar algunos administradores.",
+      "EXITO_CREAR": "Solicitud de convenio creada exitosamente\n\nID de Solicitud: {{id}}",
+      "SELECCIONE_CONVENIO_RENOVAR": "Debe seleccionar un convenio para renovar",
+      "MOTIVOS_RENOVACION": "Debe indicar los motivos de la renovación en antecedentes",
+      "ERROR_ID_INSTITUCION": "No se pudo obtener la institución del convenio. Por favor, seleccione el convenio nuevamente.",
+      "WARN_ID_INSTITUCION": "Advertencia: No se pudo obtener el ID de la institución del convenio",
+      "WARN_NO_INSTITUCION": "Advertencia: No se encontró información de la institución para este convenio",
+      "ERROR_CONSULTAR_INSTITUCION": "Error al consultar la institución del convenio. Verifique que el convenio tenga una institución asignada.",
+      "ERROR_RENOVACION": "Error: No se pudo crear la solicitud de renovación. Respuesta inesperada del servidor.",
+      "EXITO_RENOVACION": "Solicitud de renovación creada exitosamente\n\nID: {{id}}\nConvenio: {{codigo}}\n\nNota: Cuando la ORI apruebe esta solicitud, el convenio se renovará automáticamente."
+    },
+
+    "TOASTS": {
+      "EXITO": "¡Operación exitosa!",
+      "ERROR": "Error al procesar"
+    }
   }
 }

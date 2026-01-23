@@ -9,11 +9,20 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { ConvenioModel } from '../../models/ConvenioModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-convenios',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './convenios.component.html',
   styleUrls: ['./convenios.component.css'],
   providers: [ConfirmationService]
@@ -45,8 +54,11 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   loadingTable: any;
 
-
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit() {
     this.fetchTipos();
@@ -151,12 +163,12 @@ export class ConveniosComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar convenios', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('CONVENIOS.MENSAJES.ERROR_CARGA');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(this.translate.instant('CONVENIOS.MENSAJES.ERROR_CARGA'));
           this.loadingTable = false;
         }
       });
@@ -165,7 +177,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   filterConvenios() {
     this.error = null;
     if (!this.filtro || this.filtro.trim() === '') {
-      this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
+      this.showWarning(this.translate.instant('CONVENIOS.MENSAJES.FILTRO_VACIO'));
       return;
     }
     this.loadingTable = true;
@@ -193,7 +205,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al filtrar convenios', err);
-          this.showError('Error al filtrar convenios');
+          this.showError(this.translate.instant('CONVENIOS.MENSAJES.ERROR_FILTRO'));
           this.loadingTable = false;
         }
       });
@@ -206,11 +218,10 @@ export class ConveniosComponent implements OnInit, OnDestroy {
       return;
     }
 
-    //this.validateDateRange();
     if (this.dateRangeInvalid) return;
 
     if (!this.model.descripcion?.trim()) {
-      this.error = 'La descripción es obligatoria.';
+      this.error = this.translate.instant('CONVENIOS.MENSAJES.DESCRIPCION_OBLIGATORIA');
       return;
     }
 
@@ -234,15 +245,14 @@ export class ConveniosComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          // fallback por si llega algo inesperado
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('CONVENIOS.MENSAJES.RESPUESTA_DESCONOCIDA'));
         }
       },
       error: (err) => {
         console.error(isUpdate ? 'Error al actualizar convenio' : 'Error al crear convenio', err);
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
+        this.error = this.translate.instant('CONVENIOS.MENSAJES.ERROR_PROCESAR');
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
+        this.showError(this.translate.instant('CONVENIOS.MENSAJES.ERROR_PROCESAR'));
       }
     });
   }
@@ -280,7 +290,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
+    const confirmado = await this.showConfirm(this.translate.instant('CONVENIOS.CONFIRM.ELIMINAR'));
     if (!confirmado) return;
 
     this.api.delete(`Convenios/Eliminar_Entregable/${id}`)
@@ -288,11 +298,11 @@ export class ConveniosComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchConvenios();
-          this.showSuccess('Se elimino el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('CONVENIOS.MENSAJES.ELIMINADO_EXITO'));
         },
         error: (err) => {
-          console.error('Error al eliminar convenio, el resgistro se encuentra asociado', err);
-          this.showError('Error al eliminar convenio, el resgistro se encuentra asociado');
+          console.error('Error al eliminar convenio', err);
+          this.showError(this.translate.instant('CONVENIOS.MENSAJES.ERROR_ELIMINAR'));
         }
       });
   }
@@ -330,7 +340,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
 
   // ---------- Toasters / Confirm ----------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('CONVENIOS.TOASTS.EXITO_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -338,7 +348,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('CONVENIOS.TOASTS.ERROR_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -346,7 +356,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('CONVENIOS.TOASTS.WARNING_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -357,10 +367,10 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('CONVENIOS.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('CONVENIOS.CONFIRM.ACEPTAR'),
+        rejectLabel: this.translate.instant('CONVENIOS.CONFIRM.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',
@@ -381,7 +391,6 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     }
     const hoy = new Date();
     const fechaInicio = new Date(this.model.fechaInicio);
-    // Poner horas a 0 para comparar solo fechas
     hoy.setHours(0, 0, 0, 0);
     fechaInicio.setHours(0, 0, 0, 0);
 

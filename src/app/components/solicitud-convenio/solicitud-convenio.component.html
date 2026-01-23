@@ -7,46 +7,44 @@
 
         <!-- Header -->
         <div class="card-header d-flex align-items-center" style="background: #E2E6F7;">
-          <button 
-            title="Atrás" 
-            mat-icon-button 
-            (click)="goBack()" 
+          <button
+            [title]="'SOLICITUD_CONVENIO.BTN_VOLVER' | translate"
+            mat-icon-button
+            (click)="goBack()"
             [disableRipple]="true"
             class="me-2"
             style="background-color: transparent; width: 40px; height: 40px; padding: 0;">
             <mat-icon style="font-size: 14px; width: 14px; height: 14px;">arrow_back</mat-icon>
           </button>
           <p class="mb-0 fw-bold" style="color: #0D133F; font-size: 14px;">
-            Solicitudes de Convenios
+            {{ 'SOLICITUD_CONVENIO.TITULO' | translate }}
           </p>
         </div>
 
         <!-- Tabs de tipo solicitud -->
         <div class="tipo-solicitud-container" style="padding: 20px 24px 16px 24px; border-bottom: 2px solid #e5e7eb;">
           <div class="tipo-solicitud-tabs">
-            <button 
+            <button
               type="button"
               class="tab-btn"
               [class.active]="tipoSolicitud === 'Apertura'"
               (click)="cambiarTipo('Apertura')">
-              <i class="fas fa-file-signature"></i> Apertura
+              <i class="fas fa-file-signature"></i> {{ 'SOLICITUD_CONVENIO.TABS.APERTURA' | translate }}
             </button>
-            <button 
+            <button
               type="button"
               class="tab-btn"
               [class.active]="tipoSolicitud === 'Renovacion'"
               (click)="cambiarTipo('Renovacion')">
-              <i class="fas fa-sync-alt"></i> Renovación
+              <i class="fas fa-sync-alt"></i> {{ 'SOLICITUD_CONVENIO.TABS.RENOVACION' | translate }}
             </button>
-            <!-- ===================== creamos un tab de mis soliciudes======================== -->
-            <button 
+            <button
               type="button"
               class="tab-btn"
               [class.active]="tipoSolicitud === 'MisSolicitudes'"
               (click)="cambiarTipo('MisSolicitudes')">
-              <i class="fas fa-list-alt"></i> Mis Solicitudes
+              <i class="fas fa-list-alt"></i> {{ 'SOLICITUD_CONVENIO.TABS.MIS_SOLICITUDES' | translate }}
             </button>
-            
           </div>
         </div>
 
@@ -57,10 +55,10 @@
           <!-- CONTENIDO APERTURA -->
           <!-- ============================================= -->
           <div *ngIf="tipoSolicitud === 'Apertura'" class="d-flex w-100">
-            
+
             <!-- Sidebar de pasos -->
             <div class="sidebar-pasos">
-              <div 
+              <div
                 *ngFor="let paso of pasos; let i = index"
                 class="paso-item"
                 [class.active]="i === pasoActual"
@@ -74,81 +72,81 @@
 
             <!-- Contenido del formulario -->
             <div class="content-area">
-              
+
               <form #form="ngForm" (ngSubmit)="guardar(form)" class="flex-grow-1">
-                
+
                 <!-- ============================================= -->
                 <!-- PASO 1: INSTITUCIÓN -->
                 <!-- ============================================= -->
                 <div *ngIf="pasoActual === 0" class="form-container">
-                  <h2 class="form-title">1. Descripción e Institución de Convenio</h2>
+                  <h2 class="form-title">{{ 'SOLICITUD_CONVENIO.PASO1.TITULO' | translate }}</h2>
 
                   <div class="form-row">
                     <div class="form-group">
-                      <label class="form-label">Descripción del convenio</label>
-                      <input 
+                      <label class="form-label">{{ 'SOLICITUD_CONVENIO.PASO1.DESCRIPCION' | translate }}</label>
+                      <input
                         type="text"
                         class="form-control"
                         [(ngModel)]="formData.descripcion"
                         name="descripcion"
-                        placeholder="Ingrese la sigla de la institucion seguida de la sigla del pais eje: (UCM-CHL)"
+                        [placeholder]="'SOLICITUD_CONVENIO.PASO1.DESCRIPCION_PLACEHOLDER' | translate"
                         required>
                     </div>
                     <div class="form-group">
-                      <label class="form-label">Institución</label>
-                      <select 
+                      <label class="form-label">{{ 'SOLICITUD_CONVENIO.PASO1.INSTITUCION' | translate }}</label>
+                      <select
                         class="form-control"
                         [(ngModel)]="selectedInstitucion"
                         name="institucion"
                         (change)="onInstitucionChange()">
-                        <option value="">Seleccione una institución</option>
+                        <option value="">{{ 'SOLICITUD_CONVENIO.PASO1.SELECCIONE_INSTITUCION' | translate }}</option>
                         <option *ngFor="let i of institucionesFiltradas" [value]="i.id">
                           {{ i.nombre }}
                         </option>
-                        <option value="nueva">Otra (no aparece en la lista)</option>
+                        <option value="nueva">{{ 'SOLICITUD_CONVENIO.PASO1.OTRA_INSTITUCION' | translate }}</option>
                       </select>
                     </div>
                   </div>
 
                   <!-- Campos para nueva institución -->
                   <div *ngIf="selectedInstitucion === 'nueva'">
-                    <h3 class="form-subtitle">Nueva Institución</h3>
-                    
+                    <h3 class="form-subtitle">{{ 'SOLICITUD_CONVENIO.PASO1.NUEVA_INSTITUCION' | translate }}</h3>
+
                     <div class="form-row">
                       <div class="form-group">
-                        <label class="form-label">País</label>
-                        <select 
+                        <label class="form-label">{{ 'SOLICITUD_CONVENIO.PASO1.PAIS' | translate }}</label>
+                        <select
                           class="form-control"
                           [(ngModel)]="selectedPais"
                           name="pais"
                           (change)="onPaisChange()">
-                          <option value="">Seleccione un país</option>
+                          <option value="">{{ 'SOLICITUD_CONVENIO.PASO1.SELECCIONE_PAIS' | translate }}</option>
                           <option *ngFor="let p of paises" [value]="p.id">{{ p.nombre }}</option>
                         </select>
                       </div>
 
                       <div class="form-group">
-                        <label class="form-label">Ciudad</label>
-                        <select 
+                        <label class="form-label">{{ 'SOLICITUD_CONVENIO.PASO1.CIUDAD' | translate }}</label>
+                        <select
                           class="form-control"
                           [(ngModel)]="selectedCiudad"
                           name="ciudad"
                           (change)="onCiudadChange()"
                           [disabled]="!ciudades || ciudades.length === 0">
-                          <option value="">Seleccione una ciudad</option>
+                          <option value="">{{ 'SOLICITUD_CONVENIO.PASO1.SELECCIONE_CIUDAD' | translate }}</option>
                           <option *ngFor="let c of ciudades" [ngValue]="c.id">{{ c.nombre }}</option>
                         </select>
                       </div>
                     </div>
 
                     <div class="form-group">
-                      <label class="form-label">Nombre de la institución</label>
-                      <input 
+                      <label class="form-label">{{ 'SOLICITUD_CONVENIO.PASO1.NOMBRE_INSTITUCION' | translate }}</label>
+                      <input
                         type="text"
                         class="form-control"
                         [(ngModel)]="formData.institucion"
                         name="institucion"
-                        placeholder="Escriba el nombre completo"
+                        [placeholder]="'SOLICITUD_CONVENIO.PASO1.NOMBRE_PLACEHOLDER' | translate"
                         required>
                     </div>
                   </div>
@@ -158,25 +156,25 @@
                 <!-- PASO 2: ANTECEDENTES Y OBJETIVOS -->
                 <!-- ============================================= -->
                 <div *ngIf="pasoActual === 1" class="form-container">
-                  <h2 class="form-title">2. Antecedentes y Objetivos</h2>
+                  <h2 class="form-title">{{ 'SOLICITUD_CONVENIO.PASO2.TITULO' | translate }}</h2>
 
                   <div class="form-group">
-                    <label class="form-label">Antecedentes</label>
-                    <textarea 
+                    <label class="form-label">{{ 'SOLICITUD_CONVENIO.PASO2.ANTECEDENTES' | translate }}</label>
+                    <textarea
                       class="form-control"
                       [(ngModel)]="formData.antecedentes"
                       name="antecedentes"
-                      placeholder="Describa los antecedentes del convenio..."
+                      [placeholder]="'SOLICITUD_CONVENIO.PASO2.ANTECEDENTES_PLACEHOLDER' | translate"
                       required></textarea>
                   </div>
 
                   <div class="form-group">
-                    <label class="form-label">Objetivos</label>
-                    <textarea 
+                    <label class="form-label">{{ 'SOLICITUD_CONVENIO.PASO2.OBJETIVOS' | translate }}</label>
+                    <textarea
                       class="form-control"
                       [(ngModel)]="formData.objetivos"
                       name="objetivos"
-                      placeholder="Defina los objetivos del convenio..."
+                      [placeholder]="'SOLICITUD_CONVENIO.PASO2.OBJETIVOS_PLACEHOLDER' | translate"
                       required></textarea>
                   </div>
                 </div>
@@ -186,62 +184,62 @@
                 <!-- ============================================= -->
                 <div *ngIf="pasoActual === 2" class="form-container">
                   <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="form-title mb-0">3. Acciones</h2>
-                    <button 
+                    <h2 class="form-title mb-0">{{ 'SOLICITUD_CONVENIO.PASO3.TITULO' | translate }}</h2>
+                    <button
                       type="button"
                       class="btn-agregar-accion"
                       (click)="agregarAccion()"
-                      title="Agregar nueva acción">
-                      <i class="fas fa-plus-circle"></i> Agregar Acción
+                      [title]="'SOLICITUD_CONVENIO.PASO3.BTN_AGREGAR' | translate">
+                      <i class="fas fa-plus-circle"></i> {{ 'SOLICITUD_CONVENIO.PASO3.BTN_AGREGAR' | translate }}
                     </button>
                   </div>
-                
+
                   <div class="acciones-container">
-                    <div 
+                    <div
                       *ngFor="let accion of acciones; let i = index; trackBy: trackByIndex"
                       class="accion-card">
-                      
+
                       <div class="accion-header">
                         <div class="accion-numero">
                           <i class="fas fa-tasks"></i>
-                          <span>Acción {{ i + 1 }}</span>
+                          <span>{{ 'SOLICITUD_CONVENIO.PASO3.ACCION' | translate }} {{ i + 1 }}</span>
                         </div>
-                        <button 
+                        <button
                           *ngIf="acciones.length > 1"
                           type="button"
                           class="btn-eliminar-accion"
                           (click)="eliminarAccion(i)"
-                          title="Eliminar acción">
+                          [title]="'SOLICITUD_CONVENIO.PASO3.BTN_ELIMINAR' | translate">
                           <i class="fas fa-trash-alt"></i>
                         </button>
                       </div>
-                
+
                       <div class="accion-body">
                         <div class="form-group">
-                          <label class="form-label">Descripción de la acción</label>
-                          <textarea 
+                          <label class="form-label">{{ 'SOLICITUD_CONVENIO.PASO3.DESCRIPCION_ACCION' | translate }}</label>
+                          <textarea
                             class="form-control"
                             [(ngModel)]="accion.descripcion"
                             [name]="'descripcion_' + i"
-                            placeholder="Enuncie la acción a realizar..."
+                            [placeholder]="'SOLICITUD_CONVENIO.PASO3.DESCRIPCION_PLACEHOLDER' | translate"
                             rows="3"
                             required></textarea>
                         </div>
-                
+
                         <div class="form-row">
                           <div class="form-group">
-                            <label class="form-label">Fecha de inicio</label>
-                            <input 
+                            <label class="form-label">{{ 'SOLICITUD_CONVENIO.PASO3.FECHA_INICIO' | translate }}</label>
+                            <input
                               type="date"
                               class="form-control"
                               [(ngModel)]="accion.fechaInicio"
                               [name]="'fechaInicio_' + i"
                               required>
                           </div>
-                
+
                           <div class="form-group">
-                            <label class="form-label">Fecha de finalización</label>
-                            <input 
+                            <label class="form-label">{{ 'SOLICITUD_CONVENIO.PASO3.FECHA_FIN' | translate }}</label>
+                            <input
                               type="date"
                               class="form-control"
                               [(ngModel)]="accion.fechaFin"
@@ -258,97 +256,95 @@
                 <!-- PASO 4: ADMINISTRADORES -->
                 <!-- ============================================= -->
                 <div *ngIf="pasoActual === 3" class="form-container">
-                  <h2 class="form-title">4. Administradores del Convenio</h2>
-                
+                  <h2 class="form-title">{{ 'SOLICITUD_CONVENIO.PASO4.TITULO' | translate }}</h2>
+
                   <!-- ADMINISTRADOR INTERNO (UCM) - OBLIGATORIO -->
                   <div class="admin-section">
                     <h3 class="form-subtitle">
-                      <i class="fas fa-university"></i> Administrador UCM
+                      <i class="fas fa-university"></i> {{ 'SOLICITUD_CONVENIO.PASO4.ADMIN_UCM' | translate }}
                     </h3>
-                    
+
                     <div class="admin-card">
                       <div class="form-group">
-                        <input 
+                        <input
                           type="text"
                           class="form-control"
                           [(ngModel)]="formData.nombrecol"
                           name="nombrecol"
-                          placeholder="Nombre del administrador interno"
+                          [placeholder]="'SOLICITUD_CONVENIO.PASO4.NOMBRE_ADMIN_INTERNO' | translate"
                           required>
-                          </div>
-                      
-                     
+                      </div>
                     </div>
                   </div>
-                
+
                   <!-- ADMINISTRADOR EXTERNO - OPCIONAL -->
                   <div class="admin-section mt-4">
                     <h3 class="form-subtitle">
-                      <i class="fas fa-building"></i> Administrador de la Institución de Convenio
+                      <i class="fas fa-building"></i> {{ 'SOLICITUD_CONVENIO.PASO4.ADMIN_EXTERNO' | translate }}
                     </h3>
-                
+
                     <!-- Checkbox para activar/desactivar -->
                     <div class="form-check mb-3">
-                      <input 
-                        type="checkbox" 
-                        class="form-check-input" 
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
                         id="tieneAdminExterno"
                         [(ngModel)]="tieneAdminExterno"
                         name="tieneAdminExterno">
                       <label class="form-check-label" for="tieneAdminExterno">
                         <i class="fas fa-info-circle text-muted"></i>
-                        El convenio tiene un administrador externo
+                        {{ 'SOLICITUD_CONVENIO.PASO4.TIENE_ADMIN_EXTERNO' | translate }}
                       </label>
                     </div>
-                
-                    <!-- Campos del administrador externo (solo si checkbox está marcado) -->
+
+                    <!-- Campos del administrador externo -->
                     <div *ngIf="tieneAdminExterno" class="admin-card">
                       <div class="form-row">
                         <div class="form-group">
                           <label class="form-label">
-                            Nombre completo <span style="color: #ef4444;">*</span>
+                            {{ 'SOLICITUD_CONVENIO.PASO4.NOMBRE_COMPLETO' | translate }} <span style="color: #ef4444;">*</span>
                           </label>
-                          <input 
+                          <input
                             type="text"
                             class="form-control"
                             [(ngModel)]="administradorExterno.nombre"
                             name="adminExternoNombre"
-                            placeholder="Nombre del administrador externo"
+                            [placeholder]="'SOLICITUD_CONVENIO.PASO4.NOMBRE_EXTERNO_PLACEHOLDER' | translate"
                             [required]="tieneAdminExterno">
                         </div>
-                
+
                         <div class="form-group">
                           <label class="form-label">
-                            Cargo <span style="color: #ef4444;">*</span>
+                            {{ 'SOLICITUD_CONVENIO.PASO4.CARGO' | translate }} <span style="color: #ef4444;">*</span>
                           </label>
-                          <input 
+                          <input
                             type="text"
                             class="form-control"
                             [(ngModel)]="administradorExterno.cargo"
                             name="adminExternoCargo"
-                            placeholder="Cargo en la institución"
+                            [placeholder]="'SOLICITUD_CONVENIO.PASO4.CARGO_PLACEHOLDER' | translate"
                             [required]="tieneAdminExterno">
                         </div>
                       </div>
-                
+
                       <div class="form-group">
                         <label class="form-label">
-                          Correo electrónico <span style="color: #ef4444;">*</span>
+                          {{ 'SOLICITUD_CONVENIO.PASO4.CORREO' | translate }} <span style="color: #ef4444;">*</span>
                         </label>
-                        <input 
+                        <input
                           type="email"
                           class="form-control"
                           [(ngModel)]="administradorExterno.correo"
                           name="adminExternoCorreo"
-                          placeholder="ejemplo@institucion.edu.co"
+                          [placeholder]="'SOLICITUD_CONVENIO.PASO4.CORREO_PLACEHOLDER' | translate"
                           [required]="tieneAdminExterno">
                       </div>
                     </div>
-                
+
                     <!-- Mensaje cuando no hay admin externo -->
                     <div *ngIf="!tieneAdminExterno" class="alert alert-info">
                       <i class="fas fa-info-circle"></i>
-                      Este convenio no tiene un administrador externo asignado
+                      {{ 'SOLICITUD_CONVENIO.PASO4.SIN_ADMIN_EXTERNO' | translate }}
                     </div>
                   </div>
                 </div>
@@ -357,30 +353,30 @@
 
               <!-- Navegación -->
               <div class="form-navigation">
-                <button 
-                  class="btn btn-secondary" 
-                  (click)="anteriorPaso()" 
+                <button
+                  class="btn btn-secondary"
+                  (click)="anteriorPaso()"
                   [disabled]="pasoActual === 0">
                   <mat-icon style="font-size: 16px; width: 16px; height: 16px;">chevron_left</mat-icon>
-                  Anterior
+                  {{ 'SOLICITUD_CONVENIO.NAV.ANTERIOR' | translate }}
                 </button>
 
-                <span class="progress-text">Paso {{ pasoActual + 1 }} de {{ pasos.length }}</span>
+                <span class="progress-text">{{ 'SOLICITUD_CONVENIO.NAV.PASO' | translate }} {{ pasoActual + 1 }} {{ 'SOLICITUD_CONVENIO.NAV.DE' | translate }} {{ pasos.length }}</span>
 
-                <button 
+                <button
                   *ngIf="pasoActual < pasos.length - 1"
-                  class="btn btn-primary" 
+                  class="btn btn-primary"
                   (click)="siguientePaso()">
-                  Siguiente
+                  {{ 'SOLICITUD_CONVENIO.NAV.SIGUIENTE' | translate }}
                   <mat-icon style="font-size: 16px; width: 16px; height: 16px;">chevron_right</mat-icon>
                 </button>
 
-                <button 
+                <button
                   *ngIf="pasoActual === pasos.length - 1"
-                  class="btn btn-success" 
+                  class="btn btn-success"
                   (click)="guardar(form)">
                   <mat-icon style="font-size: 16px; width: 16px; height: 16px;">save</mat-icon>
-                  Guardar Solicitud
+                  {{ 'SOLICITUD_CONVENIO.NAV.GUARDAR' | translate }}
                 </button>
               </div>
 
@@ -392,144 +388,136 @@
           <!-- ============================================= -->
           <div *ngIf="tipoSolicitud === 'Renovacion'" class="w-100" style="padding: 24px;">
             <div class="renovacion-content">
-              
+
               <div class="info-banner">
                 <i class="fas fa-info-circle"></i>
                 <span class="info-banner-text">
-                  Seleccione el convenio que desea renovar. Los datos se cargarán automáticamente.
+                  {{ 'SOLICITUD_CONVENIO.RENOVACION.INFO' | translate }}
                 </span>
               </div>
 
               <form #formRenovacion="ngForm" (ngSubmit)="guardarRenovacion()">
                 <div class="form-container">
-                  <h2 class="form-title">Renovación de Convenio</h2>
+                  <h2 class="form-title">{{ 'SOLICITUD_CONVENIO.RENOVACION.TITULO' | translate }}</h2>
 
                   <div class="form-row">
                     <div class="form-group">
-                      <label class="form-label">Convenio a renovar</label>
-                      <select 
+                      <label class="form-label">{{ 'SOLICITUD_CONVENIO.RENOVACION.CONVENIO' | translate }}</label>
+                      <select
                         class="form-control"
                         [(ngModel)]="selectedConvenio"
                         name="convenio"
                         (change)="onConvenioSeleccionado()">
-                        <option value="">Seleccione un convenio</option>
+                        <option value="">{{ 'SOLICITUD_CONVENIO.RENOVACION.SELECCIONE_CONVENIO' | translate }}</option>
                         <option *ngFor="let c of convenios" [ngValue]="c.id">
-                          {{ c.nombre }} 
+                          {{ c.nombre }}
                         </option>
                       </select>
                     </div>
 
                     <div class="form-group">
-                      <label class="form-label">Código</label>
-                      <input 
+                      <label class="form-label">{{ 'SOLICITUD_CONVENIO.RENOVACION.CODIGO' | translate }}</label>
+                      <input
                         type="text"
                         class="form-control"
                         [(ngModel)]="formData.codigoRenovacion"
-                        name="codigoRenovacion"
-                        >
+                        name="codigoRenovacion">
                     </div>
                   </div>
 
                   <div class="form-row">
                     <div class="form-group">
-                      <label class="form-label">Tipo Convenio</label>
-                      <select 
+                      <label class="form-label">{{ 'SOLICITUD_CONVENIO.RENOVACION.TIPO_CONVENIO' | translate }}</label>
+                      <select
                         class="form-control"
                         [(ngModel)]="formData.tipoConvenio"
-                        name="tipoConvenio"
-                       >
+                        name="tipoConvenio">
                         <option *ngFor="let t of tiposConvenio" [ngValue]="t.id">{{ t.descripcion }}</option>
                       </select>
                     </div>
 
                     <div class="form-group">
-                      <label class="form-label">Clasificación</label>
-                      <select 
+                      <label class="form-label">{{ 'SOLICITUD_CONVENIO.RENOVACION.CLASIFICACION' | translate }}</label>
+                      <select
                         class="form-control"
                         [(ngModel)]="formData.ClasConvenio"
-                        name="ClasConvenio"
-                        >
+                        name="ClasConvenio">
                         <option *ngFor="let c of clasificaciones" [ngValue]="c.id">{{ c.nombre }}</option>
                       </select>
                     </div>
 
                     <div class="form-group">
-                      <label class="form-label">Tipo Actividad</label>
-                      <select 
+                      <label class="form-label">{{ 'SOLICITUD_CONVENIO.RENOVACION.TIPO_ACTIVIDAD' | translate }}</label>
+                      <select
                         class="form-control"
                         [(ngModel)]="formData.tipoactividad"
-                        name="tipoactividad"
-                        >
+                        name="tipoactividad">
                         <option *ngFor="let a of tiposActividad" [ngValue]="a.id">{{ a.nombre }}</option>
                       </select>
                     </div>
 
                     <div class="form-group">
-                      <label class="form-label">Categoria SNIES</label>
-                      <select 
+                      <label class="form-label">{{ 'SOLICITUD_CONVENIO.RENOVACION.CATEGORIA_SNIES' | translate }}</label>
+                      <select
                         class="form-control"
                         [(ngModel)]="selectedsnies"
-                        name="CategoriaSnies"
-                        >
+                        name="CategoriaSnies">
                         <option *ngFor="let c of categoriasnies" [ngValue]="c.id">{{ c.nombre }}</option>
                       </select>
                     </div>
 
                     <div class="form-group">
-                      <label class="form-label">Fecha de inicio</label>
-                      <input 
+                      <label class="form-label">{{ 'SOLICITUD_CONVENIO.RENOVACION.FECHA_INICIO' | translate }}</label>
+                      <input
                         type="date"
                         class="form-control"
                         [(ngModel)]="formData.fechaInicioRenovacion"
-                        name="fechaInicioRenovacion"
-                        >
+                        name="fechaInicioRenovacion">
                     </div>
 
                     <div class="form-group">
-                      <label class="form-label">Fecha de finalización</label>
-                      <input 
+                      <label class="form-label">{{ 'SOLICITUD_CONVENIO.RENOVACION.FECHA_FIN' | translate }}</label>
+                      <input
                         type="date"
                         class="form-control"
                         [(ngModel)]="formData.fechaFinRenovacion"
-                        name="fechaFinRenovacion"
-                        >
+                        name="fechaFinRenovacion">
                     </div>
 
                     <div class="form-group">
-                      <label class="form-label">Descripción</label>
-                      <input 
-                      type="text"
-                      class="form-control"
-                      [(ngModel)]="formData.descripcionRenovacion"
-                      name="descripcionRenovacion"
-                      >
+                      <label class="form-label">{{ 'SOLICITUD_CONVENIO.RENOVACION.DESCRIPCION' | translate }}</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        [(ngModel)]="formData.descripcionRenovacion"
+                        name="descripcionRenovacion">
                     </div>
                   </div>
 
                   <div class="form-group">
-                    <label class="form-label">Antecedentes (motivo de renovación)</label>
-                    <textarea 
+                    <label class="form-label">{{ 'SOLICITUD_CONVENIO.RENOVACION.ANTECEDENTES' | translate }}</label>
+                    <textarea
                       class="form-control"
                       [(ngModel)]="formData.antecedentesRenovacion"
                       name="antecedentesRenovacion"
-                      placeholder="Describa los motivos para renovar este convenio..."></textarea>
+                      [placeholder]="'SOLICITUD_CONVENIO.RENOVACION.ANTECEDENTES_PLACEHOLDER' | translate"></textarea>
                   </div>
 
                   <div style="text-align: right; margin-top: 24px;">
-                    <button 
-                    class="btn btn-success" 
-                    type="button"
-                    (click)="guardarRenovacion()"
-                    >
-                    <i *ngIf="guardandoRenovacion" class="fas fa-spinner fa-spin"></i>
-                    <i *ngIf="!guardandoRenovacion" class="fas fa-check"></i>
-                    {{ guardandoRenovacion ? 'Guardando...' : 'Solicitar Renovación' }}
-                  </button>
+                    <button
+                      class="btn btn-success"
+                      type="button"
+                      (click)="guardarRenovacion()">
+                      <i *ngIf="guardandoRenovacion" class="fas fa-spinner fa-spin"></i>
+                      <i *ngIf="!guardandoRenovacion" class="fas fa-check"></i>
+                      {{ guardandoRenovacion ? ('SOLICITUD_CONVENIO.RENOVACION.GUARDANDO' | translate) : ('SOLICITUD_CONVENIO.RENOVACION.BTN_SOLICITAR' | translate) }}
+                    </button>
                   </div>
                 </div>
               </form>
             </div>
           </div>
+
           <!-- ============================================= -->
           <!-- CONTENIDO MIS SOLICITUDES -->
           <!-- ============================================= -->
@@ -543,7 +531,7 @@
   </div>
 </div>
 
-<!-- Notificaciones de ngx-sonner -->
+<!-- Notificaciones -->
 <ngx-sonner-toaster />
-<!-- ConfirmDialog de PrimeNG -->
+<!-- ConfirmDialog -->
 <p-confirmDialog appendTo="body" styleClass="custom-confirm-dialog"></p-confirmDialog>
