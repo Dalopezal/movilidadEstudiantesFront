@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError, from } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, finalize, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface ApiResponse<T> {
@@ -17,6 +17,80 @@ export interface ApiResponse<T> {
 export class GenericApiService {
 
   constructor(private http: HttpClient) {}
+
+  // -----------------------
+  // TOKEN INTERNO (AUTO-RECOVERY SIN REFRESH) - NUEVO
+  // -----------------------
+  private internalRecoveryInFlight$?: Observable<string>;
+
+  private isAuthError(err: any): boolean {
+    return err instanceof HttpErrorResponse && (err.status === 401 || err.status === 403);
+  }
+
+  private getInternalAccessToken(): string | null {
+    return sessionStorage.getItem('generalToken') || localStorage.getItem('generalToken');
+  }
+
+  private setInternalAccessToken(token: string) {
+    sessionStorage.setItem('generalToken', token);
+    localStorage.setItem('generalToken', token);
+  }
+
+  private clearInternalAccessToken() {
+    sessionStorage.removeItem('generalToken');
+    localStorage.removeItem('generalToken');
+  }
+
+  private recoverInternalToken(): Observable<string> {
+
+    const ctxStr = sessionStorage.getItem('auth_context');
+    if (!ctxStr) {
+      this.clearInternalAccessToken();
+      return throwError(() => new Error('No hay contexto de autenticación para regenerar token.'));
+    }
+
+    let ctx: any;
+    try {
+      ctx = JSON.parse(ctxStr);
+    } catch {
+      this.clearInternalAccessToken();
+      return throwError(() => new Error('Contexto de autenticación inválido.'));
+    }
+
+    const loginUrl = this.buildUrl('Usuarios/Iniciar_Sesion');
+
+    return this.http.post<any>(loginUrl, ctx).pipe(
+      map(res => {
+        if (res?.exito && res?.datos) {
+          return String(res.datos);
+        }
+        throw new Error('No se pudo regenerar el token.');
+      }),
+      tap(token => sessionStorage.setItem('generalToken', token))
+    );
+  }
+
+  /**
+   * Wrapper para requests INTERNOS: si 401/403 => intenta recuperar token => retry 1 vez.
+   */
+  private requestInternalWithAutoRecovery<T>(requestFactory: () => Observable<ApiResponse<T> | any>): Observable<T> {
+    return requestFactory().pipe(
+      map((res: ApiResponse<T> | any) => this.extractData(res)),
+      catchError(err => {
+        if (this.isAuthError(err)) {
+          return this.recoverInternalToken().pipe(
+            switchMap(() =>
+              requestFactory().pipe(
+                map((res: ApiResponse<T> | any) => this.extractData(res))
+              )
+            ),
+            catchError(err2 => this.handleError(err2))
+          );
+        }
+        return this.handleError(err);
+      })
+    );
+  }
 
   private buildUrl(endpoint: string) {
     // Si ya es una URL completa, retornarla tal cual
@@ -58,11 +132,10 @@ export class GenericApiService {
 
   get<T>(endpoint: string, params?: any, options?: any): Observable<T> {
     const url = this.buildUrl(endpoint);
-    return this.http.get<ApiResponse<T>>(url, this.buildOptions(params, options))
-      .pipe(
-        map((res: ApiResponse<T> | any) => this.extractData(res)),
-        catchError(err => this.handleError(err))
-      );
+    const ctxStr = sessionStorage.getItem('auth_context');
+    return this.requestInternalWithAutoRecovery<T>(() =>
+      this.http.get<ApiResponse<T>>(url, this.buildOptions(params, options))
+    );
   }
 
   // -----------------------
@@ -74,7 +147,6 @@ export class GenericApiService {
     const storedExpiry = localStorage.getItem('external_token_expiry');
 
     if (storedToken && storedExpiry && new Date(storedExpiry) > new Date()) {
-      console.log('TOKEN REUSADO:', storedToken);
       return from(Promise.resolve(storedToken));
     }
 
@@ -89,15 +161,12 @@ export class GenericApiService {
 
     return this.http.post<any>(url, body).pipe(
       map(res => {
-        console.log('RESPUESTA TOKEN COMPLETA:', res);
 
         const token = res?.access as string;
         if (!token) {
           console.error('Estructura de respuesta:', res);
           throw new Error('No se recibió token.access válido del servicio externo');
         }
-
-        console.log('TOKEN NUEVO (access):', token);
 
         const expires = new Date();
         expires.setMinutes(expires.getMinutes() + 50);
@@ -121,7 +190,6 @@ export class GenericApiService {
     const baseUrlExterna = environment.apiUrlExterna; // '/api-orisiga'
     //const baseUrlExterna = `https://integracionesucmdev.ucm.edu.co/api`;
     const e = endpoint.replace(/^\//, '');
-    // Resultado: /api-orisiga/orisiga/asignaciondocente/?...
     return `${baseUrlExterna}/${e}`;
   }
 
@@ -132,9 +200,6 @@ export class GenericApiService {
 
         let headers = (options?.headers as HttpHeaders) || new HttpHeaders();
         headers = headers.set('Authorization', `Bearer ${token}`);
-
-        console.log('URL EXTERNA:', url);
-        console.log('HEADER AUTH FINAL:', headers.get('Authorization'));
 
         const httpOptions = {
           ...this.buildOptions(params, options),
@@ -153,11 +218,9 @@ export class GenericApiService {
 
   post<T>(endpoint: string, body: any, options?: any): Observable<T> {
     const url = this.buildUrl(endpoint);
-    return this.http.post<ApiResponse<T>>(url, body, this.buildOptions(undefined, options))
-      .pipe(
-        map((res: ApiResponse<T> | any) => this.extractData(res)),
-        catchError(err => this.handleError(err))
-      );
+    return this.requestInternalWithAutoRecovery<T>(() =>
+      this.http.post<ApiResponse<T>>(url, body, this.buildOptions(undefined, options))
+    );
   }
 
   postExterno<T>(endpoint: string, body: any, options?: any): Observable<T> {
@@ -167,9 +230,6 @@ export class GenericApiService {
 
         let headers = (options?.headers as HttpHeaders) || new HttpHeaders();
         headers = headers.set('Authorization', `Bearer ${token}`);
-
-        console.log('URL EXTERNA POST:', url);
-        console.log('HEADER AUTH FINAL POST:', headers.get('Authorization'));
 
         const httpOptions = {
           ...this.buildOptions(undefined, options),
@@ -188,20 +248,16 @@ export class GenericApiService {
 
   put<T>(endpoint: string, body: any, options?: any): Observable<T> {
     const url = this.buildUrl(endpoint);
-    return this.http.put<ApiResponse<T>>(url, body, this.buildOptions(undefined, options))
-      .pipe(
-        map((res: ApiResponse<T> | any) => this.extractData(res)),
-        catchError(err => this.handleError(err))
-      );
+    return this.requestInternalWithAutoRecovery<T>(() =>
+      this.http.put<ApiResponse<T>>(url, body, this.buildOptions(undefined, options))
+    );
   }
 
   delete<T>(endpoint: string, options?: any): Observable<T> {
     const url = this.buildUrl(endpoint);
-    return this.http.patch<ApiResponse<T>>(url, this.buildOptions(undefined, options))
-      .pipe(
-        map((res: ApiResponse<T> | any) => this.extractData(res)),
-        catchError(err => this.handleError(err))
-      );
+    return this.requestInternalWithAutoRecovery<T>(() =>
+      this.http.patch<ApiResponse<T>>(url, this.buildOptions(undefined, options))
+    );
   }
 
   private extractData<T>(response: ApiResponse<T> | T): T {

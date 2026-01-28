@@ -52,7 +52,7 @@ import { TranslateService } from '@ngx-translate/core';
       color: #0D133F;
       cursor: pointer;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 600;
       transition: all 0.3s ease;
       display: flex;
@@ -60,7 +60,7 @@ import { TranslateService } from '@ngx-translate/core';
       gap: 0.25rem;
     }
     .btn-lang:hover:not(:disabled) {
-      background: #E2E6F7;
+      background: #a3a8bdff;
       transform: translateY(-2px);
     }
     .btn-lang.active {

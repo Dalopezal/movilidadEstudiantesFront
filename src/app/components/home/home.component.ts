@@ -316,6 +316,9 @@ export class HomeComponent implements OnInit {
   }
 
   generarToken(datos: any): void {
+
+    sessionStorage.setItem('auth_context', JSON.stringify(datos));
+
     this.api.post<any>('Usuarios/Iniciar_Sesion', datos)
       .pipe(takeUntil(this.destroy$))
       .subscribe({

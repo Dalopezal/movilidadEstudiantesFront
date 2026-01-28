@@ -299,3 +299,24 @@
   font-size: 38px;
   color: #7a7a7a;
 }
+
+.floating-language-selector {
+  position: fixed;
+  bottom: -5px;
+  right: 20px;
+  z-index: 9999;
+  padding: 6px;
+}
+
+@media (max-width: 768px) {
+  .floating-language-selector {
+    display: none;
+  }
+}
+
+.floating-language-selector {
+  opacity: 0.9;
+}
+.floating-language-selector:hover {
+  opacity: 1;
+}

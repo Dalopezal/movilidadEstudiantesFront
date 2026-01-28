@@ -89,7 +89,7 @@
       "ERROR_PROCESAR": "The request could not be processed. Please try again.",
       "CONFIRMAR_ELIMINAR": "Are you sure you want to delete this record?",
       "ELIMINAR_OK": "The record was successfully deleted.",
-      "ELIMINAR_ERROR_ASOCIADO": "Error deleting condition, the record is associated to other data."
+      "ELIMINAR_ERROR_ASOCIADO": "Error deleting condition."
     }
   },
   "INSTITUCIONES": {
@@ -146,7 +146,7 @@
       "ERROR_PROCESAR": "The request could not be processed. Please try again.",
       "CONFIRMAR_ELIMINAR": "Are you sure you want to delete this record?",
       "ELIMINAR_OK": "The record was successfully deleted.",
-      "ELIMINAR_ERROR_ASOCIADO": "Error deleting institution, the record is associated to other data."
+      "ELIMINAR_ERROR_ASOCIADO": "Error deleting institution."
     }
   },
   "CONVOCATORIAS": {
@@ -217,7 +217,7 @@
       "ERROR_FILTRAR": "Error filtering calls",
       "CONFIRMAR_ELIMINAR": "Are you sure you want to delete this record?",
       "ELIMINAR_OK": "The record was successfully deleted.",
-      "ELIMINAR_ERROR_ASOCIADO": "Error deleting call, the record is associated to other data."
+      "ELIMINAR_ERROR_ASOCIADO": "Error deleting call."
     },
     "DETALLE": {
       "TITULO": "Call Detail",

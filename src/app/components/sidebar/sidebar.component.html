@@ -1,3 +1,6 @@
+<div class="floating-language-selector">
+  <app-language-selector></app-language-selector>
+</div>
 <aside [class.collapsed]="isCollapsed" class="sidebar fuente">
   <div class="sidebar-header">
     <img src="../../../assets/logo_ucm.png" alt="Logo UCM" class="sidebar-logo" />
@@ -219,7 +222,6 @@
     <i class="fas fa-chevron-down user-chevron" [class.rotate]="isUserMenuOpen"></i>
 
     <div class="user-submenu" *ngIf="isUserMenuOpen" (click)="$event.stopPropagation()">
-      <app-language-selector></app-language-selector>
       <a
         routerLink="/login"
         routerLinkActive="active"
