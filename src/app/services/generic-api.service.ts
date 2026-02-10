@@ -256,7 +256,7 @@ export class GenericApiService {
   delete<T>(endpoint: string, options?: any): Observable<T> {
     const url = this.buildUrl(endpoint);
     return this.requestInternalWithAutoRecovery<T>(() =>
-      this.http.patch<ApiResponse<T>>(url, this.buildOptions(undefined, options))
+      this.http.patch<ApiResponse<T>>(url, {}, this.buildOptions(undefined, options))
     );
   }
 

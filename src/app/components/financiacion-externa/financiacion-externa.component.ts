@@ -123,7 +123,7 @@ export class FinanciacionExternaComponent implements OnInit, OnDestroy {
     this.loadingTable = true;
 
     const q = encodeURIComponent(this.filtro.trim());
-    this.api.get<any>(`TipoFinanciacionExterna/Consultar_FinanciacionExternaGeneral?nombre=${q}`)
+    this.api.get<any>(`FinanciacionExterna/Consultar_FinanciacionExternaGeneral?nombre=${q}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {

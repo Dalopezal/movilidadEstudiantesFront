@@ -87,7 +87,7 @@
                   </div>
                 </div>
 
-                <div class="mb-3">
+                <div style="display: none;" class="mb-3">
                   <label for="tipoCondicion" class="form-label fw-bold">
                     {{ 'CONDICIONES.FORM.TIPO_LABEL' | translate }}
                   </label>
@@ -97,7 +97,6 @@
                     id="tipoCondicion"
                     name="tipoCondicion"
                     [placeholder]="'CONDICIONES.FORM.TIPO_PLACEHOLDER' | translate"
-                    required
                     minlength="3"
                     [(ngModel)]="model.tipoCondicion"
                     #tipoCtrl="ngModel"
@@ -232,9 +231,9 @@
                     <th style="background: white !important;">
                       {{ 'CONDICIONES.TABLA.COL_DESCRIPCION' | translate }}
                     </th>
-                    <th style="background: white !important;">
+                    <!-- <th style="background: white !important;">
                       {{ 'CONDICIONES.TABLA.COL_TIPO' | translate }}
-                    </th>
+                    </th> -->
                     <th style="background: white !important;">
                       {{ 'CONDICIONES.TABLA.COL_ES_OBLIGATORIA' | translate }}
                     </th>
@@ -261,7 +260,7 @@
                     >
                       {{ item.descripcion }}
                     </td>
-                    <td>{{ item.tipoCondicion }}</td>
+                    <!-- <td>{{ item.tipoCondicion }}</td> -->
                     <td align="center">
                       <button *ngIf="item.esObligatoria" class="button-completed">
                         {{ 'CONDICIONES.TABLA.SI' | translate }}

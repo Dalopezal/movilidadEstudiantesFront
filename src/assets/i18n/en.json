@@ -25,7 +25,19 @@
     "MOVILIDAD": {
       "TITULO": "Mobility",
       "DASHBOARD": "Dashboard",
-      "GENERAL": "GENERAL"
+      "CONVOCATORIA_GENERAL": "General Calls",
+      "MAESTROS": {
+        "TITULO": "Master Data",
+        "CONDICIONES_CONVOCATORIA": "Call Conditions",
+        "ENTREGABLES": "Call Deliverables",
+        "FINANCIACION": "External Funding",
+        "BENEFICIOS": "Call Benefits",
+        "ADMINISTRACION": "Call Administration",
+        "CONDICIONES": "Conditions",
+        "CONVENIOS": "Agreements",
+        "INSTITUCIONES": "Institutions",
+        "INSTITUCIONES_CONVENIO": "Agreement Institutions"
+      }
     },
     "USER": {
       "SALIR": "Logout"

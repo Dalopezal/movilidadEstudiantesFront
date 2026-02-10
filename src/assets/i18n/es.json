@@ -25,7 +25,20 @@
     "MOVILIDAD": {
       "TITULO": "Movilidad",
       "DASHBOARD": "Dashboard",
-      "GENERAL": "GENERAL"
+      "GENERAL": "GENERAL",
+      "CONVOCATORIA_GENERAL": "Convocatorias General",
+      "MAESTROS": {
+        "TITULO": "Maestros",
+        "CONDICIONES_CONVOCATORIA": "Condiciones Convocatoria",
+        "ENTREGABLES": "Entregables Convocatoria",
+        "FINANCIACION": "Financiación Externa",
+        "BENEFICIOS": "Beneficio Convocatoria",
+        "ADMINISTRACION": "Administración Convocatoria",
+        "CONDICIONES": "Condiciones",
+        "CONVENIOS": "Convenios",
+        "INSTITUCIONES": "Instituciones",
+        "INSTITUCIONES_CONVENIO": "Instituciones Convenio"
+      }
     },
     "USER": {
       "SALIR": "Salir"

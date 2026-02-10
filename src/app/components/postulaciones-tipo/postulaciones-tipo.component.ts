@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { Subject, takeUntil } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
@@ -13,6 +12,9 @@ import { PostulacionTipoConsultaModel } from '../../models/PostulacionTipoModel'
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+
+import { Subject, takeUntil, of, from } from 'rxjs';
+import { catchError, map, mergeMap, toArray } from 'rxjs/operators';
 
 @Component({
   selector: 'app-postulaciones-tipo',
@@ -92,8 +94,6 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
   // ---------- CRUD / listado ----------
   fetchPostulaciones() {
 
-    //carga datos parametros
-
     this.route.queryParams.subscribe(params => {
       this.nombreCombocatoria = params['nombre'];
       this.idConvocatoria = params['id'];
@@ -118,11 +118,44 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
             }
           }
 
-          this.data = items.map(item => PostulacionTipoConsultaModel.fromJSON(item));
-          this.filteredData = [...this.data];
-          this.calculateTotalPages();
-          this.updatePagedData();
-           this.loading = false;
+          const baseModels = items.map(item => PostulacionTipoConsultaModel.fromJSON(item));
+
+          from(baseModels).pipe(
+            takeUntil(this.destroy$),
+            mergeMap((m) => {
+              if (!m?.usuarioId) return of(m);
+
+              return this.api.getExterno<any>(`orisiga/nombrestudiante/?idestudiante=${m.usuarioId}`).pipe(
+                map(resp => this.mapStudentInfoToModel(m, resp)),
+                catchError(err => {
+                  // Si falla el externo, NO tumbamos toda la lista; devolvemos el item sin datos
+                  console.error('Error consultando estudiante ORISIGA, usuarioId=', m.usuarioId, err);
+                  return of(m);
+                })
+              );
+            }, 5),
+            toArray()
+          ).subscribe({
+            next: (enrichedModels) => {
+              this.data = enrichedModels;
+              this.filteredData = [...this.data];
+              this.calculateTotalPages();
+              this.updatePagedData();
+              this.loading = false;
+            },
+            error: (err) => {
+              console.error('Error enriqueciendo datos de estudiantes', err);
+              this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+              this.data = [];
+              this.filteredData = [];
+              this.pagedData = [];
+              this.calculateTotalPages();
+              this.showError();
+              this.loading = false;
+            }
+          });
+
+          // NOTA: ya no ponemos loading=false aquí porque ahora dependemos del subscribe interno
         },
         error: (err) => {
           console.error('Error al consultar convocatorias', err);
@@ -132,9 +165,27 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
-           this.loading = false;
+          this.loading = false;
         }
       });
+  }
+
+  private mapStudentInfoToModel(
+    item: PostulacionTipoConsultaModel,
+    resp: any
+  ): PostulacionTipoConsultaModel {
+
+    const data = Array.isArray(resp) ? resp[0] : resp;
+
+    const nombreCompleto = data?.nombre ?? data?.nombreCompleto ?? '';
+    const documento = data?.identificacion ?? data?.documento ?? String(item.usuarioId ?? '');
+    const correo = data?.correo ?? data?.email ?? '';
+
+    item.nombreCompleto = nombreCompleto;
+    item.documento = documento;
+    item.correo = correo;
+
+    return item;
   }
 
   filterPostulaciones() {

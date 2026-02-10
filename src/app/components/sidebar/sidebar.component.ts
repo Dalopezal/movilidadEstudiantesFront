@@ -31,6 +31,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
   menu: any[] = [];
   maestros: any[] = [];
 
+  rolMovilidad = false;
+  rolConvocatoria = false;
+  rolInternacionalizacion = false;
+
   private destroy$ = new Subject<void>();
   private storageHandler = this.onStorageChange.bind(this);
 
@@ -145,6 +149,19 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   private fetchMenu(rol: any) {
+
+    // reglas rol
+    if(rol != 7){
+      this.rolMovilidad = false;
+      this.rolConvocatoria = true;
+    }else{
+      this.rolMovilidad = true;
+    }
+
+    if(rol == 7 || rol == 9 || rol == 3 || rol == 15){
+      this.rolInternacionalizacion = true;
+    }
+
     this.api.get<any>('Permisos/Consultar_Permisos?RolId=' + rol)
       .pipe(takeUntil(this.destroy$))
       .subscribe({

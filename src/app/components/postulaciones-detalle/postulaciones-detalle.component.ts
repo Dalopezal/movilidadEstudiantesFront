@@ -92,6 +92,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   instituciones: any[] = [];
   convenios: any[] = [];
   tiposMovlidad: any[] = [];
+  periodo: number = this.obtenerPeriodoActual();
   accionesEstado: Record<number, { texto: string; accion: (form?: NgForm) => void }[]> = {};
 
   postulantStepIndex: number = 0;
@@ -124,6 +125,11 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
     22: 'Finalizado'
   };
 
+  private obtenerPeriodoActual(): number {
+    const mesActual = new Date().getMonth() + 1; // getMonth() va de 0 a 11
+    return mesActual >= 1 && mesActual <= 6 ? 1 : 2;
+  }
+
   ngOnInit() {
     window.addEventListener("storage", this.onStorageChange.bind(this));
     const data = localStorage.getItem('usuario');
@@ -148,7 +154,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
         { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' }, // Default seleccionada previamente
         { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' }, // "Pendiente Pre-Postulación" o "Pre-postulado"
         { name: 'fechaPrePostulacion', label: 'Fecha Pre-Postulación', tipo: 'readonly' }, // Automático sistema
-        { name: 'periodo', label: 'Periodo', tipo: 'number', editable: true},
+        { name: 'periodo', label: 'Periodo', tipo: 'readonly', editable: false},
         { name: 'institucionId', label: this.usuario.tipoUsuario == '1' ? 'Institución Destino' : 'Institución Origen', tipo: 'selectChange', editable: true, opciones: this.instituciones }, // Label cambia según rol
         { name: 'convenioId', label: 'Convenio', tipo: 'select', editable: true, opciones: this.convenios }, // Dependiente de institución
         { name: 'observaciones', label: 'Observaciones', tipo: 'textarea', editable: true },
@@ -182,7 +188,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
         { name: 'objetivo', label: 'Objetivo', tipo: 'textarea', editable: true }, // Obligatorio
         { name: 'fechaInicioMovilidad', label: 'Fecha Inicio Movilidad', tipo: 'date', editable: true },
         { name: 'fechaFinMovilidad', label: 'Fecha Fin Movilidad', tipo: 'date', editable: true },
-        { name: 'institucionId', label: 'Institución', tipo: 'select', editable: true },
+        { name: 'institucionId', label: this.usuario.tipoUsuario == '1' ? 'Institución Destino' : 'Institución Origen', tipo: 'selectChange', editable: true, opciones: this.instituciones }, // Label cambia según rol
         { name: 'fechaEntregable', label: 'Fecha Entregable', tipo: 'date', editable: true },
         { name: 'asistioEntrevista', label: 'Asistió Entrevista', tipo: 'checkbox', editable: true }
       ],
@@ -491,151 +497,150 @@ private fetchListaInstituciones() {
   }
 
   private getFocusableIndexes(): number[] {
-    if (!this.steps?.length) return [];
+  if (!this.steps?.length) return [];
 
-    const rolId = this.usuario?.rolId;
-    const permitidas = this.fasesPermitidasPorRol(rolId);
+  const rolId = this.usuario?.rolId;
+  const permitidas = this.fasesPermitidasPorRol(rolId);
 
-    if (permitidas.length > 0) {
-      const indices = permitidas
-        .map(idEstado => this.steps.findIndex(s => s.id === idEstado))
-        .filter(i => i >= 0);
-      return indices;
-    }
-
-    const estadoRealId = this.steps[this.postulantStepIndex]?.id;
-    const destinoEstadoId = this.computeDestinoEstadoId(estadoRealId, rolId);
-    const destinoIndex = this.steps.findIndex(s => s.id === destinoEstadoId);
-    return destinoIndex >= 0 ? [destinoIndex] : [this.postulantStepIndex];
+  if (permitidas.length > 0) {
+    const indices = permitidas
+      .map(idEstado => this.steps.findIndex(s => s.id === idEstado))
+      .filter(i => i >= 0);
+    return indices;
   }
 
-  private canFocusStep(targetIndex: number): boolean {
-    return this.getFocusableIndexes().includes(targetIndex);
-  }
+  const estadoRealId = this.steps[this.postulantStepIndex]?.id;
+  const destinoEstadoId = this.computeDestinoEstadoId(estadoRealId, rolId);
+  const destinoIndex = this.steps.findIndex(s => s.id === destinoEstadoId);
+  return destinoIndex >= 0 ? [destinoIndex] : [this.postulantStepIndex];
+}
 
-  // Paso 2 – bitácora, asignar a los steps existentes
-    getBitacora(id: number) {
+private canFocusStep(targetIndex: number): boolean {
+  return this.getFocusableIndexes().includes(targetIndex);
+}
 
-    this.steps.forEach(step => {
-        const fieldsForThisStep = this.campoEstado[step.id] || [];
-        const stepData: any = {};
+// Paso 2 – bitácora, asignar a los steps existentes
+getBitacora(id: number) {
+  this.steps.forEach(step => {
+    const fieldsForThisStep = this.campoEstado[step.id] || [];
+    const stepData: any = {};
 
-        this.route.queryParams.subscribe(params => {
-          this.idCovocatoria = params['idConvocatoria'];
-          this.nombreCombocatoria = params['nombre'];
-        });
+    this.route.queryParams.subscribe(params => {
+      this.idCovocatoria = params['idConvocatoria'];
+      this.nombreCombocatoria = params['nombre'];
+    });
 
-        // PASO 1: Cargar datos del localStorage primero
-        fieldsForThisStep.forEach(field => {
-          if (field.name === 'usuarioId' && this.usuario?.nombre) {
-            stepData[field.name] = `${this.usuario.nombre}`;
+    // PASO 1: Cargar datos del localStorage primero
+    fieldsForThisStep.forEach(field => {
+      if (field.name === 'usuarioId' && this.usuario?.nombre) {
+        stepData[field.name] = `${this.usuario.nombre}`;
+      }
+
+      if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
+        stepData[field.name] = `${this.nombreCombocatoria}`;
+      }
+
+      if (field.name === 'periodo') {
+        stepData[field.name] = this.obtenerPeriodoActual();
+      }
+
+      if (field.name === 'estadoPostulacionId' && 'Pre-postulación') {
+        stepData[field.name] = 'Pre-postulación';
+        stepData['fechaPrePostulacion'] = new Date().toLocaleDateString();
+      }
+    });
+
+    step.data = { ...step.data, ...stepData };
+  });
+
+  this.api.get<any>(`Postulaciones/Consultar_PostulacionBitacora?id=${id}`)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (resp) => {
+        let bitacora: any[] = [];
+
+        if (Array.isArray(resp)) {
+          bitacora = resp;
+        } else if (resp && typeof resp === 'object') {
+          if (Array.isArray(resp.data)) bitacora = resp.data;
+          else if (Array.isArray(resp.items)) bitacora = resp.items;
+          else {
+            const arr = Object.values(resp).find(v => Array.isArray(v));
+            if (Array.isArray(arr)) bitacora = arr;
           }
+        }
 
-          if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
-            stepData[field.name] = `${this.nombreCombocatoria}`;
-          }
+        console.log("bitacora:", bitacora);
 
-          if (field.name === 'estadoPostulacionId' && 'Pre-postulación') {
-            stepData[field.name] = 'Pre-postulación';
-            stepData['fechaPrePostulacion'] = new Date().toLocaleDateString();
-          }
-        });
+        this.steps.forEach(step => {
+          const fieldsForThisStep = this.campoEstado[step.id] || [];
+          const stepData: any = {};
 
-        step.data = stepData;
-      });
+          bitacora.forEach(entry => {
+            fieldsForThisStep.forEach(field => {
+              if (field.name === 'usuarioId' && this.usuario?.nombre) {
+                //stepData[field.name] = this.usuario.nombre;
+                stepData[field.name] = entry[field.name];
+              } else if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
+                stepData[field.name] = this.nombreCombocatoria;
+              } else if (field.name === 'estadoPostulacionId') {
+                const estado = entry.estadoPostulacionId;
+                stepData[field.name] = this.estadosMap[estado] ?? estado;
 
-    this.api.get<any>(`Postulaciones/Consultar_PostulacionBitacora?id=${id}`)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (resp) => {
-          let bitacora: any[] = [];
-
-          if (Array.isArray(resp)) {
-            bitacora = resp;
-          } else if (resp && typeof resp === 'object') {
-            if (Array.isArray(resp.data)) bitacora = resp.data;
-            else if (Array.isArray(resp.items)) bitacora = resp.items;
-            else {
-              const arr = Object.values(resp).find(v => Array.isArray(v));
-              if (Array.isArray(arr)) bitacora = arr;
-            }
-          }
-
-          console.log("bitacora:", bitacora);
-
-          this.steps.forEach(step => {
-            const fieldsForThisStep = this.campoEstado[step.id] || [];
-            const stepData: any = {};
-
-            bitacora.forEach(entry => {
-              fieldsForThisStep.forEach(field => {
-                if (field.name === 'usuarioId' && this.usuario?.nombre) {
-                  //stepData[field.name] = this.usuario.nombre;
-                  stepData[field.name] = entry[field.name];
-                }else
-
-                if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
-                  stepData[field.name] = this.nombreCombocatoria;
-                }else
-
-                if (field.name === 'estadoPostulacionId') {
-                  const estado = entry.estadoPostulacionId;
-                  stepData[field.name] = this.estadosMap[estado] ?? estado;
-
-                  if (estado === 1) {
-                    stepData['fechaPrePostulacion'] = new Date().toLocaleDateString();
-                  }
-                } else if (entry[field.name] !== undefined && entry[field.name] !== null) {
-                  stepData[field.name] = entry[field.name];
+                if (estado === 1) {
+                  stepData['fechaPrePostulacion'] = new Date().toLocaleDateString();
                 }
-              });
+              } else if (entry[field.name] !== undefined && entry[field.name] !== null) {
+                stepData[field.name] = entry[field.name];
+              }
             });
-
-            step.data = stepData;
           });
 
-          if (bitacora.length > 0) {
-            const ultimo = bitacora[bitacora.length - 1];
-            console.log("ultimo registro:", ultimo);
+          step.data = { ...step.data, ...stepData };
+        });
 
-            const index = this.steps.findIndex(s =>
-              String(s.id) === String(ultimo.estadoPostulacionId)
-            );
-            console.log("index encontrado:", index);
+        if (bitacora.length > 0) {
+          const ultimo = bitacora[bitacora.length - 1];
+          console.log("ultimo registro:", ultimo);
 
-            if (index >= 0) {
-              // Índice real donde está el postulante
-              this.postulantStepIndex = index;
+          const index = this.steps.findIndex(s =>
+            String(s.id) === String(ultimo.estadoPostulacionId)
+          );
+          console.log("index encontrado:", index);
 
-              const estadoRealId = this.steps[index]?.id;
-              const destinoEstadoId = this.computeDestinoEstadoId(estadoRealId, this.usuario?.rolId);
-              const destinoIndex = this.steps.findIndex(s => s.id === destinoEstadoId);
+          if (index >= 0) {
+            // Índice real donde está el postulante
+            this.postulantStepIndex = index;
 
-              // Si encontramos el destino, enfocamos ahí; si no, al real
-              const destino = destinoIndex >= 0 ? destinoIndex : index;
+            const estadoRealId = this.steps[index]?.id;
+            const destinoEstadoId = this.computeDestinoEstadoId(estadoRealId, this.usuario?.rolId);
+            const destinoIndex = this.steps.findIndex(s => s.id === destinoEstadoId);
 
-              this.selectedStepIndex = destino;
-              this.currentStep = destino;
+            // Si encontramos el destino, enfocamos ahí; si no, al real
+            const destino = destinoIndex >= 0 ? destinoIndex : index;
 
-              this.documento = ultimo.documento;
-              this.nombreCompleto = ultimo.nombreCompleto;
-              this.convocatoria = ultimo.nombreConvocatoria;
-              this.convocatoriaId = ultimo.convocatoriaId;
-              this.idUsuario = ultimo.usuarioId;
+            this.selectedStepIndex = destino;
+            this.currentStep = destino;
 
-              this.focusCurrentStep();
-            }
+            this.documento = ultimo.documento;
+            this.nombreCompleto = ultimo.nombreCompleto;
+            this.convocatoria = ultimo.nombreConvocatoria;
+            this.convocatoriaId = ultimo.convocatoriaId;
+            this.idUsuario = ultimo.usuarioId;
+
+            this.focusCurrentStep();
           }
-
-          this.fetchListaInstituciones();
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error('Error al cargar bitácora', err);
-          this.loading = false;
         }
-      });
-      this.fetchListaInstituciones();
+
+        this.fetchListaInstituciones();
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar bitácora', err);
+        this.loading = false;
+      }
+    });
+    this.fetchListaInstituciones();
 }
 
 // Devuelve el id de estado a enfocar (del catálogo) según estado real y rol

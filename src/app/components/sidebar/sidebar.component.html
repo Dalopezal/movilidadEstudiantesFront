@@ -25,7 +25,7 @@
 
     <!-- Internacionalización del Currículo -->
     <div class="has-submenu">
-      <a
+      <a *ngIf="rolInternacionalizacion"
         (click)="toggleInternacionalizacionMenu()"
         class="nav-link submenu-toggle"
         role="button"
@@ -178,21 +178,71 @@
           </span>
         </a>
 
+        <a *ngIf="rolConvocatoria" routerLink="/tipos-convocatorias" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">
+            {{ 'SIDEBAR.MOVILIDAD.CONVOCATORIA_GENERAL' | translate }}
+          </span>
+        </a>
+
         <!-- SUBGRUPO Maestros -->
         <div class="submenu-group">
-          <span class="submenu-title">
-            {{ 'SIDEBAR.MOVILIDAD.GENERAL' | translate }}
-          </span>
-
-          <!-- menú dinámico generado según permisos (texto viene de backend, no se traduce) -->
-          <a
-            *ngFor="let m of maestros"
-            [routerLink]="'/'+m.url"
-            routerLinkActive="active"
-            class="nav-link submenu-link"
-          >
+           <span class="submenu-title">
+             {{ 'SIDEBAR.MOVILIDAD.MAESTROS.TITULO' | translate }}
+           </span>
+          <a *ngIf="rolMovilidad" routerLink="/condicion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
             <i class="fas fa-dot-circle"></i>
-            <span class="link-text">{{ m.nombre }}</span>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.CONDICIONES_CONVOCATORIA' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/entregables" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.ENTREGABLES' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/financiacion-externa" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.FINANCIACION' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/beneficios-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.BENEFICIOS' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/administracion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.ADMINISTRACION' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/condicion" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.CONDICIONES' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/convenios" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.CONVENIOS' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/instituciones" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.INSTITUCIONES' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/institucion-convenio" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.INSTITUCIONES_CONVENIO' | translate }}
+            </span>
           </a>
         </div>
       </div>
