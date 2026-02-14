@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError, from } from 'rxjs';
 import { catchError, finalize, map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
 export interface ApiResponse<T> {
@@ -16,7 +17,10 @@ export interface ApiResponse<T> {
 })
 export class GenericApiService {
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
   // -----------------------
   // TOKEN INTERNO (AUTO-RECOVERY SIN REFRESH) - NUEVO
@@ -41,32 +45,65 @@ export class GenericApiService {
     localStorage.removeItem('generalToken');
   }
 
-  private recoverInternalToken(): Observable<string> {
+  /**
+   * Limpia toda la sesión y redirige al login
+   */
+  private forceLogout() {
+    console.warn('[GenericApiService] Forzando logout por sesión expirada...');
 
+    // Limpiar tokens internos
+    this.clearInternalAccessToken();
+    sessionStorage.removeItem('auth_context');
+
+    // Limpiar otros datos de sesión (ajusta según tu app)
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('usuario');
+
+    // Limpiar sessionStorage completo (opcional, ajusta según necesites)
+    // sessionStorage.clear();
+
+    // Redirigir al login
+    this.router.navigateByUrl('/');
+  }
+
+  private recoverInternalToken(): Observable<string> {
     const ctxStr = sessionStorage.getItem('auth_context');
+
     if (!ctxStr) {
-      this.clearInternalAccessToken();
-      return throwError(() => new Error('No hay contexto de autenticación para regenerar token.'));
+      console.warn('[GenericApiService] No hay auth_context. No se puede autorecuperar.');
+      this.forceLogout();
+      return throwError(() => new Error('SESSION_LOST'));
     }
 
     let ctx: any;
     try {
       ctx = JSON.parse(ctxStr);
     } catch {
-      this.clearInternalAccessToken();
-      return throwError(() => new Error('Contexto de autenticación inválido.'));
+      console.warn('[GenericApiService] auth_context corrupto.');
+      this.forceLogout();
+      return throwError(() => new Error('SESSION_LOST'));
     }
 
     const loginUrl = this.buildUrl('Usuarios/Iniciar_Sesion');
+    console.log('[GenericApiService] Intentando autoregenerar token...');
 
     return this.http.post<any>(loginUrl, ctx).pipe(
       map(res => {
         if (res?.exito && res?.datos) {
+          console.log('[GenericApiService] Token regenerado con éxito.');
           return String(res.datos);
         }
-        throw new Error('No se pudo regenerar el token.');
+        throw new Error('SESSION_LOST');
       }),
-      tap(token => sessionStorage.setItem('generalToken', token))
+      tap(token => {
+        sessionStorage.setItem('generalToken', token);
+        localStorage.setItem('generalToken', token);
+      }),
+      catchError(() => {
+        console.error('[GenericApiService] Falló la regeneración del token.');
+        this.forceLogout();
+        return throwError(() => new Error('SESSION_LOST'));
+      })
     );
   }
 
@@ -78,13 +115,21 @@ export class GenericApiService {
       map((res: ApiResponse<T> | any) => this.extractData(res)),
       catchError(err => {
         if (this.isAuthError(err)) {
+          console.log('[GenericApiService] Error 401/403 detectado, intentando recuperar token...');
           return this.recoverInternalToken().pipe(
             switchMap(() =>
               requestFactory().pipe(
                 map((res: ApiResponse<T> | any) => this.extractData(res))
               )
             ),
-            catchError(err2 => this.handleError(err2))
+            catchError(err2 => {
+              // Si el error es SESSION_LOST, ya se hizo logout automáticamente
+              if (err2.message === 'SESSION_LOST') {
+                console.error('[GenericApiService] Sesión perdida completamente. Usuario redirigido al login.');
+                return throwError(() => new Error('Sesión expirada. Por favor, inicie sesión nuevamente.'));
+              }
+              return this.handleError(err2);
+            })
           );
         }
         return this.handleError(err);
@@ -132,7 +177,6 @@ export class GenericApiService {
 
   get<T>(endpoint: string, params?: any, options?: any): Observable<T> {
     const url = this.buildUrl(endpoint);
-    const ctxStr = sessionStorage.getItem('auth_context');
     return this.requestInternalWithAutoRecovery<T>(() =>
       this.http.get<ApiResponse<T>>(url, this.buildOptions(params, options))
     );

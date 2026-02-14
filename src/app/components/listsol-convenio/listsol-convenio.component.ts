@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, forkJoin, of} from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
@@ -13,6 +13,7 @@ import { PostulacionTipoConsultaModel } from '../../models/PostulacionTipoModel'
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { catchError, map } from 'rxjs/operators';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -34,10 +35,15 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 })
 export class ListsolConvenioComponent implements OnInit, OnDestroy{
 
+  // MODIFICADO 
+   usuarioCache = new Map<number, { nombre: string; email: string }>(); // para traer los usuarios administradores
+  
+
+
     ///// DATA DE ALEJANDRA ///////
 
   @Input() embebido: boolean = false;
-    ///// VARIABLES DE LOS MODALES DE  ////////
+    ///// VARIABLES DE LOS MODALES DE  //////// 
   isClosing = false;
   cardPosition = { top: 100, left: 100 };
 
@@ -53,7 +59,9 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
   cardPositionAdministradores = { top: 120, left: 200 };
   administradoresConvenio: any[] = [];
 
-  usuarioRol:string='ORI interno';
+   // MODIFICADO
+   usuarioRol!: number;
+   //usuarioRol: this.usuario.rolId;  // cambio
 
     // === FILTROS NUEVOS ===
   tipoSolicitudId: number = 0;
@@ -65,7 +73,7 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
   estadosConvenio: any[] = [];
   instituciones: any[] = [];
   solicitudesConvenio: any[] = [];
-
+  
 
 
 
@@ -91,7 +99,7 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
     });
   }
 
-  /// estados ////
+  /// estados //// 
  fetchEstadosConvenio() {
   this.api.get<any>('EstadoConvenio/Consultar_EstadoConvenio')
   .pipe(takeUntil(this.destroy$))
@@ -160,16 +168,16 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
         }
         console.log('📋 Items procesados:', items);
         console.log('📊 Cantidad de items:', items.length);
-
+        
         // Asignar directamente a solicitudesConvenio
         this.solicitudesConvenio = items;
         console.log('✅ solicitudesConvenio asignado:', this.solicitudesConvenio);
-
+        
         // Actualizar paginación
         this.updatePagination();
         console.log('📄 pagedData después de paginación:', this.pagedData);
         console.log('🔢 Página actual:', this.currentPage, 'Total páginas:', this.totalPages);
-
+        
         this.loading = false;
       },
       error: (err) => {
@@ -179,13 +187,13 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
         this.loading = false;
       }
     });
-
+    
   }
 
 
    procesarRespuesta(resp: any) {
     let items: any[] = [];
-
+  
     if (Array.isArray(resp)) items = resp;
     else if (resp && typeof resp === 'object') {
       if (Array.isArray(resp.data)) items = resp.data;
@@ -195,51 +203,51 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
         if (Array.isArray(arr)) items = arr;
       }
     }
-
+  
     return items;
   }
 
 
-  // fitros ///   ///// apis para los filtros nuevos ///////
+  // fitros ///   ///// apis para los filtros nuevos /////// 
   filterSolicitudesConvenio() {
     this.loading = true;
     console.log('🔍 Aplicando filtros...');
     console.log('  Tipo:', this.tipoSolicitudId);
     console.log('  Estado:', this.estadoConvenioId);
     console.log('  Institución:', this.institucionId);
-
+    
     // Contar cuántos filtros están activos
     const filtrosActivos = [
       this.tipoSolicitudId && this.tipoSolicitudId !== 0,
       this.estadoConvenioId && this.estadoConvenioId !== 0,
       this.institucionId && this.institucionId !== 0
     ].filter(Boolean).length;
-
+    
     console.log('📊 Filtros activos:', filtrosActivos);
-
+    
     // Sin filtros → cargar todo
     if (filtrosActivos === 0) {
       console.log('⚠️ Sin filtros, cargando todo...');
       this.fetchSolicitudesConvenio();
       return;
     }
-
+    
     // UN SOLO FILTRO → usar endpoint específico
     if (filtrosActivos === 1) {
       console.log('✅ Un filtro, usando endpoint específico');
       this.aplicarFiltroSimple();
       return;
     }
-
+    
     // MÚLTIPLES FILTROS → cargar todo y filtrar localmente
     console.log('✅ Múltiples filtros, filtrando localmente');
     this.aplicarFiltrosMultiples();
   }
-
+  
   // Aplicar un solo filtro (usa el endpoint específico)
   private aplicarFiltroSimple() {
     let url = '';
-
+    
     if (this.tipoSolicitudId && this.tipoSolicitudId !== 0) {
       url = `SolicitudConvenios/Consultar_SolicitudConveniosTipo?TipoSolicitudId=${this.tipoSolicitudId}`;
       console.log('📌 Filtrando por TIPO');
@@ -250,16 +258,16 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
       url = `SolicitudConvenios/Consultar_SolicitudConveniosInstitucion?IdInstitucion=${this.institucionId}`;
       console.log('📌 Filtrando por INSTITUCIÓN');
     }
-
+    
     console.log('🌐 URL:', url);
-
+    
     this.api.get<any>(url)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
           const items = this.procesarRespuesta(resp);
           console.log('✅ Items recibidos:', items.length);
-
+          
           this.solicitudesConvenio = items;
           this.currentPage = 1;
           this.updatePagination();
@@ -274,27 +282,27 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
         }
       });
   }
-
+  
   // Aplicar múltiples filtros (carga todo y filtra en frontend)
   private aplicarFiltrosMultiples() {
     console.log('📥 Cargando todos los datos para filtrar localmente...');
-
+    
     this.api.get<any>('SolicitudConvenios/Consultar_SolicitudConvenios')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
           let items = this.procesarRespuesta(resp);
           console.log('📦 Items totales antes de filtrar:', items.length);
-
+          
           // DEBUG: Ver estructura de un item
           if (items.length > 0) {
             console.log('🔍 Ejemplo de item:', items[0]);
           }
-
+          
           // Aplicar filtros locales
           items = this.aplicarFiltrosLocales(items);
           console.log('✅ Items después de filtrar:', items.length);
-
+          
           this.solicitudesConvenio = items;
           this.currentPage = 1;
           this.updatePagination();
@@ -309,11 +317,11 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
         }
       });
   }
-
+  
   // Filtrar en el frontend
   aplicarFiltrosLocales(items: any[]): any[] {
     let resultado = [...items];
-
+    
     // Filtrar por tipo
     if (this.tipoSolicitudId && this.tipoSolicitudId !== 0) {
       console.log('  🔸 Aplicando filtro TIPO:', this.tipoSolicitudId);
@@ -322,9 +330,9 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
         // Puede ser: tipoSolicitudId, tipoId, tipo_id, etc.
         return item.tipoSolicitudId === this.tipoSolicitudId;
       });
-      console.log('    → Quedan:', resultado.length);
+      console.log('Quedan:', resultado.length);
     }
-
+    
     // Filtrar por estado
     if (this.estadoConvenioId && this.estadoConvenioId !== 0) {
       console.log('  🔸 Aplicando filtro ESTADO:', this.estadoConvenioId);
@@ -335,7 +343,7 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
       });
       console.log('    → Quedan:', resultado.length);
     }
-
+    
     // Filtrar por institución
     if (this.institucionId && this.institucionId !== 0) {
       console.log('  🔸 Aplicando filtro INSTITUCIÓN:', this.institucionId);
@@ -344,17 +352,17 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
         // Puede ser: institucionId, institucion_id, etc.
         return item.institucionId === this.institucionId;
       });
-      console.log('    → Quedan:', resultado.length);
+      console.log('Quedan:', resultado.length);
     }
-
+    
     return resultado;
   }
 
- /// abrir modal de acciones de convenio
+ /// abrir modal de acciones de convenio 
   abrirModalAccionesConvenio(item: any) {
     this.selectedItemAcciones = item;
     this.isClosingAcciones = false;
-
+    
     // Cargar acciones desde el backend
     this.api.get<any>(`Accion/Consultar_AccionSolicitudEspecifico?Id=${item.id}`)
     .pipe(takeUntil(this.destroy$))
@@ -386,9 +394,9 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
         this.showError(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.ERROR_ACCIONES'));
       }
     });
-
+   
   }
-
+  
   // cerrar tarjeta de acciones
   closeCardAcciones() {
     this.isClosingAcciones = true;
@@ -399,18 +407,18 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
   }
 
   puedeEditarAcciones(): boolean {
-    return this.usuarioRol === 'ORI interno';
+    return this.usuarioRol === 7;
   }
 
-
+/*
   // acciones del modal
-  guardarAcciones() {
-    // acciones actualziadas
+  guardarAcciones() { // revisar este guardar acciones 
+    // acciones actualziadas 
     const body = {
       solicitudId: this.selectedItemAcciones.id,
       acciones: this.accionesConvenio
     };
-
+  
     this.api.post<any>('Accion/actualiza_AccionSolicitud', body)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -424,14 +432,79 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
         }
       });
   }
+*/
+
+  actualizarAccionEstado(accion: any) {
+    const body = {
+      id: Number(accion.id),
+      solicitudconId: Number(accion.idsolicitud),      // viene de tu mapeo: idsolicitud
+      descripcion: accion.descripcion,
+      responsableId: Number(accion.responsable),       // viene de tu mapeo: responsable
+      fechainicio: accion.fecha_ini,                   // viene de tu mapeo: fecha_ini
+      fechafin: accion.fecha_fin,                      // viene de tu mapeo: fecha_fin
+      estadoaccionId: Boolean(accion.aprobado)          // lo que cambió el switch
+    };
+  
+    this.api.put<any>('Accion/actualiza_AccionSolicitud', body)  // ✅ cambia a tu ruta real
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.showSuccess(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.ACCIONES_GUARDADAS'));
+        },
+        error: (err) => {
+          console.error('Error actualizando acción', err);
+          this.showError(this.translate.instant('SOLICITUDES_CONVENIO.MENSAJES.ERROR_GUARDAR_ACCIONES'));
+          // Revertir el switch si falla
+          accion.aprobado = !accion.aprobado;
+        }
+      });
+  }
+  
 
 
+  // MODIFICADO
+  
+  /// funcion para tarer el nombre del usuario 
+  fetchNombreUsuario(usuarioId: number){
+    
+    const url = `orisiga/nombrestudiante/?idestudiante=${usuarioId}`;
+
+    // Cache
+    const cached = this.usuarioCache.get(usuarioId);
+    if (cached) return of(cached);
+  
+    return this.api.getExterno<any>(url).pipe(
+      map((resp) => {
+        // Resp viene como arreglo: [ { identificacion, nombre, correo } ]
+        const arr = Array.isArray(resp) ? resp : (Array.isArray(resp?.data) ? resp.data : []);
+        const first = arr?.[0];
+  
+        const detalle = {
+          nombre: first?.nombre ?? 'No disponible',
+          email: first?.correo ?? 'No disponible'
+        };
+  
+        this.usuarioCache.set(usuarioId, detalle);
+        return detalle;
+      }),
+      catchError((err) => {
+        console.error('Error consultando nombre/correo en ORISIGA:', usuarioId, err);
+        const fallback = { nombre: 'No disponible', email: 'No disponible' };
+        this.usuarioCache.set(usuarioId, fallback);
+        return of(fallback);
+      })
+    );
+  }
+
+  
+// MODIFICADO 
   // ========== MODAL ADMINISTRADORES ==========
   abrirModalAdministradores(item: any) {
+    this.usuarioCache.clear();
     console.log('🔑 Propiedades disponibles:', Object.keys(item));
     this.selectedItemAdministradores = item;
     this.isClosingAdministradores = false;
-
+    
     this.api.get<any>(`Administrador/Consultar_AdministradoresConveniosGeneral?SolicitudDescripcion=${item.descripcion}`)
     .pipe(takeUntil(this.destroy$))
     .subscribe({
@@ -446,13 +519,46 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
             if (Array.isArray(arr)) items = arr;
           }
         }
-        this.administradoresConvenio = items.map(a => ({
+      
+        // Base con documento (usuarioId)
+        const baseAdmins = items.map(a => ({
           id: Number(a.id),
-          nombre: 'Paola Monterrey Villa',
-          email: 'pmonterrey@ucm.edu.co',
-          documento: a.usuarioId
+          documento: Number(a.usuarioId)
         }));
-      },
+      
+        if (baseAdmins.length === 0) {
+          this.administradoresConvenio = [];
+          return;
+        }
+      
+        // Consultar ORISIGA por cada documento 
+        const requests = baseAdmins.map(admin =>
+          this.fetchNombreUsuario(admin.documento).pipe(
+            map(det => ({
+              id: admin.id,
+              documento: admin.documento,
+              nombre: det.nombre,
+              email: det.email
+            }))
+          )
+        );
+      
+        forkJoin(requests)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (adminsEnriquecidos) => {
+              this.administradoresConvenio = adminsEnriquecidos;
+            },
+            error: (err) => {
+              console.error('Error enriqueciendo administradores (forkJoin)', err);
+              this.administradoresConvenio = baseAdmins.map(a => ({
+                ...a,
+                nombre: 'No disponible',
+                email: 'No disponible'
+              }));
+            }
+          });
+      },      
       error: (err) => {
         console.error('Error cargando administradores', err);
         this.administradoresConvenio = [];
@@ -504,10 +610,10 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
     */
   }
 
-  // ========== APROBAR/RECHAZAR ==========  debo modificar el body
-  aprobarSolicitud(solicitud: any, tipo: 'jefe' | 'ori') {
-    const nuevoEstado = tipo === 'jefe' ? 5 : 6;
-
+  // ========== APROBAR/RECHAZAR ==========  debo modificar el body  // cambio
+  aprobarSolicitud(solicitud: any) {
+    const nuevoEstado = 6;
+    
     this.confirmationService.confirm({
       message: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.APROBAR'),
       header: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.HEADER_APROBAR'),
@@ -521,7 +627,6 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
       defaultFocus: 'reject',
       accept: () => {
         const body = {
-
           id:solicitud.id,
           solicitanteId:solicitud.solicitanteId,
           descripcion: solicitud.descripcion,
@@ -531,9 +636,8 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
           institucionId: solicitud.institucionId,
           fechacreacion: solicitud.fechacreacion,
           estadoId:nuevoEstado
-
         };
-
+  
         this.api.put<any>('SolicitudConvenios/actualiza_SolicitudConvenios', body)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
@@ -550,14 +654,14 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
     });
   }
 
-  rechazarSolicitud(solicitud: any, tipo: 'jefe' | 'ori') {
-    const nuevoEstado = tipo === 'jefe' ? 9 : 10;
-
+  rechazarSolicitud(solicitud: any) {  // cambio
+    const nuevoEstado = 10;
+    
     this.confirmationService.confirm({
       message: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.RECHAZAR'),
       header: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.HEADER_RECHAZAR'),
       icon: 'pi pi-times-circle custom-confirm-icon',
-      acceptLabel: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_RECHAZAR'),
+      acceptLabel:  this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_RECHAZAR'),
       rejectLabel: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_CANCELAR'),
       acceptIcon: 'pi pi-times',
       rejectIcon: 'pi pi-ban',
@@ -566,7 +670,6 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
       defaultFocus: 'reject',
       accept: () => {
         const body = {
-
           id:solicitud.id,
           solicitanteId:solicitud.solicitanteId,
           descripcion: solicitud.descripcion,
@@ -576,10 +679,9 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
           institucionId: solicitud.institucionId,
           fechacreacion: solicitud.fechacreacion,
           estadoId:nuevoEstado
-
         };
-
-        this.api.post<any>('SolicitudConvenios/actualiza_SolicitudConvenios', body)
+  
+        this.api.put<any>('SolicitudConvenios/actualiza_SolicitudConvenios', body)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: (resp) => {
@@ -595,7 +697,7 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
     });
   }
 
-
+  
 
 
 
@@ -628,7 +730,7 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
   tipoMovilidad: any[] = [];
   convocatoriaId: any;
 
-  selectedItem: any = null; // esta se usaba para el anterior modal
+  selectedItem: any = null; // esta se usaba para el anterior modal 
 
 
   nombreCombocatoria: any;
@@ -645,39 +747,102 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
     private translate: TranslateService
   ) {}
 
+ 
+
   ngOnInit(): void {
+    // MODIFICADO
+    
+    const usuarioLS = localStorage.getItem('usuario');
+
+    if (usuarioLS) {
+      const usuario = JSON.parse(usuarioLS);
+      this.usuarioRol = usuario.rolId;
+    }
+
     //this.fetchPostulaciones();
     //this.fetchListaEstados();
     //this.fetchListaTipoMovilidad();
 
-    //// los fetch para convenios
+
+    //// los fetch para convenios 
     this.fetchTiposSolicitud();
     this.fetchEstadosConvenio();
     this.fetchInstituciones();
     this.fetchSolicitudesConvenio()
   }
 
+
+  // MODIFICADO
+  esOriInterno(): boolean {
+    return this.usuarioRol === 7; // ajusta al ID real
+  }
   ngOnDestroy(): void {
+    
     this.destroy$.next();
     this.destroy$.complete();
   }
 
+  //MODIFICADO tarer los nombres de todo el listado 
+  private cargarNombresSolicitantesDePagina() {
+    if (!Array.isArray(this.pagedData) || this.pagedData.length === 0) return;
+  
+    // ids únicos de la página actual
+    const ids = Array.from(
+      new Set(
+        this.pagedData
+          .map(x => Number(x?.solicitanteId))
+          .filter(id => Number.isFinite(id) && id > 0)
+      )
+    );
+  
+    // solo los que NO estén en cache
+    const pendientes = ids.filter(id => !this.usuarioCache.has(id));
+  
+    if (pendientes.length === 0) return;
+  
+    const requests = pendientes.map(id =>
+      this.fetchNombreUsuario(id).pipe(
+        map(det => ({ id, nombre: det.nombre }))
+      )
+    );
+  
+    forkJoin(requests)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resultados) => {
+          // Ya se guardaron en cache dentro de fetchNombreUsuario
+          // Esto solo fuerza el refresh visual
+          resultados.forEach(r => {
+            if (!r.nombre) {
+              this.usuarioCache.set(r.id, { nombre: String(r.id), email: '' });
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Error batch cargando nombres de solicitantes', err);
+        }
+      });
+  }
+  
+
+
+
  /// borre fetchpostulaciones
  //borre filter postulaciones
-// borre reset form
-
+// borre reset form 
+  
 
 
 
   // ---------- Paginación ----------
   updatePagination() {
     // Calcular total de páginas
-    const totalItems = Array.isArray(this.solicitudesConvenio)
-      ? this.solicitudesConvenio.length
+    const totalItems = Array.isArray(this.solicitudesConvenio) 
+      ? this.solicitudesConvenio.length 
       : 0;
     this.totalPages = Math.max(1, Math.ceil(totalItems / this.pageSize));
     this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-
+    
     // Actualizar datos paginados
     this.updatePagedData();
   }
@@ -689,6 +854,8 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
     }
     const start = (this.currentPage - 1) * this.pageSize;
     this.pagedData = this.solicitudesConvenio.slice(start, start + this.pageSize);
+    //MODIFICADO AÑADIR FUNCION 
+    this.cargarNombresSolicitantesDePagina();
   }
 
   goToPage(page: number) {
@@ -735,8 +902,8 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
         message: mensaje,
         header: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_CONFIRMAR'),
-        rejectLabel: this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_CANCELAR'),
+        acceptLabel:  this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_CONFIRMAR'),
+        rejectLabel:  this.translate.instant('SOLICITUDES_CONVENIO.CONFIRM.BTN_CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',
@@ -748,11 +915,11 @@ export class ListsolConvenioComponent implements OnInit, OnDestroy{
     });
   }
 
+  
+  /// borre lista estados 
 
-  /// borre lista estados
-
-
-
+    
+  
 
   trackBySolicitudId(index: number, item: any): any {
     return item?.id ?? index;

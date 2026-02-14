@@ -153,7 +153,7 @@ export class SharePointDriveComponent {
     let modelAux = this.EntregablePostulacionModel;
     modelAux.url = webUrl;
 
-    this.api.post('EntregablePostulacion/Actualiza_EntregablePostulacion', modelAux).subscribe({
+    this.api.put('EntregablePostulacion/Actualiza_EntregablePostulacion', modelAux).subscribe({
       next: (resp) => {
         this.showSuccess('Url Entregable registrado exitosamente');
       },

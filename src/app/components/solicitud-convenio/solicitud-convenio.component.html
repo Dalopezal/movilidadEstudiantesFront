@@ -8,7 +8,7 @@
         <!-- Header -->
         <div class="card-header d-flex align-items-center" style="background: #E2E6F7;">
           <button
-            [title]="'SOLICITUD_CONVENIO.BTN_VOLVER' | translate"
+            title="'SOLICITUD_CONVENIO.BTN_VOLVER' | translate"
             mat-icon-button
             (click)="goBack()"
             [disableRipple]="true"
@@ -38,6 +38,7 @@
               (click)="cambiarTipo('Renovacion')">
               <i class="fas fa-sync-alt"></i> {{ 'SOLICITUD_CONVENIO.TABS.RENOVACION' | translate }}
             </button>
+            <!-- ===================== creamos un tab de mis soliciudes======================== -->
             <button
               type="button"
               class="tab-btn"
@@ -45,6 +46,7 @@
               (click)="cambiarTipo('MisSolicitudes')">
               <i class="fas fa-list-alt"></i> {{ 'SOLICITUD_CONVENIO.TABS.MIS_SOLICITUDES' | translate }}
             </button>
+
           </div>
         </div>
 
@@ -89,7 +91,7 @@
                         class="form-control"
                         [(ngModel)]="formData.descripcion"
                         name="descripcion"
-                        [placeholder]="'SOLICITUD_CONVENIO.PASO1.DESCRIPCION_PLACEHOLDER' | translate"
+                        placeholder="'SOLICITUD_CONVENIO.PASO1.DESCRIPCION_PLACEHOLDER' | translate"
                         required>
                     </div>
                     <div class="form-group">
@@ -146,7 +148,8 @@
                         class="form-control"
                         [(ngModel)]="formData.institucion"
                         name="institucion"
-                        [placeholder]="'SOLICITUD_CONVENIO.PASO1.NOMBRE_PLACEHOLDER' | translate"
+                        placeholder="'SOLICITUD_CONVENIO.PASO1.NOMBRE_PLACEHOLDER' | translate"
+                        (ngModelChange)="actualizarDescripcionInstitucionNueva()"
                         required>
                     </div>
                   </div>
@@ -164,7 +167,7 @@
                       class="form-control"
                       [(ngModel)]="formData.antecedentes"
                       name="antecedentes"
-                      [placeholder]="'SOLICITUD_CONVENIO.PASO2.ANTECEDENTES_PLACEHOLDER' | translate"
+                      placeholder="'SOLICITUD_CONVENIO.PASO2.ANTECEDENTES_PLACEHOLDER' | translate"
                       required></textarea>
                   </div>
 
@@ -174,7 +177,7 @@
                       class="form-control"
                       [(ngModel)]="formData.objetivos"
                       name="objetivos"
-                      [placeholder]="'SOLICITUD_CONVENIO.PASO2.OBJETIVOS_PLACEHOLDER' | translate"
+                      placeholder="'SOLICITUD_CONVENIO.PASO2.OBJETIVOS_PLACEHOLDER' | translate"
                       required></textarea>
                   </div>
                 </div>
@@ -189,7 +192,7 @@
                       type="button"
                       class="btn-agregar-accion"
                       (click)="agregarAccion()"
-                      [title]="'SOLICITUD_CONVENIO.PASO3.BTN_AGREGAR' | translate">
+                      title="'SOLICITUD_CONVENIO.PASO3.BTN_AGREGAR' | translate">
                       <i class="fas fa-plus-circle"></i> {{ 'SOLICITUD_CONVENIO.PASO3.BTN_AGREGAR' | translate }}
                     </button>
                   </div>
@@ -209,7 +212,7 @@
                           type="button"
                           class="btn-eliminar-accion"
                           (click)="eliminarAccion(i)"
-                          [title]="'SOLICITUD_CONVENIO.PASO3.BTN_ELIMINAR' | translate">
+                          title="'SOLICITUD_CONVENIO.PASO3.BTN_ELIMINAR' | translate">
                           <i class="fas fa-trash-alt"></i>
                         </button>
                       </div>
@@ -221,7 +224,7 @@
                             class="form-control"
                             [(ngModel)]="accion.descripcion"
                             [name]="'descripcion_' + i"
-                            [placeholder]="'SOLICITUD_CONVENIO.PASO3.DESCRIPCION_PLACEHOLDER' | translate"
+                            placeholder="'SOLICITUD_CONVENIO.PASO3.DESCRIPCION_PLACEHOLDER' | translate"
                             rows="3"
                             required></textarea>
                         </div>
@@ -271,16 +274,18 @@
                           class="form-control"
                           [(ngModel)]="formData.nombrecol"
                           name="nombrecol"
-                          [placeholder]="'SOLICITUD_CONVENIO.PASO4.NOMBRE_ADMIN_INTERNO' | translate"
+                          placeholder="'SOLICITUD_CONVENIO.PASO4.NOMBRE_ADMIN_INTERNO' | translate"
                           required>
-                      </div>
+                          </div>
+
+
                     </div>
                   </div>
 
                   <!-- ADMINISTRADOR EXTERNO - OPCIONAL -->
                   <div class="admin-section mt-4">
                     <h3 class="form-subtitle">
-                      <i class="fas fa-building"></i> {{ 'SOLICITUD_CONVENIO.PASO4.ADMIN_EXTERNO' | translate }}
+                      <i class="fas fa-building"></i> Administrador de la Institución de Convenio
                     </h3>
 
                     <!-- Checkbox para activar/desactivar -->
@@ -297,7 +302,7 @@
                       </label>
                     </div>
 
-                    <!-- Campos del administrador externo -->
+                    <!-- Campos del administrador externo (solo si checkbox está marcado) -->
                     <div *ngIf="tieneAdminExterno" class="admin-card">
                       <div class="form-row">
                         <div class="form-group">
@@ -309,7 +314,7 @@
                             class="form-control"
                             [(ngModel)]="administradorExterno.nombre"
                             name="adminExternoNombre"
-                            [placeholder]="'SOLICITUD_CONVENIO.PASO4.NOMBRE_EXTERNO_PLACEHOLDER' | translate"
+                            placeholder="'SOLICITUD_CONVENIO.PASO4.NOMBRE_EXTERNO_PLACEHOLDER' | translate"
                             [required]="tieneAdminExterno">
                         </div>
 
@@ -322,21 +327,21 @@
                             class="form-control"
                             [(ngModel)]="administradorExterno.cargo"
                             name="adminExternoCargo"
-                            [placeholder]="'SOLICITUD_CONVENIO.PASO4.CARGO_PLACEHOLDER' | translate"
+                            placeholder="'SOLICITUD_CONVENIO.PASO4.CARGO_PLACEHOLDER' | translate"
                             [required]="tieneAdminExterno">
                         </div>
                       </div>
 
                       <div class="form-group">
                         <label class="form-label">
-                          {{ 'SOLICITUD_CONVENIO.PASO4.CORREO' | translate }} <span style="color: #ef4444;">*</span>
+                          {{ 'SOLICITUD_CONVENIO.PASO4.CORREO' | translate }}  <span style="color: #ef4444;">*</span>
                         </label>
                         <input
                           type="email"
                           class="form-control"
                           [(ngModel)]="administradorExterno.correo"
                           name="adminExternoCorreo"
-                          [placeholder]="'SOLICITUD_CONVENIO.PASO4.CORREO_PLACEHOLDER' | translate"
+                          placeholder="'SOLICITUD_CONVENIO.PASO4.CORREO_PLACEHOLDER' | translate"
                           [required]="tieneAdminExterno">
                       </div>
                     </div>
@@ -421,7 +426,8 @@
                         type="text"
                         class="form-control"
                         [(ngModel)]="formData.codigoRenovacion"
-                        name="codigoRenovacion">
+                        name="codigoRenovacion"
+                        >
                     </div>
                   </div>
 
@@ -431,7 +437,8 @@
                       <select
                         class="form-control"
                         [(ngModel)]="formData.tipoConvenio"
-                        name="tipoConvenio">
+                        name="tipoConvenio"
+                       >
                         <option *ngFor="let t of tiposConvenio" [ngValue]="t.id">{{ t.descripcion }}</option>
                       </select>
                     </div>
@@ -441,7 +448,8 @@
                       <select
                         class="form-control"
                         [(ngModel)]="formData.ClasConvenio"
-                        name="ClasConvenio">
+                        name="ClasConvenio"
+                        >
                         <option *ngFor="let c of clasificaciones" [ngValue]="c.id">{{ c.nombre }}</option>
                       </select>
                     </div>
@@ -451,7 +459,8 @@
                       <select
                         class="form-control"
                         [(ngModel)]="formData.tipoactividad"
-                        name="tipoactividad">
+                        name="tipoactividad"
+                        >
                         <option *ngFor="let a of tiposActividad" [ngValue]="a.id">{{ a.nombre }}</option>
                       </select>
                     </div>
@@ -461,7 +470,8 @@
                       <select
                         class="form-control"
                         [(ngModel)]="selectedsnies"
-                        name="CategoriaSnies">
+                        name="CategoriaSnies"
+                        >
                         <option *ngFor="let c of categoriasnies" [ngValue]="c.id">{{ c.nombre }}</option>
                       </select>
                     </div>
@@ -472,7 +482,8 @@
                         type="date"
                         class="form-control"
                         [(ngModel)]="formData.fechaInicioRenovacion"
-                        name="fechaInicioRenovacion">
+                        name="fechaInicioRenovacion"
+                        >
                     </div>
 
                     <div class="form-group">
@@ -481,16 +492,18 @@
                         type="date"
                         class="form-control"
                         [(ngModel)]="formData.fechaFinRenovacion"
-                        name="fechaFinRenovacion">
+                        name="fechaFinRenovacion"
+                        >
                     </div>
 
                     <div class="form-group">
                       <label class="form-label">{{ 'SOLICITUD_CONVENIO.RENOVACION.DESCRIPCION' | translate }}</label>
                       <input
-                        type="text"
-                        class="form-control"
-                        [(ngModel)]="formData.descripcionRenovacion"
-                        name="descripcionRenovacion">
+                      type="text"
+                      class="form-control"
+                      [(ngModel)]="formData.descripcionRenovacion"
+                      name="descripcionRenovacion"
+                      >
                     </div>
                   </div>
 
@@ -500,24 +513,24 @@
                       class="form-control"
                       [(ngModel)]="formData.antecedentesRenovacion"
                       name="antecedentesRenovacion"
-                      [placeholder]="'SOLICITUD_CONVENIO.RENOVACION.ANTECEDENTES_PLACEHOLDER' | translate"></textarea>
+                      placeholder="'SOLICITUD_CONVENIO.RENOVACION.ANTECEDENTES_PLACEHOLDER' | translate"></textarea>
                   </div>
 
                   <div style="text-align: right; margin-top: 24px;">
                     <button
-                      class="btn btn-success"
-                      type="button"
-                      (click)="guardarRenovacion()">
-                      <i *ngIf="guardandoRenovacion" class="fas fa-spinner fa-spin"></i>
-                      <i *ngIf="!guardandoRenovacion" class="fas fa-check"></i>
-                      {{ guardandoRenovacion ? ('SOLICITUD_CONVENIO.RENOVACION.GUARDANDO' | translate) : ('SOLICITUD_CONVENIO.RENOVACION.BTN_SOLICITAR' | translate) }}
-                    </button>
+                    class="btn btn-success"
+                    type="button"
+                    (click)="guardarRenovacion()"
+                    >
+                    <i *ngIf="guardandoRenovacion" class="fas fa-spinner fa-spin"></i>
+                    <i *ngIf="!guardandoRenovacion" class="fas fa-check"></i>
+                    {{ guardandoRenovacion ? ('SOLICITUD_CONVENIO.RENOVACION.GUARDANDO' | translate) : ('SOLICITUD_CONVENIO.RENOVACION.BTN_SOLICITAR' | translate) }}
+                  </button>
                   </div>
                 </div>
               </form>
             </div>
           </div>
-
           <!-- ============================================= -->
           <!-- CONTENIDO MIS SOLICITUDES -->
           <!-- ============================================= -->
@@ -531,7 +544,7 @@
   </div>
 </div>
 
-<!-- Notificaciones -->
+<!-- Notificaciones de ngx-sonner -->
 <ngx-sonner-toaster />
-<!-- ConfirmDialog -->
+<!-- ConfirmDialog de PrimeNG -->
 <p-confirmDialog appendTo="body" styleClass="custom-confirm-dialog"></p-confirmDialog>

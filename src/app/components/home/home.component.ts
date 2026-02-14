@@ -247,6 +247,7 @@ export class HomeComponent implements OnInit {
           this.usuario.rol = this.getNombreRol(Number(this.selectedRole));
           this.usuario.tipoUsuario = this.tipoUsuario;
           this.usuario.idUsuario = u?.identificacion ?? null;
+          this.usuario.programa = u.programa;
           localStorage.setItem('usuario', JSON.stringify(this.usuario));
           this.datosPerfil = { ...this.usuario };
           this.populateDatosPerfilFromResp(resp);

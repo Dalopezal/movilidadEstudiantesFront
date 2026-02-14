@@ -69,6 +69,7 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
   isClosing = false;
   nombreCombocatoria: any;
   idConvocatoria: any;
+  usuario: any = {};
 
   @Input() tipoPostulacion: any;
 
@@ -81,6 +82,10 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
+
     this.fetchPostulaciones();
     this.fetchListaEstados();
     this.fetchListaTipoMovilidad();
@@ -94,6 +99,7 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
   // ---------- CRUD / listado ----------
   fetchPostulaciones() {
 
+    // Carga datos parámetros
     this.route.queryParams.subscribe(params => {
       this.nombreCombocatoria = params['nombre'];
       this.idConvocatoria = params['id'];
@@ -118,7 +124,18 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
             }
           }
 
-          const baseModels = items.map(item => PostulacionTipoConsultaModel.fromJSON(item));
+          let filteredItems = items;
+
+          if (this.usuario?.rolId == 10) {
+            filteredItems = items.filter(item =>
+              item?.programa === this.usuario?.programa
+            );
+          }
+
+
+          const baseModels = filteredItems.map(item =>
+            PostulacionTipoConsultaModel.fromJSON(item)
+          );
 
           from(baseModels).pipe(
             takeUntil(this.destroy$),
@@ -128,7 +145,6 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
               return this.api.getExterno<any>(`orisiga/nombrestudiante/?idestudiante=${m.usuarioId}`).pipe(
                 map(resp => this.mapStudentInfoToModel(m, resp)),
                 catchError(err => {
-                  // Si falla el externo, NO tumbamos toda la lista; devolvemos el item sin datos
                   console.error('Error consultando estudiante ORISIGA, usuarioId=', m.usuarioId, err);
                   return of(m);
                 })

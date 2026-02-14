@@ -373,4 +373,40 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
 
     return customFormat;
   }
+
+  abrirUrlEntregable(item: EntregablePostulacionModel) {
+    if (!item.url || item.url === 'NA') {
+      this.showWarning('Este entregable aún no tiene un archivo asociado.');
+      return;
+    }
+
+    try {
+      window.open(item.url, '_blank');
+    } catch (e) {
+      this.showError('No se pudo abrir la URL del entregable');
+    }
+  }
+
+  async cambiarEstadoAprobacion(event: Event, item: any) {
+    event.preventDefault();
+
+    const nuevoEstado = !item.estado;
+    const accion = nuevoEstado ? 'aprobar' : 'marcar como pendiente';
+
+    const confirmado = await this.showConfirm(`¿Deseas ${accion} el entregable "${item.descripcion}"?`);
+
+    if (confirmado) {
+      const modelUpdate = { ...item, estado: nuevoEstado };
+
+      this.api.put('EntregablePostulacion/Actualiza_EntregablePostulacion', modelUpdate).subscribe({
+        next: () => {
+          item.estado = nuevoEstado;
+          this.showSuccess(`Entregable ${nuevoEstado ? 'aprobado' : 'pendiente'} correctamente`);
+        },
+        error: (err) => {
+          this.showError('No se pudo actualizar el estado');
+        }
+      });
+    }
+  }
 }

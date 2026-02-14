@@ -290,3 +290,40 @@
   }
 }
 
+/* Chips Pro */
+.badge-pro {
+  padding: 0.5em 1em;
+  border-radius: 50rem;
+  font-weight: 600;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+}
+
+.badge-success-pro {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-color: #c8e6c9;
+}
+
+.badge-warning-pro {
+  background-color: #fff3e0;
+  color: #ef6c00;
+  border-color: #ffe0b2;
+}
+
+/* Switch Pro para Aprobar */
+.form-switch .form-check-input {
+  width: 2.5em;
+  height: 1.25em;
+  cursor: pointer;
+}
+
+.form-switch .form-check-input:checked {
+  background-color: #2e7d32;
+  border-color: #2e7d32;
+}

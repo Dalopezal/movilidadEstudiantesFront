@@ -345,7 +345,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
 
           this.route.queryParams.subscribe(params => {
             //this.idPostulacion = params['id'];
-            this.idPostulacion = this.usuario.rolId == 7 ? params['id'] ? Number(params['id']) : undefined : params['idPostulacion'] ? Number(params['idPostulacion']) : undefined;
+            this.idPostulacion = this.usuario.rolId == 7 || this.usuario.rolId == 10 || this.usuario.rolId == 11 ? params['id'] ? Number(params['id']) : undefined : params['idPostulacion'] ? Number(params['idPostulacion']) : undefined;
           });
           this.getBitacora(this.idPostulacion);
 
@@ -469,8 +469,8 @@ private fetchListaInstituciones() {
     const r = Number(rolId);
 
     const ROL_ORI = 7;
-    const ROL_DIRECTOR = 100;
-    const ROL_DECANATURA = 101;
+    const ROL_DIRECTOR = 10;
+    const ROL_DECANATURA = 11;
     const ROL_VICERRECTORIA = 102;
     const ROL_JEFE = 103;
     const ROL_RECTORIA = 104;
@@ -622,7 +622,7 @@ getBitacora(id: number) {
             this.selectedStepIndex = destino;
             this.currentStep = destino;
 
-            this.documento = ultimo.documento;
+            this.documento = ultimo.documento == null ? ultimo.usuarioId.toString() : ultimo.documento;
             this.nombreCompleto = ultimo.nombreCompleto;
             this.convocatoria = ultimo.nombreConvocatoria;
             this.convocatoriaId = ultimo.convocatoriaId;
@@ -646,6 +646,7 @@ getBitacora(id: number) {
 // Devuelve el id de estado a enfocar (del catálogo) según estado real y rol
 private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
     const esORI = Number(rolId) === 7;
+    const esDIR = Number(rolId) === 10;
 
     // Reglas por estado (catálogo):
     // 1: Pre‑postulación
@@ -662,16 +663,16 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
     // Si quieres que ambos (ORI y usuario) aterricen en el formulario de Postulación, usa id=3.
     if (estadoRealId === 21) return 3;
 
-    // 4: Postulado → ORI puede aprobar/rechazar (5/3 según tu API), usuario sigue viendo 3 para editar/objetivo.
+    // 4: Postulado → ORI puede aprobar/rechazar, usuario sigue viendo 3 para editar/objetivo.
     if (estadoRealId === 4) {
-      return esORI ? 4 : 3;
+      return esDIR ? 6 : 3;
     }
 
     // 5: Rechazado Postulación → mantener foco en 5
     if (estadoRealId === 5) return 5;
 
     // 6/7: Director (Aprobado/Rechazado)
-    if (estadoRealId === 6 || estadoRealId === 7) return estadoRealId;
+    if (estadoRealId === 6 || estadoRealId === 7) return 8;
 
     // 8/9: Decanatura (Aprobado/Rechazado)
     if (estadoRealId === 8 || estadoRealId === 9) return estadoRealId;
@@ -853,6 +854,7 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
       estadoPostulacionId: 1,
       convocatoriaId: this.idCovocatoria,
       usuarioId: this.usuario.idUsuario,
+      programa: this.usuario.programa
     };
 
     this.loading = true;
@@ -925,7 +927,7 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
   onPostular() {
   const currentStepData = this.steps[this.selectedStepIndex]?.data || {};
   const payload = {
-    usuarioId: this.usuario.rolId == 7 ? this.idUsuario : this.usuario.usuarioId,
+    usuarioId: this.idUsuario,
     convocatoriaId: this.idCovocatoria,
     estadoPostulacionId: 4,
     fechaPostulacion: currentStepData['fechaPostulacion'],
@@ -983,9 +985,7 @@ onRechazarPostulacion(form?: NgForm) {
 
 onAprobarPostulacion(form?: NgForm) {
 
-  // Si hay formulario y no es válido: marcar touched y mostrar advertencia
   if (form && !form.valid) {
-    // marcar todos los controls como touched para que aparezcan errores
     Object.values(form.controls).forEach(ctrl => ctrl.markAsTouched());
     this.showWarning('Complete todos los campos obligatorios antes de continuar.');
     return;
@@ -1021,7 +1021,7 @@ onRechazarDirector() {
     fechaPostulacion: currentStepData['fechaPostulacion']
   };
 
-  this.api.post('Postulaciones/RechazarDirector', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Rechazado Director:', resp);
       this.refreshBitacora();
@@ -1034,10 +1034,12 @@ onAprobarDirector() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 6,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/AprobarDirector', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Aprobado Director:', resp);
       this.refreshBitacora();
@@ -1070,10 +1072,12 @@ onAprobarDecanatura() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 8,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/AprobarDecanatura', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Aprobado Decanatura:', resp);
       this.refreshBitacora();

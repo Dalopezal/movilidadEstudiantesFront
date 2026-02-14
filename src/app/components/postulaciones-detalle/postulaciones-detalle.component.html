@@ -175,7 +175,7 @@
                                   [name]="'ctrl-'+selectedStepIndex+'-'+j"
                                   [(ngModel)]="steps[selectedStepIndex].data[field.name]"
                                   (ngModelChange)="field.tipo === 'selectChange' ? onFieldChange(field, $event) : null"
-                                  [disabled]="!field.editable"
+                                  [required]="field.name === 'convocatoriaId' ? false : false">
                                   [required]="!!field.editable">
                             <option value="" disabled *ngIf="field.editable">Seleccione...</option>
                             <option *ngFor="let opt of field.opciones" [value]="opt.value">{{ opt.label }}</option>

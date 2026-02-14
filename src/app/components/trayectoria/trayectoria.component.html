@@ -99,21 +99,21 @@
                 <div class="mb-3 d-flex gap-3">
                   <div class="flex-grow-1">
                     <label for="periodo" class="form-label fw-bold">{{ 'TRAYECTORIAS.PERIODO' | translate }}</label>
-                    <input
-                      type="number"
-                      class="form-control"
+                    <select
+                      class="form-select"
                       id="periodo"
                       name="periodo"
-                      [placeholder]="'TRAYECTORIAS.PLACEHOLDER_PERIODO' | translate"
                       required
-                      min="1"
                       [(ngModel)]="model.periodo"
                       #periodoCtrl="ngModel"
                       style="font-size: 13px"
-                    />
+                    >
+                      <option [ngValue]="0" disabled>{{ 'TRAYECTORIAS.SELECCIONE' | translate }}</option>
+                      <option [ngValue]="1">1</option>
+                      <option [ngValue]="2">2</option>
+                    </select>
                     <div class="text-danger small mt-1" *ngIf="periodoCtrl.invalid && (periodoCtrl.touched || periodoCtrl.dirty)">
                       <div *ngIf="periodoCtrl.errors?.['required']">{{ 'TRAYECTORIAS.ERROR_PERIODO' | translate }}</div>
-                      <div *ngIf="periodoCtrl.errors?.['min']">{{ 'TRAYECTORIAS.ERROR_PERIODO_MIN' | translate }}</div>
                     </div>
                   </div>
 

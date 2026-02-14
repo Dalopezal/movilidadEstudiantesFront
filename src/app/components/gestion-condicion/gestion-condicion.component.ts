@@ -59,7 +59,7 @@ export class GestionCondicionComponent implements OnInit, OnDestroy {
     const data = localStorage.getItem('usuario');
     this.usuario = data ? JSON.parse(data) : {};
     //this.fetchEntregables();
-    //this.fetchListaEntregablesConvocatoria();
+    //zthis.fetchListaEntregablesConvocatoria();
   }
 
   private onStorageChange() {

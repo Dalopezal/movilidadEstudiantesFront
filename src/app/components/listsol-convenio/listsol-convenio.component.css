@@ -288,3 +288,47 @@
     opacity: 0;
   }
 }
+
+
+/* ===== Botones de opciones (Aceptar / Rechazar) ===== */
+
+.btn-opcion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 160ms ease;
+  background: transparent;
+  white-space: nowrap;
+}
+
+/* Aceptar */
+.btn-opcion.aprobar {
+  color: #18206E;
+  border-color: #18206E;
+}
+
+.btn-opcion.aprobar:hover {
+  background-color: #18206E;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(24, 32, 110, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Rechazar */
+.btn-opcion.rechazar {
+  color: #7a1c1c;
+  border-color: #7a1c1c;
+}
+
+.btn-opcion.rechazar:hover {
+  background-color: #7a1c1c;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(122, 28, 28, 0.25);
+  transform: translateY(-1px);
+}
