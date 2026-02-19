@@ -49,7 +49,7 @@ export class TiposConvocatoriaComponent implements OnInit, OnDestroy {
       // Usuario tipo 2: solo Entrante
       this.isInternal = false;
       this.isExternal = true;
-    } else if (tipo === 3) {
+    } else if (tipo === 3 || tipo === 1) {
       // Usuario tipo 1: solo Saliente
       this.isInternal = true;
       this.isExternal = false;

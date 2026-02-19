@@ -85,6 +85,7 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   private _componentesRaw: ComponenteDocente[] = [];
   private _backupData: EstudianteAprobacion[] = [];
   isFilteredByCedula = false;
+  usuario: any = {};
 
   constructor(
     private api: GenericApiService,
@@ -120,7 +121,11 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   }
 
   fetchProgramas() {
-    this.api.getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
+
+    this.api.getExterno<any[]>('orisiga/asignaciondocente/?identificacion='+this.usuario.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -252,7 +257,11 @@ export class AprobacionEstudiantesComponent implements OnInit, OnDestroy {
   }
 
   cargarListadoEstudiantes(habilitarGuardar: boolean, aprobaciones: any[] = []) {
-    this.api.getExterno<any>(`orisiga/listestgrucom/?identificacion=24341126&componente=${this.componenteCodigo}&grupo=${this.grupoId}`)
+
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
+
+    this.api.getExterno<any>(`orisiga/listestgrucom/?identificacion=${this.usuario.idUsuario}&componente=${this.componenteCodigo}&grupo=${this.grupoId}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (responseEstudiantes) => {

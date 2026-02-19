@@ -70,6 +70,7 @@ export class AsignacionPlanComponenteComponent
   model: AsignacionPlanComponenteModel = new AsignacionPlanComponenteModel();
   isEditing = false;
   @Input() idConvocatoria!: any;
+  usuario: any = {};
 
   private destroy$ = new Subject<void>();
 
@@ -99,6 +100,10 @@ export class AsignacionPlanComponenteComponent
 
   // -------- Combos iniciales ----------
   private fetchCombosIniciales() {
+
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
+
     // Planeaciones
     this.api
       .get<any>('Planeacion/Consultar_Planeacion')
@@ -176,7 +181,7 @@ export class AsignacionPlanComponenteComponent
 
     // Programas UCM
     this.api
-      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion='+this.usuario.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
@@ -193,7 +198,7 @@ export class AsignacionPlanComponenteComponent
 
     // Grupos UCM
     this.api
-      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion='+this.usuario.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
@@ -207,7 +212,7 @@ export class AsignacionPlanComponenteComponent
 
     // Planes de estudio UCM
     this.api
-      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion='+this.usuario.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
@@ -224,7 +229,7 @@ export class AsignacionPlanComponenteComponent
 
     // Componentes UCM
     this.api
-      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion='+this.usuario.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {

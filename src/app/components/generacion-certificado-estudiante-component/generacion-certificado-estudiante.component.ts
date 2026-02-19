@@ -132,6 +132,8 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
   private usarTextoRequerimientoNuevo = true;
   private readonly NA = 'N/A';
 
+  usuario: any = {};
+
   constructor(
     private api: GenericApiService,
     private confirmationService: ConfirmationService,
@@ -183,7 +185,11 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
   }
 
   fetchProgramas() {
-    this.api.getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
+
+    this.api.getExterno<any[]>('orisiga/asignaciondocente/?identificacion=' + this.usuario.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {

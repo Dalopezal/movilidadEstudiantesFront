@@ -69,6 +69,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
   modalVisible = false;
   isEditing = false;
   actividad: ActividadSeguimientoModel = new ActividadSeguimientoModel();
+  usuario: any = {};
 
   constructor(
     private api: GenericApiService,
@@ -88,6 +89,10 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
   // ================== CARGA DE COMBOS ==================
 
   cargarCombos(): void {
+
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
+
     // Planeación - Consultar Planeaciones
     this.api
       .get<any>('Planeacion/Consultar_Planeacion')
@@ -135,7 +140,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
 
     // Programas - ConsultaAsignacionPrograma
     this.api
-      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion='+ this.usuario.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
@@ -157,7 +162,7 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
 
     // Componentes (del mismo endpoint, filtrando códigos únicos)
     this.api
-      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion='+ this.usuario.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
