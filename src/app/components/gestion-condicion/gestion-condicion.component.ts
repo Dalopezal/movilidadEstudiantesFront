@@ -58,7 +58,7 @@ export class GestionCondicionComponent implements OnInit, OnDestroy {
     window.addEventListener("storage", this.onStorageChange.bind(this));
     const data = localStorage.getItem('usuario');
     this.usuario = data ? JSON.parse(data) : {};
-    //this.fetchEntregables();
+    this.fetchEntregables();
     //zthis.fetchListaEntregablesConvocatoria();
   }
 
@@ -134,28 +134,28 @@ export class GestionCondicionComponent implements OnInit, OnDestroy {
   fetchEntregables() {
     this.error = null;
     this.loadingTable = true;
-    this.api.get<any>(`EntregablePostulacion/Consultar_EntregablePostulacion?idPostulacion=${this.idPostulacion}`)
+    this.api.get<any>(`CondicionConvocatoria/Consultar_CondicionesConvocatoriaConvocatoria?idConvocatoria=${this.idConvocatoria}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          // let items: any[] = [];
-          // if (Array.isArray(response)) items = response;
-          // else if (response && typeof response === 'object') {
-          //   if (Array.isArray(response.data)) items = response.data;
-          //   else if (Array.isArray(response.items)) items = response.items;
-          //   else {
-          //     const arr = Object.values(response).find(v => Array.isArray(v));
-          //     if (Array.isArray(arr)) items = arr;
-          //   }
-          // }
+          let items: any[] = [];
+          if (Array.isArray(response)) items = response;
+          else if (response && typeof response === 'object') {
+            if (Array.isArray(response.data)) items = response.data;
+            else if (Array.isArray(response.items)) items = response.items;
+            else {
+              const arr = Object.values(response).find(v => Array.isArray(v));
+              if (Array.isArray(arr)) items = arr;
+            }
+          }
 
-          // this.data = items.map(item =>
-          //   CondicionModel.fromJSON ? CondicionModel.fromJSON(item) : Object.assign(new CondicionModel(), item)
-          // );
+          this.data = items.map(item =>
+            CondicionModel.fromJSON ? CondicionModel.fromJSON(item) : Object.assign(new CondicionModel(), item)
+          );
 
-          // this.filteredData = [...this.data];
-          // this.calculateTotalPages();
-          // this.updatePagedData();
+          this.filteredData = [...this.data];
+          this.calculateTotalPages();
+          this.updatePagedData();
           this.loadingTable = false;
         },
         error: (err) => {

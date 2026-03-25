@@ -41,6 +41,8 @@ export class BeneficiosComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   loadingTable: any;
   beneficios: any[] = [];
+  usuario: any;
+  esEstudiante: boolean = false;
 
   constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
 
@@ -48,6 +50,17 @@ export class BeneficiosComponent implements OnInit, OnDestroy {
     this.fetchBeneficios();
     this.fetchBeneficioConvocatoria();
     this.model.postulacionId = this.postulacionId;
+
+    window.addEventListener("storage", this.onStorageChange.bind(this));
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
+    if(this.usuario.rolId == "3" || this.usuario.rolId == "7" || this.usuario.rolId == "10"){
+      this.esEstudiante = true;
+    }
+  }
+
+  private onStorageChange() {
+    const user = JSON.parse(localStorage.getItem("usuario") || "{}");
   }
 
   ngOnDestroy() {

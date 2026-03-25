@@ -27,7 +27,7 @@ export class ConvenioModel {
     codigoUcm: string = '',
     descripcion: string = '',
     fechaInicio: string = '',
-    fechaVencimiento: string = '1900-01-01',
+    fechaVencimiento: string = '',
     diasVigencia: number = 1,
     estado: boolean = false,
     tipoConvenioId: string = '',

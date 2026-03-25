@@ -50,6 +50,11 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   isEditing = false;
 
   dateRangeInvalid = false;
+  fechaInicioInvalida = false;
+  diasVigenciaInvalida = false;
+
+  /** Para min en inputs type="date" */
+  todayStr = '';
 
   private destroy$ = new Subject<void>();
   loadingTable: any;
@@ -61,6 +66,8 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.todayStr = this.getTodayAsYmd();
+
     this.fetchTipos();
     this.fetchClasificaciones();
     this.fetchTiposActividad();
@@ -213,12 +220,18 @@ export class ConveniosComponent implements OnInit, OnDestroy {
 
   // ---------- Form handlers ----------
   onSubmit(form: NgForm) {
+    // Aseguramos que las validaciones se ejecuten aunque no haya disparado change
+    this.validateFechaInicio();
+    this.validateDateRange();
+    this.calculateDiasVigencia();
+    this.validateDiasVigencia();
+
     if (form.invalid) {
       form.control.markAllAsTouched();
       return;
     }
 
-    if (this.dateRangeInvalid) return;
+    if (this.dateRangeInvalid || this.fechaInicioInvalida || this.diasVigenciaInvalida) return;
 
     if (!this.model.descripcion?.trim()) {
       this.error = this.translate.instant('CONVENIOS.MENSAJES.DESCRIPCION_OBLIGATORIA');
@@ -257,18 +270,47 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Cambio de fechas (para mantenerlo ordenado desde el HTML) */
+  onFechaInicioChange() {
+    this.validateFechaInicio();
+    this.validateDateRange();
+    this.calculateDiasVigencia();
+    this.validateDiasVigencia();
+  }
+
+  onFechaFinChange() {
+    this.validateDateRange();
+    this.calculateDiasVigencia();
+    this.validateDiasVigencia();
+  }
+
   validateDateRange() {
     this.dateRangeInvalid = false;
+
     if (!this.model.fechaInicio || !this.model.fechaVencimiento) return;
+
     const inicio = new Date(this.model.fechaInicio);
     const fin = new Date(this.model.fechaVencimiento);
-    if (fin < inicio) this.dateRangeInvalid = true;
+
+    // Normalizamos horas para evitar falsos negativos por TZ
+    inicio.setHours(0, 0, 0, 0);
+    fin.setHours(0, 0, 0, 0);
+
+    if (fin < inicio) {
+      this.dateRangeInvalid = true;
+      // Si el rango es inválido, deja los días en 0 para evitar incoherencias
+      this.model.diasVigencia = 0;
+    }
   }
 
   resetForm(form?: NgForm) {
     this.model = new ConvenioModel();
     this.isEditing = false;
+
     this.dateRangeInvalid = false;
+    this.fechaInicioInvalida = false;
+    this.diasVigenciaInvalida = false;
+
     if (form) form.resetForm({
       codigoUcm: '',
       descripcion: '',
@@ -285,7 +327,12 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   startEdit(item: any) {
     this.model = ConvenioModel.fromJSON(item);
     this.isEditing = true;
+
+    this.validateFechaInicio();
     this.validateDateRange();
+    this.calculateDiasVigencia();
+    this.validateDiasVigencia();
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -382,8 +429,6 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     });
   }
 
-  fechaInicioInvalida = false;
-
   validateFechaInicio() {
     if (!this.model.fechaInicio) {
       this.fechaInicioInvalida = false;
@@ -394,17 +439,21 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     hoy.setHours(0, 0, 0, 0);
     fechaInicio.setHours(0, 0, 0, 0);
 
+    // Tu regla actual: inicio NO puede ser menor que hoy
     this.fechaInicioInvalida = fechaInicio < hoy;
   }
 
   get formInvalidCustom(): boolean {
+    // Lo dejo (no lo usas en el disable), pero lo alineo con tu regla
     if (!this.model.fechaInicio) return false;
     const hoy = new Date();
     const fechaInicio = new Date(this.model.fechaInicio);
     hoy.setHours(0, 0, 0, 0);
     fechaInicio.setHours(0, 0, 0, 0);
-    if (fechaInicio > hoy) return true;
-    if (this.model.diasVigencia === null || this.model.diasVigencia <= 1) return true;
+
+    if (fechaInicio < hoy) return true;
+    if (this.model.diasVigencia === null || this.model.diasVigencia < 1) return true;
+    if (this.dateRangeInvalid) return true;
     return false;
   }
 
@@ -413,16 +462,32 @@ export class ConveniosComponent implements OnInit, OnDestroy {
       this.model.diasVigencia = 0;
       return;
     }
+
     const inicio = new Date(this.model.fechaInicio);
     const fin = new Date(this.model.fechaVencimiento);
+    inicio.setHours(0, 0, 0, 0);
+    fin.setHours(0, 0, 0, 0);
+
+    if (fin < inicio) {
+      this.model.diasVigencia = 0;
+      return;
+    }
+
+    // Cálculo INCLUSIVO: mismo día => 1 día
     const diffTime = fin.getTime() - inicio.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
     this.model.diasVigencia = diffDays > 0 ? diffDays : 0;
   }
 
-  diasVigenciaInvalida = false;
-
   validateDiasVigencia() {
     this.diasVigenciaInvalida = this.model.diasVigencia !== null && this.model.diasVigencia < 1;
+  }
+
+  private getTodayAsYmd(): string {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   }
 }

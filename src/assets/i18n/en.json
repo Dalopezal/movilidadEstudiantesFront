@@ -571,6 +571,7 @@
       "DESCRIPCION": "Description",
       "DESCRIPCION_PLACEHOLDER": "Enter Description",
       "FECHA_INICIO": "Start Date",
+      "FECHA_FIN": "Expiration Date",
       "TIPO_CONVENIO": "Agreement Type",
       "CLASIFICACION": "Classification",
       "TIPO_ACTIVIDAD": "Activity Type",

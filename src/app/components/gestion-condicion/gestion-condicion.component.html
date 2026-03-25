@@ -12,7 +12,7 @@
             <div class="card-header text-white" style="background: #E2E6F7;">
               <p class="mb-0" style="color: #0D133F;font-size: 14px">Condiciones</p>
             </div>
-            <div class="card-header d-flex align-items-center gap-3" style="background: white;">
+            <!-- <div class="card-header d-flex align-items-center gap-3" style="background: white;">
               <select
                 class="form-select"
                 id="EntregablesConvocatoria"
@@ -26,7 +26,7 @@
                 <option value="0">Seleccione Condición de la Convocatria</option>
                 <option *ngFor="let m of lstEntregablesConvocatoria" [ngValue]="m.id">{{ m.nombre }}</option>
               </select>
-            </div>
+            </div> -->
             <div class="table-responsive flex-grow-1" style="min-height: 0; overflow-y: auto;">
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
@@ -34,10 +34,10 @@
                     <th style="background: white !important;">Nombre</th>
                     <!-- <th style="background: white !important;">Descripción</th>
                     <th style="background: white !important;">Convocatoria</th> -->
-                    <th style="background: white !important;">Url</th>
+                    <!-- <th style="background: white !important;">Url</th>
                     <th *ngIf="this.usuario.rolId != 7" style="background: white !important;">Aprobado Oficina Movilidad</th>
                     <th *ngIf="this.usuario.rolId == 7" style="background: white !important;">Aprobar</th>
-                    <th style="background: white !important;">Opciones</th>
+                    <th style="background: white !important;">Opciones</th> -->
                   </tr>
                 </thead>
                 <tbody>
@@ -53,7 +53,7 @@
                       {{ item.descripcion }}
                     </td>
                     <td></td> -->
-                    <td> <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed">
+                    <!-- <td> <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed">
                         <i class="fas fa-link"></i>
                       </button>
                     </td>
@@ -65,7 +65,7 @@
                       <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="toggleDetalleConvocatoria(item)">
                         <i class="fas fa-cloud"></i>
                       </button>
-                    </td>
+                    </td> -->
                   </tr>
                   <tr *ngIf="!loadingTable && pagedData.length === 0">
                     <td colspan="6" class="text-center">No hay registros.</td>

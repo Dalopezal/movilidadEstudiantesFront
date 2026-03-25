@@ -31,6 +31,7 @@
                     <div *ngIf="codigoUcmCtrl.errors?.['minlength']">{{ 'CONVENIOS.FORM.ERROR_MIN_3' | translate }}</div>
                   </div>
                 </div>
+
                 <div class="mb-3">
                   <label for="descripcion" class="form-label fw-bold">{{ 'CONVENIOS.FORM.DESCRIPCION' | translate }}</label>
                   <textarea
@@ -51,6 +52,7 @@
                   </div>
                 </div>
 
+                <!-- Fechas: INICIO + FIN -->
                 <div class="row g-3" style="margin-bottom: 20px;">
                   <div class="col-12 col-md-6">
                     <label for="fechaInicio" class="form-label fw-bold">{{ 'CONVENIOS.FORM.FECHA_INICIO' | translate }}</label>
@@ -60,9 +62,10 @@
                       id="fechaInicio"
                       name="fechaInicio"
                       required
+                      [min]="todayStr"
                       [(ngModel)]="model.fechaInicio"
                       #inicioCtrl="ngModel"
-                      (change)="validateFechaInicio(); calculateDiasVigencia()"
+                      (change)="onFechaInicioChange()"
                       style="font-size: 13px;"
                     />
                     <div class="text-danger small mt-1" *ngIf="(inicioCtrl.invalid && (inicioCtrl.touched || inicioCtrl.dirty)) || fechaInicioInvalida">
@@ -70,6 +73,31 @@
                       <div *ngIf="fechaInicioInvalida">{{ 'CONVENIOS.FORM.ERROR_FECHA_MENOR' | translate }}</div>
                     </div>
                   </div>
+
+                  <div class="col-12 col-md-6">
+                    <label for="fechaVencimiento" class="form-label fw-bold">
+                      {{ 'CONVENIOS.FORM.FECHA_FIN' | translate }}
+                    </label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="fechaVencimiento"
+                      name="fechaVencimiento"
+                      required
+                      [min]="model.fechaInicio || todayStr"
+                      [(ngModel)]="model.fechaVencimiento"
+                      #finCtrl="ngModel"
+                      (change)="onFechaFinChange()"
+                      style="font-size: 13px;"
+                    />
+                    <div class="text-danger small mt-1" *ngIf="(finCtrl.invalid && (finCtrl.touched || finCtrl.dirty)) || dateRangeInvalid">
+                      <div *ngIf="finCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_FECHA_REQUERIDA' | translate }}</div>
+                      <div *ngIf="dateRangeInvalid">La fecha fin no puede ser menor que la fecha inicio.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row g-3" style="margin-bottom: 20px;">
                   <div class="col-12 col-md-6">
                     <label for="tipoConvenio" class="form-label fw-bold">{{ 'CONVENIOS.FORM.TIPO_CONVENIO' | translate }}</label>
                     <select
@@ -87,9 +115,7 @@
                       <div *ngIf="tipoConvCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_TIPO_CONVENIO' | translate }}</div>
                     </div>
                   </div>
-                </div>
 
-                <div class="row g-3" style="margin-bottom: 20px;">
                   <div class="col-12 col-md-6">
                     <label for="clasificacion" class="form-label fw-bold">{{ 'CONVENIOS.FORM.CLASIFICACION' | translate }}</label>
                     <select
@@ -107,6 +133,9 @@
                       <div *ngIf="clasificacionCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_CLASIFICACION' | translate }}</div>
                     </div>
                   </div>
+                </div>
+
+                <div class="row g-3" style="margin-bottom: 20px;">
                   <div class="col-12 col-md-6">
                     <label for="tipoActividad" class="form-label fw-bold">{{ 'CONVENIOS.FORM.TIPO_ACTIVIDAD' | translate }}</label>
                     <select
@@ -124,9 +153,7 @@
                       <div *ngIf="tipoActCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_TIPO_ACTIVIDAD' | translate }}</div>
                     </div>
                   </div>
-                </div>
 
-                <div class="row g-3 align-items-center">
                   <div class="col-12 col-md-6">
                     <label for="diasVigencia" class="form-label fw-bold">{{ 'CONVENIOS.FORM.DIAS_VIGENCIA' | translate }}</label>
                     <input
@@ -139,14 +166,16 @@
                       [(ngModel)]="model.diasVigencia"
                       #diasCtrl="ngModel"
                       style="font-size: 13px;"
-                      (input)="validateDiasVigencia()"
+                      readonly
                     />
                     <div class="text-danger small mt-1" *ngIf="(diasCtrl.invalid && (diasCtrl.touched || diasCtrl.dirty)) || diasVigenciaInvalida">
                       <div *ngIf="diasCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_DIAS_REQUERIDO' | translate }}</div>
                       <div *ngIf="diasVigenciaInvalida">{{ 'CONVENIOS.FORM.ERROR_DIAS_MINIMO' | translate }}</div>
                     </div>
                   </div>
+                </div>
 
+                <div class="row g-3 align-items-center">
                   <div class="col-12 col-md-6 d-flex align-items-center">
                     <input
                       type="checkbox"
@@ -172,8 +201,13 @@
                     <span *ngIf="loading">{{ 'CONVENIOS.FORM.BTN_GUARDANDO' | translate }}</span>
                   </button>
 
-                  <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading"
-                    style="font-size: 13px;">
+                  <button
+                    type="button"
+                    class="btn btn-secondary flex-grow-1"
+                    (click)="resetForm(myForm)"
+                    [disabled]="loading"
+                    style="font-size: 13px;"
+                  >
                     {{ 'CONVENIOS.FORM.BTN_CANCELAR' | translate }}
                   </button>
                 </div>
@@ -217,9 +251,7 @@
                   </tr>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.codigoUcm }}</td>
-                    <td
-                      class="text-truncate-custom"
-                      [title]="item.descripcion">
+                    <td class="text-truncate-custom" [title]="item.descripcion">
                       {{ item.descripcion }}
                     </td>
                     <td>{{ item.nombreTipoConvenio }}</td>
@@ -277,7 +309,5 @@
   <br><br><br><br><br><br><br><br><br>
 </div>
 
-<!-- Notificaciones de ngx-sonner -->
 <ngx-sonner-toaster />
-<!-- ConfirmDialog de PrimeNG -->
 <p-confirmDialog appendTo="body" styleClass="custom-confirm-dialog"></p-confirmDialog>

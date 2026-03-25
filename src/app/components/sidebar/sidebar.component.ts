@@ -159,7 +159,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.rolConvocatoria = true;
     }
 
-    if(rol == 7 || rol == 9 || rol == 3 || rol == 15){
+    if(rol == 7 || rol == 9 || rol == 3 || rol == 15 || rol == 10){
       this.rolInternacionalizacion = true;
     }
 

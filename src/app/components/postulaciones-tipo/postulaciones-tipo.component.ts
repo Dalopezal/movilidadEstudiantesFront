@@ -130,8 +130,6 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
             filteredItems = items.filter(item =>
               item?.programa === this.usuario?.programa
             );
-            alert(this.usuario?.programa);
-            console.log("xxxxx",filteredItems);
           }
 
 

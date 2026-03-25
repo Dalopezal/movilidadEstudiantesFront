@@ -47,7 +47,7 @@
                 </div>
 
                 <!-- Botones -->
-                <div class="d-flex gap-3 mt-auto">
+                <div *ngIf="this.esEstudiante" class="d-flex gap-3 mt-auto">
                   <button type="submit" class="btn btn-ucm flex-grow-1 text-white"
                           [disabled]="myForm.invalid || loading"
                           [ngStyle]="{ 'background': '#0D133F' }" style="font-size: 13px;">
