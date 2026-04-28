@@ -103,22 +103,22 @@ export class HomeComponent implements OnInit {
     this.fetchProgramasForm();
 
     // Inicializamos paises
-    // this.fetchPaises().pipe(takeUntil(this.destroy$)).subscribe({
-    //   next: (p) => this.paises = p,
-    //   error: (err) => {
-    //     console.error('Error al cargar países', err);
-    //     this.paises = [];
-    //   }
-    // });
+    this.fetchPaises().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (p) => this.paises = p,
+      error: (err) => {
+        console.error('Error al cargar países', err);
+        this.paises = [];
+      }
+    });
 
     // // Inicializamos tipos de documento
-    // this.fetchTipoDocumentos().pipe(takeUntil(this.destroy$)).subscribe({
-    //   next: (t) => this.tiposDocumento = t,
-    //   error: (err) => {
-    //     console.error('Error al cargar tipos de documento', err);
-    //     this.tiposDocumento = [];
-    //   }
-    // });
+    this.fetchTipoDocumentos().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (t) => this.tiposDocumento = t,
+      error: (err) => {
+        console.error('Error al cargar tipos de documento', err);
+        this.tiposDocumento = [];
+      }
+    });
 
     // // Inicializamos programas
     // this.fetchProgramas().pipe(takeUntil(this.destroy$)).subscribe({

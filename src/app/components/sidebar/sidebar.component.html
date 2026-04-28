@@ -40,16 +40,28 @@
       </a>
 
       <div class="submenu" [class.open]="isInternacionalizacionOpen">
+        <a routerLink="/estrategia" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">
+            {{ 'SIDEBAR.INTERNACIONALIZACION.ESTRATEGIA' | translate }}
+          </span>
+        </a>
         <a routerLink="/planeacion" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
           <span class="link-text">
             {{ 'SIDEBAR.INTERNACIONALIZACION.PLANEACION' | translate }}
           </span>
         </a>
-        <a routerLink="/estrategia" routerLinkActive="active" class="nav-link submenu-link">
+        <a routerLink="/asignacion-plan-componente" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
           <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.ESTRATEGIA' | translate }}
+            {{ 'SIDEBAR.INTERNACIONALIZACION.ASIGNACION_PLAN_COMPONENTE' | translate }}
+          </span>
+        </a>
+        <a routerLink="/horarios-universidad" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">
+            {{ 'SIDEBAR.INTERNACIONALIZACION.HORARIOS_UNIVERSIDAD' | translate }}
           </span>
         </a>
         <a routerLink="/actividades-seguimiento" routerLinkActive="active" class="nav-link submenu-link">
@@ -70,12 +82,6 @@
             {{ 'SIDEBAR.INTERNACIONALIZACION.CERTIFICADO_ESTUDIANTES' | translate }}
           </span>
         </a>
-        <a routerLink="/asignacion-plan-componente" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.ASIGNACION_PLAN_COMPONENTE' | translate }}
-          </span>
-        </a>
         <a routerLink="/desarrollo-profesional" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
           <span class="link-text">
@@ -88,22 +94,16 @@
             {{ 'SIDEBAR.INTERNACIONALIZACION.TRAYECTORIA' | translate }}
           </span>
         </a>
-        <a routerLink="/horarios-universidad" routerLinkActive="active" class="nav-link submenu-link">
+        <a routerLink="/vs" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
           <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.HORARIOS_UNIVERSIDAD' | translate }}
+            {{ 'SIDEBAR.INTERNACIONALIZACION.PLANEADO_VS_EJECUTADO' | translate }}
           </span>
         </a>
         <a routerLink="/insignia-digital" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
           <span class="link-text">
             {{ 'SIDEBAR.INTERNACIONALIZACION.INSIGNIA_DIGITAL' | translate }}
-          </span>
-        </a>
-        <a routerLink="/vs" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.PLANEADO_VS_EJECUTADO' | translate }}
           </span>
         </a>
       </div>
@@ -190,30 +190,6 @@
            <span class="submenu-title">
              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.TITULO' | translate }}
            </span>
-          <a *ngIf="rolMovilidad" routerLink="/condicion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i>
-            <span class="link-text">
-              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.CONDICIONES_CONVOCATORIA' | translate }}
-            </span>
-          </a>
-          <a *ngIf="rolMovilidad" routerLink="/entregables" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i>
-            <span class="link-text">
-              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.ENTREGABLES' | translate }}
-            </span>
-          </a>
-          <a *ngIf="rolMovilidad" routerLink="/financiacion-externa" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i>
-            <span class="link-text">
-              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.FINANCIACION' | translate }}
-            </span>
-          </a>
-          <a *ngIf="rolMovilidad" routerLink="/beneficios-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
-            <i class="fas fa-dot-circle"></i>
-            <span class="link-text">
-              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.BENEFICIOS' | translate }}
-            </span>
-          </a>
           <a *ngIf="rolMovilidad" routerLink="/administracion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
             <i class="fas fa-dot-circle"></i>
             <span class="link-text">
@@ -226,18 +202,42 @@
               {{ 'SIDEBAR.MOVILIDAD.MAESTROS.CONDICIONES' | translate }}
             </span>
           </a>
-          <!-- <a *ngIf="rolMovilidad" routerLink="/convenios" routerLinkActive="active" class="nav-link submenu-link">
+          <a *ngIf="rolMovilidad" routerLink="/condicion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
             <i class="fas fa-dot-circle"></i>
             <span class="link-text">
-              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.CONVENIOS' | translate }}
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.CONDICIONES_CONVOCATORIA' | translate }}
             </span>
-          </a> -->
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/beneficios-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.BENEFICIOS' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/entregables" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.ENTREGABLES' | translate }}
+            </span>
+          </a>
           <a *ngIf="rolMovilidad" routerLink="/instituciones" routerLinkActive="active" class="nav-link submenu-link">
             <i class="fas fa-dot-circle"></i>
             <span class="link-text">
               {{ 'SIDEBAR.MOVILIDAD.MAESTROS.INSTITUCIONES' | translate }}
             </span>
           </a>
+          <a *ngIf="rolMovilidad" routerLink="/financiacion-externa" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.FINANCIACION' | translate }}
+            </span>
+          </a>
+          <!-- <a *ngIf="rolMovilidad" routerLink="/convenios" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.CONVENIOS' | translate }}
+            </span>
+          </a> -->
           <!-- <a *ngIf="rolMovilidad" routerLink="/institucion-convenio" routerLinkActive="active" class="nav-link submenu-link">
             <i class="fas fa-dot-circle"></i>
             <span class="link-text">

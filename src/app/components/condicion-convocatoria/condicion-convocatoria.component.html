@@ -12,24 +12,6 @@
 
             <div class="card-body d-flex flex-column flex-grow-1">
               <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
-                <div class="mb-3">
-                  <label for="condicion" class="form-label fw-bold">{{ 'CONDICION_CONVOCATORIA.FORM.CONDICION_LABEL' | translate }}</label>
-                  <select
-                    class="form-select"
-                    id="condicion"
-                    name="condicionesId"
-                    required
-                    [(ngModel)]="model.condicionesId"
-                    #condCtrl="ngModel"
-                    style="font-size: 13px"
-                  >
-                    <option [ngValue]="null" style="display:none;"></option>
-                    <option *ngFor="let c of condiciones" [ngValue]="c.id">{{ c.nombre }}</option>
-                  </select>
-                  <div class="text-danger small mt-1" *ngIf="condCtrl.invalid && (condCtrl.touched || condCtrl.dirty)">
-                    <div *ngIf="condCtrl.errors?.['required']">{{ 'CONDICION_CONVOCATORIA.FORM.CONDICION_REQUERIDA' | translate }}</div>
-                  </div>
-                </div>
 
                 <div class="mb-3">
                   <label for="convocatoria" class="form-label fw-bold">{{ 'CONDICION_CONVOCATORIA.FORM.CONVOCATORIA_LABEL' | translate }}</label>
@@ -46,6 +28,25 @@
                   </select>
                   <div class="text-danger small mt-1" *ngIf="convCtrl.invalid && (convCtrl.touched || convCtrl.dirty)">
                     <div *ngIf="convCtrl.errors?.['required']">{{ 'CONDICION_CONVOCATORIA.FORM.CONVOCATORIA_REQUERIDA' | translate }}</div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="condicion" class="form-label fw-bold">{{ 'CONDICION_CONVOCATORIA.FORM.CONDICION_LABEL' | translate }}</label>
+                  <select
+                    class="form-select"
+                    id="condicion"
+                    name="condicionesId"
+                    required
+                    [(ngModel)]="model.condicionesId"
+                    #condCtrl="ngModel"
+                    style="font-size: 13px"
+                  >
+                    <option [ngValue]="null" style="display:none;"></option>
+                    <option *ngFor="let c of condiciones" [ngValue]="c.id">{{ c.nombre }}</option>
+                  </select>
+                  <div class="text-danger small mt-1" *ngIf="condCtrl.invalid && (condCtrl.touched || condCtrl.dirty)">
+                    <div *ngIf="condCtrl.errors?.['required']">{{ 'CONDICION_CONVOCATORIA.FORM.CONDICION_REQUERIDA' | translate }}</div>
                   </div>
                 </div>
 

@@ -194,8 +194,7 @@
                             <input type="checkbox" class="form-check-input"
                                   [name]="'ctrl-'+selectedStepIndex+'-'+j"
                                   [(ngModel)]="steps[selectedStepIndex].data[field.name]"
-                                  [disabled]="!field.editable"
-                                  [required]="!!field.editable">
+                                  [disabled]="!field.editable">
                             <span class="form-check-label small">
                               {{ steps[selectedStepIndex].data[field.name] ? 'Sí' : 'No' }}
                             </span>

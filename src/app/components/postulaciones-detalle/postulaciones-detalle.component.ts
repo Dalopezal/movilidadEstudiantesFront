@@ -155,7 +155,14 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
         { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' }, // "Pendiente Pre-Postulación" o "Pre-postulado"
         { name: 'fechaPrePostulacion', label: 'Fecha Pre-Postulación', tipo: 'readonly' }, // Automático sistema
         { name: 'periodo', label: 'Periodo', tipo: 'readonly', editable: false},
-        { name: 'institucionId', label: this.usuario.tipoUsuario == '1' ? 'Institución Destino' : 'Institución Origen', tipo: 'selectChange', editable: true, opciones: this.instituciones }, // Label cambia según rol
+        // { name: 'institucionId', label: this.usuario.tipoUsuario == '1' ? 'Institución Destino' : 'Institución Origen', tipo: 'selectChange', editable: true, opciones: this.instituciones }, // Label cambia según rol
+        {
+          name: 'institucionId',
+          label: this.steps[this.selectedStepIndex]?.data['tipoMovilidadId'] == '1' ? 'Institución Destino' : 'Institución Origen',
+          tipo: 'selectChange',
+          editable: true,
+          opciones: this.instituciones
+        },
         { name: 'convenioId', label: 'Convenio', tipo: 'select', editable: true, opciones: this.convenios }, // Dependiente de institución
         { name: 'observaciones', label: 'Observaciones', tipo: 'textarea', editable: true },
         { name: 'tipoMovilidadId', label: 'Tipo Movilidad', tipo: 'select', editable: true, opciones: this.tiposMovlidad },
@@ -188,7 +195,14 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
         { name: 'objetivo', label: 'Objetivo', tipo: 'textarea', editable: true }, // Obligatorio
         { name: 'fechaInicioMovilidad', label: 'Fecha Inicio Movilidad', tipo: 'date', editable: true },
         { name: 'fechaFinMovilidad', label: 'Fecha Fin Movilidad', tipo: 'date', editable: true },
-        { name: 'institucionId', label: this.usuario.tipoUsuario == '1' ? 'Institución Destino' : 'Institución Origen', tipo: 'selectChange', editable: true, opciones: this.instituciones }, // Label cambia según rol
+        {
+          name: 'institucionId',
+          label: this.steps[this.selectedStepIndex]?.data['tipoMovilidadId'] == '1' ? 'Institución Destino' : 'Institución Origen',
+          tipo: 'selectChange',
+          editable: true,
+          opciones: this.instituciones
+        },
+        // { name: 'institucionId', label: this.usuario.tipoUsuario == '1' ? 'Institución Destino' : 'Institución Origen', tipo: 'selectChange', editable: true, opciones: this.instituciones }, // Label cambia según rol
         { name: 'fechaEntregable', label: 'Fecha Entregable', tipo: 'date', editable: true },
         { name: 'asistioEntrevista', label: 'Asistió Entrevista', tipo: 'checkbox', editable: true }
       ],
@@ -402,8 +416,8 @@ private fetchListaInstituciones() {
   }
 
   onFieldChange(field: FieldConfig, value: any) {
-    this.steps[this.currentStep].data = {
-      ...this.steps[this.currentStep].data,
+    this.steps[this.selectedStepIndex].data = {
+      ...this.steps[this.selectedStepIndex].data,
       [field.name]: value
     };
 
@@ -747,10 +761,10 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
       ] : [],
 
       // ---------------- FASE POSTULACIÓN ----------------
-      3: [ // En postulación (usuario llena formulario y confirma postulacion)
-        { texto: 'Postularme', accion: () => this.onPostular() },
-        { texto: 'Cancelar la postulación', accion: () => this.onCancelar() }
-      ],
+      3: this.usuario.rolId != 7 ? [
+      { texto: 'Postularme', accion: () => this.onPostular() },
+      { texto: 'Cancelar la postulación', accion: () => this.onCancelar() }
+      ] : [],
       4: [ // Aprobado Postulación (ORI)
         { texto: 'Aprobar postulación', accion: (form?: NgForm) => this.onAprobarPostulacion(form) }
       ],
@@ -937,11 +951,11 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
     tipoMovilidadId: currentStepData['tipoMovilidadId'],
     urlEncuestaSatisfaccion: currentStepData['urlEncuestaSatisfaccion'],
     objetivo: currentStepData['objetivo'], // Obligatorio
-    fechaInicioMovilidad: currentStepData['fechaFinMovilidad'],
+    fechaInicioMovilidad: currentStepData['fechaInicioMovilidad'],
     fechaFinMovilidad: currentStepData['fechaFinMovilidad'],
-    institucionId: 1,
+    institucionId: currentStepData['institucionId'],
     fechaEntregable: currentStepData['fechaEntregable'],
-    asistioEntrevista: currentStepData['asistioEntrevista'] || false,
+    asistioEntrevista: currentStepData['asistioEntrevista'] ?? false,
     UrlEncuestaSatisfaccion: "https://docs.google.com/forms/d/e/1FAIpQLSe1piZ1G84UYLDpToyN86EZhhFDSB01FdUyRVmlksoGyAJ8-w/viewform"
   };
 
