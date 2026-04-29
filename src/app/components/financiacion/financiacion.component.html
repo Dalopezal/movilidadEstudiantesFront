@@ -1,37 +1,36 @@
-<div class="container fuente" style="padding-top: 5px;">
+<div class="container fuente" style="padding-top: 30px;">
   <div class="row h-100">
-    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;font-size: 13px">
+    <main
+      class="col-12 col-md-12 d-flex flex-column"
+      style="height: 100%; font-size: 13px;"
+    >
       <div class="row g-4 flex-grow-1">
+
         <!-- Formulario -->
-        <section class="col-12 col-lg-4 d-flex flex-column" style="height: 73vh;">
+        <section
+          class="col-12 col-lg-4 d-flex flex-column"
+          style="height: 75vh;"
+        >
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
-            <!-- <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;font-size: 14px">Administrar Financiación</p>
-            </div> -->
+            <div class="card-header text-white" style="background: #E2E6F7;">
+              <p class="mb-0" style="color: #0D133F;font-size: 14px">
+                {{ 'FINANCIACION.FORM.TITULO' | translate }}
+              </p>
+            </div>
 
             <div class="card-body d-flex flex-column flex-grow-1">
-              <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
+              <form
+                class="d-flex flex-column flex-grow-1"
+                #myForm="ngForm"
+                (ngSubmit)="onSubmit(myForm)"
+                style="font-size: 13px;"
+              >
 
-                <!-- <div class="mb-3">
-                  <label for="postulacionId" class="form-label fw-bold">ID Postulación</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="postulacionId"
-                    name="postulacionId"
-                    required
-                    [(ngModel)]="model.postulacionId"
-                    #postulacionCtrl="ngModel"
-                    style="font-size: 13px;"
-                  />
-                  <div class="text-danger small mt-1" *ngIf="postulacionCtrl.invalid && (postulacionCtrl.touched || postulacionCtrl.dirty)">
-                    <div *ngIf="postulacionCtrl.errors?.['required']">La postulación es obligatoria.</div>
-                  </div>
-                </div> -->
-
-                <div class="row g-3" style="margin-bottom: 20px;">
+                <div class="row g-3 mb-3">
                   <div class="col-12 col-md-6">
-                    <label for="arl" class="form-label fw-bold">ARL</label>
+                    <label for="arl" class="form-label fw-bold">
+                      {{ 'FINANCIACION.FORM.LABEL_ARL' | translate }}
+                    </label>
                     <input
                       type="number"
                       min="0"
@@ -43,7 +42,9 @@
                     />
                   </div>
                   <div class="col-12 col-md-6">
-                    <label for="comisionServicios" class="form-label fw-bold">Comisión Servicios</label>
+                    <label for="comisionServicios" class="form-label fw-bold">
+                      {{ 'FINANCIACION.FORM.LABEL_COMISION_SERVICIOS' | translate }}
+                    </label>
                     <input
                       type="number"
                       min="0"
@@ -56,9 +57,11 @@
                   </div>
                 </div>
 
-                <div class="row g-3" style="margin-bottom: 20px;">
+                <div class="row g-3 mb-3">
                   <div class="col-12 col-md-6">
-                    <label for="descuentoMatricula" class="form-label fw-bold">Descuento Matrícula</label>
+                    <label for="descuentoMatricula" class="form-label fw-bold">
+                      {{ 'FINANCIACION.FORM.LABEL_DESCUENTO_MATRICULA' | translate }}
+                    </label>
                     <input
                       type="number"
                       min="0"
@@ -70,7 +73,9 @@
                     />
                   </div>
                   <div class="col-12 col-md-6">
-                    <label for="valorApoyoAlojamiento" class="form-label fw-bold">Apoyo Alojamiento</label>
+                    <label for="valorApoyoAlojamiento" class="form-label fw-bold">
+                      {{ 'FINANCIACION.FORM.LABEL_APOYO_ALOJAMIENTO' | translate }}
+                    </label>
                     <input
                       type="number"
                       min="0"
@@ -83,9 +88,11 @@
                   </div>
                 </div>
 
-                <div class="row g-3" style="margin-bottom: 20px;">
+                <div class="row g-3 mb-3">
                   <div class="col-12 col-md-6">
-                    <label for="valorApoyoEconomico" class="form-label fw-bold">Apoyo Económico</label>
+                    <label for="valorApoyoEconomico" class="form-label fw-bold">
+                      {{ 'FINANCIACION.FORM.LABEL_APOYO_ECONOMICO' | translate }}
+                    </label>
                     <input
                       type="number"
                       min="0"
@@ -97,7 +104,9 @@
                     />
                   </div>
                   <div class="col-12 col-md-6">
-                    <label for="valorOtros" class="form-label fw-bold">Otros Valores</label>
+                    <label for="valorOtros" class="form-label fw-bold">
+                      {{ 'FINANCIACION.FORM.LABEL_OTROS_VALORES' | translate }}
+                    </label>
                     <input
                       type="number"
                       min="0"
@@ -111,7 +120,9 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="valorCompraTiquetes" class="form-label fw-bold">Compra Tiquetes</label>
+                  <label for="valorCompraTiquetes" class="form-label fw-bold">
+                    {{ 'FINANCIACION.FORM.LABEL_COMPRA_TIQUETES' | translate }}
+                  </label>
                   <input
                     type="number"
                     min="0"
@@ -123,39 +134,57 @@
                   />
                 </div>
 
-                <div class="row g-3" style="margin-bottom: 20px;">
+                <div class="row g-3 mb-3">
                   <div class="col-12 col-md-6">
-                    <label for="tipoFinanciacionExterna" class="form-label fw-bold">Financiación Externa</label>
+                    <label for="tipoFinanciacionExternaId" class="form-label fw-bold">
+                      {{ 'FINANCIACION.FORM.LABEL_FINANCIACION_EXTERNA' | translate }}
+                    </label>
                     <select
                       class="form-select"
-                      id="tipoFinanciacionExterna"
+                      id="tipoFinanciacionExternaId"
                       name="tipoFinanciacionExternaId"
                       required
                       [(ngModel)]="model.tipoFinanciacionExternaId"
                       #tipoExtCtrl="ngModel"
                       style="font-size: 13px;"
                     >
-                      <option *ngFor="let t of tiposFinanciacionExterna" [ngValue]="t.id">{{ t.descripcion }}</option>
+                      <option *ngFor="let item of tiposFinanciacionExterna" [ngValue]="item.id">
+                        {{ item.descripcion }}
+                      </option>
                     </select>
-                    <div class="text-danger small mt-1" *ngIf="tipoExtCtrl.invalid && (tipoExtCtrl.touched || tipoExtCtrl.dirty)">
-                      <div *ngIf="tipoExtCtrl.errors?.['required']">Seleccione un tipo de financiación externa.</div>
+                    <div
+                      class="text-danger small mt-1"
+                      *ngIf="tipoExtCtrl.invalid && (tipoExtCtrl.touched || tipoExtCtrl.dirty)"
+                    >
+                      <div *ngIf="tipoExtCtrl.errors?.['required']">
+                        {{ 'FINANCIACION.FORM.FIN_EXTERNA_REQUIRED' | translate }}
+                      </div>
                     </div>
                   </div>
                   <div class="col-12 col-md-6">
-                    <label for="tipoFinanciacion" class="form-label fw-bold">Financiación</label>
+                    <label for="tipoFinanciacionId" class="form-label fw-bold">
+                      {{ 'FINANCIACION.FORM.LABEL_FINANCIACION' | translate }}
+                    </label>
                     <select
                       class="form-select"
-                      id="tipoFinanciacion"
+                      id="tipoFinanciacionId"
                       name="tipoFinanciacionId"
                       required
                       [(ngModel)]="model.tipoFinanciacionId"
                       #tipoFinCtrl="ngModel"
                       style="font-size: 13px;"
                     >
-                      <option *ngFor="let t of tiposFinanciacion" [ngValue]="t.id">{{ t.descripcion }}</option>
+                      <option *ngFor="let item of tiposFinanciacion" [ngValue]="item.id">
+                        {{ item.descripcion }}
+                      </option>
                     </select>
-                    <div class="text-danger small mt-1" *ngIf="tipoFinCtrl.invalid && (tipoFinCtrl.touched || tipoFinCtrl.dirty)">
-                      <div *ngIf="tipoFinCtrl.errors?.['required']">Seleccione un tipo de financiación.</div>
+                    <div
+                      class="text-danger small mt-1"
+                      *ngIf="tipoFinCtrl.invalid && (tipoFinCtrl.touched || tipoFinCtrl.dirty)"
+                    >
+                      <div *ngIf="tipoFinCtrl.errors?.['required']">
+                        {{ 'FINANCIACION.FORM.FIN_REQUIRED' | translate }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -166,15 +195,25 @@
                     class="btn btn-ucm flex-grow-1 text-white"
                     [disabled]="myForm.invalid || loading"
                     [ngStyle]="{ 'background': '#0D133F' }"
-                    style="font-size: 13px;"
+                    style="font-size: 13px"
                   >
-                    <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
-                    <span *ngIf="loading">Guardando...</span>
+                    <span *ngIf="!loading">
+                      {{ isEditing ? ('FINANCIACION.FORM.BTN_ACTUALIZAR' | translate)
+                                   : ('FINANCIACION.FORM.BTN_INGRESAR' | translate) }}
+                    </span>
+                    <span *ngIf="loading">
+                      {{ 'FINANCIACION.FORM.BTN_GUARDANDO' | translate }}
+                    </span>
                   </button>
 
-                  <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading"
-                    style="font-size: 13px;">
-                    Cancelar
+                  <button
+                    type="button"
+                    class="btn btn-secondary flex-grow-1"
+                    (click)="resetForm(myForm)"
+                    [disabled]="loading"
+                    style="font-size: 13px"
+                  >
+                    {{ 'FINANCIACION.FORM.BTN_CANCELAR' | translate }}
                   </button>
                 </div>
               </form>
@@ -183,15 +222,38 @@
         </section>
 
         <!-- Tabla -->
-        <section class="col-12 col-lg-8 d-flex flex-column" style="height: 73vh;">
+        <section
+          class="col-12 col-lg-8 d-flex flex-column"
+          style="height: 75vh;"
+        >
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
-            <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
-              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchFinanciaciones(); filtro=''">
-                <i class="fas fa-sync-alt"></i> Actualizar
+            <div
+              class="card-header d-flex align-items-center gap-3 text-white"
+              style="background-color: white;"
+            >
+              <button
+                class="btn btn-primary d-flex align-items-center gap-2"
+                style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;"
+                (click)="fetchFinanciaciones(); filtro=''"
+              >
+                <i class="fas fa-sync-alt"></i>
+                {{ 'FINANCIACION.TABLA.BTN_ACTUALIZAR' | translate }}
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite nombre postulación" [(ngModel)]="filtro" name="filtro"/>
-              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterFinanciaciones()">
-                <i class="fas fa-search"></i> Buscar
+              <input
+                style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;"
+                type="text"
+                class="form-control"
+                [placeholder]="'FINANCIACION.TABLA.FILTRO_PLACEHOLDER' | translate"
+                [(ngModel)]="filtro"
+                name="filtro"
+              />
+              <button
+                class="btn btn-primary d-flex align-items-center gap-2"
+                style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;"
+                (click)="filterFinanciaciones()"
+              >
+                <i class="fas fa-search"></i>
+                {{ 'FINANCIACION.TABLA.BTN_BUSCAR' | translate }}
               </button>
             </div>
 
@@ -199,22 +261,26 @@
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
                   <tr>
-                    <th style="background: white !important;">ID</th>
-                    <th style="background: white !important;">Postulación</th>
-                    <th style="background: white !important;">ARL</th>
-                    <th style="background: white !important;">Comisión</th>
-                    <th style="background: white !important;">Descuento</th>
-                    <th style="background: white !important;">Apoyo Aloj.</th>
-                    <th style="background: white !important;">Apoyo Econ.</th>
-                    <th style="background: white !important;">Tipo Fin. Ext.</th>
-                    <th style="background: white !important;">Tipo Fin.</th>
-                    <th style="background: white !important;">Opciones</th>
+                    <th style="background: white !important;">{{ 'FINANCIACION.TABLA.COL_ID' | translate }}</th>
+                    <th style="background: white !important;">{{ 'FINANCIACION.TABLA.COL_POSTULACION' | translate }}</th>
+                    <th style="background: white !important;">{{ 'FINANCIACION.TABLA.COL_ARL' | translate }}</th>
+                    <th style="background: white !important;">{{ 'FINANCIACION.TABLA.COL_COMISION' | translate }}</th>
+                    <th style="background: white !important;">{{ 'FINANCIACION.TABLA.COL_DESCUENTO' | translate }}</th>
+                    <th style="background: white !important;">{{ 'FINANCIACION.TABLA.COL_ALOJAMIENTO' | translate }}</th>
+                    <th style="background: white !important;">{{ 'FINANCIACION.TABLA.COL_ECONOMICO' | translate }}</th>
+                    <th style="background: white !important;">{{ 'FINANCIACION.TABLA.COL_TIPO_EXT' | translate }}</th>
+                    <th style="background: white !important;">{{ 'FINANCIACION.TABLA.COL_TIPO' | translate }}</th>
+                    <th style="background: white !important;">
+                      {{ 'FINANCIACION.TABLA.COL_OPCIONES' | translate }}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   <div *ngIf="loadingTable" class="table-overlay">
-                  <i class="fas fa-spinner fa-spin fa-3x"></i>
-                  <p style="background: transparent;">Cargando datos</p>
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <p style="background: transparent;">
+                      {{ 'FINANCIACION.TABLA.CARGANDO' | translate }}
+                    </p>
                   </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.id }}</td>
@@ -227,16 +293,25 @@
                     <td>{{ item.nombreTipoFinanciacionExterna }}</td>
                     <td>{{ item.nombreTipoFinanciacion }}</td>
                     <td>
-                      <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">
+                      <button
+                        style="margin-bottom: 3px;"
+                        class="btn btn-sm btn-primary me-1 button-completed"
+                        (click)="startEdit(item)"
+                      >
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="btn btn-sm btn-danger button-completed" (click)="deleteItem(item.id)">
+                      <button
+                        class="btn btn-sm btn-danger button-completed"
+                        (click)="deleteItem(item.id)"
+                      >
                         <i class="fas fa-trash"></i>
                       </button>
                     </td>
                   </tr>
                   <tr *ngIf="!loadingTable && pagedData.length === 0">
-                    <td colspan="10" class="text-center">No hay registros.</td>
+                    <td colspan="10" class="text-center">
+                      {{ 'FINANCIACION.TABLA.SIN_REGISTROS' | translate }}
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -244,25 +319,51 @@
 
             <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
               <div class="items-per-page d-flex align-items-center gap-2">
-                <label for="itemsPerPageSelect" class="mb-0">Mostrar</label>
-                <select id="itemsPerPageSelect" (change)="onPageSizeChange($event)" [value]="pageSize">
-                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                <label for="itemsPerPageSelectFin" class="mb-0">
+                  {{ 'FINANCIACION.PAGINACION.MOSTRAR' | translate }}
+                </label>
+                <select
+                  id="itemsPerPageSelectFin"
+                  (change)="onPageSizeChange($event)"
+                  [value]="pageSize"
+                >
+                  <option *ngFor="let size of pageSizeOptions" [value]="size">
+                    {{ size }}
+                  </option>
                 </select>
-                <span>de {{ data.length }}</span>
+                <span>
+                  {{ 'FINANCIACION.PAGINACION.DE' | translate }} {{ data.length }}
+                </span>
               </div>
 
               <nav aria-label="Page navigation example">
                 <ul class="pagination mb-0">
                   <li class="page-item" [class.disabled]="currentPage === 1">
-                    <button class="page-link text-white" (click)="goToPage(currentPage - 1)" aria-label="Previous" style="background: #0D133F;">
+                    <button
+                      class="page-link text-white"
+                      (click)="goToPage(currentPage - 1)"
+                      aria-label="Previous"
+                      style="background: #0D133F;"
+                    >
                       <span aria-hidden="true">&laquo;</span>
                     </button>
                   </li>
-                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
-                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  <li
+                    class="page-item"
+                    *ngFor="let page of pages"
+                    [class.active]="page === currentPage"
+                  >
+                    <button class="page-link" (click)="goToPage(page)">
+                      {{ page }}
+                    </button>
                   </li>
                   <li class="page-item" [class.disabled]="currentPage === totalPages">
-                    <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background: #0D133F;">
+                    <button
+                      class="page-link text-white"
+                      (click)="goToPage(currentPage + 1)"
+                      aria-label="Next"
+                      style="background: #0D133F;"
+                    >
                       <span aria-hidden="true">&raquo;</span>
                     </button>
                   </li>

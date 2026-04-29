@@ -78,6 +78,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   loading = false;
   idPostulacion: any;
   idConvocatoria: any;
+  categoria: any;
   nombreConvocatoria: any;
   documento: any;
   nombreCompleto: any;
@@ -89,6 +90,8 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   campoEstado: Record<number, FieldConfig[]> = {};
   idCovocatoria: any;
   nombreCombocatoria: any;
+  nombreMovilidad: any;
+  nombreConvenio: any;
   instituciones: any[] = [];
   convenios: any[] = [];
   tiposMovlidad: any[] = [];
@@ -145,6 +148,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
 
     this.cargatSecciones();
     this.getEstados();
+    this.categoria = params['categoria'];
   }
 
   cargatSecciones(){
@@ -158,7 +162,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
         // { name: 'institucionId', label: this.usuario.tipoUsuario == '1' ? 'Institución Destino' : 'Institución Origen', tipo: 'selectChange', editable: true, opciones: this.instituciones }, // Label cambia según rol
         {
           name: 'institucionId',
-          label: this.steps[this.selectedStepIndex]?.data['tipoMovilidadId'] == '1' ? 'Institución Destino' : 'Institución Origen',
+          label: this.getInstitucionLabel(this.categoria),
           tipo: 'selectChange',
           editable: true,
           opciones: this.instituciones
@@ -197,7 +201,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
         { name: 'fechaFinMovilidad', label: 'Fecha Fin Movilidad', tipo: 'date', editable: true },
         {
           name: 'institucionId',
-          label: this.steps[this.selectedStepIndex]?.data['tipoMovilidadId'] == '1' ? 'Institución Destino' : 'Institución Origen',
+          label: this.getInstitucionLabel(this.categoria),
           tipo: 'selectChange',
           editable: true,
           opciones: this.instituciones
@@ -379,6 +383,8 @@ private fetchListaInstituciones() {
   this.route.queryParams.subscribe(params => {
     this.idCovocatoria = params['idConvocatoria'];
     this.nombreCombocatoria = params['nombre'];
+    this.nombreMovilidad = params['nombreMovilida'];
+    this.nombreConvenio = params['nombreConvenio'];
   });
 
   // this.api.get<any>('InstitucionConvenio/Consultar_InstitucionConvenioEspecifico?id=' + this.idCovocatoria)
@@ -597,7 +603,11 @@ getBitacora(id: number) {
                 stepData[field.name] = entry[field.name];
               } else if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
                 stepData[field.name] = this.nombreCombocatoria;
-              } else if (field.name === 'estadoPostulacionId') {
+              } else if (field.name === 'tipoMovilidadId' && this.nombreMovilidad) {
+                stepData[field.name] = this.nombreMovilidad;
+              }  else if (field.name === 'convenioId' && this.nombreConvenio) {
+                stepData[field.name] = this.nombreConvenio;
+              }  else if (field.name === 'estadoPostulacionId') {
                 const estado = entry.estadoPostulacionId;
                 stepData[field.name] = this.estadosMap[estado] ?? estado;
 
@@ -1506,4 +1516,22 @@ getColorEstado(id: number): string {
 
     return customFormat;
   }
+
+  private getInstitucionLabel(tipoMovilidadId: any): string {
+  // Intentar resolver por los tipos cargados desde el backend
+  const tipo = this.tiposMovlidad?.find(t => String(t.value) === String(tipoMovilidadId))?.label?.toLowerCase();
+
+  if (tipo) {
+    if (tipo.includes('entr')) return 'Institución Origen';
+    if (tipo.includes('sal')) return 'Institución Destino';
+  }
+
+  // Fallback por valores habituales (ajusta '1'/'2' si tu backend usa otros ids)
+  const val = String(tipoMovilidadId || '').toLowerCase();
+  if (val === 'entrante' || val === 'entr' || val === '1') return 'Institución Origen';
+  if (val === 'saliente' || val === 'sal' || val === '2') return 'Institución Destino';
+
+  // Por defecto neutro
+  return 'Institución';
+}
 }

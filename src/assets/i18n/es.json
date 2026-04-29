@@ -1341,5 +1341,75 @@
     "PERIODO": "Periodo",
     "SELECCIONE": "Seleccione",
     "NO_DATOS": "No hay datos"
+  },
+  "FINANCIACION": {
+    "FORM": {
+      "TITULO": "Gestión de Financiación",
+      "LABEL_ARL": "Valor ARL",
+      "LABEL_COMISION_SERVICIOS": "Comisión de Servicios",
+      "LABEL_DESCUENTO_MATRICULA": "Descuento Matrícula",
+      "LABEL_APOYO_ALOJAMIENTO": "Apoyo Alojamiento",
+      "LABEL_APOYO_ECONOMICO": "Apoyo Económico",
+      "LABEL_OTROS_VALORES": "Otros Valores",
+      "LABEL_COMPRA_TIQUETES": "Compra de Tiquetes",
+      "LABEL_FINANCIACION_EXTERNA": "Financiación Externa",
+      "LABEL_FINANCIACION": "Tipo de Financiación",
+      "FIN_EXTERNA_REQUIRED": "La financiación externa es requerida",
+      "FIN_REQUIRED": "El tipo de financiación es requerido",
+      "BTN_INGRESAR": "Ingresar",
+      "BTN_ACTUALIZAR": "Actualizar",
+      "BTN_CANCELAR": "Cancelar",
+      "BTN_GUARDANDO": "Guardando..."
+    },
+    "TABLA": {
+      "BTN_ACTUALIZAR": "Actualizar",
+      "FILTRO_PLACEHOLDER": "Buscar por nombre o ID...",
+      "BTN_BUSCAR": "Buscar",
+      "CARGANDO": "Cargando datos...",
+      "SIN_REGISTROS": "No se encontraron registros de financiación",
+      "COL_ID": "ID",
+      "COL_POSTULACION": "Postulación",
+      "COL_ARL": "ARL",
+      "COL_COMISION": "Comisión",
+      "COL_DESCUENTO": "Descuento",
+      "COL_ALOJAMIENTO": "Alojamiento",
+      "COL_ECONOMICO": "Económico",
+      "COL_TIPO_EXT": "Fin. Externa",
+      "COL_TIPO": "Tipo Fin.",
+      "COL_OPCIONES": "Opciones"
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Mostrar",
+      "DE": "de"
+    },
+    "MENSAJES": {
+      "GUARDADO_EXITO": "Datos guardados correctamente",
+      "ACTUALIZADO_EXITO": "Datos actualizados correctamente",
+      "ELIMINADO_EXITO": "Registro eliminado con éxito",
+      "ERROR": "Ocurrió un error al procesar la solicitud",
+      "ERROR_CARGA": "Error al cargar los datos de financiación",
+      "ERROR_FILTRO": "Error al realizar la búsqueda de financiación",
+      "ERROR_PROCESAR": "Error al procesar la solicitud de financiación",
+      "RESPUESTA_DESCONOCIDA": "Respuesta desconocida del servidor",
+      "FILTRO_VACIO": "Ingrese un término de búsqueda para filtrar",
+      "CONFIRMAR_ELIMINAR": "¿Está seguro de eliminar este registro de financiación?",
+      "ELIMINAR_OK": "Registro eliminado con éxito",
+      "ELIMINAR_ERROR": "Error al eliminar el registro de financiación",
+      "ERROR_GUARDAR": "Error al guardar los datos de financiación",
+      "ERROR_ACTUALIZAR": "Error al actualizar los datos de financiación",
+      "ERROR_CARGAR_DATOS": "Error al cargar los datos de financiación",
+      "ERROR_FORMULARIO_INVALIDO": "Por favor complete todos los campos obligatorios",
+      "ERROR_CAMPOS_REQUERIDOS": "Los siguientes campos son obligatorios:"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "Éxito",
+      "ERROR_TITULO": "Error",
+      "WARNING_TITULO": "Atención"
+    },
+    "CONFIRM": {
+      "HEADER": "Confirmar acción",
+      "ACEPTAR": "Aceptar",
+      "CANCELAR": "Cancelar"
+    }
   }
 }

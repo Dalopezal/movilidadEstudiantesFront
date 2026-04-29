@@ -1340,5 +1340,75 @@
     "PERIODO": "Period",
     "SELECCIONE": "Select",
     "NO_DATOS": "No data"
+  },
+  "FINANCIACION": {
+    "FORM": {
+      "TITULO": "Financing Management",
+      "LABEL_ARL": "ARL Value",
+      "LABEL_COMISION_SERVICIOS": "Service Commission",
+      "LABEL_DESCUENTO_MATRICULA": "Tuition Discount",
+      "LABEL_APOYO_ALOJAMIENTO": "Accommodation Support",
+      "LABEL_APOYO_ECONOMICO": "Economic Support",
+      "LABEL_OTROS_VALORES": "Other Values",
+      "LABEL_COMPRA_TIQUETES": "Ticket Purchase",
+      "LABEL_FINANCIACION_EXTERNA": "External Financing",
+      "LABEL_FINANCIACION": "Financing Type",
+      "FIN_EXTERNA_REQUIRED": "External financing is required",
+      "FIN_REQUIRED": "Financing type is required",
+      "BTN_INGRESAR": "Submit Data",
+      "BTN_ACTUALIZAR": "Update Data",
+      "BTN_CANCELAR": "Cancel",
+      "BTN_GUARDANDO": "Saving..."
+    },
+    "TABLA": {
+      "BTN_ACTUALIZAR": "Update Table",
+      "FILTRO_PLACEHOLDER": "Search by name or ID...",
+      "BTN_BUSCAR": "Search",
+      "CARGANDO": "Loading data...",
+      "SIN_REGISTROS": "No financing records found",
+      "COL_ID": "ID",
+      "COL_POSTULACION": "Application",
+      "COL_ARL": "ARL",
+      "COL_COMISION": "Commission",
+      "COL_DESCUENTO": "Discount",
+      "COL_ALOJAMIENTO": "Accommodation",
+      "COL_ECONOMICO": "Economic",
+      "COL_TIPO_EXT": "Ext. Fin",
+      "COL_TIPO": "Fin. Type",
+      "COL_OPCIONES": "Options"
+    },
+    "PAGINACION": {
+      "MOSTRAR": "Show",
+      "DE": "of"
+    },
+    "MENSAJES": {
+      "GUARDADO_EXITO": "Data saved successfully",
+      "ACTUALIZADO_EXITO": "Data updated successfully",
+      "ELIMINADO_EXITO": "Record deleted successfully",
+      "ERROR": "An error occurred while processing the request",
+      "ERROR_CARGA": "Error loading financing data",
+      "ERROR_FILTRO": "Error performing financing search",
+      "ERROR_PROCESAR": "Error processing the financing request",
+      "RESPUESTA_DESCONOCIDA": "Unknown server response",
+      "FILTRO_VACIO": "Please enter a search term to filter",
+      "CONFIRMAR_ELIMINAR": "Are you sure you want to delete this financing record?",
+      "ELIMINAR_OK": "Record deleted successfully",
+      "ELIMINAR_ERROR": "Error deleting financing record",
+      "ERROR_GUARDAR": "Error saving financing data",
+      "ERROR_ACTUALIZAR": "Error updating financing data",
+      "ERROR_CARGAR_DATOS": "Error loading financing data",
+      "ERROR_FORMULARIO_INVALIDO": "Please complete all required fields",
+      "ERROR_CAMPOS_REQUERIDOS": "The following fields are required:"
+    },
+    "TOASTS": {
+      "EXITO_TITULO": "Success",
+      "ERROR_TITULO": "Error",
+      "WARNING_TITULO": "Warning"
+    },
+    "CONFIRM": {
+      "HEADER": "Confirm action",
+      "ACEPTAR": "Accept",
+      "CANCELAR": "Cancel"
+    }
   }
 }

@@ -70,6 +70,7 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
   nombreCombocatoria: any;
   idConvocatoria: any;
   usuario: any = {};
+  categoria: any;
 
   @Input() tipoPostulacion: any;
 
@@ -89,6 +90,9 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
     this.fetchPostulaciones();
     this.fetchListaEstados();
     this.fetchListaTipoMovilidad();
+
+    const params = this.route.snapshot.queryParams;
+    this.categoria = params['categoria'];
   }
 
   ngOnDestroy(): void {
@@ -394,6 +398,9 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
       nombre: item.nombreConvocatoria,
       id: item.id,
       idConvocatoria: item.convocatoriaId,
+      categoria: this.categoria,
+      nombreMovilida: item.nombreModalidad,
+      nombreConvenio: item.nombreConvenio
     }
     });
   }

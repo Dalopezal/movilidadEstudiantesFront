@@ -370,7 +370,8 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   abrirPostulaciones(item: ConvocatoriaGeneralModel) {
     this.router.navigate(['/postulacion-convocatoria'], {queryParams: {
       id: item.id,
-      nombre: item.nombre
+      nombre: item.nombre,
+      categoria: this.categoria
     }
     });
   }
@@ -390,6 +391,9 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
               idConvocatoria: item.id,
               nombre: item.nombre,
               idPostulacion: 0,
+              categoria: this.categoria,
+              nombreMovilida: item.movilidadNombre,
+              nombreConvenio: item.movilidadNombre
             }
           });
         }else{
@@ -397,6 +401,8 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
               idConvocatoria: item.id,
               nombre: item.nombre,
               idPostulacion: response.datos[0].id,
+              categoria: this.categoria,
+              nombreMovilida: item.movilidadNombre
             }
           });
         }
