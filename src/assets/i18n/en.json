@@ -1242,7 +1242,8 @@
     "ELIMINADO_EXITO": "Record deleted successfully",
     "ERROR_ELIMINAR": "Error deleting pathway, the record is associated",
     "CONFIRMAR_ACCION": "Confirm action",
-    "SI_CONFIRMO": "Yes, Confirm"
+    "SI_CONFIRMO": "Yes, Confirm",
+    "SEMESTRE": "Semester"
   },
   "HORARIOS_UNIVERSIDAD": {
     "TITULO": "Manage University Schedules",

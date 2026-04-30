@@ -855,8 +855,8 @@
     "RESULTADOS_APRENDIZAJE": "Resultados de Aprendizaje",
     "DIGITE_RESULTADOS_APRENDIZAJE": "Digite Resultados de Aprendizaje",
     "RESULTADOS_OBLIGATORIOS": "Los resultados son obligatorios.",
-    "DESEMPENO": "Desempeño",
-    "DIGITE_DESEMPENO": "Digite Desempeño",
+    "DESEMPENO": "Capacidades para un desempeño global",
+    "DIGITE_DESEMPENO": "Digite Capacidades para un desempeño global",
     "DESEMPENO_OBLIGATORIO": "El desempeño es obligatorio.",
     "COMENTARIOS": "Comentarios",
     "DIGITE_COMENTARIOS": "Digite Comentarios",
@@ -1243,7 +1243,8 @@
     "ELIMINADO_EXITO": "Se eliminó el registro satisfactoriamente",
     "ERROR_ELIMINAR": "Error al eliminar trayectoria, el registro se encuentra asociado",
     "CONFIRMAR_ACCION": "Confirmar acción",
-    "SI_CONFIRMO": "Sí, Confirmo"
+    "SI_CONFIRMO": "Sí, Confirmo",
+    "SEMESTRE": "Semestre"
   },
   "HORARIOS_UNIVERSIDAD": {
     "TITULO": "Administrar Horarios Universidad",

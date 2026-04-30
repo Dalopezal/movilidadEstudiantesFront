@@ -67,23 +67,6 @@
                   </select>
                 </div>
 
-                <!-- Estado -->
-                <div class="form-item">
-                  <label class="form-label fw-bold">{{ 'ASIGNACION_PLAN_COMPONENTE.ESTADO' | translate }}</label>
-                  <select
-                    class="form-select"
-                    required
-                    [(ngModel)]="model.estadoId"
-                    name="estadoId"
-                    style="font-size: 13px;"
-                  >
-                    <option [ngValue]="null">{{ 'ASIGNACION_PLAN_COMPONENTE.SELECCIONE' | translate }}</option>
-                    <option *ngFor="let e of estados" [ngValue]="e.id">
-                      {{ e.nombre }}
-                    </option>
-                  </select>
-                </div>
-
                 <!-- Colaboración -->
                 <div class="form-item d-flex align-items-end">
                   <div class="w-100">
@@ -331,6 +314,24 @@
                     readonly
                     style="font-size: 13px; background-color: #f5f5f5;"
                   />
+                </div>
+
+
+                <!-- Estado -->
+                <div class="form-item">
+                  <label class="form-label fw-bold">{{ 'ASIGNACION_PLAN_COMPONENTE.ESTADO' | translate }}</label>
+                  <select
+                    class="form-select"
+                    required
+                    [(ngModel)]="model.estadoId"
+                    name="estadoId"
+                    style="font-size: 13px;"
+                  >
+                    <option [ngValue]="null">{{ 'ASIGNACION_PLAN_COMPONENTE.SELECCIONE' | translate }}</option>
+                    <option *ngFor="let e of estados" [ngValue]="e.id">
+                      {{ e.nombre }}
+                    </option>
+                  </select>
                 </div>
               </div>
 

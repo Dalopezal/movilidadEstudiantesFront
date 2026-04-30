@@ -24,8 +24,8 @@
     </a>
 
     <!-- Internacionalización del Currículo -->
-    <div class="has-submenu">
-      <a *ngIf="rolInternacionalizacion"
+    <div class="has-submenu" *ngIf="rolInternacionalizacion">
+      <a
         (click)="toggleInternacionalizacionMenu()"
         class="nav-link submenu-toggle"
         role="button"
@@ -40,77 +40,65 @@
       </a>
 
       <div class="submenu" [class.open]="isInternacionalizacionOpen">
-        <a routerLink="/estrategia" routerLinkActive="active" class="nav-link submenu-link">
+        <a *ngIf="accessEstrategia" routerLink="/estrategia" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.ESTRATEGIA' | translate }}
-          </span>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.ESTRATEGIA' | translate }}</span>
         </a>
-        <a routerLink="/planeacion" routerLinkActive="active" class="nav-link submenu-link">
+
+        <a *ngIf="accessPlaneacion" routerLink="/planeacion" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.PLANEACION' | translate }}
-          </span>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.PLANEACION' | translate }}</span>
         </a>
-        <a routerLink="/asignacion-plan-componente" routerLinkActive="active" class="nav-link submenu-link">
+
+        <a *ngIf="accessAsignacionPlanComponente" routerLink="/asignacion-plan-componente" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.ASIGNACION_PLAN_COMPONENTE' | translate }}
-          </span>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.ASIGNACION_PLAN_COMPONENTE' | translate }}</span>
         </a>
-        <a routerLink="/horarios-universidad" routerLinkActive="active" class="nav-link submenu-link">
+
+        <a *ngIf="accessHorariosUniversidad" routerLink="/horarios-universidad" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.HORARIOS_UNIVERSIDAD' | translate }}
-          </span>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.HORARIOS_UNIVERSIDAD' | translate }}</span>
         </a>
-        <a routerLink="/actividades-seguimiento" routerLinkActive="active" class="nav-link submenu-link">
+
+        <a *ngIf="accessActividades" routerLink="/actividades-seguimiento" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.ACTIVIDADES' | translate }}
-          </span>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.ACTIVIDADES' | translate }}</span>
         </a>
-        <a routerLink="/aprobacion-estudiante" routerLinkActive="active" class="nav-link submenu-link">
+
+        <a *ngIf="accessAprobacionEstudiante" routerLink="/aprobacion-estudiante" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.APROBACION_ESTUDIANTE' | translate }}
-          </span>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.APROBACION_ESTUDIANTE' | translate }}</span>
         </a>
-        <a routerLink="/certificado-estudiantes" routerLinkActive="active" class="nav-link submenu-link">
+
+        <a *ngIf="accessCertificadoEstudiante" routerLink="/certificado-estudiantes" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.CERTIFICADO_ESTUDIANTES' | translate }}
-          </span>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.CERTIFICADO_ESTUDIANTES' | translate }}</span>
         </a>
-        <a routerLink="/desarrollo-profesional" routerLinkActive="active" class="nav-link submenu-link">
+
+        <a *ngIf="accessDesarrolloProfesional" routerLink="/desarrollo-profesional" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.DESARROLLO_PROFESIONAL' | translate }}
-          </span>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.DESARROLLO_PROFESIONAL' | translate }}</span>
         </a>
-        <a routerLink="/trayectoria" routerLinkActive="active" class="nav-link submenu-link">
+
+        <a *ngIf="accessTrayectorias" routerLink="/trayectoria" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.TRAYECTORIA' | translate }}
-          </span>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.TRAYECTORIA' | translate }}</span>
         </a>
-        <a routerLink="/vs" routerLinkActive="active" class="nav-link submenu-link">
+
+        <a *ngIf="accessPlaneadoVsEjecutado" routerLink="/vs" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.PLANEADO_VS_EJECUTADO' | translate }}
-          </span>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.PLANEADO_VS_EJECUTADO' | translate }}</span>
         </a>
-        <a routerLink="/insignia-digital" routerLinkActive="active" class="nav-link submenu-link">
+
+        <a *ngIf="accessInsigniaDigital" routerLink="/insignia-digital" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
-          <span class="link-text">
-            {{ 'SIDEBAR.INTERNACIONALIZACION.INSIGNIA_DIGITAL' | translate }}
-          </span>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.INSIGNIA_DIGITAL' | translate }}</span>
         </a>
       </div>
     </div>
 
     <!-- Cooperación -->
-    <div class="has-submenu">
+    <div *ngIf="accessFormulariosConvenios" class="has-submenu">
       <a
         (click)="toggleCooperacionMenu()"
         class="nav-link submenu-toggle"
@@ -126,7 +114,7 @@
       </a>
 
       <div class="submenu" [class.open]="isCooperacionOpen">
-        <a routerLink="/solicitud-convenio" routerLinkActive="active" class="nav-link submenu-link">
+        <!-- <a routerLink="/solicitud-convenio" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
           <span class="link-text">
             {{ 'SIDEBAR.COOPERACION.SOLICITUDES_CONVENIO' | translate }}
@@ -137,7 +125,7 @@
           <span class="link-text">
             {{ 'SIDEBAR.COOPERACION.ADMIN_SOLICITUDES_CONVENIO' | translate }}
           </span>
-        </a>
+        </a> -->
         <a routerLink="/convenios" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
           <span class="link-text">

@@ -258,6 +258,14 @@
                     <td>{{ item.nombreClasificacionConvenio }}</td>
                     <td>{{ item.nombreTipoActividadConvenio }}</td>
                     <td>{{ item.fechaInicio }}</td>
+                    <td align="center">
+                      <button *ngIf="item.estado" class="button-completed">
+                        {{ 'CONDICIONES.TABLA.SI' | translate }}
+                      </button>
+                      <button *ngIf="!item.estado" class="button-pending">
+                        {{ 'CONDICIONES.TABLA.NO' | translate }}
+                      </button>
+                    </td>
                     <td>
                       <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">
                         <i class="fas fa-edit"></i>

@@ -162,22 +162,34 @@ export class AsignacionPlanComponenteComponent
         }
       });
 
-    // Facultades UCM
-    this.api
-      .getExterno<any[]>('orisiga/facultades/')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (resp) => {
-          this.facultadesUCM = this.uniqueByKey(
-            this.mapArray(resp),
-            'facultad_codigo'
-          );
-        },
-        error: (err) => {
-          console.error('Error al cargar facultades', err);
-          this.facultadesUCM = [];
-        }
-      });
+    // Facultades UCM (llenadas desde orisiga/asignaciondocente usando campo "facultad")
+    if (this.usuario?.idUsuario) {
+      const url = `orisiga/asignaciondocente/?identificacion=${this.usuario.idUsuario}`;
+
+      this.api
+        .getExterno<any[]>(url)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (resp) => {
+            const items = this.mapArray(resp);
+
+            const facultadesUnicas = Array.from(
+              new Set(items.map((i: any) => i.facultad).filter(Boolean))
+            );
+
+            this.facultadesUCM = facultadesUnicas.map((f: string) => ({
+              value: f,
+              label: f
+            }));
+          },
+          error: (err) => {
+            console.error('Error al cargar facultades desde asignaciondocente', err);
+            this.facultadesUCM = [];
+          }
+        });
+    } else {
+      this.facultadesUCM = [];
+    }
 
     // Programas UCM
     this.api
