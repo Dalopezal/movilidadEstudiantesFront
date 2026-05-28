@@ -62,15 +62,14 @@
                       id="fechaInicio"
                       name="fechaInicio"
                       required
-                      [min]="todayStr"
                       [(ngModel)]="model.fechaInicio"
                       #inicioCtrl="ngModel"
                       (change)="onFechaInicioChange()"
                       style="font-size: 13px;"
                     />
-                    <div class="text-danger small mt-1" *ngIf="(inicioCtrl.invalid && (inicioCtrl.touched || inicioCtrl.dirty)) || fechaInicioInvalida">
+                    <!-- El div de abajo ahora solo muestra error si el campo está vacío -->
+                    <div class="text-danger small mt-1" *ngIf="inicioCtrl.invalid && (inicioCtrl.touched || inicioCtrl.dirty)">
                       <div *ngIf="inicioCtrl.errors?.['required']">{{ 'CONVENIOS.FORM.ERROR_FECHA_REQUERIDA' | translate }}</div>
-                      <div *ngIf="fechaInicioInvalida">{{ 'CONVENIOS.FORM.ERROR_FECHA_MENOR' | translate }}</div>
                     </div>
                   </div>
 

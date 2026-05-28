@@ -64,6 +64,7 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
     this.fetchTiposFinanciacionExterna();
     this.fetchTiposFinanciacion();
     this.fetchFinanciaciones();
+    this.model.postulacionId = this.postulacionId
   }
 
   ngOnDestroy() {
@@ -253,7 +254,6 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
     this.model = new FinanciacionModel();
     this.isEditing = false;
     if (form) form.resetForm({
-      postulacionId: 0,
       arl: 0,
       comisionServicios: 0,
       descuentoMatricula: 0,

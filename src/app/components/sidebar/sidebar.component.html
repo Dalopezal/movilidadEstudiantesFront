@@ -40,6 +40,10 @@
       </a>
 
       <div class="submenu" [class.open]="isInternacionalizacionOpen">
+        <a *ngIf="accessEstrategia" routerLink="/dashboard-curriculo" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">Dashboard</span>
+        </a>
         <a *ngIf="accessEstrategia" routerLink="/estrategia" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
           <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.ESTRATEGIA' | translate }}</span>
@@ -126,6 +130,12 @@
             {{ 'SIDEBAR.COOPERACION.ADMIN_SOLICITUDES_CONVENIO' | translate }}
           </span>
         </a> -->
+        <a routerLink="/dashboard-cooperacion" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">
+            Dashboard
+          </span>
+        </a>
         <a routerLink="/convenios" routerLinkActive="active" class="nav-link submenu-link">
           <i class="fas fa-dot-circle"></i>
           <span class="link-text">

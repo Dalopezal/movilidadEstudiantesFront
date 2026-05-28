@@ -33,6 +33,8 @@ import { TrayectoriaComponent } from './components/trayectoria/trayectoria.compo
 import { SolicitudConvenioComponent } from './components/solicitud-convenio/solicitud-convenio.component';
 import { ListsolConvenioComponent } from './components/listsol-convenio/listsol-convenio.component';
 import { PlaneacionVsEjecucionComponent } from './components/planeacion-vs-ejecucion/planeacion-vs-ejecucion.component';
+import { DashboardCooperacionComponent } from './components/dashboard-cooperacion/dashboard-cooperacion.component';
+import { DashboardCurriculoComponent } from './components/dashboard-curriculo/dashboard-curriculo.component';
 
 export const routes: Routes = [
   // Login: si ya está autenticado redirige a /home
@@ -68,6 +70,8 @@ export const routes: Routes = [
 
   { path: 'solicitud-convenio', component: SolicitudConvenioComponent, canActivate: [authGuard] },
   { path: 'listsol-convenio', component: ListsolConvenioComponent, canActivate: [authGuard] },
+  { path: 'dashboard-cooperacion', component: DashboardCooperacionComponent, canActivate: [authGuard] },
+  { path: 'dashboard-curriculo', component: DashboardCurriculoComponent, canActivate: [authGuard] },
 
   // Wildcard -> login
   { path: '**', redirectTo: '' }

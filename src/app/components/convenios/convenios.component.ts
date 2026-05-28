@@ -440,18 +440,18 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     fechaInicio.setHours(0, 0, 0, 0);
 
     // Tu regla actual: inicio NO puede ser menor que hoy
-    this.fechaInicioInvalida = fechaInicio < hoy;
+    this.fechaInicioInvalida = false;
   }
 
   get formInvalidCustom(): boolean {
     // Lo dejo (no lo usas en el disable), pero lo alineo con tu regla
-    if (!this.model.fechaInicio) return false;
-    const hoy = new Date();
-    const fechaInicio = new Date(this.model.fechaInicio);
-    hoy.setHours(0, 0, 0, 0);
-    fechaInicio.setHours(0, 0, 0, 0);
+    //if (!this.model.fechaInicio) return false;
+    // const hoy = new Date();
+    // const fechaInicio = new Date(this.model.fechaInicio);
+    // hoy.setHours(0, 0, 0, 0);
+    // fechaInicio.setHours(0, 0, 0, 0);
 
-    if (fechaInicio < hoy) return true;
+    //if (fechaInicio < hoy) return true;
     if (this.model.diasVigencia === null || this.model.diasVigencia < 1) return true;
     if (this.dateRangeInvalid) return true;
     return false;

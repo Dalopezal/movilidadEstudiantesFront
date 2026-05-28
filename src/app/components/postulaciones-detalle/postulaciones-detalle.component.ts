@@ -92,6 +92,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   nombreCombocatoria: any;
   nombreMovilidad: any;
   nombreConvenio: any;
+  convenioId: any;
   instituciones: any[] = [];
   convenios: any[] = [];
   tiposMovlidad: any[] = [];
@@ -603,11 +604,11 @@ getBitacora(id: number) {
                 stepData[field.name] = entry[field.name];
               } else if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
                 stepData[field.name] = this.nombreCombocatoria;
-              } else if (field.name === 'tipoMovilidadId' && this.nombreMovilidad) {
-                stepData[field.name] = this.nombreMovilidad;
-              }  else if (field.name === 'convenioId' && this.nombreConvenio) {
-                stepData[field.name] = this.nombreConvenio;
-              }  else if (field.name === 'estadoPostulacionId') {
+              } else if (field.name === 'tipoMovilidadId') {
+                stepData[field.name] = entry.tipoMovilidadId;
+              } else if (field.name === 'convenioId') {
+                stepData[field.name] = entry.convenioId;
+              } else if (field.name === 'estadoPostulacionId') {
                 const estado = entry.estadoPostulacionId;
                 stepData[field.name] = this.estadosMap[estado] ?? estado;
 
@@ -874,11 +875,12 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
     }
 
     const payload = {
-      ...this.steps[0].data,
+      ...this.resolverIds(this.steps[0].data),
       estadoPostulacionId: 1,
       convocatoriaId: this.idCovocatoria,
       usuarioId: this.usuario.idUsuario,
-      programa: this.usuario.programa
+      programa: this.usuario.programa,
+      rolId: this.usuario.rolId
     };
 
     this.loading = true;
@@ -939,10 +941,12 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
     }
 
     const payload = {
-      ...this.steps[0].data,
+      ...this.resolverIds(this.steps[0].data),
       convocatoriaId: this.idCovocatoria,
-      estadoPostulacionId: 21
+      estadoPostulacionId: 21,
+      rolId: this.usuario.rolId
     };
+
     this.api.post('Postulaciones/crear_Postulacion', payload).subscribe(() => {
       this.refreshBitacora();
     });
@@ -950,23 +954,25 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
 
   onPostular() {
   const currentStepData = this.steps[this.selectedStepIndex]?.data || {};
+  const resolved = this.resolverIds(currentStepData);
   const payload = {
     usuarioId: this.idUsuario,
     convocatoriaId: this.idCovocatoria,
     estadoPostulacionId: 4,
     fechaPostulacion: currentStepData['fechaPostulacion'],
     periodo: currentStepData['periodo'],
-    convenioId: currentStepData['convenioId'],
     observaciones: currentStepData['observaciones'],
-    tipoMovilidadId: currentStepData['tipoMovilidadId'],
     urlEncuestaSatisfaccion: currentStepData['urlEncuestaSatisfaccion'],
     objetivo: currentStepData['objetivo'], // Obligatorio
     fechaInicioMovilidad: currentStepData['fechaInicioMovilidad'],
     fechaFinMovilidad: currentStepData['fechaFinMovilidad'],
-    institucionId: currentStepData['institucionId'],
     fechaEntregable: currentStepData['fechaEntregable'],
     asistioEntrevista: currentStepData['asistioEntrevista'] ?? false,
-    UrlEncuestaSatisfaccion: "https://docs.google.com/forms/d/e/1FAIpQLSe1piZ1G84UYLDpToyN86EZhhFDSB01FdUyRVmlksoGyAJ8-w/viewform"
+    UrlEncuestaSatisfaccion: "https://docs.google.com/forms/d/e/1FAIpQLSe1piZ1G84UYLDpToyN86EZhhFDSB01FdUyRVmlksoGyAJ8-w/viewform",
+    convenioId: resolved['convenioId'],
+    tipoMovilidadId: resolved['tipoMovilidadId'],
+    institucionId: resolved['institucionId'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
@@ -995,7 +1001,8 @@ onRechazarPostulacion(form?: NgForm) {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: this.idUsuario,
     convocatoriaId: this.idCovocatoria,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
@@ -1023,6 +1030,7 @@ onAprobarPostulacion(form?: NgForm) {
     estadoPostulacionId: 4,
     usuarioId: this.idUsuario,
     convocatoriaId: this.idCovocatoria,
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
@@ -1042,7 +1050,8 @@ onRechazarDirector() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
@@ -1061,6 +1070,7 @@ onAprobarDirector() {
     fechaPostulacion: currentStepData['fechaPostulacion'],
     usuarioId: this.idUsuario,
     convocatoriaId: this.idCovocatoria,
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
@@ -1080,7 +1090,8 @@ onConfirmarRechazoDirector() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/ConfirmarRechazoDirector', payload).subscribe({
@@ -1099,6 +1110,7 @@ onAprobarDecanatura() {
     fechaPostulacion: currentStepData['fechaPostulacion'],
     usuarioId: this.idUsuario,
     convocatoriaId: this.idCovocatoria,
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
@@ -1118,7 +1130,8 @@ onRechazarDecanatura() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/RechazarDecanatura', payload).subscribe({
@@ -1134,7 +1147,8 @@ onAprobarVicerrectoria() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 10,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/AprobarVicerrectoria', payload).subscribe({
@@ -1154,7 +1168,8 @@ onRechazarVicerrectoria() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/RechazarVicerrectoria', payload).subscribe({
@@ -1170,7 +1185,8 @@ onAprobarJefe() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 12,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/AprobarJefe', payload).subscribe({
@@ -1190,7 +1206,8 @@ onRechazarJefe() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/RechazarJefe', payload).subscribe({
@@ -1206,7 +1223,8 @@ onAprobarRectoria() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 14,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/AprobarRectoria', payload).subscribe({
@@ -1226,7 +1244,8 @@ onRechazarRectoria() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/RechazarRectoria', payload).subscribe({
@@ -1242,7 +1261,8 @@ onPostularUniversidad() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 16,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/PostularUniversidad', payload).subscribe({
@@ -1258,7 +1278,8 @@ onAprobarUniversidad() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 17,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/AprobarUniversidad', payload).subscribe({
@@ -1278,7 +1299,8 @@ onRechazarUniversidad() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/RechazarUniversidad', payload).subscribe({
@@ -1296,7 +1318,8 @@ onEnMovilidad() {
     estadoPostulacionId: 19,
     fechaPostulacion: currentStepData['fechaPostulacion'],
     esMatriculadoSiiga: currentStepData['esMatriculadoSiiga'] || false,
-    esNotificadoRegistroAcademico: currentStepData['esNotificadoRegistroAcademico'] || false
+    esNotificadoRegistroAcademico: currentStepData['esNotificadoRegistroAcademico'] || false,
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/EnMovilidad', payload).subscribe({
@@ -1317,7 +1340,8 @@ onFinalizado() {
     realizoEncuestaSatisfaccion: currentStepData['realizoEncuestaSatisfaccion'] || false,
     registradoSire: currentStepData['registradoSire'] || false,
     financiacionExterna: currentStepData['financiacionExterna'],
-    financiacioUcm: currentStepData['financiacioUcm']
+    financiacioUcm: currentStepData['financiacioUcm'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/Finalizado', payload).subscribe({
@@ -1533,5 +1557,27 @@ getColorEstado(id: number): string {
 
   // Por defecto neutro
   return 'Institución';
+}
+
+private resolverIds(data: any): any {
+  const resolved = { ...data };
+
+  // Solo resolver si por alguna razón llegó como string
+  if (typeof resolved['tipoMovilidadId'] === 'string') {
+    const tipo = this.tiposMovlidad.find(t => t.label === resolved['tipoMovilidadId']);
+    if (tipo) resolved['tipoMovilidadId'] = tipo.value;
+  }
+
+  if (typeof resolved['convenioId'] === 'string') {
+    const convenio = this.convenios.find(c => c.label === resolved['convenioId']);
+    if (convenio) resolved['convenioId'] = convenio.value;
+  }
+
+  if (typeof resolved['institucionId'] === 'string') {
+    const inst = this.instituciones.find(i => i.label === resolved['institucionId']);
+    if (inst) resolved['institucionId'] = inst.value;
+  }
+
+  return resolved;
 }
 }
