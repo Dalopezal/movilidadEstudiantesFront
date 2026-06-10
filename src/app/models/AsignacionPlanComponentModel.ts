@@ -30,10 +30,12 @@ export class AsignacionPlanComponenteModel {
 
   docenteauxNombre: string | null;
   docenteauxCorreo: string | null;
+  periodo: number | null;
 
   constructor(
     id?: number,
     planId?: number,
+    periodo?: number,
     estrategiaId?: number,
     estadoId?: number,
     componenteCodigoUCM?: string,
@@ -63,8 +65,9 @@ export class AsignacionPlanComponenteModel {
     docenteauxNombre?: string,
     docenteauxCorreo?: string
   ) {
-    this.id = id! ?? null;
+    this.id = id! ?? 0;
     this.planId = planId ?? null;
+    this.periodo = periodo ?? 0;
     this.estrategiaId = estrategiaId ?? null;
     this.estadoId = estadoId ?? null;
     this.componenteCodigoUCM = componenteCodigoUCM ?? '';
@@ -99,6 +102,7 @@ export class AsignacionPlanComponenteModel {
     return new AsignacionPlanComponenteModel(
       Number(json.id ?? 0),
       Number(json.planId ?? json.plan_id ?? 0) || 0,
+      Number(json.periodo ?? json.plan_id ?? 0) || 0,
       Number(json.estrategiaId ?? 0) || 0,
       Number(json.estadoId ?? 0) || 0,
       json.componenteCodigoUCM ?? '',
@@ -133,6 +137,7 @@ export class AsignacionPlanComponenteModel {
   toJSON(): any {
     return {
       planId: this.planId,
+      periodo: this.periodo,
       estrategiaId: this.estrategiaId,
       estadoId: this.estadoId,
       componenteCodigoUCM: this.componenteCodigoUCM,

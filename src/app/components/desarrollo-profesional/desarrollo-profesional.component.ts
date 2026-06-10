@@ -10,7 +10,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import * as XLSX from 'xlsx';
 import { CursoModel, CursoPersonaModel, DesarrolloProfesionalRow } from '../../models/CursoPersonaModel';
-import { TranslateModule, TranslateService } from '@ngx-translate/core'; // ✅
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-desarrollo-profesional',
@@ -144,7 +145,7 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
               programaCodigo: row[0] || 0,
               planEstudio: row[1] || 0,
               codigoCurso: row[2] || 0,
-              nombre: row[3] || '',
+              nombreCurso: row[3] || '',
               descripcion: row[4] || '',
               institucionId: row[5] || 0,
               usuarioId: row[6] || 0,
@@ -186,74 +187,88 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
   }
 
   private async saveDataToAPI(rows: DesarrolloProfesionalRow[]) {
-    if (rows.length === 0) {
-      this.showWarning(this.translate.instant('DESARROLLO_PROFESIONAL.NO_DATOS_VALIDOS'));
-      this.loading = false;
-      return;
+  if (!rows || rows.length === 0) {
+    this.showWarning(this.translate.instant('DESARROLLO_PROFESIONAL.NO_DATOS_VALIDOS'));
+    this.loading = false;
+    return;
+  }
+
+  // 1) Preparar cursos únicos y cursoPersonas con referencia a la key
+  const cursosMap = new Map<string, any>();
+  const cursoPersonas: any[] = [];
+
+  for (const r of rows) {
+    const key = `${r.programaCodigo}-${r.planEstudio}-${r.codigoCurso}`;
+
+    if (!cursosMap.has(key)) {
+      cursosMap.set(key, {
+        programaCodigo: String(r.programaCodigo),
+        planestuId: r.planEstudio,
+        codigo: String(r.codigoCurso),
+        nombreCurso: r.nombreCurso,
+        descripcion: r.descripcion,
+        institucionId: r.institucionId // AJUSTA si tu backend espera otro nombre
+      });
     }
 
-    // Agrupar por curso único
-    const cursosMap = new Map<string, CursoModel>();
-    const cursoPersonas: CursoPersonaModel[] = [];
-
-    rows.forEach(row => {
-      const cursoKey = `${row.programaCodigo}-${row.planEstudio}-${row.codigoCurso}`;
-
-      // Crear o actualizar curso
-      if (!cursosMap.has(cursoKey)) {
-        const curso = new CursoModel();
-        curso.programaCodigo = String(row.programaCodigo);
-        curso.planestuId = row.planEstudio;
-        curso.codigo = String(row.codigoCurso);
-        curso.nombreCurso = row.nombreCurso;
-        curso.descripcion = row.descripcion;
-        curso.instuducionid = row.institucionId;
-        cursosMap.set(cursoKey, curso);
-      }
-
-      // Crear CursoPersona
-      const cursoPersona = new CursoPersonaModel();
-      cursoPersona.usuarioId = row.usuarioId;
-      cursoPersona.cursoId = row.codigoCurso;
-      cursoPersona.periodo = 1; // Valor por defecto
-      cursoPersona.fechainicio = row.fechainicio;
-      cursoPersona.fechafinal = row.fechafinal;
-      cursoPersona.costocurso = row.costocurso;
-      cursoPersonas.push(cursoPersona);
+    cursoPersonas.push({
+      usuarioId: r.usuarioId,
+      periodo: 1,
+      fechainicio: r.fechainicio,
+      fechafinal: r.fechafinal,
+      costocurso: r.costocurso,
+      cursoKey: key // referencia temporal para mapear el id luego
     });
+  }
 
-    const cursos = Array.from(cursosMap.values());
+  const cursosArr = Array.from(cursosMap.entries()).map(([key, curso]) => ({ key, curso }));
 
-    // Guardar primero los cursos
-    const cursoRequests = cursos.map(curso =>
-      this.api.post<any>('Curso/crear_Curso', curso)
+  try {
+    // 2) Crear cursos y obtener ids (paralelo)
+    const created = await Promise.all(
+      cursosArr.map(async ({ key, curso }) => {
+        const resp = await firstValueFrom(this.api.post<any>('Curso/crear_Curso', curso));
+        // extraer id de la respuesta (ajusta según formato de tu API)
+        const id = (typeof resp === 'number' || typeof resp === 'string')
+          ? resp
+          : resp?.id ?? resp?.insertId ?? resp?.result?.id;
+        if (!id) throw new Error(`No se obtuvo id al crear curso ${key}. Resp: ${JSON.stringify(resp)}`);
+        return { key, id: String(id) };
+      })
     );
 
-    try {
-      await forkJoin(cursoRequests).toPromise();
+    const keyToId = new Map(created.map(c => [c.key, c.id]));
 
-      // Luego guardar las relaciones CursoPersona (DesarrolloProfesional)
-      const cursoPersonaRequests = cursoPersonas.map(cp =>
-        this.api.post<any>('DesarrolloProfesional/crear_DesarrolloProfesinales', cp)
-      );
-
-      await forkJoin(cursoPersonaRequests).toPromise();
-
-      this.showSuccess(
-        this.translate.instant('DESARROLLO_PROFESIONAL.PROCESADO_EXITOSO', {
-          cursos: cursos.length,
-          asignaciones: cursoPersonas.length
-        })
-      );
-      this.fetchDesarrolloProfesional();
-      this.clearFileSelection();
-      this.loading = false;
-    } catch (error) {
-      console.error('Error guardando datos:', error);
-      this.showError(this.translate.instant('DESARROLLO_PROFESIONAL.ERROR_GUARDAR_DATOS'));
-      this.loading = false;
+    // 3) Asignar cursoId real a cada cursoPersona
+    for (const cp of cursoPersonas) {
+      const id = keyToId.get(cp.cursoKey);
+      if (!id) throw new Error(`No hay id para la key ${cp.cursoKey}`);
+      cp.cursoId = id;
+      delete cp.cursoKey; // opcional
     }
+
+    // 4) Enviar relaciones CursoPersona (paralelo)
+    await Promise.all(
+      cursoPersonas.map(cp =>
+        firstValueFrom(this.api.post<any>('DesarrolloProfesional/crear_DesarrolloProfesinales', cp))
+      )
+    );
+
+    this.showSuccess(
+      this.translate.instant('DESARROLLO_PROFESIONAL.PROCESADO_EXITOSO', {
+        cursos: cursosArr.length,
+        asignaciones: cursoPersonas.length
+      })
+    );
+    this.fetchDesarrolloProfesional();
+    this.clearFileSelection();
+    this.loading = false;
+  } catch (error) {
+    console.error('Error guardando datos:', error);
+    this.showError(this.translate.instant('DESARROLLO_PROFESIONAL.ERROR_GUARDAR_DATOS'));
+    this.loading = false;
   }
+}
 
   clearFileSelection() {
     this.selectedFile = null;

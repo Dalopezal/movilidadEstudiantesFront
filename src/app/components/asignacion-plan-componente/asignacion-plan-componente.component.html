@@ -119,7 +119,7 @@
                     <option [ngValue]="''">{{ 'ASIGNACION_PLAN_COMPONENTE.SELECCIONE' | translate }}</option>
                     <option
                       *ngFor="let p of programasUCM"
-                      [ngValue]="p.programa.codigo"
+                      [ngValue]="p.programa.nombre"
                     >
                       {{ p.programa.nombre }}
                     </option>

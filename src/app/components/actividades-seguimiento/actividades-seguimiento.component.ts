@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-actividades-seguimiento',
@@ -183,6 +184,70 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
       });
   }
 
+  private findComponenteNombreSync(codigoOrText: string | null): string | null {
+  if (!codigoOrText) return null;
+  const q = codigoOrText.toString().trim().toLowerCase();
+
+  // Primero intentar match por código exacto (si existe campo de código)
+  const byCode = this.componentesUCM?.find((x: any) => {
+    const codigo = (x.componenteCodigoUCM ?? x.componente_codigo ?? x.codigo ?? x?.componente?.codigo ?? '').toString().trim().toLowerCase();
+    return codigo && codigo === q;
+  });
+  if (byCode) {
+    return byCode.componente_nombre ?? byCode.nombre ?? byCode?.componente?.nombre ?? null;
+  }
+
+  // Si no se encontró por código, buscar por coincidencia parcial en el nombre
+  const byName = this.componentesUCM?.find((x: any) => {
+    const nombre = (x.componente_nombre ?? x.nombre ?? x?.componente?.nombre ?? '').toString().trim().toLowerCase();
+    return nombre && nombre.includes(q);
+  });
+  if (byName) {
+    return byName.componente_nombre ?? byName.nombre ?? byName?.componente?.nombre ?? null;
+  }
+
+  return null;
+}
+
+  private findPlaneacionSync(idOrText: number | string | null) {
+    if (idOrText == null) return null;
+
+    // --- Si es número (o string numérico) intentar buscar por id ---
+    const isNumeric = typeof idOrText === 'number' || (/^\d+$/.test(String(idOrText).trim()));
+    if (isNumeric) {
+      const id = Number(idOrText);
+      const byId = this.planeaciones?.find((x: any) =>
+        x.id === id || x.planId === id || x.planeacionId === id || x.planoId === id
+      );
+      if (byId) {
+        return {
+          planId: byId.id ?? byId.planId ?? byId.planeacionId ?? null,
+          planTitulo: byId.titulo ?? byId.nombre ?? byId.descripcion ?? null,
+          planDescripcion: byId.descripcion ?? byId.titulo ?? byId.nombre ?? null
+        };
+      }
+      // si no lo encuentra por id, continúa para probar como texto
+    }
+
+    // --- Tratar como texto: búsqueda parcial en título/descripcion ---
+    const q = String(idOrText).trim().toLowerCase();
+    if (!q) return null;
+
+    const found = this.planeaciones?.find((x: any) => {
+      const titulo = (x.titulo ?? x.nombre ?? x.descripcion ?? '').toString().trim().toLowerCase();
+      const descripcion = (x.descripcion ?? x.titulo ?? x.nombre ?? '').toString().trim().toLowerCase();
+      return (titulo && titulo.includes(q)) || (descripcion && descripcion.includes(q));
+    });
+
+    if (!found) return null;
+
+    return {
+      planId: found.id ?? found.planId ?? found.planeacionId ?? null,
+      planTitulo: found.titulo ?? found.nombre ?? found.descripcion ?? null,
+      planDescripcion: found.descripcion ?? found.titulo ?? found.nombre ?? null
+    };
+  }
+
   private extraerLista(resp: any): any[] {
     if (!resp) return [];
     if (Array.isArray(resp)) return resp;
@@ -323,7 +388,17 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
     }
 
     this.loadingModal = true;
+    let nombreInstitucion = this.getInstitucionNombreByIdSync(this.filtro.institucionId);
+    this.actividad.institucionNombre = nombreInstitucion;
+
+    let nombreComponente = this.findComponenteNombreSync(this.filtro.componenteCodigoUCM);
+    this.actividad.nombreComponenteUCM = this.filtro.componenteCodigoUCM;
+
+    this.actividad.componenteCodigoUCM = this.filtro.componenteCodigoUCM;
     const payload = this.actividad.toJSON();
+
+    let planTitulo = this.findPlaneacionSync(this.filtro.planId);
+    this.actividad.planTitulo = planTitulo?.planTitulo;
 
     const esUpdate = this.isEditing && this.actividad.id && this.actividad.id > 0;
     const endpoint = esUpdate
@@ -365,6 +440,17 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
         }
       });
   }
+
+  // helper síncrono: busca en this.instituciones
+private getInstitucionNombreByIdSync(id: number | null): string | null {
+  if (id == null) return null;
+  const inst = this.instituciones?.find((i: any) => {
+    // comprobar varias propiedades que puedan contener el id
+    return i.id === id || i.institucionId === id || i.institucion_id === id;
+  });
+  if (!inst) return null;
+  return inst.nombre ?? inst.razonSocial ?? inst.institucionNombre ?? null;
+}
 
   // ================== PAGINADOR ==================
 

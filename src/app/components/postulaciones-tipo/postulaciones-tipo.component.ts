@@ -131,11 +131,12 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
           let filteredItems = items;
 
           if (this.usuario?.rolId == 10) {
-            filteredItems = items.filter(item =>
-              item?.programa === this.usuario?.programa
+            filteredItems = items.filter(
+              item =>
+                this.normalizarTexto(item?.programa || '') ===
+                this.normalizarTexto(this.usuario?.programa || '')
             );
           }
-
 
           const baseModels = filteredItems.map(item =>
             PostulacionTipoConsultaModel.fromJSON(item)
@@ -188,6 +189,14 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
           this.loading = false;
         }
       });
+  }
+
+  private normalizarTexto(texto: string): string {
+  return texto
+    ?.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // elimina tildes
+    .trim()
+    .toUpperCase();
   }
 
   private mapStudentInfoToModel(

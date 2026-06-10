@@ -87,7 +87,7 @@
                 <option [ngValue]="null">{{ 'ACTIVIDADES_SEGUIMIENTO.SELECCIONE' | translate }}</option>
                 <option
                   *ngFor="let c of componentesUCM"
-                  [ngValue]="c.componente_nombre"
+                  [ngValue]="c.componente_codigo"
                 >
                   {{ c.componente_nombre }}
                 </option>

@@ -77,7 +77,7 @@ export class AsignacionPlanComponenteComponent
   constructor(
     private api: GenericApiService,
     private confirmationService: ConfirmationService,
-    private translate: TranslateService // ✅
+    private translate: TranslateService
   ) {}
 
   ngOnInit() {
@@ -162,34 +162,51 @@ export class AsignacionPlanComponenteComponent
         }
       });
 
-    // Facultades UCM (llenadas desde orisiga/asignaciondocente usando campo "facultad")
     if (this.usuario?.idUsuario) {
-      const url = `orisiga/asignaciondocente/?identificacion=${this.usuario.idUsuario}`;
+    const url = `orisiga/asignaciondocente/?identificacion=${this.usuario.idUsuario}`;
 
-      this.api
-        .getExterno<any[]>(url)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (resp) => {
-            const items = this.mapArray(resp);
+    this.api
+      .getExterno<any>(url)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          console.log('RESPUESTA BRUTA asignaciondocente:', resp);
 
-            const facultadesUnicas = Array.from(
-              new Set(items.map((i: any) => i.facultad).filter(Boolean))
-            );
+          const rawArray: any[] = Array.isArray(resp)
+            ? resp
+            : resp?.datos ?? resp?.data ?? [];
 
-            this.facultadesUCM = facultadesUnicas.map((f: string) => ({
-              value: f,
-              label: f
-            }));
-          },
-          error: (err) => {
-            console.error('Error al cargar facultades desde asignaciondocente', err);
-            this.facultadesUCM = [];
+          const items = typeof this.mapArray === 'function' ? this.mapArray(rawArray) : rawArray;
+          console.log('ITEMS PROCESADOS:', items);
+
+          const facultades = items
+            .map((i: any) => {
+              const f = i?.facultad ?? i?.facultado ?? '';
+              return f ? String(f).trim() : '';
+            })
+            .filter((f: string) => f.length > 0);
+
+          const facultadesUnicas = Array.from(new Set(facultades));
+
+          this.facultadesUCM = facultadesUnicas.map((f: string, idx: number) => ({
+            facultad_codigo: f,
+            facultad_nombre: f
+          }));
+
+          console.log('facultadesUCM asignadas:', this.facultadesUCM);
+
+          if ((this as any).cd && typeof (this as any).cd.detectChanges === 'function') {
+            (this as any).cd.detectChanges();
           }
-        });
-    } else {
-      this.facultadesUCM = [];
-    }
+        },
+        error: (err) => {
+          console.error('Error al cargar facultades desde asignaciondocente', err);
+          this.facultadesUCM = [];
+        }
+      });
+  } else {
+    this.facultadesUCM = [];
+  }
 
     // Programas UCM
     this.api
@@ -199,7 +216,7 @@ export class AsignacionPlanComponenteComponent
         next: (resp) => {
           this.programasUCM = this.uniqueByNestedKey(
             this.mapArray(resp),
-            'programa.codigo'
+            'programa.nombre'
           );
         },
         error: (err) => {
@@ -381,6 +398,47 @@ export class AsignacionPlanComponenteComponent
     this.cargarInfoComponente(this.model.planestudioId, this.model.componenteCodigoUCM);
   }
 
+  private getNombreComponenteByCodigo(codigo: string): string {
+    if (!codigo || !this.componentesUCM || !Array.isArray(this.componentesUCM)) {
+      return '';
+    }
+    const found = this.componentesUCM.find((c: any) =>
+      c.componente_codigo === codigo || c.componente_codigo === String(codigo)
+    );
+    return found ? (found.componente_nombre ?? '') : '';
+  }
+
+  private getNombreProgramaByCodigo(codigo: string): string {
+    if (!codigo || !this.programasUCM || !Array.isArray(this.programasUCM)) {
+      return '';
+    }
+
+    const found = this.programasUCM.find((p: any) =>
+      String(p?.programa?.codigo) === String(codigo)
+    );
+
+    return found?.programa?.nombre ?? '';
+  }
+
+  private getNombreProgramaByHoras(codigo: string): string {
+    if (!codigo || !this.programasUCM || !Array.isArray(this.programasUCM)) {
+      return '';
+    }
+
+    const found = this.programasUCM.find((p: any) =>
+      String(p?.programa?.nombre) === String(codigo)
+    );
+
+    return found?.programa?.horasinternacionaliza ?? '';
+  }
+
+  private formatDateToYMD(date: Date): string {
+    const y = date.getFullYear();
+    const m = ('0' + (date.getMonth() + 1)).slice(-2);
+    const d = ('0' + date.getDate()).slice(-2);
+    return `${y}-${m}-${d}`;
+  }
+
   // -------- Form --------
   onSubmit(form: NgForm) {
     if (form.invalid) {
@@ -408,7 +466,16 @@ export class AsignacionPlanComponenteComponent
     this.error = null;
 
     const isUpdate = this.isEditing && this.model.id && this.model.id > 0;
-    const payload = this.model.toJSON();
+    const payload = {
+    ...(this.model.toJSON ? this.model.toJSON() : { ...this.model }),
+      id: this.model.id ?? null,
+      docentetitularId: this.usuario?.idUsuario ?? null,
+      nombreComponenteUCM: this.getNombreComponenteByCodigo(this.model.componenteCodigoUCM),
+      programaUCM: this.getNombreProgramaByCodigo(this.model.programaUCM),
+      fechacreacion: this.formatDateToYMD(new Date()),
+      horasInternacionalizacion: this.getNombreProgramaByHoras(this.model.programaUCM),
+      periodo: this.getPeriodoAcademico()
+    };
 
     const endpoint = isUpdate
       ? 'AsignacionPlanComponente/actualiza_AsignacionPlanComponente'
@@ -444,6 +511,13 @@ export class AsignacionPlanComponenteComponent
         this.showError(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_PROCESAR_SOLICITUD'));
       }
     });
+  }
+
+
+  getPeriodoAcademico() {
+    const now = new Date();
+    const mesIndex = now.getMonth();
+    return (mesIndex >= 0 && mesIndex <= 5) ? 1 : 2;
   }
 
   resetForm(form?: NgForm) {
