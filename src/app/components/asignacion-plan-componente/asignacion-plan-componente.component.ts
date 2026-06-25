@@ -471,7 +471,7 @@ export class AsignacionPlanComponenteComponent
       id: this.model.id ?? null,
       docentetitularId: this.usuario?.idUsuario ?? null,
       nombreComponenteUCM: this.getNombreComponenteByCodigo(this.model.componenteCodigoUCM),
-      programaUCM: this.getNombreProgramaByCodigo(this.model.programaUCM),
+      programaUCM: this.model.programaUCM,
       fechacreacion: this.formatDateToYMD(new Date()),
       horasInternacionalizacion: this.getNombreProgramaByHoras(this.model.programaUCM),
       periodo: this.getPeriodoAcademico()

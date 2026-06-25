@@ -116,7 +116,7 @@ export class ConvenioModel {
       diasVigencia: this.diasVigencia,
       estado: this.estado,
       descripcion: this.descripcion,
-      fechaVencimiento: '1900-01-01',
+      fechaVencimiento: this.fechaVencimiento,
       // opcionales/display (se envían sólo si existen)
       ...(this.nombreClasificacionConvenio ? { nombreClasificacionConvenio: this.nombreClasificacionConvenio } : {}),
       ...(this.nombreTipoActividadConvenio ? { nombreTipoActividadConvenio: this.nombreTipoActividadConvenio } : {}),

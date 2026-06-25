@@ -13,11 +13,14 @@
           <div class="row g-3 align-items-end">
             <!-- Selección Planeación -->
             <div class="col-md-2">
-              <label class="form-label fw-bold" style="font-size: 13px;">{{ 'ACTIVIDADES_SEGUIMIENTO.SELECCION_PLANEACION' | translate }}</label>
+              <label class="form-label fw-bold" style="font-size: 13px;">
+                {{ 'ACTIVIDADES_SEGUIMIENTO.SELECCION_PLANEACION' | translate }}
+              </label>
               <select
                 class="form-select"
                 [(ngModel)]="filtro.planId"
                 name="planId"
+                (ngModelChange)="onPlanOrComponenteChange()"
                 style="font-size: 13px;"
               >
                 <option [ngValue]="null">{{ 'ACTIVIDADES_SEGUIMIENTO.SELECCIONE' | translate }}</option>
@@ -82,17 +85,30 @@
                 class="form-select"
                 [(ngModel)]="filtro.componenteCodigoUCM"
                 name="componenteCodigoUCM"
+                (ngModelChange)="onPlanOrComponenteChange()"
                 style="font-size: 13px;"
               >
                 <option [ngValue]="null">{{ 'ACTIVIDADES_SEGUIMIENTO.SELECCIONE' | translate }}</option>
-                <option
-                  *ngFor="let c of componentesUCM"
-                  [ngValue]="c.componente_codigo"
-                >
+                <option *ngFor="let c of componentesUCM" [ngValue]="c.componente_codigo ?? c.componenteCodigoUCM">
                   {{ c.componente_nombre }}
                 </option>
               </select>
             </div>
+
+            <div class="col-md-2">
+            <label class="form-label fw-bold">{{ 'ACTIVIDADES_SEGUIMIENTO.SELECCION_ASIGNACION' | translate }}</label>
+            <select
+              class="form-select"
+              [(ngModel)]="filtro.asignacionId"
+              name="asignacionId"
+              style="font-size: 13px;"
+            >
+              <option [ngValue]="null">{{ 'ACTIVIDADES_SEGUIMIENTO.SELECCIONE' | translate }}</option>
+              <option *ngFor="let a of asignaciones" [ngValue]="a.id">
+                {{ a.nombre ?? a.descripcion ?? a.asignacionNombre ?? ('ID: ' + (a.id ?? '')) }}
+              </option>
+            </select>
+          </div>
 
             <!-- Botón Ver actividades en la misma fila -->
             <div class="col-md-2 d-flex justify-content-center">

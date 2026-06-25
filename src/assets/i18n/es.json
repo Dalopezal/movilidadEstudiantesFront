@@ -77,8 +77,8 @@
       "COL_OPCIONES": "Opciones",
       "CARGANDO": "Cargando datos",
       "SIN_REGISTROS": "No hay registros.",
-      "SI": "Sí",
-      "NO": "No"
+      "SI": "Activo",
+      "NO": "Inactivo"
     },
     "PAGINACION": {
       "MOSTRAR": "Mostrar",
@@ -941,6 +941,7 @@
     "SELECCION_INSTITUCION": "Selección Institución",
     "SELECCION_PROGRAMA": "Selección Programa",
     "SELECCION_COMPONENTE": "Selección Componente",
+    "SELECCION_ASIGNACION": "Selección Asignación",
     "SELECCIONE": "Seleccione",
     "VER_ACTIVIDADES": "Ver Actividades",
     "AGREGAR_ACTIVIDADES": "Agregar actividades",
@@ -960,6 +961,7 @@
     "EVALUACION": "Evaluación",
     "OPCIONES": "Opciones",
     "CARGANDO_DATOS": "Cargando datos",
+    "CARGANDO_ASIGNACIONES": "Cargando asignaciones",
     "NO_HAY_ACTIVIDADES": "No hay actividades para mostrar.",
     "MOSTRAR": "Mostrar",
     "DE": "de",
@@ -972,6 +974,7 @@
     "ERROR_CARGAR_INSTITUCIONES": "Error al cargar instituciones",
     "ERROR_CARGAR_PROGRAMAS": "Error al cargar programas",
     "ERROR_CARGAR_COMPONENTES": "Error al cargar componentes",
+    "ERROR_CARGAR_ASIGNACIONES": "Error al cargar asignaciones",
     "COMPLETE_FILTROS": "Complete los filtros requeridos",
     "NO_ACTIVIDADES_FILTROS": "No se encontraron actividades para los filtros seleccionados",
     "ACTIVIDADES_CARGADAS": "Actividades cargadas correctamente",

@@ -151,7 +151,7 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
               usuarioId: row[6] || 0,
               fechainicio: this.formatExcelDate(row[7]),
               fechafinal: this.formatExcelDate(row[8]),
-              costoCurso: row[9] || 0,
+              costoCurso: row[9] !== undefined ? Number(row[9]) : 0,
               id: row[10]
             } as any;
 
@@ -205,9 +205,9 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
         programaCodigo: String(r.programaCodigo),
         planestuId: r.planEstudio,
         codigo: String(r.codigoCurso),
-        nombreCurso: r.nombreCurso,
+        nombre: r.nombreCurso,
         descripcion: r.descripcion,
-        institucionId: r.institucionId // AJUSTA si tu backend espera otro nombre
+        institucionId: r.institucionId
       });
     }
 
@@ -216,8 +216,9 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
       periodo: 1,
       fechainicio: r.fechainicio,
       fechafinal: r.fechafinal,
-      costocurso: r.costocurso,
-      cursoKey: key // referencia temporal para mapear el id luego
+      costocurso: r.costoCurso,
+      institucionId: r.institucionId,
+      cursoKey: key,
     });
   }
 

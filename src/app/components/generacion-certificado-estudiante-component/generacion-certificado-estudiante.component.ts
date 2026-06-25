@@ -591,10 +591,11 @@ export class GeneracionCertificadoEstudianteComponent implements OnInit, OnDestr
 
     const partes: string[] = [
       `Participó como: ${rol}`,
-      `En el desarrollo de: ${estrategia}`,
-      `Estrategia de: ${tipo}`,
-      `Universidad de origen: ${origenU} (Ciudad: ${origenCiudad}, País: ${origenPais})`,
-      `Universidad externa: ${externaU} (Ciudad: ${externaCiudad}, País: ${externaPais})`,
+      `En el desarrollo de la estrategia: ${estrategia}`,
+      //`Estrategia de: ${tipo}`,
+      `Impartida entre:`,
+      `Universidad de origen ${origenU} (Ciudad: ${origenCiudad}, País: ${origenPais})`,
+      `Universidad externa ${externaU} (Ciudad: ${externaCiudad}, País: ${externaPais})`,
       `Año: ${anio}`,
       `Periodo de desarrollo: ${periodo}`
     ];

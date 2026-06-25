@@ -76,8 +76,8 @@
       "COL_OPCIONES": "Options",
       "CARGANDO": "Loading data",
       "SIN_REGISTROS": "No records found.",
-      "SI": "Yes",
-      "NO": "No"
+      "SI": "Active",
+      "NO": "Inactive"
     },
     "PAGINACION": {
       "MOSTRAR": "Show",
@@ -940,6 +940,7 @@
     "SELECCION_INSTITUCION": "Institution Selection",
     "SELECCION_PROGRAMA": "Program Selection",
     "SELECCION_COMPONENTE": "Component Selection",
+    "SELECCION_ASIGNACION": "Assignment Selection",
     "SELECCIONE": "Select",
     "VER_ACTIVIDADES": "View Activities",
     "AGREGAR_ACTIVIDADES": "Add activities",
@@ -959,6 +960,7 @@
     "EVALUACION": "Evaluation",
     "OPCIONES": "Options",
     "CARGANDO_DATOS": "Loading data",
+    "CARGANDO_ASIGNACIONES": "Loading assignments",
     "NO_HAY_ACTIVIDADES": "No activities to display.",
     "MOSTRAR": "Show",
     "DE": "of",
@@ -971,6 +973,7 @@
     "ERROR_CARGAR_INSTITUCIONES": "Error loading institutions",
     "ERROR_CARGAR_PROGRAMAS": "Error loading programs",
     "ERROR_CARGAR_COMPONENTES": "Error loading components",
+    "ERROR_CARGAR_ASIGNACIONES": "Error loading assignments",
     "COMPLETE_FILTROS": "Complete the required filters",
     "NO_ACTIVIDADES_FILTROS": "No activities found for the selected filters",
     "ACTIVIDADES_CARGADAS": "Activities loaded successfully",

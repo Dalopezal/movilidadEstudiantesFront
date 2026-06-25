@@ -44,14 +44,14 @@
     <mat-form-field appearance="outline" class="full-width">
       <mat-label style="font-family: 'Urbanist', sans-serif !important;">Descripción</mat-label>
       <textarea matInput
-                [(ngModel)]="descripcion"
+                [(ngModel)]="mensaje"
                 name="descripcion"
                 placeholder="Escriba aquí la descripción de la notificación..."
                 rows="6"
                 maxlength="500"
                 required style="font-family: 'Urbanist', sans-serif !important;">
       </textarea>
-      <mat-hint align="end">{{descripcion.length || 0}}/500</mat-hint>
+      <mat-hint align="end">{{mensaje.length || 0}}/500</mat-hint>
     </mat-form-field>
   </form>
 </mat-dialog-content>

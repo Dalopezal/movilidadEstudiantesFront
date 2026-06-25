@@ -4,7 +4,7 @@ export class CursoPersonaModel {
   periodo: number;
   fechainicio: string;
   fechafinal: string;
-  costocurso: number;
+  costoCurso: number;
 
   constructor() {
     this.usuarioId = 0;
@@ -12,7 +12,7 @@ export class CursoPersonaModel {
     this.periodo = 0;
     this.fechainicio = '';
     this.fechafinal = '';
-    this.costocurso = 0;
+    this.costoCurso = 0;
   }
 
   static fromJSON(json: any): CursoPersonaModel {
@@ -22,7 +22,7 @@ export class CursoPersonaModel {
     model.periodo = json.periodo || json.Periodo || 0;
     model.fechainicio = json.fechainicio || json.Fechainicio || '';
     model.fechafinal = json.fechafinal || json.Fechafinal || '';
-    model.costocurso = json.costocurso || json.Costocurso || 0;
+    model.costoCurso = json.costoCurso || json.CostoCurso || 0;
     return model;
   }
 }
@@ -67,5 +67,6 @@ export interface DesarrolloProfesionalRow {
   usuarioId: number;
   fechainicio: string;
   fechafinal: string;
-  costocurso: number;
+  costoCurso: number;
+  costocurso?: number;
 }

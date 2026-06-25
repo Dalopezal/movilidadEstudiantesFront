@@ -11,7 +11,6 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-actividades-seguimiento',
@@ -43,8 +42,12 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
     estrategiaId: null as number | null,
     institucionId: null as number | null,
     programaUCM: null as string | null,
-    componenteCodigoUCM: null as string | null
+    componenteCodigoUCM: null as string | null,
+    asignacionId: null as number | null
   };
+
+  asignaciones: any[] = [];
+  loadingAsignaciones = false;
 
   filtroTexto = '';
 
@@ -332,114 +335,143 @@ export class ActividadesSeguimientoComponent implements OnInit, OnDestroy {
   // ================== MODAL ==================
 
   openModalCrear(): void {
-    this.isEditing = false;
-    this.actividad = new ActividadSeguimientoModel(
-      0,
-      null,
-      null,
-      null,
-      null,
-      '',
-      '',
-      this.filtro.planId,
-      this.filtro.estrategiaId,
-      this.filtro.institucionId,
-      this.filtro.programaUCM,
-      this.filtro.componenteCodigoUCM,
-      null,
-      null,
-      null
-    );
-    this.modalVisible = true;
+  this.isEditing = false;
+  this.actividad = new ActividadSeguimientoModel(
+    0,
+    null,
+    null,
+    null,
+    null,
+    '',
+    '',
+    this.filtro.planId,
+    this.filtro.estrategiaId,
+    this.filtro.institucionId,
+    this.filtro.programaUCM,
+    this.filtro.componenteCodigoUCM,
+    null,
+    null,
+    null
+  );
+
+  // intentar setear planTitulo si ya seleccionaron un plan
+  const planData = this.findPlaneacionSync(this.filtro.planId);
+  if (planData?.planTitulo) {
+    this.actividad.planTitulo = planData.planTitulo;
   }
 
-  openModalEditar(item: ActividadSeguimientoModel): void {
-    this.isEditing = true;
-    this.actividad = new ActividadSeguimientoModel(
-      item.id,
-      item.fechainicio,
-      item.fechafin,
-      item.asignacionComponenteId,
-      item.evaluacion,
-      item.descripcion,
-      item.herramientas,
-      item.planId,
-      item.estrategiaId,
-      item.institucionId,
-      item.programaUCM,
-      item.componenteCodigoUCM,
-      item.nombreComponenteUCM,
-      item.institucionNombre,
-      item.planTitulo
-    );
-    this.modalVisible = true;
+  // si ya hay planId y componente, cargar asignaciones para que el usuario pueda escoger
+  this.cargarAsignaciones();
+
+  this.modalVisible = true;
+}
+
+openModalEditar(item: ActividadSeguimientoModel): void {
+  this.isEditing = true;
+  this.actividad = new ActividadSeguimientoModel(
+    item.id,
+    item.fechainicio,
+    item.fechafin,
+    item.asignacionComponenteId,
+    item.evaluacion,
+    item.descripcion,
+    item.herramientas,
+    item.planId,
+    item.estrategiaId,
+    item.institucionId,
+    item.programaUCM,
+    item.componenteCodigoUCM,
+    item.nombreComponenteUCM,
+    item.institucionNombre,
+    item.planTitulo
+  );
+
+  // setear filtros visibles para que los selects muestren la situación actual
+  this.filtro.planId = item.planId ?? this.filtro.planId;
+  this.filtro.componenteCodigoUCM = item.componenteCodigoUCM ?? this.filtro.componenteCodigoUCM;
+
+  // cargar asignaciones y preseleccionar la actual (sin setTimeout)
+  this.cargarAsignaciones(item.asignacionComponenteId ?? null);
+
+  // asegurar que el planTitulo esté en actividad (si no vino en el item, buscarlo en planeaciones)
+  if (!this.actividad.planTitulo) {
+    const planData = this.findPlaneacionSync(item.planId);
+    if (planData?.planTitulo) this.actividad.planTitulo = planData.planTitulo;
   }
+
+  this.modalVisible = true;
+}
 
   closeModal(): void {
     this.modalVisible = false;
     this.actividad = new ActividadSeguimientoModel();
   }
 
-  onSubmitActividad(form: NgForm): void {
-    if (form.invalid) {
-      this.showWarning(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.COMPLETE_CAMPOS_ACTIVIDAD'));
-      form.control.markAllAsTouched();
-      return;
-    }
+  async onSubmitActividad(form: NgForm): Promise<void> {
+  if (form.invalid) {
+    this.showWarning(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.COMPLETE_CAMPOS_ACTIVIDAD'));
+    form.control.markAllAsTouched();
+    return;
+  }
 
-    this.loadingModal = true;
-    let nombreInstitucion = this.getInstitucionNombreByIdSync(this.filtro.institucionId);
-    this.actividad.institucionNombre = nombreInstitucion;
+  this.loadingModal = true;
 
-    let nombreComponente = this.findComponenteNombreSync(this.filtro.componenteCodigoUCM);
-    this.actividad.nombreComponenteUCM = this.filtro.componenteCodigoUCM;
+  // Institución (si existe)
+  const nombreInstitucion = this.getInstitucionNombreByIdSync(this.filtro.institucionId);
+  this.actividad.institucionNombre = nombreInstitucion ?? this.actividad.institucionNombre;
 
-    this.actividad.componenteCodigoUCM = this.filtro.componenteCodigoUCM;
-    const payload = this.actividad.toJSON();
+  // Componente: intentar resolver nombre desde los componentes cargados
+  const nombreComponente = this.findComponenteNombreSync(this.filtro.componenteCodigoUCM ?? this.actividad.componenteCodigoUCM);
+  if (nombreComponente) this.actividad.nombreComponenteUCM = nombreComponente;
+  // asegurar que el código del componente en la actividad venga del filtro si aplicó
+  if (this.filtro.componenteCodigoUCM) this.actividad.componenteCodigoUCM = this.filtro.componenteCodigoUCM;
 
-    let planTitulo = this.findPlaneacionSync(this.filtro.planId);
-    this.actividad.planTitulo = planTitulo?.planTitulo;
+  // Plan: asegurar planTitulo antes de enviar (buscar por actividad.planId o filtro.planId)
+  const planIdParaBuscar = this.actividad.planId ?? this.filtro.planId;
+  const planData = this.findPlaneacionSync(planIdParaBuscar);
+  if (planData?.planTitulo) this.actividad.planTitulo = planData.planTitulo;
 
-    const esUpdate = this.isEditing && this.actividad.id && this.actividad.id > 0;
-    const endpoint = esUpdate
-      ? 'Actividad/actualiza_Actividades'
-      : 'Actividad/crear_Actividades';
+  // Asignación: tomar la seleccion en el filtro (preseleccionada al cargar asignaciones)
+  this.actividad.asignacionComponenteId = this.filtro.asignacionId ?? this.actividad.asignacionComponenteId ?? null;
 
-    const obs = esUpdate
-      ? this.api.put<any>(endpoint, payload)
-      : this.api.post<any>(endpoint, payload);
+  const payload = this.actividad.toJSON ? this.actividad.toJSON() : { ...this.actividad };
 
-    obs
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          this.loadingModal = false;
-          this.closeModal();
-          this.recargarTabla();
+  const esUpdate = this.isEditing && this.actividad.id && this.actividad.id > 0;
+  const endpoint = esUpdate ? 'Actividad/actualiza_Actividades' : 'Actividad/crear_Actividades';
 
-          if (response?.exito && response?.datos) {
-            this.showSuccess(response.exito);
-          } else if (response?.error && response?.datos === false) {
-            this.showError(response.error);
-          } else {
-            this.showSuccess(
-              esUpdate
-                ? this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ACTIVIDAD_ACTUALIZADA')
-                : this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ACTIVIDAD_CREADA')
-            );
-          }
-        },
-        error: (err) => {
-          console.error(esUpdate ? 'Error al actualizar actividad' : 'Error al crear actividad', err);
-          this.loadingModal = false;
-          this.showError(
+  const obs = esUpdate ? this.api.put<any>(endpoint, payload) : this.api.post<any>(endpoint, payload);
+
+  obs
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (response) => {
+        this.loadingModal = false;
+        this.closeModal();
+        this.recargarTabla();
+
+        if (response?.exito && response?.datos) {
+          this.showSuccess(response.exito);
+        } else if (response?.error && response?.datos === false) {
+          this.showError(response.error);
+        } else {
+          this.showSuccess(
             esUpdate
-              ? this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_ACTUALIZAR_ACTIVIDAD')
-              : this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_CREAR_ACTIVIDAD')
+              ? this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ACTIVIDAD_ACTUALIZADA')
+              : this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ACTIVIDAD_CREADA')
           );
         }
-      });
-  }
+      },
+      error: (err) => {
+        console.error(esUpdate ? 'Error al actualizar actividad' : 'Error al crear actividad', err);
+        this.loadingModal = false;
+        this.showError(
+          esUpdate
+            ? this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_ACTUALIZAR_ACTIVIDAD')
+            : this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_CREAR_ACTIVIDAD')
+        );
+      }
+    });
+}
 
   // helper síncrono: busca en this.instituciones
 private getInstitucionNombreByIdSync(id: number | null): string | null {
@@ -534,4 +566,49 @@ private getInstitucionNombreByIdSync(id: number | null): string | null {
       });
     });
   }
+
+  onPlanOrComponenteChange(): void {
+  // Limpiar selección de asignación previa si cambió plan/componente
+  this.filtro.asignacionId = null;
+  // Llamar a cargar (si ambos filtros están presentes)
+  this.cargarAsignaciones();
+}
+
+  cargarAsignaciones(preselectId?: number | null): void {
+  const planId = this.filtro.planId;
+  const codigoComponente = this.filtro.componenteCodigoUCM;
+
+  if (!planId || !codigoComponente) {
+    this.asignaciones = [];
+    this.filtro.asignacionId = null;
+    return;
+  }
+
+  this.loadingAsignaciones = true;
+  const params: any = { planId: planId, CodigoComponente: codigoComponente };
+
+  this.api
+    .get<any>('AsignacionPlanComponente/Buscar_AsignacionPlanComponente', params)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (resp) => {
+        const lista = this.extraerLista(resp);
+        this.asignaciones = Array.isArray(lista) ? lista : (lista ? [lista] : []);
+        // preseleccionar si viene preselectId y existe en la lista
+        if (preselectId != null && this.asignaciones.some(a => (a.id ?? a.asignacionId) === preselectId)) {
+          // normalizar posible nombre de id
+          const found = this.asignaciones.find(a => (a.id ?? a.asignacionId) === preselectId);
+          this.filtro.asignacionId = found ? (found.id ?? found.asignacionId) : null;
+        }
+        this.loadingAsignaciones = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar asignaciones', err);
+        this.asignaciones = [];
+        this.filtro.asignacionId = null;
+        this.loadingAsignaciones = false;
+        this.showError(this.translate.instant('ACTIVIDADES_SEGUIMIENTO.ERROR_CARGAR_ASIGNACIONES') || 'Error al cargar asignaciones');
+      }
+    });
+}
 }
