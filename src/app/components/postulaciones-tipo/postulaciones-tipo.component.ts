@@ -130,12 +130,32 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
 
           let filteredItems = items;
 
-          if (this.usuario?.rolId == 10) {
-            filteredItems = items.filter(
-              item =>
-                this.normalizarTexto(item?.programa || '') ===
-                this.normalizarTexto(this.usuario?.programa || '')
-            );
+          const rol = Number(this.usuario?.rolId);
+
+          if ([9, 10, 11].includes(rol)) {
+            // Vicerrectoría, Director, Decanatura → solo estudiantes y profesores
+            filteredItems = items.filter(item => [1, 2, 3, 4].includes(Number(item?.rolId)));
+
+            // Director además filtra por su programa
+            if (rol === 10) {
+              filteredItems = filteredItems.filter(
+                item =>
+                  this.normalizarTexto(item?.programa || '') ===
+                  this.normalizarTexto(this.usuario?.programa || '')
+              );
+            }
+          } else if ([12, 13].includes(rol)) {
+            // Rectoría, Jefe inmediato → solo administrativos
+            filteredItems = items.filter(item => [5, 6].includes(Number(item?.rolId)));
+
+            // Jefe inmediato además filtra por su área
+            if (rol === 13) {
+              filteredItems = filteredItems.filter(
+                item =>
+                  this.normalizarTexto(item?.area || '') ===
+                  this.normalizarTexto(this.usuario?.area || '')
+              );
+            }
           }
 
           const baseModels = filteredItems.map(item =>

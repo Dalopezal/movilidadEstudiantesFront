@@ -143,7 +143,10 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
 
     // lee params sólo una vez
     const params = this.route.snapshot.queryParams;
-    this.idPostulacion = this.usuario.rolId == 7 ? params['id'] ? Number(params['id']) : undefined : params['idPostulacion'] ? Number(params['idPostulacion']) : undefined;
+    const rolesRevisores = [7, 9, 10, 11, 12, 13];
+    this.idPostulacion = rolesRevisores.includes(Number(this.usuario.rolId))
+        ? params['id'] ? Number(params['id']) : undefined
+        : params['idPostulacion'] ? Number(params['idPostulacion']) : undefined;
     this.idConvocatoria = params['idConvocatoria'];
     this.nombreConvocatoria = params['nombre'];
 
@@ -364,7 +367,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
 
           this.route.queryParams.subscribe(params => {
             //this.idPostulacion = params['id'];
-            this.idPostulacion = this.usuario.rolId == 7 || this.usuario.rolId == 10 || this.usuario.rolId == 11 ? params['id'] ? Number(params['id']) : undefined : params['idPostulacion'] ? Number(params['idPostulacion']) : undefined;
+            this.idPostulacion = this.usuario.rolId == 7 || this.usuario.rolId == 9 || this.usuario.rolId == 10 || this.usuario.rolId == 11 || this.usuario.rolId == 13 ? params['id'] ? Number(params['id']) : undefined : params['idPostulacion'] ? Number(params['idPostulacion']) : undefined;
           });
           this.getBitacora(this.idPostulacion);
 
@@ -489,29 +492,19 @@ private fetchListaInstituciones() {
   private fasesPermitidasPorRol(rolId: any): number[] {
     const r = Number(rolId);
 
-    const ROL_ORI = 7;
-    const ROL_DIRECTOR = 10;
-    const ROL_DECANATURA = 11;
-    const ROL_VICERRECTORIA = 102;
-    const ROL_JEFE = 103;
-    const ROL_RECTORIA = 104;
-    const ROL_UNIV_DESTINO = 105;
-
     switch (r) {
-      case ROL_ORI:
-        return [1,2,21,3,4,5,16,17,18,19,20];
-      case ROL_DIRECTOR:
-        return [6,7];
-      case ROL_DECANATURA:
-        return [8,9];
-      case ROL_VICERRECTORIA:
-        return [10,11];
-      case ROL_JEFE:
-        return [12,13];
-      case ROL_RECTORIA:
-        return [14,15];
-      case ROL_UNIV_DESTINO:
-        return [16,17,18];
+      case 7:  // ORI
+        return [1, 2, 21, 3, 4, 5,16, 17, 18, 19, 20];
+      case 10: // Director programa
+        return [6, 7];
+      case 11: // Decanatura
+        return [8, 9];
+      case 9:  // Vicerrectoría académica
+        return [10, 11];
+      case 13: // Jefe inmediato
+        return [12, 13];
+      case 12: // Rectoría
+        return [14, 15];
       default:
         return [];
     }
@@ -670,57 +663,30 @@ getBitacora(id: number) {
 
 // Devuelve el id de estado a enfocar (del catálogo) según estado real y rol
 private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
-    const esORI = Number(rolId) === 7;
-    const esDIR = Number(rolId) === 10;
+    const esORI      = Number(rolId) === 7;
+    const esDIR      = Number(rolId) === 10;
+    const esDEC      = Number(rolId) === 11;
+    const esVICE     = Number(rolId) === 9;
+    const esJEFE     = Number(rolId) === 13;
+    const esRECTORIA = Number(rolId) === 12;
 
-    // Reglas por estado (catálogo):
-    // 1: Pre‑postulación
-    if (estadoRealId === 1) {
-      // Usuario normal ve el 1
-      return esORI ? 21 : 1;
-    }
-
-    // 2: Rechazado Pre‑postulación → mantener foco en 2
-    if (estadoRealId === 2) return 2;
-
-    // 21: Aceptado Pre‑postulación → usuario debe ir a Postulación (id=4 “Postulado” lo crea el usuario,
-    // pero el formulario que llena es el de la fase “Postulación”, tu step id=3 con campos a diligenciar).
-    // Si quieres que ambos (ORI y usuario) aterricen en el formulario de Postulación, usa id=3.
+    if (estadoRealId === 1)  return esORI ? 21 : 1;
+    if (estadoRealId === 2)  return 2;
     if (estadoRealId === 21) return 3;
 
-    // 4: Postulado → ORI puede aprobar/rechazar, usuario sigue viendo 3 para editar/objetivo.
-    if (estadoRealId === 4) {
-      return esDIR ? 6 : 3;
-    }
+    if (estadoRealId === 4)  return esDIR ? 6 : 3;
+    if (estadoRealId === 5)  return 5;
 
-    // 5: Rechazado Postulación → mantener foco en 5
-    if (estadoRealId === 5) return 5;
+    if (estadoRealId === 6 || estadoRealId === 7)   return esDEC ? 8 : estadoRealId;
+    if (estadoRealId === 8 || estadoRealId === 9)   return esVICE ? 10 : estadoRealId;
+    if (estadoRealId === 10 || estadoRealId === 11) return esJEFE ? 12 : estadoRealId;
+    if (estadoRealId === 12 || estadoRealId === 13) return esRECTORIA ? 14 : estadoRealId;
+    if (estadoRealId === 14 || estadoRealId === 15) return esORI ? 17 : estadoRealId;
 
-    // 6/7: Director (Aprobado/Rechazado)
-    if (estadoRealId === 6 || estadoRealId === 7) return 8;
-
-    // 8/9: Decanatura (Aprobado/Rechazado)
-    if (estadoRealId === 8 || estadoRealId === 9) return estadoRealId;
-
-    // 10/11: Vicerrectoría (Aprobado/Rechazado)
-    if (estadoRealId === 10 || estadoRealId === 11) return estadoRealId;
-
-    // 12/13: Jefe Inmediato (Aprobado/Rechazado)
-    if (estadoRealId === 12 || estadoRealId === 13) return estadoRealId;
-
-    // 14/15: Rectoría (Aprobado/Rechazado)
-    if (estadoRealId === 14 || estadoRealId === 15) return estadoRealId;
-
-    // 16/17/18/19: Universidad Destino (Postulado/Aceptado/Rechazado/Aprobado)
-    if ([16, 17, 18, 19].includes(estadoRealId)) return estadoRealId;
-
-    // 20: En Movilidad
+    if ([17, 18, 19].includes(estadoRealId)) return estadoRealId;
     if (estadoRealId === 20) return 20;
+    if (estadoRealId === 22) return 22;
 
-    // 22: Finalizado
-    if (estadoRealId === 22) return 20; // si quieres mostrar “Finalizado” en el step 20 (tu catálogo lo etiqueta como Finalizado)
-
-    // Por defecto, mantener el real
     return estadoRealId;
   }
 
@@ -759,90 +725,57 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
   }
 
   private buildAccionesEstado() {
+    const rol = Number(this.usuario.rolId);
+    const esPostulante = [1, 2, 3, 4, 5, 6].includes(rol);
+    const esORI        = rol === 7;
+    const esDIR        = rol === 10;
+    const esDEC        = rol === 11;
+    const esVICE       = rol === 9;
+    const esJEFE       = rol === 13;
+    const esRECTORIA   = rol === 12;
+
     this.accionesEstado = {
-    // ---------------- FASE PRE ----------------
-      1: this.usuario.rolId != 7 ? [ // Pre-postulación
-        { texto: 'Prepostularme', accion: (form?: NgForm) => this.onPrepostular(form) }
+      // PRE-POSTULACIÓN
+      1:  esPostulante ? [{ texto: 'Prepostularme', accion: (form?: NgForm) => this.onPrepostular(form) }] : [],
+      2:  esORI ? [{ texto: 'Rechazado Pre-postulación', accion: (form?: NgForm) => this.onRechazarPre(form) }] : [],
+      21: esORI ? [{ texto: 'Aceptar Pre-postulación',   accion: (form?: NgForm) => this.onAceptarPre(form) }] : [],
+
+      // POSTULACIÓN
+      3: esPostulante ? [
+        { texto: 'Postularme',              accion: () => this.onPostular() },
+        { texto: 'Cancelar la postulación', accion: () => this.onCancelar() }
       ] : [],
-      2: this.usuario.rolId == 7 ?[ // Rechazado Pre-postulación
-        { texto: 'Rechazado Pre-postulación', accion: (form?: NgForm) => this.onRechazarPre(form) }
-      ] : [],
-      21: this.usuario.rolId == 7 ?[ // Aceptado Pre-postulación
-        { texto: 'Aceptar Pre-postulación', accion: (form?: NgForm) => this.onAceptarPre(form) }
-      ] : [],
+      4: esORI ? [{ texto: 'Aprobar postulación',  accion: (form?: NgForm) => this.onAprobarPostulacion(form) }] : [],
+      5: esORI ? [{ texto: 'Rechazar postulación', accion: (form?: NgForm) => this.onRechazarPostulacion(form) }] : [],
 
-      // ---------------- FASE POSTULACIÓN ----------------
-      3: this.usuario.rolId != 7 ? [
-      { texto: 'Postularme', accion: () => this.onPostular() },
-      { texto: 'Cancelar la postulación', accion: () => this.onCancelar() }
-      ] : [],
-      4: [ // Aprobado Postulación (ORI)
-        { texto: 'Aprobar postulación', accion: (form?: NgForm) => this.onAprobarPostulacion(form) }
-      ],
-      5: [ // Rechazado Postulación (ORI)
-        { texto: 'Rechazar postulación', accion: (form?: NgForm) => this.onRechazarPostulacion(form) }
-      ],
+      // DIRECTOR DE PROGRAMA (rolId 10)
+      6: esDIR ? [{ texto: 'Aprobar director de programa', accion: () => this.onAprobarDirector() }] : [],
+      7: esDIR ? [{ texto: 'Rechazar director programa',   accion: () => this.onConfirmarRechazoDirector() }] : [],
 
-      // ---------------- FASE DIRECTOR ----------------
-      6: [
-        { texto: 'Aprobar director de programa', accion: () => this.onAprobarDirector() },
-        // { texto: 'Rechazar director de programa', accion: () => this.onRechazarDirector() }
-      ],
-      7: [
-        { texto: 'Rechazar director programa', accion: () => this.onConfirmarRechazoDirector() }
-      ],
+      // DECANATURA (rolId 11)
+      8: esDEC ? [{ texto: 'Aprobar decanatura', accion: () => this.onAprobarDecanatura() }] : [],
+      9: esDEC ? [{ texto: 'Rechazar decanatura', accion: () => this.onRechazarDecanatura() }] : [],
 
-      // ---------------- FASE DECANATURA ----------------
-      8: [
-        { texto: 'Aprobado Decanatura', accion: () => this.onAprobarDecanatura() }
-      ],
-      9: [
-        { texto: 'Rechazo Decanatura', accion: () => this.onRechazarDecanatura() }
-      ],
+      // VICERRECTORÍA ACADÉMICA (rolId 9)
+      10: esVICE ? [{ texto: 'Aprobar vicerrectoría', accion: () => this.onAprobarVicerrectoria() }] : [],
+      11: esVICE ? [{ texto: 'Rechazar vicerrectoría', accion: () => this.onRechazarVicerrectoria() }] : [],
 
-      // ---------------- FASE VICERRECTORÍA ----------------
-      10: [
-        { texto: 'Aprobado Vicerrectoría Académica', accion: () => this.onAprobarVicerrectoria() }
-      ],
-      11: [
-        { texto: 'Rechazo Vicerrectoría Académica', accion: () => this.onRechazarVicerrectoria() }
-      ],
+      // JEFE INMEDIATO (rolId 13)
+      12: esJEFE ? [{ texto: 'Aprobar jefe inmediato', accion: () => this.onAprobarJefe() }] : [],
+      13: esJEFE ? [{ texto: 'Rechazar jefe inmediato', accion: () => this.onRechazarJefe() }] : [],
 
-      // ---------------- JEFE INMEDIATO ----------------
-      12: [
-        { texto: 'Aprobado Jefe Inmediato', accion: () => this.onAprobarJefe() }
-      ],
-      13: [
-        { texto: 'Rechazado Jefe Inmediato', accion: () => this.onRechazarJefe() }
-      ],
+      // RECTORÍA (rolId 12)
+      14: esRECTORIA ? [{ texto: 'Aprobar rectoría', accion: () => this.onAprobarRectoria() }] : [],
+      15: esRECTORIA ? [{ texto: 'Rechazar rectoría', accion: () => this.onRechazarRectoria() }] : [],
 
-      // ---------------- RECTORÍA ----------------
-      14: [
-        { texto: 'Aprobado Rectoría', accion: () => this.onAprobarRectoria() }
-      ],
-      15: [
-        { texto: 'Rechazo Rectoría', accion: () => this.onRechazarRectoria() }
-      ],
+      // UNIVERSIDAD DESTINO (ORI)
+      16: esORI ? [{ texto: 'Postulado Universidad Destino', accion: () => this.onPostularUniversidad() }] : [],
+      17: esORI ? [{ texto: 'Aceptado Universidad Destino',  accion: () => this.onAprobarUniversidad() }] : [],
+      18: esORI ? [{ texto: 'Rechazado Universidad Destino', accion: () => this.onRechazarUniversidad() }] : [],
 
-      // ---------------- UNIVERSIDAD DESTINO ----------------
-      16: [
-        { texto: 'Postulado Universidad Destino', accion: () => this.onPostularUniversidad() },
-        { texto: 'Cancelar postulación', accion: () => this.onCancelar() }
-      ],
-      17: [
-        { texto: 'Aceptado Universidad Destino', accion: () => this.onAprobarUniversidad() }
-      ],
-      18: [
-        { texto: 'Rechazado Universidad Destino', accion: () => this.onRechazarUniversidad() }
-      ],
-
-      // ---------------- ETAPA FINAL ----------------
-      19: [
-        { texto: 'En movilidad', accion: () => this.onEnMovilidad() }
-      ],
-      20: [
-        { texto: 'Finalizado', accion: () => this.onFinalizado() }
-      ]
+      // EN MOVILIDAD / FINALIZADO (ORI)
+      19: esORI ? [{ texto: 'En Movilidad', accion: () => this.onEnMovilidad() }] : [],
+      20: esORI ? [{ texto: 'Finalizado',   accion: () => this.onFinalizado() }] : [],
     };
   }
 
@@ -1094,7 +1027,7 @@ onConfirmarRechazoDirector() {
     rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/ConfirmarRechazoDirector', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Confirmado Rechazo Director:', resp);
       this.refreshBitacora();
@@ -1134,7 +1067,7 @@ onRechazarDecanatura() {
     rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/RechazarDecanatura', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Rechazado Decanatura:', resp);
       this.refreshBitacora();
@@ -1148,10 +1081,12 @@ onAprobarVicerrectoria() {
   const payload = {
     estadoPostulacionId: 10,
     fechaPostulacion: currentStepData['fechaPostulacion'],
-    rolId: this.usuario.rolId
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/AprobarVicerrectoria', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Aprobado Vicerrectoría:', resp);
       this.refreshBitacora();
@@ -1172,7 +1107,7 @@ onRechazarVicerrectoria() {
     rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/RechazarVicerrectoria', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Rechazado Vicerrectoría:', resp);
       this.refreshBitacora();
@@ -1186,10 +1121,12 @@ onAprobarJefe() {
   const payload = {
     estadoPostulacionId: 12,
     fechaPostulacion: currentStepData['fechaPostulacion'],
-    rolId: this.usuario.rolId
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/AprobarJefe', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Aprobado Jefe Inmediato:', resp);
       this.refreshBitacora();
@@ -1210,7 +1147,7 @@ onRechazarJefe() {
     rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/RechazarJefe', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Rechazado Jefe Inmediato:', resp);
       this.refreshBitacora();
@@ -1227,7 +1164,7 @@ onAprobarRectoria() {
     rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/AprobarRectoria', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Aprobado Rectoría:', resp);
       this.refreshBitacora();
@@ -1248,7 +1185,7 @@ onRechazarRectoria() {
     rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/RechazarRectoria', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Rechazado Rectoría:', resp);
       this.refreshBitacora();
@@ -1262,10 +1199,12 @@ onPostularUniversidad() {
   const payload = {
     estadoPostulacionId: 16,
     fechaPostulacion: currentStepData['fechaPostulacion'],
-    rolId: this.usuario.rolId
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/PostularUniversidad', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Postulado Universidad Destino:', resp);
       this.refreshBitacora();
@@ -1279,10 +1218,12 @@ onAprobarUniversidad() {
   const payload = {
     estadoPostulacionId: 17,
     fechaPostulacion: currentStepData['fechaPostulacion'],
-    rolId: this.usuario.rolId
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/AprobarUniversidad', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Aprobado Universidad Destino:', resp);
       this.refreshBitacora();
@@ -1303,7 +1244,7 @@ onRechazarUniversidad() {
     rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/RechazarUniversidad', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Rechazado Universidad Destino:', resp);
       this.refreshBitacora();
@@ -1319,10 +1260,12 @@ onEnMovilidad() {
     fechaPostulacion: currentStepData['fechaPostulacion'],
     esMatriculadoSiiga: currentStepData['esMatriculadoSiiga'] || false,
     esNotificadoRegistroAcademico: currentStepData['esNotificadoRegistroAcademico'] || false,
-    rolId: this.usuario.rolId
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/EnMovilidad', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('En Movilidad:', resp);
       this.refreshBitacora();
@@ -1341,10 +1284,12 @@ onFinalizado() {
     registradoSire: currentStepData['registradoSire'] || false,
     financiacionExterna: currentStepData['financiacionExterna'],
     financiacioUcm: currentStepData['financiacioUcm'],
-    rolId: this.usuario.rolId
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/Finalizado', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Finalizado:', resp);
       // Aquí puedes agregar lógica para generar el PDF del certificado

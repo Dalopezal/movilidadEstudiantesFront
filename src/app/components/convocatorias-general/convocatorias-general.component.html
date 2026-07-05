@@ -76,7 +76,7 @@
                     <th style="background: white;color: #0D133F;">{{ 'CONVOCATORIAS_GENERAL.TABLE.COL_ENTREGABLES' | translate }}</th>
                     <th style="background: white;color: #0D133F;">{{ 'CONVOCATORIAS_GENERAL.TABLE.COL_ESTADO' | translate }}</th>
                     <th *ngIf="this.usuario.rolId != 7" style="background: white;color: #0D133F;">{{ 'CONVOCATORIAS_GENERAL.TABLE.COL_POSTULARME' | translate }}</th>
-                    <th *ngIf="this.usuario.rolId == 7" style="background: white;color: #0D133F;">{{ 'CONVOCATORIAS_GENERAL.TABLE.COL_POSTULACIONES' | translate }}</th>
+                    <th *ngIf="this.usuario.rolId == 7 || this.usuario.rolId == 7|| this.usuario.rolId == 9 || this.usuario.rolId == 10 || this.usuario.rolId == 11|| this.usuario.rolId == 12|| this.usuario.rolId == 13" style="background: white;color: #0D133F;">{{ 'CONVOCATORIAS_GENERAL.TABLE.COL_POSTULACIONES' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody style="font-size: 13px">
@@ -106,7 +106,7 @@
                     <td *ngIf="this.usuario.rolId != 7" align="center" [title]="'CONVOCATORIAS_GENERAL.TABLE.TOOLTIP_POSTULACION' | translate" (click)="abrirPostulacionDetalle(item)">
                       <i class="fa-duotone fa-regular fa-user button-eye"></i>
                     </td>
-                    <td *ngIf="this.usuario.rolId == 7 || this.usuario.rolId == 10 || this.usuario.rolId == 11" align="center" [title]="'CONVOCATORIAS_GENERAL.TABLE.TOOLTIP_POSTULACION' | translate" (click)="abrirPostulaciones(item)">
+                    <td *ngIf="this.usuario.rolId == 7|| this.usuario.rolId == 9 || this.usuario.rolId == 10 || this.usuario.rolId == 11|| this.usuario.rolId == 12|| this.usuario.rolId == 13" align="center" [title]="'CONVOCATORIAS_GENERAL.TABLE.TOOLTIP_POSTULACION' | translate" (click)="abrirPostulaciones(item)">
                       <i class="fa-duotone fa-regular fa-share-from-square button-eye"></i>
                     </td>
                   </tr>

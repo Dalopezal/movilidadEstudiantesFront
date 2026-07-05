@@ -171,9 +171,10 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
           codigo: item.componente_codigo,
           nombre: item.componente_nombre,
           semestre: item.semestre ?? item.semestre_ucm ?? null,
-          creditos: item.creditos ?? item.creditos_ucm ?? null,
+          creditos: item.totalcreditos ?? item.creditos_ucm ?? null,
           facultad: item.facultad ?? item.plaFacultad ?? null,
-          area_formacion: item.area_formacion ?? item.act_interdetalle ?? item.act_internacional ?? item.areaformacion ?? ''
+          area_formacion: item.area_formacion ?? item.act_interdetalle ?? item.act_internacional ?? item.areaformacion ?? '',
+          creditosComponente: item.creditos
         }));
       }),
       tap((list) => {
@@ -356,12 +357,15 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
       estrategiaid: Number(this.model.estrategiaid),
       periodo: Number(this.model.periodo),
       fecha: this.model.fecha,
-      area_formacion: this.model.area_formacion,
+      areaformacion: this.model.area_formacion,
       totalcreditosprograma: Number(this.model.totalcreditosprograma),
       componenteNombre: this.model.componenteNombre,
-      programa: this.model.programa,
+      programa: this.getNombreProgramaByCodigo(this.model.programa),
       planestudioid: Number(this.model.planestudioid),
-      plaFacultad: this.model.plaFacultad
+      plaFacultad: this.model.plaFacultad,
+      semestreComponente: this.model.semestre,
+      creditosComponente: this.model.creditosComponente
+
     };
 
     if (isUpdate) payload.id = this.model.id;
@@ -393,6 +397,11 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
     });
   }
 
+  getNombreProgramaByCodigo(codigo: string): string {
+    const prog = this.programas.find(p => p.id === codigo);
+    return prog ? prog.nombre : codigo;
+  }
+
   resetForm(form?: NgForm) {
     this.model = new TrayectoriaModel();
     this.isEditing = false;
@@ -413,40 +422,41 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
   }
 
   startEdit(item: TrayectoriaModel) {
-  this.model = Object.assign(new TrayectoriaModel(), item);
-  this.isEditing = true;
+    this.model = Object.assign(new TrayectoriaModel(), item);
+    this.isEditing = true;
 
-  // Normaliza posibles claves legacy
-  if ((this.model as any).areaformacion && !this.model.area_formacion) {
-    this.model.area_formacion = (this.model as any).areaformacion;
-  }
+    if ((this.model as any).areaformacion && !this.model.area_formacion) {
+      this.model.area_formacion = (this.model as any).areaformacion;
+    }
 
-  // Si ya hay componentes cargados, poblar directamente
-  const found = this.componentes?.find(c => c.codigo === this.model.componenteCodigo);
-  if (found) {
-    this.populateFromComponente(found);
-  } else {
-    // Si no hay componentes, intenta cargarlos y luego poblar cuando lleguen
-    if (this.model.programa && this.model.planestudioid) {
-      this.fetchComponentesPorPlan(this.model.programa, Number(this.model.planestudioid))
+    this.resolverCodigoPrograma();
+
+    if (this.model.programa) {
+      this.fetchPlanesPorPrograma(this.model.programa)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (list) => {
-            const f = list.find(c => c.codigo === this.model.componenteCodigo);
-            if (f) {
-              this.populateFromComponente(f);
+          next: () => {
+            const found = this.componentes?.find(c => c.codigo === this.model.componenteCodigo);
+            if (found) {
+              this.populateFromComponente(found);
+            } else if (this.model.planestudioid) {
+              this.fetchComponentesPorPlan(this.model.programa, Number(this.model.planestudioid))
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                  next: (list) => {
+                    const f = list.find(c => c.codigo === this.model.componenteCodigo);
+                    if (f) this.populateFromComponente(f);
+                  },
+                  error: (err) => console.error('Error cargando componentes en startEdit', err)
+                });
             }
-            // Si no se encontró, quizás el item trae su propia area_formacion (ya la normalizamos arriba)
           },
-          error: (err) => {
-            console.error('Error cargando componentes en startEdit', err);
-          }
+          error: (err) => console.error('Error cargando planes en startEdit', err)
         });
     }
-  }
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   async deleteItem(id: number) {
     const confirmado = await this.showConfirm(this.translate.instant('TRAYECTORIAS.CONFIRMAR_ELIMINAR'));
@@ -572,6 +582,7 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
     if (!this.model.componenteCodigo) {
       this.model.componenteNombre = '';
       this.model.totalcreditosprograma = 0;
+      this.model.creditosComponente = 0;
       this.model.plaFacultad = '';
       this.model.area_formacion = '';
       this.model.semestre = null as any;
@@ -585,12 +596,14 @@ export class TrayectoriaComponent implements OnInit, OnDestroy {
       this.model.semestre = (found.semestre !== undefined) ? Number(found.semestre) : this.model.semestre;
       this.model.plaFacultad = found.facultad ?? this.model.plaFacultad;
       this.model.area_formacion = found.area_formacion ?? found.act_interdetalle ?? found.act_internacional ?? this.model.area_formacion;
+      this.model.creditosComponente = found.creditosComponente;
     } else {
       this.model.componenteNombre = '';
       this.model.totalcreditosprograma = 0;
       this.model.plaFacultad = '';
       this.model.area_formacion = '';
       this.model.semestre = null as any;
+      this.model.creditosComponente = 0;
     }
   }
 
@@ -691,21 +704,34 @@ onProgramaChange() {
 }
 
 onPlanEstudioSelect() {
-  if (this.model.planestudioid) {
-    // cargar componentes para el plan seleccionado
-    this.fetchComponentesPorPlan(this.model.programa, Number(this.model.planestudioid))
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.model.componenteCodigo = '';
-        },
-        error: (err) => {
-          console.error('Error cargando componentes al seleccionar plan', err);
-        }
-      });
-  } else {
-    this.componentes = [];
-    this.model.componenteCodigo = '';
+    if (this.model.planestudioid) {
+      // cargar componentes para el plan seleccionado
+      this.fetchComponentesPorPlan(this.model.programa, Number(this.model.planestudioid))
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.model.componenteCodigo = '';
+          },
+          error: (err) => {
+            console.error('Error cargando componentes al seleccionar plan', err);
+          }
+        });
+    } else {
+      this.componentes = [];
+      this.model.componenteCodigo = '';
+    }
   }
-}
+
+  private resolverCodigoPrograma() {
+    if (!this.model.programa) return;
+
+    const porCodigo = this.programas.find(p => p.id === this.model.programa);
+    if (porCodigo) return;
+
+    const porNombre = this.programas.find(p => p.nombre === this.model.programa);
+    if (porNombre) {
+      this.model.programa = porNombre.id;
+    }
+  }
+
 }

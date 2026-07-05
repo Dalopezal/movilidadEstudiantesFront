@@ -157,6 +157,8 @@ export class BeneficiosComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
+    //this.model.nombreBeneficio = "esto es una prueba"
+
     const isUpdate = this.isEditing && this.model.id > 0;
     const payload = this.model.toJSON();
 

@@ -64,7 +64,7 @@ export class PlaneacionVsEjecucionComponent implements OnInit, OnDestroy {
   };
 
   programas = ['Enfermeria', 'Programa 2'];
-  planes = [1, 2, 3];
+  planes: any[] = [];
   periodos = [1, 2];
 
   semestres: string[] = Array.from({ length: 10 }, (_, i) => `Semestre ${i + 1}`);
@@ -299,4 +299,51 @@ export class PlaneacionVsEjecucionComponent implements OnInit, OnDestroy {
       }))
       .filter(x => (x.planeado && x.planeado.length > 0) || (x.ejecutado && x.ejecutado.length > 0));
   }
+
+  onProgramaChange(): void {
+  const prog = this.programasLst.find(p => p.nombre === this.filtros.programa);
+  if (prog) {
+    this.fetchPlanesPorPrograma(prog.id);
+  } else {
+    this.planes = [];
+    this.filtros.plan = null;
+  }
+}
+
+// Nuevo método
+private fetchPlanesPorPrograma(programaCodigo: string): void {
+  if (!programaCodigo) {
+    this.planes = [];
+    this.filtros.plan = null;
+    return;
+  }
+
+  this.api.getExterno<any>(`orisiga/planesxprograma/?programacodigo=${programaCodigo}`)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (resp) => {
+        let items: any[] = [];
+        if (Array.isArray(resp)) items = resp;
+        else if (resp && typeof resp === 'object') {
+          if (Array.isArray(resp.data)) items = resp.data;
+          else if (Array.isArray(resp.items)) items = resp.items;
+          else {
+            const arr = Object.values(resp).find(v => Array.isArray(v));
+            if (Array.isArray(arr)) items = arr;
+          }
+        }
+        this.planes = items.map(item => ({
+          id: item.plan_codigo ?? item.id ?? item.plan_id ?? null,
+          nombre: item.programa_nombre ?? item.nombre ?? item.descripcion ?? String(item.planestudioid ?? item.id ?? '')
+        }));
+        // resetear plan seleccionado al cambiar programa
+        this.filtros.plan = null;
+      },
+      error: (err) => {
+        console.error('Error al cargar planes de estudio', err);
+        this.planes = [];
+        this.filtros.plan = null;
+      }
+    });
+}
 }

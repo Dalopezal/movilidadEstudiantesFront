@@ -201,7 +201,7 @@ export class GenericApiService {
 
     // FIX: Usar la URL correcta con el proxy
     const url = `${environment.apiUrlExterna}/orisiga/token/`;
-    //const url = `https://integracionesucmdev.ucm.edu.co/api/orisiga/token/`;
+   //const url = `https://integracionesucmdev.ucm.edu.co/api/orisiga/token/`;
 
     return this.http.post<any>(url, body).pipe(
       map(res => {

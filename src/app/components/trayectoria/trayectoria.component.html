@@ -27,7 +27,7 @@
                       style="font-size: 13px"
                     >
                       <option [ngValue]="''" disabled>{{ 'TRAYECTORIAS.SELECCIONE' | translate }}</option>
-                      <option *ngFor="let prog of programas" [ngValue]="prog.id">{{ prog.nombre }}</option>
+                      <option *ngFor="let prog of programas" [ngValue]="prog.id">{{prog.nombre}}</option>
                     </select>
                     <div class="text-danger small mt-1" *ngIf="programaCtrl.invalid && (programaCtrl.touched || programaCtrl.dirty)">
                       <div *ngIf="programaCtrl.errors?.['required']">{{ 'TRAYECTORIAS.ERROR_PROGRAMA' | translate }}</div>
@@ -51,7 +51,7 @@
                       style="font-size: 13px"
                     >
                       <option [ngValue]="0" disabled>{{ 'TRAYECTORIAS.SELECCIONE' | translate }}</option>
-                      <option *ngFor="let plan of planesEstudio" [ngValue]="plan.id">{{ plan.nombre }}</option>
+                      <option *ngFor="let plan of planesEstudio" [ngValue]="plan.id">{{ plan.id }}</option>
                     </select>
 
                     <div class="text-danger small mt-1" *ngIf="planCtrl.invalid && (planCtrl.touched || planCtrl.dirty)">
@@ -277,7 +277,7 @@
                     <td>{{ item.area_formacion }}</td>
                     <td>{{ item.totalcreditosprograma }}</td>
                     <td>{{ item.programa }}</td>
-                    <td>{{ getNombrePlanEstudio(item.planestudioid) }}</td>
+                    <td>{{ item.planestudioid }}</td>
                     <td>{{ item.plaFacultad }}</td>
                     <td>
                       <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">

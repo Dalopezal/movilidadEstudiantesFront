@@ -41,7 +41,7 @@ export class TiposConvocatoriaComponent implements OnInit, OnDestroy {
     const tipo = this.usuario?.tipoUsuario != null ? Number(this.usuario.tipoUsuario) : null;
     const rol = this.usuario?.rolId != null ? Number(this.usuario.rolId) : null;
 
-    if (rol === 7 || rol === 10 || rol === 11) {
+    if (rol === 7 || rol === 10 || rol === 11 || rol === 12 || rol === 9 || rol === 13) {
       // ORI: mostrar ambos tabs
       this.isInternal = true;  // Saliente
       this.isExternal = true;  // Entrante

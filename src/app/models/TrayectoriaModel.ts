@@ -7,11 +7,12 @@ export class TrayectoriaModel {
   fecha: string;
   area_formacion: string;
   totalcreditosprograma: number;
+  creditosComponente: number;
   componenteNombre: string;
   programa: string;
   planestudioid: number;
   plaFacultad: string;
-  semestre?: number | null; // <-- nueva propiedad
+  semestre?: number | null;
 
   constructor(
     id?: number,
@@ -22,11 +23,12 @@ export class TrayectoriaModel {
     fecha: string = '',
     area_formacion: string = '',
     totalcreditosprograma: number = 0,
+    creditosComponente: number = 0,
     componenteNombre: string = '',
     programa: string = '',
     planestudioid: number = 0,
     plaFacultad: string = '',
-    semestre: number | null = null // <-- nuevo parámetro con valor por defecto
+    semestre: number | null = null
   ) {
     this.id = id;
     this.usuarioid = usuarioid;
@@ -36,6 +38,7 @@ export class TrayectoriaModel {
     this.fecha = fecha;
     this.area_formacion = area_formacion;
     this.totalcreditosprograma = totalcreditosprograma;
+    this.creditosComponente = creditosComponente;
     this.componenteNombre = componenteNombre;
     this.programa = programa;
     this.planestudioid = planestudioid;
@@ -53,6 +56,7 @@ export class TrayectoriaModel {
       json.fecha ?? '',
       json.area_formacion ?? json.area_formacion ?? '',
       Number(json.totalcreditosprograma ?? json.total_creditos ?? 0),
+      Number(json.creditosComponente ?? json.creditos_componente ?? 0),
       json.componenteNombre ?? json.componente_nombre ?? '',
       json.programa ?? '',
       Number(json.planestudioid ?? json.plan_id ?? 0),
@@ -74,6 +78,7 @@ export class TrayectoriaModel {
       fecha: this.fecha,
       area_formacion: this.area_formacion,
       totalcreditosprograma: this.totalcreditosprograma,
+      creditosComponente: this.creditosComponente,
       componenteNombre: this.componenteNombre,
       programa: this.programa,
       planestudioid: this.planestudioid,

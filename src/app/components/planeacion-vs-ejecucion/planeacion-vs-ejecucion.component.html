@@ -27,7 +27,7 @@
   <div class="row g-3 mb-4">
     <div class="col-12 col-md-3" style="font-size: 13px;">
       <label class="form-label">{{ 'PLANEACION_VS_EJECUCION.PROGRAMA' | translate }}</label>
-      <select class="form-select" style="font-size: 13px;" [(ngModel)]="filtros.programa" (change)="filtrar()">
+      <select class="form-select" style="font-size: 13px;" [(ngModel)]="filtros.programa" (change)="onProgramaChange()">
         <option value="" disabled>{{ 'PLANEACION_VS_EJECUCION.SELECCIONE' | translate }}</option>
         <option *ngFor="let p of programasLst" [value]="p.nombre">{{ p.nombre }}</option>
       </select>
@@ -37,7 +37,7 @@
       <label class="form-label">{{ 'PLANEACION_VS_EJECUCION.PLAN_ESTUDIO' | translate }}</label>
       <select class="form-select" style="font-size: 13px;" [(ngModel)]="filtros.plan" (change)="filtrar()">
         <option [ngValue]="null" disabled>{{ 'PLANEACION_VS_EJECUCION.SELECCIONE' | translate }}</option>
-        <option *ngFor="let p of planes" [ngValue]="p">{{ p }}</option>
+        <option *ngFor="let p of planes" [ngValue]="p.id">{{ p.id }}</option>
       </select>
     </div>
 

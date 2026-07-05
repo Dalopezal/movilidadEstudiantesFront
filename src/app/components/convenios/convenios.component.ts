@@ -327,11 +327,12 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   startEdit(item: any) {
     this.model = ConvenioModel.fromJSON(item);
     this.isEditing = true;
+    this.calcularFechaVencimientoDesdeVigencia();
 
     this.validateFechaInicio();
     this.validateDateRange();
-    this.calculateDiasVigencia();
-    this.validateDiasVigencia();
+    // this.calculateDiasVigencia();
+    // this.validateDiasVigencia();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -489,5 +490,20 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
+  }
+
+  private calcularFechaVencimientoDesdeVigencia() {
+    if (!this.model.fechaInicio || !this.model.diasVigencia || this.model.diasVigencia < 1) return;
+
+    const [year, month, day] = this.model.fechaInicio.split('-').map(Number);
+    const inicio = new Date(year, month - 1, day);
+
+    inicio.setDate(inicio.getDate() + (this.model.diasVigencia - 1));
+
+    const y = inicio.getFullYear();
+    const m = String(inicio.getMonth() + 1).padStart(2, '0');
+    const d = String(inicio.getDate()).padStart(2, '0');
+
+    this.model.fechaVencimiento = `${y}-${m}-${d}`;
   }
 }
