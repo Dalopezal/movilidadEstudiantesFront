@@ -149,7 +149,6 @@ async uploadFile(file: File) {
 
           let driveItem = event.body;
 
-          // Si Graph no devolvió webUrl inmediatamente, solicitar metadata por id
           let webUrlCompleta: string | undefined = driveItem?.webUrl;
           if (!webUrlCompleta && driveItem?.id) {
             try {
@@ -162,20 +161,16 @@ async uploadFile(file: File) {
               webUrlCompleta = meta?.webUrl;
               driveItem = { ...driveItem, ...meta };
             } catch (err) {
-              // no interrumpimos, fallback abajo
             }
           }
 
-          // Si aún no tenemos webUrl, como último recurso reconstruimos con site + ruta si parentReference existe
           if (!webUrlCompleta && driveItem?.parentReference?.path) {
             const fullPath = driveItem.parentReference.path.split(':/')[1] || '';
             webUrlCompleta = `https://ucmeduco.sharepoint.com/sites/Internacionalizacion/${fullPath}/${finalFileName}`;
           }
 
-          // Enviamos la misma URL para url y rutaArchivo (según tu requerimiento)
           await this.registrarUrl(webUrlCompleta, webUrlCompleta);
 
-          // refrescar lista interna de archivos del drive
           this.loadFiles();
         }
       },
@@ -211,7 +206,6 @@ async uploadFile(file: File) {
   this.api.put(endpoint, modelAux).subscribe({
     next: (resp) => {
       this.showSuccess(mensajeExito);
-      // Emitir al padre para que actualice la vista inmediatamente
       this.registroActualizado.emit(modelAux);
     },
     error: (err) => {
