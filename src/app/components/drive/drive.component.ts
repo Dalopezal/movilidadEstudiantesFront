@@ -1,4 +1,4 @@
-import { Component, Inject, Input, model } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, model, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -46,7 +46,10 @@ export class SharePointDriveComponent {
 
   @Input() convocatoria!: any;
   @Input() documento!: any;
-  @Input() EntregablePostulacionModel!: EntregablePostulacionModel;
+  @Input() registroActual: any;
+  @Input() tipoRegistro: 'entregable' | 'condicion' = 'entregable';
+
+  @Output() registroActualizado = new EventEmitter<any>();
 
   // driveId de Procesos_Movilidad
   private driveId = "b!hxInP5NdSkWGDF706k5q4NgI4QHbbA9MuYfs3fRJTRQp2TIIFpMeSKgCChkFV0A1";
@@ -79,91 +82,144 @@ export class SharePointDriveComponent {
     }
   }
 
+  private async getRootFolderName(): Promise<string> {
+    return this.tipoRegistro === 'condicion' ? 'Condiciones' : 'Movilidad';
+  }
+
   // Listar archivos en {documento}/{convocatoria}
   async loadFiles() {
-    this.loading = true;
-    try {
-      const documentoFolderId = await this.getOrCreateFolder(this.documento);
-      const convocatoriaFolderId = await this.getOrCreateFolder(this.convocatoria, documentoFolderId);
+  this.loading = true;
+  try {
+    const rootFolderName = await this.getRootFolderName();
+    const rootFolderId = await this.getOrCreateFolder(rootFolderName);
 
-      const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
-      const headers = { Authorization: `Bearer ${token}` };
+    const documentoFolderId = await this.getOrCreateFolder(this.documento, rootFolderId);
+    const convocatoriaFolderId = await this.getOrCreateFolder(this.convocatoria, documentoFolderId);
 
-      const resp: any = await this.http.get(
-        `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${convocatoriaFolderId}/children`,
-        { headers }
-      ).toPromise();
+    const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
+    const headers = { Authorization: `Bearer ${token}` };
 
-      this.files = resp.value || [];
-    } catch (err: any) {
-      this.error = 'Error al cargar archivos: ' + err.message;
-    } finally {
-      this.loading = false;
-    }
+    const resp: any = await this.http.get(
+    `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${convocatoriaFolderId}/children?$select=id,name,webUrl,parentReference,@microsoft.graph.downloadUrl`,
+    { headers }
+  ).toPromise();
+
+  this.files = resp.value || [];
+  } catch (err: any) {
+    this.error = 'Error al cargar archivos: ' + err.message;
+  } finally {
+    this.loading = false;
   }
+}
 
   // Subida de archivo
-  async uploadFile(file: File) {
-    this.uploading = true;
-    this.uploadProgress = 0;
-    try {
-      const documentoFolderId = await this.getOrCreateFolder(this.documento);
-      const convocatoriaFolderId = await this.getOrCreateFolder(this.convocatoria, documentoFolderId);
+async uploadFile(file: File) {
+  const cleanFileName = file.name
+    .replace(/\s+/g, '_')
+    .replace(/[^\w._-]/g, '')
+    .replace(/_{2,}/g, '_')
+    .trim();
+  const finalFileName = cleanFileName || `archivo_${new Date().getTime()}`;
 
-      const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
-      const headers = { Authorization: `Bearer ${token}` };
+  this.uploading = true;
+  this.uploadProgress = 0;
 
-      const url = `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${convocatoriaFolderId}:/${file.name}:/content`;
+  try {
+    const rootFolderName = await this.getRootFolderName();
+    const rootFolderId = await this.getOrCreateFolder(rootFolderName);
+    const documentoFolderId = await this.getOrCreateFolder(this.documento, rootFolderId);
+    const convocatoriaFolderId = await this.getOrCreateFolder(this.convocatoria, documentoFolderId);
 
-      this.http.put(url, file, {
-        headers,
-        reportProgress: true,
-        observe: 'events'
-      }).subscribe({
-        next: (event: any) => {
-          if (event.type === 1 && event.total) {
-            this.uploadProgress = Math.round((event.loaded / event.total) * 100);
-          }
-          if (event.type === 4) {
-            this.showSuccess('¡Archivo listo!', 'Subido exitosamente');
-            this.uploading = false;
-            this.loadFiles();
+    const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
+    const headers = { Authorization: `Bearer ${token}` };
+    const putUrl = `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${convocatoriaFolderId}:/${encodeURIComponent(finalFileName)}:/content`;
 
-            // event.body contiene el driveItem creado/actualizado
-            const driveItem = event.body;
-
-            // URL de SharePoint para abrir en navegador
-            const webUrl: string | undefined = driveItem?.webUrl;
-            this.registrarUrl(webUrl);
-            }
-        },
-        error: (err) => {
-          this.showError('Error al subir', err.message);
-          this.uploading = false;
+    this.http.put(putUrl, file, {
+      headers,
+      reportProgress: true,
+      observe: 'events'
+    }).subscribe({
+      next: async (event: any) => {
+        if (event.type === 1 && event.total) {
+          this.uploadProgress = Math.round((event.loaded / event.total) * 100);
         }
-      });
-    } catch (err: any) {
-      this.showError('Error inesperado', err.message);
-      this.uploading = false;
-    }
-  }
+        if (event.type === 4) {
+          this.showSuccess('¡Archivo listo!', 'Subido exitosamente');
+          this.uploading = false;
 
-  async registrarUrl(webUrl: any) {
+          let driveItem = event.body;
 
-    let modelAux = this.EntregablePostulacionModel;
-    modelAux.url = webUrl;
+          // Si Graph no devolvió webUrl inmediatamente, solicitar metadata por id
+          let webUrlCompleta: string | undefined = driveItem?.webUrl;
+          if (!webUrlCompleta && driveItem?.id) {
+            try {
+              const token2 = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
+              const headers2 = { Authorization: `Bearer ${token2}` };
+              const meta: any = await this.http.get(
+                `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${driveItem.id}?$select=webUrl,parentReference`,
+                { headers: headers2 }
+              ).toPromise();
+              webUrlCompleta = meta?.webUrl;
+              driveItem = { ...driveItem, ...meta };
+            } catch (err) {
+              // no interrumpimos, fallback abajo
+            }
+          }
 
-    this.api.put('EntregablePostulacion/Actualiza_EntregablePostulacion', modelAux).subscribe({
-      next: (resp) => {
-        this.showSuccess('Url Entregable registrado exitosamente');
+          // Si aún no tenemos webUrl, como último recurso reconstruimos con site + ruta si parentReference existe
+          if (!webUrlCompleta && driveItem?.parentReference?.path) {
+            const fullPath = driveItem.parentReference.path.split(':/')[1] || '';
+            webUrlCompleta = `https://ucmeduco.sharepoint.com/sites/Internacionalizacion/${fullPath}/${finalFileName}`;
+          }
+
+          // Enviamos la misma URL para url y rutaArchivo (según tu requerimiento)
+          await this.registrarUrl(webUrlCompleta, webUrlCompleta);
+
+          // refrescar lista interna de archivos del drive
+          this.loadFiles();
+        }
       },
       error: (err) => {
-        // Asegúrate de extraer el mensaje correcto del error
-        const mensaje = err?.error?.message || err?.message || 'Error al registrar url del entregable';
-        this.showError(mensaje);
+        this.showError('Error al subir', err.message);
+        this.uploading = false;
       }
     });
+  } catch (err: any) {
+    this.showError('Error inesperado', err.message);
+    this.uploading = false;
   }
+}
+
+  async registrarUrl(webUrl: string | undefined, rutaCompleta: string | undefined) {
+  const modelAux = {
+    ...this.registroActual,
+    url: webUrl || null,
+    rutaArchivo: webUrl || rutaCompleta || null
+  };
+
+  let endpoint = '';
+  let mensajeExito = '';
+
+  if (this.tipoRegistro === 'condicion') {
+    endpoint = 'CumplimientoCondicion/Actualiza_CumplimientoCondiciones';
+    mensajeExito = 'Url de condición registrada exitosamente';
+  } else {
+    endpoint = 'EntregablePostulacion/Actualiza_EntregablePostulacion';
+    mensajeExito = 'Url Entregable registrado exitosamente';
+  }
+
+  this.api.put(endpoint, modelAux).subscribe({
+    next: (resp) => {
+      this.showSuccess(mensajeExito);
+      // Emitir al padre para que actualice la vista inmediatamente
+      this.registroActualizado.emit(modelAux);
+    },
+    error: (err) => {
+      const mensaje = err?.error?.message || err?.message || 'Error al registrar url';
+      this.showError(mensaje);
+    }
+  });
+}
 
   // Descargar archivo
   async downloadFile(file: any) {

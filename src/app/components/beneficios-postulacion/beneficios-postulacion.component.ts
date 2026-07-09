@@ -72,7 +72,7 @@ export class BeneficiosComponent implements OnInit, OnDestroy {
   fetchBeneficios() {
     this.error = null;
     this.loadingTable = true;
-    this.api.get<any>('BeneficioPostulacion/Consultar_PostulacionBeneficios')
+    this.api.get<any>('BeneficioPostulacion/Consultar_BeneficiosPostu?postula='+ this.postulacionId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {

@@ -3,7 +3,7 @@ export class BeneficioPostulacionaModel {
   beneficioConvocatoriaId: string = "";
   postulacionId: number = 0;
   estado: boolean = false;
-  nombreBeneficio: string = '';
+  nombreBeneficioConvocatoria: string = '';
 
   static fromJSON(json: any): BeneficioPostulacionaModel {
     const model = new BeneficioPostulacionaModel();
@@ -11,7 +11,7 @@ export class BeneficioPostulacionaModel {
     model.beneficioConvocatoriaId = (json.beneficioConvocatoriaId ?? 0);
     model.postulacionId = Number(json.postulacionId ?? 0);
     model.estado = Boolean(json.estado);
-    model.nombreBeneficio = json.nombreBeneficio ?? '';
+    model.nombreBeneficioConvocatoria = json.nombreBeneficioConvocatoria ?? '';
     return model;
   }
 
@@ -21,7 +21,7 @@ export class BeneficioPostulacionaModel {
       beneficioConvocatoriaId: this.beneficioConvocatoriaId,
       postulacionId: this.postulacionId,
       estado: this.estado,
-      nombreBeneficio: this.nombreBeneficio
+      nombreBeneficioConvocatoria: this.nombreBeneficioConvocatoria
     };
   }
 }

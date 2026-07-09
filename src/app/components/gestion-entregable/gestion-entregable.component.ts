@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
@@ -49,6 +49,8 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
   EntregablesConvocatoria: number = 0;
   lstEntregablesConvocatoria: any[] = [];
   selectedItemCard: EntregablePostulacionModel | null = null;
+
+  @Output() registroActualizado = new EventEmitter<any>();
 
   private destroy$ = new Subject<void>();
 
@@ -332,16 +334,44 @@ export class GestionEntregableComponent implements OnInit, OnDestroy {
   }
 
   abrirModalDrive() {
-    this.dialog.open(SharePointDriveComponent, {
-      width: '600px',
-      height: '480px',
-      disableClose: false,
-      data: {
+  const dialogRef = this.dialog.open(SharePointDriveComponent, {
+    width: '600px',
+    height: '480px',
+    disableClose: false,
+    data: {
       documento: this.documento,
       convocatoria: this.convocatoria
     }
+  });
+
+  const instance = (dialogRef.componentInstance as any);
+  if (instance && instance.registroActualizado && instance.registroActualizado.subscribe) {
+    instance.registroActualizado.subscribe((updated: any) => {
+      this.onRegistroActualizado(updated);
     });
   }
+
+
+}
+
+onRegistroActualizado(updated: any) {
+  if (!updated) return;
+
+  if (this.selectedItemCard && this.selectedItemCard.id === updated.id) {
+    this.selectedItemCard = { ...this.selectedItemCard, ...updated };
+  }
+
+  if (Array.isArray(this.data)) {
+    this.data = this.data.map((d: any) => d.id === updated.id ? { ...d, ...updated } : d);
+  }
+
+  if (Array.isArray(this.filteredData)) {
+    this.filteredData = this.filteredData.map((d: any) => d.id === updated.id ? { ...d, ...updated } : d);
+  }
+
+  this.calculateTotalPages();
+  this.updatePagedData();
+}
 
   cardPosition = { top: 100, left: 100 };
   isClosing = false;

@@ -12,32 +12,29 @@
             <div class="card-header text-white" style="background: #E2E6F7;">
               <p class="mb-0" style="color: #0D133F;font-size: 14px">Condiciones</p>
             </div>
-            <!-- <div class="card-header d-flex align-items-center gap-3" style="background: white;">
+            <div class="card-header d-flex align-items-center gap-3" style="background: white;">
               <select
                 class="form-select"
-                id="EntregablesConvocatoria"
-                name="EntregablesConvocatoria"
+                id="CondicionesConvocatoria"
+                name="CondicionesConvocatoria"
                 required
                 style="font-size: 13px;margin-right: 5px;"
-                [(ngModel)]="EntregablesConvocatoria"
-                name="filtro"
-                (change)="registrarEntregable(EntregablesConvocatoria)"
+                [(ngModel)]="condicionesConvocatoria"
+                (change)="registrarCondicion(condicionesConvocatoria)"
               >
-                <option value="0">Seleccione Condición de la Convocatria</option>
-                <option *ngFor="let m of lstEntregablesConvocatoria" [ngValue]="m.id">{{ m.nombre }}</option>
+                <option value="0">Seleccione Condición de la Convocatoria</option>
+                <option *ngFor="let m of lstCondicionesConvocatoria" [ngValue]="m.id">{{ m.nombre }}</option>
               </select>
-            </div> -->
+            </div>
             <div class="table-responsive flex-grow-1" style="min-height: 0; overflow-y: auto;">
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
                   <tr>
                     <th style="background: white !important;">Nombre</th>
-                    <!-- <th style="background: white !important;">Descripción</th>
-                    <th style="background: white !important;">Convocatoria</th> -->
-                    <!-- <th style="background: white !important;">Url</th>
+                    <th style="background: white !important;">Url</th>
                     <th *ngIf="this.usuario.rolId != 7" style="background: white !important;">Aprobado Oficina Movilidad</th>
                     <th *ngIf="this.usuario.rolId == 7" style="background: white !important;">Aprobar</th>
-                    <th style="background: white !important;">Opciones</th> -->
+                    <th style="background: white !important;">Opciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -47,25 +44,40 @@
                   </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.descripcion }}</td>
-                    <!-- <td
-                      class="text-truncate-custom"
-                      [title]="item.descripcion">
-                      {{ item.descripcion }}
-                    </td>
-                    <td></td> -->
-                    <!-- <td> <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed">
+                    <td>
+                      <button
+                        style="margin-bottom: 3px;"
+                        class="btn btn-sm btn-primary me-1 button-completed"
+                        (click)="abrirUrlCondicion(item)"
+                        [disabled]="!item.rutaArchivo || item.rutaArchivo === 'NA' || item.rutaArchivo === '' || item.rutaArchivo === null">
                         <i class="fas fa-link"></i>
                       </button>
                     </td>
                      <td align="center">
-                      <button *ngIf="this.usuario.rolId != 7" class="button-pending">No</button>
-                      <input *ngIf="this.usuario.rolId == 7" type="checkbox" class="form-check-label">
+                      <div *ngIf="this.usuario.rolId != 7">
+                        <span class="badge-pro" [ngClass]="item.estado ? 'badge-success-pro' : 'badge-warning-pro'">
+                          <i class="fas" [ngClass]="item.estado ? 'fa-check-circle' : 'fa-clock'"></i>
+                          {{ item.estado ? 'Aprobado' : 'Pendiente' }}
+                        </span>
+                      </div>
+
+                      <div *ngIf="this.usuario.rolId == 7" class="form-check form-switch d-flex justify-content-center">
+                        <div *ngIf="this.usuario.rolId == 7" class="form-check form-switch d-flex justify-content-center">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            role="switch"
+                            [id]="'switch' + item.id"
+                            [checked]="item.estado"
+                            (click)="cambiarEstadoAprobacion($event, item)">
+                        </div>
+                      </div>
                     </td>
                     <td>
                       <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="toggleDetalleConvocatoria(item)">
                         <i class="fas fa-cloud"></i>
                       </button>
-                    </td> -->
+                    </td>
                   </tr>
                   <tr *ngIf="!loadingTable && pagedData.length === 0">
                     <td colspan="6" class="text-center">No hay registros.</td>
@@ -122,7 +134,14 @@
     </div>
 
     <div class="card-body glass-effect scroll-body" style="font-size: 13px;">
-      <app-sharepoint-drive [convocatoria]="convocatoria" [documento]="documento">></app-sharepoint-drive>
+      <!-- Creamos un objeto compatible con EntregablePostulacionModel -->
+      <app-sharepoint-drive
+        [convocatoria]="convocatoria"
+        [documento]="documento"
+        [registroActual]="selectedItemCard"
+        tipoRegistro="condicion"
+        (registroActualizado)="onRegistroActualizado($event)">
+      </app-sharepoint-drive>
     </div>
   </div>
 </div>

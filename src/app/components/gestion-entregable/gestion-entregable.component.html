@@ -143,7 +143,13 @@
     </div>
 
     <div class="card-body glass-effect scroll-body" style="font-size: 13px;">
-      <app-sharepoint-drive [convocatoria]="convocatoria" [documento]="documento" [EntregablePostulacionModel]="modelAux" >></app-sharepoint-drive>
+      <app-sharepoint-drive
+        [convocatoria]="convocatoria"
+        [documento]="documento"
+        [registroActual]="selectedItemCard"
+        tipoRegistro="entregable"
+        (registroActualizado)="onRegistroActualizado($event)">
+      </app-sharepoint-drive>
     </div>
   </div>
 </div>
