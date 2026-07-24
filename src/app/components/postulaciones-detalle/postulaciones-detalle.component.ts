@@ -367,7 +367,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
 
           this.route.queryParams.subscribe(params => {
             //this.idPostulacion = params['id'];
-            this.idPostulacion = this.usuario.rolId == 7 || this.usuario.rolId == 9 || this.usuario.rolId == 10 || this.usuario.rolId == 11 || this.usuario.rolId == 13 ? params['id'] ? Number(params['id']) : undefined : params['idPostulacion'] ? Number(params['idPostulacion']) : undefined;
+            this.idPostulacion = this.usuario.rolId == 7 || this.usuario.rolId == 9 || this.usuario.rolId == 10 || this.usuario.rolId == 11 || this.usuario.rolId == 13 || this.usuario.rolId == 12 ? params['id'] ? Number(params['id']) : undefined : params['idPostulacion'] ? Number(params['idPostulacion']) : undefined;
           });
           this.getBitacora(this.idPostulacion);
 
