@@ -312,11 +312,11 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
       20: [ // Finalizado
         { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' },
         { name: 'fechaPostulacion', label: 'Fecha Postulación', tipo: 'readonly' },
-        { name: 'certificadoMovilidad', label: 'Certificado Movilidad', tipo: 'text', editable: true }, // Genera PDF
+        { name: 'certificadoMovilidad', label: 'Certificado Movilidad', tipo: 'checkbox', editable: true }, // Genera PDF
         { name: 'realizoEncuestaSatisfaccion', label: 'Realizó Encuesta Satisfacción', tipo: 'checkbox', editable: true },
         { name: 'registradoSire', label: 'Registrado SIRE', tipo: 'checkbox', editable: true },
-        { name: 'financiacionExterna', label: 'Financiación Externa', tipo: 'text', editable: true },
-        { name: 'financiacioUcm', label: 'Financiación UCM', tipo: 'text', editable: true }
+        { name: 'financiacionExterna', label: 'Financiación Externa', tipo: 'checkbox', editable: true },
+        { name: 'financiacioUcm', label: 'Financiación UCM', tipo: 'checkbox', editable: true }
       ]
     };
 
@@ -565,6 +565,7 @@ getBitacora(id: number) {
     });
 
     step.data = { ...step.data, ...stepData };
+    this.normalizeCheckboxesForStepData(step);
   });
 
   this.api.get<any>(`Postulaciones/Consultar_PostulacionBitacora?id=${id}`)
@@ -615,6 +616,7 @@ getBitacora(id: number) {
           });
 
           step.data = { ...step.data, ...stepData };
+          this.normalizeCheckboxesForStepData(step);
         });
 
         if (bitacora.length > 0) {
@@ -1161,7 +1163,9 @@ onAprobarRectoria() {
   const payload = {
     estadoPostulacionId: 14,
     fechaPostulacion: currentStepData['fechaPostulacion'],
-    rolId: this.usuario.rolId
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
   this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
@@ -1275,28 +1279,70 @@ onEnMovilidad() {
 }
 
 onFinalizado() {
-  const currentStepData = this.steps[this.currentStep]?.data || {};
-  const payload = {
-    estadoPostulacionId: 20,
-    fechaPostulacion: currentStepData['fechaPostulacion'],
-    certificadoMovilidad: currentStepData['certificadoMovilidad'],
-    realizoEncuestaSatisfaccion: currentStepData['realizoEncuestaSatisfaccion'] || false,
-    registradoSire: currentStepData['registradoSire'] || false,
-    financiacionExterna: currentStepData['financiacionExterna'],
-    financiacioUcm: currentStepData['financiacioUcm'],
-    rolId: this.usuario.rolId,
-    usuarioId: this.idUsuario,
-    convocatoriaId: this.idCovocatoria,
-  };
+  const stepIndexForPayload = (this.selectedStepIndex ?? this.currentStep);
 
-  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
-    next: (resp) => {
-      console.log('Finalizado:', resp);
-      // Aquí puedes agregar lógica para generar el PDF del certificado
-      this.generarCertificadoMovilidad();
-      this.refreshBitacora();
-    },
-    error: (err) => console.error('Error al finalizar:', err)
+  Promise.resolve().then(() => {
+    const step = this.steps?.[stepIndexForPayload];
+    if (!step) {
+      console.error('onFinalizado: no existe step para index', stepIndexForPayload);
+      return;
+    }
+
+    // asegurar que las checkboxes existan y sean booleanas
+    this.normalizeCheckboxesForStepData(step);
+
+    const data = step.data || {};
+
+    const payload = {
+      estadoPostulacionId: 20,
+      fechaPostulacion: data['fechaPostulacion'],
+      certificadoMovilidad: !!data['certificadoMovilidad'],
+      realizoEncuestaSatisfaccion: !!data['realizoEncuestaSatisfaccion'],
+      registradoSire: !!data['registradoSire'],
+      financiacionExterna: !!data['financiacionExterna'],
+      financiacioUcm: !!data['financiacioUcm'], // revisar typo (ver nota)
+      rolId: this.usuario.rolId,
+      usuarioId: this.idUsuario,
+      convocatoriaId: this.idCovocatoria,
+    };
+
+    console.log('payload onFinalizado:', payload);
+
+    this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
+      next: (resp) => {
+        console.log('Finalizado:', resp);
+        this.generarCertificadoMovilidad();
+        this.refreshBitacora();
+      },
+      error: (err) => console.error('Error al finalizar:', err)
+    });
+  });
+}
+
+private normalizeCheckboxesForStepData(step: any) {
+  if (!step) return;
+  step.data = step.data || {};
+
+  // Lista de campos checkbox del estado 20 (Finalizado).
+  // Si más estados añaden checkbox, puedes generalizar buscando en this.campoEstado[step.id]
+  const checkboxNames = [
+    'certificadoMovilidad',
+    'realizoEncuestaSatisfaccion',
+    'registradoSire',
+    'financiacionExterna',
+    'financiacioUcm' // ojo: comprueba typo (ver nota abajo)
+  ];
+
+  checkboxNames.forEach(name => {
+    const val = step.data[name];
+    if (val === undefined || val === null) {
+      step.data[name] = false;
+    } else if (typeof val === 'string') {
+      const low = val.toLowerCase();
+      step.data[name] = (low === '1' || low === 'true' || low === 'yes');
+    } else {
+      step.data[name] = !!val;
+    }
   });
 }
 
