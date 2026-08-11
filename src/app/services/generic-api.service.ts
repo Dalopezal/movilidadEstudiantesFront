@@ -2,7 +2,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError, from } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, finalize, map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
 export interface ApiResponse<T> {
@@ -12,11 +13,129 @@ export interface ApiResponse<T> {
 }
 
 @Injectable({
-  providedIn: 'any' // mantiene la compatibilidad con standalone components
+  providedIn: 'any'
 })
 export class GenericApiService {
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
+
+  // -----------------------
+  // TOKEN INTERNO (AUTO-RECOVERY SIN REFRESH) - NUEVO
+  // -----------------------
+  private internalRecoveryInFlight$?: Observable<string>;
+
+  private isAuthError(err: any): boolean {
+    return err instanceof HttpErrorResponse && (err.status === 401 || err.status === 403);
+  }
+
+  private getInternalAccessToken(): string | null {
+    return sessionStorage.getItem('generalToken') || localStorage.getItem('generalToken');
+  }
+
+  private setInternalAccessToken(token: string) {
+    sessionStorage.setItem('generalToken', token);
+    localStorage.setItem('generalToken', token);
+  }
+
+  private clearInternalAccessToken() {
+    sessionStorage.removeItem('generalToken');
+    localStorage.removeItem('generalToken');
+  }
+
+  /**
+   * Limpia toda la sesión y redirige al login
+   */
+  private forceLogout() {
+    console.warn('[GenericApiService] Forzando logout por sesión expirada...');
+
+    // Limpiar tokens internos
+    this.clearInternalAccessToken();
+    sessionStorage.removeItem('auth_context');
+
+    // Limpiar otros datos de sesión (ajusta según tu app)
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('usuario');
+
+    // Limpiar sessionStorage completo (opcional, ajusta según necesites)
+    // sessionStorage.clear();
+
+    // Redirigir al login
+    this.router.navigateByUrl('/');
+  }
+
+  private recoverInternalToken(): Observable<string> {
+    const ctxStr = sessionStorage.getItem('auth_context');
+
+    if (!ctxStr) {
+      console.warn('[GenericApiService] No hay auth_context. No se puede autorecuperar.');
+      this.forceLogout();
+      return throwError(() => new Error('SESSION_LOST'));
+    }
+
+    let ctx: any;
+    try {
+      ctx = JSON.parse(ctxStr);
+    } catch {
+      console.warn('[GenericApiService] auth_context corrupto.');
+      this.forceLogout();
+      return throwError(() => new Error('SESSION_LOST'));
+    }
+
+    const loginUrl = this.buildUrl('Usuarios/Iniciar_Sesion');
+    console.log('[GenericApiService] Intentando autoregenerar token...');
+
+    return this.http.post<any>(loginUrl, ctx).pipe(
+      map(res => {
+        if (res?.exito && res?.datos) {
+          console.log('[GenericApiService] Token regenerado con éxito.');
+          return String(res.datos);
+        }
+        throw new Error('SESSION_LOST');
+      }),
+      tap(token => {
+        sessionStorage.setItem('generalToken', token);
+        localStorage.setItem('generalToken', token);
+      }),
+      catchError(() => {
+        console.error('[GenericApiService] Falló la regeneración del token.');
+        this.forceLogout();
+        return throwError(() => new Error('SESSION_LOST'));
+      })
+    );
+  }
+
+  /**
+   * Wrapper para requests INTERNOS: si 401/403 => intenta recuperar token => retry 1 vez.
+   */
+  private requestInternalWithAutoRecovery<T>(requestFactory: () => Observable<ApiResponse<T> | any>): Observable<T> {
+    return requestFactory().pipe(
+      map((res: ApiResponse<T> | any) => this.extractData(res)),
+      catchError(err => {
+        if (this.isAuthError(err)) {
+          console.log('[GenericApiService] Error 401/403 detectado, intentando recuperar token...');
+          return this.recoverInternalToken().pipe(
+            switchMap(() =>
+              requestFactory().pipe(
+                map((res: ApiResponse<T> | any) => this.extractData(res))
+              )
+            ),
+            catchError(err2 => {
+              // Si el error es SESSION_LOST, ya se hizo logout automáticamente
+              if (err2.message === 'SESSION_LOST') {
+                console.error('[GenericApiService] Sesión perdida completamente. Usuario redirigido al login.');
+                return throwError(() => new Error('Sesión expirada. Por favor, inicie sesión nuevamente.'));
+              }
+              return this.handleError(err2);
+            })
+          );
+        }
+        return this.handleError(err);
+      })
+    );
+  }
 
   private buildUrl(endpoint: string) {
     // Si ya es una URL completa, retornarla tal cual
@@ -58,11 +177,9 @@ export class GenericApiService {
 
   get<T>(endpoint: string, params?: any, options?: any): Observable<T> {
     const url = this.buildUrl(endpoint);
-    return this.http.get<ApiResponse<T>>(url, this.buildOptions(params, options))
-      .pipe(
-        map((res: ApiResponse<T> | any) => this.extractData(res)),
-        catchError(err => this.handleError(err))
-      );
+    return this.requestInternalWithAutoRecovery<T>(() =>
+      this.http.get<ApiResponse<T>>(url, this.buildOptions(params, options))
+    );
   }
 
   // -----------------------
@@ -74,7 +191,6 @@ export class GenericApiService {
     const storedExpiry = localStorage.getItem('external_token_expiry');
 
     if (storedToken && storedExpiry && new Date(storedExpiry) > new Date()) {
-      console.log('TOKEN REUSADO:', storedToken);
       return from(Promise.resolve(storedToken));
     }
 
@@ -84,20 +200,17 @@ export class GenericApiService {
     };
 
     // FIX: Usar la URL correcta con el proxy
-    const url = `${environment.apiUrlExterna}/orisiga/token/`;
-    //const url = `https://integracionesucmdev.ucm.edu.co/api/orisiga/token/`;
+    //const url = `${environment.apiUrlExterna}/orisiga/token/`;
+    const url = `https://integracionesucmdev.ucm.edu.co/api/orisiga/token/`;
 
     return this.http.post<any>(url, body).pipe(
       map(res => {
-        console.log('RESPUESTA TOKEN COMPLETA:', res);
 
         const token = res?.access as string;
         if (!token) {
           console.error('Estructura de respuesta:', res);
           throw new Error('No se recibió token.access válido del servicio externo');
         }
-
-        console.log('TOKEN NUEVO (access):', token);
 
         const expires = new Date();
         expires.setMinutes(expires.getMinutes() + 50);
@@ -118,10 +231,9 @@ export class GenericApiService {
     if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
       return endpoint;
     }
-    const baseUrlExterna = environment.apiUrlExterna; // '/api-orisiga'
-    //const baseUrlExterna = `https://integracionesucmdev.ucm.edu.co/api`;
+    ///const baseUrlExterna = environment.apiUrlExterna; // '/api-orisiga'
+    const baseUrlExterna = `https://integracionesucmdev.ucm.edu.co/api`;
     const e = endpoint.replace(/^\//, '');
-    // Resultado: /api-orisiga/orisiga/asignaciondocente/?...
     return `${baseUrlExterna}/${e}`;
   }
 
@@ -132,9 +244,6 @@ export class GenericApiService {
 
         let headers = (options?.headers as HttpHeaders) || new HttpHeaders();
         headers = headers.set('Authorization', `Bearer ${token}`);
-
-        console.log('URL EXTERNA:', url);
-        console.log('HEADER AUTH FINAL:', headers.get('Authorization'));
 
         const httpOptions = {
           ...this.buildOptions(params, options),
@@ -153,29 +262,46 @@ export class GenericApiService {
 
   post<T>(endpoint: string, body: any, options?: any): Observable<T> {
     const url = this.buildUrl(endpoint);
-    return this.http.post<ApiResponse<T>>(url, body, this.buildOptions(undefined, options))
-      .pipe(
-        map((res: ApiResponse<T> | any) => this.extractData(res)),
-        catchError(err => this.handleError(err))
-      );
+    return this.requestInternalWithAutoRecovery<T>(() =>
+      this.http.post<ApiResponse<T>>(url, body, this.buildOptions(undefined, options))
+    );
+  }
+
+  postExterno<T>(endpoint: string, body: any, options?: any): Observable<T> {
+    return this.getExternalToken().pipe(
+      switchMap(token => {
+        const url = this.buildUrlExterno(endpoint);
+
+        let headers = (options?.headers as HttpHeaders) || new HttpHeaders();
+        headers = headers.set('Authorization', `Bearer ${token}`);
+
+        const httpOptions = {
+          ...this.buildOptions(undefined, options),
+          headers,
+          responseType: 'json' as const,
+          observe: 'body' as const
+        };
+
+        return this.http.post<any>(url, body, httpOptions).pipe(
+          map((res: any) => this.extractData(res) as T),
+          catchError(err => this.handleError(err))
+        );
+      })
+    );
   }
 
   put<T>(endpoint: string, body: any, options?: any): Observable<T> {
     const url = this.buildUrl(endpoint);
-    return this.http.put<ApiResponse<T>>(url, body, this.buildOptions(undefined, options))
-      .pipe(
-        map((res: ApiResponse<T> | any) => this.extractData(res)),
-        catchError(err => this.handleError(err))
-      );
+    return this.requestInternalWithAutoRecovery<T>(() =>
+      this.http.put<ApiResponse<T>>(url, body, this.buildOptions(undefined, options))
+    );
   }
 
   delete<T>(endpoint: string, options?: any): Observable<T> {
     const url = this.buildUrl(endpoint);
-    return this.http.patch<ApiResponse<T>>(url, this.buildOptions(undefined, options))
-      .pipe(
-        map((res: ApiResponse<T> | any) => this.extractData(res)),
-        catchError(err => this.handleError(err))
-      );
+    return this.requestInternalWithAutoRecovery<T>(() =>
+      this.http.patch<ApiResponse<T>>(url, {}, this.buildOptions(undefined, options))
+    );
   }
 
   private extractData<T>(response: ApiResponse<T> | T): T {

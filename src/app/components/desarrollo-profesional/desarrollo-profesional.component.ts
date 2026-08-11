@@ -10,11 +10,21 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import * as XLSX from 'xlsx';
 import { CursoModel, CursoPersonaModel, DesarrolloProfesionalRow } from '../../models/CursoPersonaModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-desarrollo-profesional',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule // ✅
+  ],
   templateUrl: './desarrollo-profesional.component.html',
   styleUrls: ['./desarrollo-profesional.component.css'],
   providers: [ConfirmationService]
@@ -42,7 +52,11 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService // ✅
+  ) {}
 
   ngOnInit() {
     this.fetchDesarrolloProfesional();
@@ -74,7 +88,7 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
       ];
 
       if (!validTypes.includes(file.type)) {
-        this.showError('Por favor seleccione un archivo Excel válido (.xls o .xlsx)');
+        this.showError(this.translate.instant('DESARROLLO_PROFESIONAL.ERROR_ARCHIVO_INVALIDO'));
         input.value = '';
         return;
       }
@@ -86,11 +100,13 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
 
   async processExcelFile() {
     if (!this.selectedFile) {
-      this.showWarning('Debe seleccionar un archivo Excel primero');
+      this.showWarning(this.translate.instant('DESARROLLO_PROFESIONAL.DEBE_SELECCIONAR_ARCHIVO'));
       return;
     }
 
-    const confirmado = await this.showConfirm('¿Está seguro de procesar este archivo? Se crearán los registros correspondientes.');
+    const confirmado = await this.showConfirm(
+      this.translate.instant('DESARROLLO_PROFESIONAL.CONFIRMAR_PROCESAR_ARCHIVO')
+    );
     if (!confirmado) return;
 
     this.loading = true;
@@ -101,7 +117,7 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
       await this.saveDataToAPI(data);
     } catch (error) {
       console.error('Error procesando archivo:', error);
-      this.showError('Error al procesar el archivo Excel');
+      this.showError(this.translate.instant('DESARROLLO_PROFESIONAL.ERROR_PROCESAR_ARCHIVO'));
       this.loading = false;
     }
   }
@@ -129,14 +145,14 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
               programaCodigo: row[0] || 0,
               planEstudio: row[1] || 0,
               codigoCurso: row[2] || 0,
-              nombre: row[3] || '',
+              nombreCurso: row[3] || '',
               descripcion: row[4] || '',
               institucionId: row[5] || 0,
               usuarioId: row[6] || 0,
               fechainicio: this.formatExcelDate(row[7]),
               fechafinal: this.formatExcelDate(row[8]),
-              costoCurso: row[9] || 0,
-              id: row[10] // si el backend luego te devuelve id en la consulta
+              costoCurso: row[9] !== undefined ? Number(row[9]) : 0,
+              id: row[10]
             } as any;
 
             rows.push(rowData);
@@ -171,69 +187,89 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
   }
 
   private async saveDataToAPI(rows: DesarrolloProfesionalRow[]) {
-    if (rows.length === 0) {
-      this.showWarning('No se encontraron datos válidos en el archivo');
-      this.loading = false;
-      return;
+  if (!rows || rows.length === 0) {
+    this.showWarning(this.translate.instant('DESARROLLO_PROFESIONAL.NO_DATOS_VALIDOS'));
+    this.loading = false;
+    return;
+  }
+
+  // 1) Preparar cursos únicos y cursoPersonas con referencia a la key
+  const cursosMap = new Map<string, any>();
+  const cursoPersonas: any[] = [];
+
+  for (const r of rows) {
+    const key = `${r.programaCodigo}-${r.planEstudio}-${r.codigoCurso}`;
+
+    if (!cursosMap.has(key)) {
+      cursosMap.set(key, {
+        programaCodigo: String(r.programaCodigo),
+        planestuId: r.planEstudio,
+        codigo: String(r.codigoCurso),
+        nombre: r.nombreCurso,
+        descripcion: r.descripcion,
+        institucionId: r.institucionId
+      });
     }
 
-    // Agrupar por curso único
-    const cursosMap = new Map<string, CursoModel>();
-    const cursoPersonas: CursoPersonaModel[] = [];
-
-    rows.forEach(row => {
-      const cursoKey = `${row.programaCodigo}-${row.planEstudio}-${row.codigoCurso}`;
-
-      // Crear o actualizar curso
-      if (!cursosMap.has(cursoKey)) {
-        const curso = new CursoModel();
-        curso.programaCodigo = String(row.programaCodigo);
-        curso.planestuId = row.planEstudio;
-        curso.codigo = String(row.codigoCurso);
-        curso.nombre = row.nombre;
-        curso.descripcion = row.descripcion;
-        curso.instuducionid = row.institucionId;
-        cursosMap.set(cursoKey, curso);
-      }
-
-      // Crear CursoPersona
-      const cursoPersona = new CursoPersonaModel();
-      cursoPersona.usuarioId = row.usuarioId;
-      cursoPersona.cursoId = row.codigoCurso;
-      cursoPersona.periodo = 1; // Valor por defecto
-      cursoPersona.fechainicio = row.fechainicio;
-      cursoPersona.fechafinal = row.fechafinal;
-      cursoPersona.costocurso = row.costoCurso;
-      cursoPersonas.push(cursoPersona);
+    cursoPersonas.push({
+      usuarioId: r.usuarioId,
+      periodo: 1,
+      fechainicio: r.fechainicio,
+      fechafinal: r.fechafinal,
+      costocurso: r.costoCurso,
+      institucionId: r.institucionId,
+      cursoKey: key,
     });
+  }
 
-    const cursos = Array.from(cursosMap.values());
+  const cursosArr = Array.from(cursosMap.entries()).map(([key, curso]) => ({ key, curso }));
 
-    // Guardar primero los cursos
-    const cursoRequests = cursos.map(curso =>
-      this.api.post<any>('Curso/crear_Curso', curso)
+  try {
+    // 2) Crear cursos y obtener ids (paralelo)
+    const created = await Promise.all(
+      cursosArr.map(async ({ key, curso }) => {
+        const resp = await firstValueFrom(this.api.post<any>('Curso/crear_Curso', curso));
+        // extraer id de la respuesta (ajusta según formato de tu API)
+        const id = (typeof resp === 'number' || typeof resp === 'string')
+          ? resp
+          : resp?.id ?? resp?.insertId ?? resp?.result?.id;
+        if (!id) throw new Error(`No se obtuvo id al crear curso ${key}. Resp: ${JSON.stringify(resp)}`);
+        return { key, id: String(id) };
+      })
     );
 
-    try {
-      await forkJoin(cursoRequests).toPromise();
+    const keyToId = new Map(created.map(c => [c.key, c.id]));
 
-      // Luego guardar las relaciones CursoPersona (DesarrolloProfesional)
-      const cursoPersonaRequests = cursoPersonas.map(cp =>
-        this.api.post<any>('DesarrolloProfesional/crear_DesarrolloProfesinales', cp)
-      );
-
-      await forkJoin(cursoPersonaRequests).toPromise();
-
-      this.showSuccess(`Se procesaron exitosamente ${cursos.length} cursos y ${cursoPersonas.length} asignaciones`);
-      this.fetchDesarrolloProfesional();
-      this.clearFileSelection();
-      this.loading = false;
-    } catch (error) {
-      console.error('Error guardando datos:', error);
-      this.showError('Error al guardar los datos en el servidor');
-      this.loading = false;
+    // 3) Asignar cursoId real a cada cursoPersona
+    for (const cp of cursoPersonas) {
+      const id = keyToId.get(cp.cursoKey);
+      if (!id) throw new Error(`No hay id para la key ${cp.cursoKey}`);
+      cp.cursoId = id;
+      delete cp.cursoKey; // opcional
     }
+
+    // 4) Enviar relaciones CursoPersona (paralelo)
+    await Promise.all(
+      cursoPersonas.map(cp =>
+        firstValueFrom(this.api.post<any>('DesarrolloProfesional/crear_DesarrolloProfesinales', cp))
+      )
+    );
+
+    this.showSuccess(
+      this.translate.instant('DESARROLLO_PROFESIONAL.PROCESADO_EXITOSO', {
+        cursos: cursosArr.length,
+        asignaciones: cursoPersonas.length
+      })
+    );
+    this.fetchDesarrolloProfesional();
+    this.clearFileSelection();
+    this.loading = false;
+  } catch (error) {
+    console.error('Error guardando datos:', error);
+    this.showError(this.translate.instant('DESARROLLO_PROFESIONAL.ERROR_GUARDAR_DATOS'));
+    this.loading = false;
   }
+}
 
   clearFileSelection() {
     this.selectedFile = null;
@@ -272,12 +308,12 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar desarrollo profesional', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('DESARROLLO_PROFESIONAL.ERROR_CARGAR_INFO');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(this.translate.instant('DESARROLLO_PROFESIONAL.ERROR_CARGAR_INFO'));
           this.loadingTable = false;
         }
       });
@@ -287,7 +323,9 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
   // Eliminar registro
   // -----------------------
   async deleteItem(id: any) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro de desarrollo profesional?');
+    const confirmado = await this.showConfirm(
+      this.translate.instant('DESARROLLO_PROFESIONAL.CONFIRMAR_ELIMINAR')
+    );
     if (!confirmado) return;
 
     this.api.delete(`DesarrolloProfesional/Eliminar_DesarrolloProfesional/${id}`)
@@ -295,11 +333,11 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchDesarrolloProfesional();
-          this.showSuccess('Se eliminó el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('DESARROLLO_PROFESIONAL.ELIMINADO_EXITOSO'));
         },
         error: (err) => {
           console.error('Error al eliminar desarrollo profesional', err);
-          this.showError('Error al eliminar el registro, puede estar asociado a otros datos');
+          this.showError(this.translate.instant('DESARROLLO_PROFESIONAL.ERROR_ELIMINAR_ASOCIADO'));
         }
       });
   }
@@ -311,13 +349,13 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
     this.error = null;
 
     if (!this.filtro || this.filtro.trim() === '') {
-      this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
+      this.showWarning(this.translate.instant('DESARROLLO_PROFESIONAL.DEBE_DIGITAR_VALOR'));
       return;
     }
 
     const filtroLower = this.filtro.toLowerCase().trim();
     this.filteredData = this.data.filter(item =>
-      item.nombre?.toLowerCase().includes(filtroLower) ||
+      item.nombreCurso?.toLowerCase().includes(filtroLower) ||
       item.descripcion?.toLowerCase().includes(filtroLower)
     );
 
@@ -366,7 +404,7 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
   // Toasters / Confirm
   // -----------------------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('DESARROLLO_PROFESIONAL.OPERACION_EXITOSA'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -374,7 +412,7 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('DESARROLLO_PROFESIONAL.ERROR_PROCESAR'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -382,7 +420,7 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('DESARROLLO_PROFESIONAL.ATENCION'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -393,10 +431,10 @@ export class DesarrolloProfesionalComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('DESARROLLO_PROFESIONAL.CONFIRMAR_ACCION'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('DESARROLLO_PROFESIONAL.SI_CONFIRMO'),
+        rejectLabel: this.translate.instant('DESARROLLO_PROFESIONAL.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

@@ -9,11 +9,20 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { InstitucionModel } from '../../models/InstitucionModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-instituciones',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './instituciones.component.html',
   styleUrls: ['./instituciones.component.css'],
   providers: [ConfirmationService]
@@ -43,7 +52,11 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit() {
     this.fetchPaises();
@@ -87,7 +100,7 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
   // -----------------------
   onPaisChange() {
     const paisId = Number(this.selectedPaisId ?? 0);
-    this.model.ciudadId = null; // <-- limpiar ciudad al cambiar país
+    this.model.ciudadId = null;
     this.ciudades = [];
 
     if (!paisId) return;
@@ -149,12 +162,13 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar instituciones', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          const msg = this.translate.instant('INSTITUCIONES.MENSAJES.ERROR_CARGA');
+          this.error = msg;
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(msg);
           this.loadingTable = false;
         }
       });
@@ -167,7 +181,8 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
     this.error = null;
 
     if (!this.filtro || this.filtro.trim() === '') {
-      this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
+      const msg = this.translate.instant('INSTITUCIONES.MENSAJES.FILTRO_VACIO');
+      this.showWarning(msg);
       return;
     }
     this.loadingTable = true;
@@ -199,12 +214,13 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al filtrar instituciones', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          const msg = this.translate.instant('INSTITUCIONES.MENSAJES.ERROR_CARGA');
+          this.error = msg;
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(msg);
           this.loadingTable = false;
         }
       });
@@ -219,9 +235,8 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // validaciones adicionales
     if (!this.model.nombre?.trim() || !this.model.contactoDescripcion?.trim()) {
-      this.error = 'Nombre y descripción son obligatorios.';
+      this.error = this.translate.instant('INSTITUCIONES.MENSAJES.NOMBRE_DESC_REQUERIDOS');
       return;
     }
 
@@ -252,26 +267,26 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          // fallback por si llega algo inesperado
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('INSTITUCIONES.MENSAJES.RESPUESTA_DESCONOCIDA'));
         }
       },
       error: (err) => {
         console.error(isUpdate ? 'Error al actualizar institución' : 'Error al crear institución', err);
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
+        const msg = this.translate.instant('INSTITUCIONES.MENSAJES.ERROR_PROCESAR');
+        this.error = msg;
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
+        this.showError(msg);
       }
     });
   }
 
   resetForm(form?: NgForm) {
-  this.model = new InstitucionModel();
-  this.isEditing = false;
-  this.selectedPaisId = null;
-  this.ciudades = [];
-  if (form) form.resetForm();
-}
+    this.model = new InstitucionModel();
+    this.isEditing = false;
+    this.selectedPaisId = null;
+    this.ciudades = [];
+    if (form) form.resetForm();
+  }
 
   startEdit(item: InstitucionModel) {
     const paisId = item.paisId != null ? Number(item.paisId) : null;
@@ -287,7 +302,6 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // cargar ciudades y luego asignar ciudadId
     this.api.get<any>(`Ciudad/Consultar_CiudadEspecificoPais?idPais=${paisId}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -304,7 +318,6 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
           }
           this.ciudades = items.map(i => ({ id: Number(i.id), nombre: i.nombreCiudad }));
 
-          // ahora sí asignar el modelo
           this.model = Object.assign(new InstitucionModel(), item);
           this.model.ciudadId = ciudadId;
         },
@@ -319,7 +332,8 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
+    const question = this.translate.instant('INSTITUCIONES.MENSAJES.CONFIRMAR_ELIMINAR');
+    const confirmado = await this.showConfirm(question);
     if (!confirmado) return;
 
     this.api.delete(`Institucion/Eliminar/${id}`)
@@ -327,11 +341,11 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchInstituciones();
-          this.showSuccess('Se elimino el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('INSTITUCIONES.MENSAJES.ELIMINAR_OK'));
         },
         error: (err) => {
           console.error('Error al eliminar institución, el resgistro se encuentra asociado', err);
-          this.showError('Error al eliminar institución, el resgistro se encuentra asociado');
+          this.showError(this.translate.instant('INSTITUCIONES.MENSAJES.ELIMINAR_ERROR_ASOCIADO'));
         }
       });
   }
@@ -376,7 +390,8 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
   // Toasters / Confirm
   // -----------------------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    const title = this.translate.instant('INSTITUCIONES.TOASTS.EXITO_TITULO');
+    toast.success(title, {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -384,7 +399,8 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    const title = this.translate.instant('INSTITUCIONES.TOASTS.ERROR_TITULO');
+    toast.error(title, {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -392,7 +408,8 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    const title = this.translate.instant('INSTITUCIONES.TOASTS.WARNING_TITULO');
+    toast.warning(title, {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -403,10 +420,10 @@ export class InstitucionesComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('INSTITUCIONES.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('INSTITUCIONES.CONFIRM.ACEPTAR'),
+        rejectLabel: this.translate.instant('INSTITUCIONES.CONFIRM.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

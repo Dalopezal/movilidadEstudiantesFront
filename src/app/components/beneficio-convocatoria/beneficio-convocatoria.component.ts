@@ -11,11 +11,20 @@ import { ConvocatoriaModel } from '../../models/ConvocatoriaModel';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-beneficio-convocatoria',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './beneficio-convocatoria.component.html',
   styleUrls: ['./beneficio-convocatoria.component.css'],
   providers: [
@@ -45,7 +54,11 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
   filtro: String = "";
   @Input() idConvocatoria!: any;
 
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit() {
     this.fetchConvocatorias();
@@ -125,7 +138,7 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar beneficios', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('BENEFICIOS_CONVOCATORIA.MENSAJES.ERROR_CARGA');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
@@ -140,7 +153,7 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
     this.error = null;
 
     if(this.filtro == ""){
-      this.showWarning("Debe digitar un valor para ejecutar la busqueda");
+      this.showWarning(this.translate.instant('BENEFICIOS_CONVOCATORIA.MENSAJES.FILTRO_VACIO'));
       return;
     }
     this.loadingTable = true;
@@ -173,7 +186,7 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar beneficios', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('BENEFICIOS_CONVOCATORIA.MENSAJES.ERROR_CARGA');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
@@ -260,11 +273,11 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
 
     // validaciones adicionales
     if (this.model.convocatoriaId == null || Number(this.model.convocatoriaId) <= 0) {
-      this.error = 'Debe seleccionar una convocatoria válida.';
+      this.error = this.translate.instant('BENEFICIOS_CONVOCATORIA.FORM.CONVOCATORIA_REQUERIDA');
       return;
     }
     if (!this.model.nombreBeneficio?.trim() || !this.model.descripcion?.trim()) {
-      this.error = 'Nombre y descripción son obligatorios.';
+      this.error = this.translate.instant('BENEFICIOS_CONVOCATORIA.FORM.NOMBRE_REQUERIDO');
       return;
     }
 
@@ -298,7 +311,7 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al actualizar', err);
-          this.error = 'No se pudo actualizar. Intenta de nuevo.';
+          this.error = this.translate.instant('BENEFICIOS_CONVOCATORIA.MENSAJES.ERROR_CARGA');
           this.loading = false;
           this.showError();
         }
@@ -315,7 +328,7 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al guardar', err);
-          this.error = 'No se pudo guardar. Intenta de nuevo.';
+          this.error = this.translate.instant('BENEFICIOS_CONVOCATORIA.MENSAJES.ERROR_CARGA');
           this.loading = false;
           this.showError();
         }
@@ -341,41 +354,41 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
   }
 
   async deleteItem(id: number) {
-  const confirmado = await this.showConfirm('Estas seguro de eliminar este registro');
-  if (!confirmado) return;
+    const confirmado = await this.showConfirm(this.translate.instant('BENEFICIOS_CONVOCATORIA.CONFIRM.ELIMINAR'));
+    if (!confirmado) return;
 
-  this.api.delete(`BeneficioConvocatoria/Eliminar_Beneficios/${id}`)
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-     next: () => {
+    this.api.delete(`BeneficioConvocatoria/Eliminar_Beneficios/${id}`)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
           this.fetchConvocatorias();
           this.showSuccess();
         },
-      error: (err) => {
-        console.error('Error al eliminar', err);
-        this.showError()
-      }
-    });
-}
+        error: (err) => {
+          console.error('Error al eliminar', err);
+          this.showError()
+        }
+      });
+  }
 
   showSuccess() {
-    toast.success('¡Operación exitosa!', {
-      description: 'Tus datos se guardaron correctamente',
+    toast.success(this.translate.instant('BENEFICIOS_CONVOCATORIA.TOASTS.EXITO_TITULO'), {
+      description: this.translate.instant('BENEFICIOS_CONVOCATORIA.TOASTS.EXITO_DESC'),
       unstyled: true,
       class: 'my-success-toast'
     });
   }
 
   showError() {
-    toast.error('Error al procesar', {
-      description: 'El registro se encuentra asociado',
+    toast.error(this.translate.instant('BENEFICIOS_CONVOCATORIA.TOASTS.ERROR_TITULO'), {
+      description: this.translate.instant('BENEFICIOS_CONVOCATORIA.TOASTS.ERROR_DESC'),
       unstyled: true,
       class: 'my-error-toast'
     });
   }
 
   showWarning(mensaje: String) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('BENEFICIOS_CONVOCATORIA.TOASTS.WARNING_TITULO'), {
       description: mensaje.toString(),
       unstyled: true,
       class: 'my-warning-toast'
@@ -384,21 +397,20 @@ export class BeneficioConvocatoriaComponent implements OnInit, OnDestroy {
 
   showConfirm(mensaje: string): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-    this.confirmationService.confirm({
-      message: `¿${mensaje}?`,
-      header: 'Confirmar acción',
-      icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-      acceptLabel: 'Sí, Confirmo',
-      rejectLabel: 'Cancelar',
-      acceptIcon: 'pi pi-check',
-      rejectIcon: 'pi pi-times',
-      acceptButtonStyleClass: 'custom-accept-btn',
-      rejectButtonStyleClass: 'custom-reject-btn',
-      defaultFocus: 'reject',
-      accept: () => resolve(true),
-      reject: () => resolve(false),
+      this.confirmationService.confirm({
+        message: `¿${mensaje}?`,
+        header: this.translate.instant('BENEFICIOS_CONVOCATORIA.CONFIRM.HEADER'),
+        icon: 'pi pi-exclamation-triangle custom-confirm-icon',
+        acceptLabel: this.translate.instant('BENEFICIOS_CONVOCATORIA.CONFIRM.ACEPTAR'),
+        rejectLabel: this.translate.instant('BENEFICIOS_CONVOCATORIA.CONFIRM.CANCELAR'),
+        acceptIcon: 'pi pi-check',
+        rejectIcon: 'pi pi-times',
+        acceptButtonStyleClass: 'custom-accept-btn',
+        rejectButtonStyleClass: 'custom-reject-btn',
+        defaultFocus: 'reject',
+        accept: () => resolve(true),
+        reject: () => resolve(false),
+      });
     });
-  });
-
   }
 }

@@ -1,3 +1,6 @@
+<div class="floating-language-selector">
+  <app-language-selector></app-language-selector>
+</div>
 <aside [class.collapsed]="isCollapsed" class="sidebar fuente">
   <div class="sidebar-header">
     <img src="../../../assets/logo_ucm.png" alt="Logo UCM" class="sidebar-logo" />
@@ -8,122 +11,277 @@
 
   <nav class="sidebar-nav">
     <!-- Inicio -->
-    <a routerLink="/home"
-       routerLinkActive="active"
-       [routerLinkActiveOptions]="{ exact: true }"
-       class="nav-link">
-      <i class="fas fa-tachometer-alt"></i><span class="link-text">Inicio</span>
+    <a
+      routerLink="/home"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="nav-link"
+    >
+      <i class="fas fa-tachometer-alt"></i>
+      <span class="link-text">
+        {{ 'SIDEBAR.INICIO' | translate }}
+      </span>
     </a>
 
     <!-- Internacionalización del Currículo -->
-    <div class="has-submenu">
-      <a (click)="toggleInternacionalizacionMenu()" class="nav-link submenu-toggle" role="button"
-         aria-haspopup="true" [attr.aria-expanded]="isInternacionalizacionOpen">
+    <div class="has-submenu" *ngIf="rolInternacionalizacion">
+      <a
+        (click)="toggleInternacionalizacionMenu()"
+        class="nav-link submenu-toggle"
+        role="button"
+        aria-haspopup="true"
+        [attr.aria-expanded]="isInternacionalizacionOpen"
+      >
         <i class="fas fa-globe-americas"></i>
-        <span class="link-text">Internacionalización del Currículo</span>
+        <span class="link-text">
+          {{ 'SIDEBAR.INTERNACIONALIZACION.TITULO' | translate }}
+        </span>
         <i class="fas fa-chevron-down submenu-icon" [class.rotate]="isInternacionalizacionOpen"></i>
       </a>
 
       <div class="submenu" [class.open]="isInternacionalizacionOpen">
-        <a routerLink="/planeacion" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Planeación</span>
+        <a *ngIf="accessEstrategia" routerLink="/dashboard-curriculo" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">Dashboard</span>
         </a>
-        <a routerLink="/estrategia" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Estrategia</span>
+        <a *ngIf="accessEstrategia" routerLink="/estrategia" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.ESTRATEGIA' | translate }}</span>
         </a>
-        <a routerLink="/actividades-seguimiento" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Actividades</span>
+
+        <a *ngIf="accessPlaneacion" routerLink="/planeacion" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.PLANEACION' | translate }}</span>
         </a>
-        <a routerLink="/aprobacion-estudiante" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Aprobación Estudiante</span>
+
+        <a *ngIf="accessAsignacionPlanComponente" routerLink="/asignacion-plan-componente" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.ASIGNACION_PLAN_COMPONENTE' | translate }}</span>
         </a>
-        <a routerLink="/certificado-estudiantes" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Certificado Estudiantes</span>
+
+        <a *ngIf="accessHorariosUniversidad" routerLink="/horarios-universidad" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.HORARIOS_UNIVERSIDAD' | translate }}</span>
         </a>
-        <a routerLink="/asignacion-plan-componente" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Asignación Plan - Componente</span>
+
+        <a *ngIf="accessActividades" routerLink="/actividades-seguimiento" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.ACTIVIDADES' | translate }}</span>
         </a>
-        <a routerLink="/desarrollo-profesional" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Desarrollo Profesional</span>
+
+        <a *ngIf="accessAprobacionEstudiante" routerLink="/aprobacion-estudiante" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.APROBACION_ESTUDIANTE' | translate }}</span>
         </a>
-        <a routerLink="/trayectoria" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Trayectoría</span>
+
+        <a *ngIf="accessCertificadoEstudiante" routerLink="/certificado-estudiantes" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.CERTIFICADO_ESTUDIANTES' | translate }}</span>
         </a>
-        <a routerLink="/horarios-universidad" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Horarios Universidad</span>
+
+        <a *ngIf="accessDesarrolloProfesional" routerLink="/desarrollo-profesional" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.DESARROLLO_PROFESIONAL' | translate }}</span>
         </a>
-        <a routerLink="/insignia-digital" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Insignia Digital</span>
+
+        <a *ngIf="accessTrayectorias" routerLink="/trayectoria" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.TRAYECTORIA' | translate }}</span>
+        </a>
+
+        <a *ngIf="accessPlaneadoVsEjecutado" routerLink="/vs" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.PLANEADO_VS_EJECUTADO' | translate }}</span>
+        </a>
+
+        <a *ngIf="accessInsigniaDigital" routerLink="/insignia-digital" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">{{ 'SIDEBAR.INTERNACIONALIZACION.INSIGNIA_DIGITAL' | translate }}</span>
         </a>
       </div>
     </div>
 
     <!-- Cooperación -->
-    <a routerLink="/"
-       routerLinkActive="active"
-       [routerLinkActiveOptions]="{ exact: true }"
-       class="nav-link">
-      <i class="fas fa-handshake"></i><span class="link-text">Cooperación</span>
-    </a>
+    <div *ngIf="accessFormulariosConvenios" class="has-submenu">
+      <a
+        (click)="toggleCooperacionMenu()"
+        class="nav-link submenu-toggle"
+        role="button"
+        aria-haspopup="true"
+        [attr.aria-expanded]="isCooperacionOpen"
+      >
+        <i class="fas fa-handshake"></i>
+        <span class="link-text">
+          {{ 'SIDEBAR.COOPERACION.TITULO' | translate }}
+        </span>
+        <i class="fas fa-chevron-down submenu-icon" [class.rotate]="isCooperacionOpen"></i>
+      </a>
+
+      <div class="submenu" [class.open]="isCooperacionOpen">
+        <!-- <a routerLink="/solicitud-convenio" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">
+            {{ 'SIDEBAR.COOPERACION.SOLICITUDES_CONVENIO' | translate }}
+          </span>
+        </a>
+        <a routerLink="/listsol-convenio" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">
+            {{ 'SIDEBAR.COOPERACION.ADMIN_SOLICITUDES_CONVENIO' | translate }}
+          </span>
+        </a> -->
+        <a routerLink="/dashboard-cooperacion" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">
+            Dashboard
+          </span>
+        </a>
+        <a routerLink="/convenios" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">
+            {{ 'SIDEBAR.COOPERACION.CONVENIOS' | translate }}
+          </span>
+        </a>
+        <a routerLink="/institucion-convenio" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">
+            {{ 'SIDEBAR.COOPERACION.INSTITUCION_CONVENIOS' | translate }}
+          </span>
+        </a>
+      </div>
+    </div>
 
     <!-- Movilidad -->
     <div class="has-submenu">
-      <a (click)="togglemovilidadMenu()" class="nav-link submenu-toggle" role="button"
-         aria-haspopup="true" [attr.aria-expanded]="ismovilidadOpen">
+      <a
+        (click)="togglemovilidadMenu()"
+        class="nav-link submenu-toggle"
+        role="button"
+        aria-haspopup="true"
+        [attr.aria-expanded]="ismovilidadOpen"
+      >
         <i class="fas fa-plane"></i>
-        <span class="link-text">Movilidad</span>
+        <span class="link-text">
+          {{ 'SIDEBAR.MOVILIDAD.TITULO' | translate }}
+        </span>
         <i class="fas fa-chevron-down submenu-icon" [class.rotate]="ismovilidadOpen"></i>
       </a>
 
       <div class="submenu" [class.open]="ismovilidadOpen">
         <!-- Opciones directas de movilidad -->
         <a routerLink="/dashboard" routerLinkActive="active" class="nav-link submenu-link">
-          <i class="fas fa-dot-circle"></i><span class="link-text">Dashboard</span>
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">
+            {{ 'SIDEBAR.MOVILIDAD.DASHBOARD' | translate }}
+          </span>
+        </a>
+
+        <a *ngIf="rolConvocatoria" routerLink="/tipos-convocatorias" routerLinkActive="active" class="nav-link submenu-link">
+          <i class="fas fa-dot-circle"></i>
+          <span class="link-text">
+            {{ 'SIDEBAR.MOVILIDAD.CONVOCATORIA_GENERAL' | translate }}
+          </span>
         </a>
 
         <!-- SUBGRUPO Maestros -->
         <div class="submenu-group">
-          <span class="submenu-title">GENERAL</span>
-
-          <!-- menú dinámico generado según permisos -->
-          <a *ngFor="let m of maestros"
-            [routerLink]="'/'+m.url"
-            routerLinkActive="active"
-            class="nav-link submenu-link">
+           <span class="submenu-title">
+             {{ 'SIDEBAR.MOVILIDAD.MAESTROS.TITULO' | translate }}
+           </span>
+          <a *ngIf="rolMovilidad" routerLink="/administracion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
             <i class="fas fa-dot-circle"></i>
-            <span class="link-text">{{ m.nombre }}</span>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.ADMINISTRACION' | translate }}
+            </span>
           </a>
+          <a *ngIf="rolMovilidad" routerLink="/condicion" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.CONDICIONES' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/condicion-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.CONDICIONES_CONVOCATORIA' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/beneficios-convocatoria" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.BENEFICIOS' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/entregables" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.ENTREGABLES' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/instituciones" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.INSTITUCIONES' | translate }}
+            </span>
+          </a>
+          <a *ngIf="rolMovilidad" routerLink="/financiacion-externa" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.FINANCIACION' | translate }}
+            </span>
+          </a>
+          <!-- <a *ngIf="rolMovilidad" routerLink="/convenios" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.CONVENIOS' | translate }}
+            </span>
+          </a> -->
+          <!-- <a *ngIf="rolMovilidad" routerLink="/institucion-convenio" routerLinkActive="active" class="nav-link submenu-link">
+            <i class="fas fa-dot-circle"></i>
+            <span class="link-text">
+              {{ 'SIDEBAR.MOVILIDAD.MAESTROS.INSTITUCIONES_CONVENIO' | translate }}
+            </span>
+          </a> -->
         </div>
       </div>
     </div>
   </nav>
-  <div class="sidebar-user"
-     (click)="onToggleUserMenu($event)"
-     [class.open]="isUserMenuOpen">
+
+  <div
+    class="sidebar-user"
+    (click)="onToggleUserMenu($event)"
+    [class.open]="isUserMenuOpen"
+  >
     <ng-container *ngIf="usuario?.foto && usuario.foto !== '' && usuario.foto !== 'null'; else userIcon">
       <img [src]="usuario?.foto" alt="Usuario" class="user-avatar" (error)="onImageError($event)" />
     </ng-container>
     <ng-template #userIcon>
       <i class="fas fa-user-circle user-icon"></i>
     </ng-template>
+
     <div class="user-info">
       <strong [style.fontSize.px]="(usuario?.nombre)?.length > 30 ? 10 : 13.5">
-      {{ decodeUtf8(usuario?.nombre) }}
-    </strong>
+        {{ decodeUtf8(usuario?.nombre) }}
+      </strong>
       <small>{{ usuario?.correo }}</small>
       <small>{{ usuario?.rol }}</small>
     </div>
+
     <i class="fas fa-chevron-down user-chevron" [class.rotate]="isUserMenuOpen"></i>
-      <div class="user-submenu" *ngIf="isUserMenuOpen" (click)="$event.stopPropagation()">
-      <a routerLink="/login"
+
+    <div class="user-submenu" *ngIf="isUserMenuOpen" (click)="$event.stopPropagation()">
+      <a
+        routerLink="/login"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
         (click)="onLogoutClick($event)"
-        class="submenu-link">
-        <i class="fa fa-sign-out-alt"></i> Salir
+        class="submenu-link"
+      >
+        <i class="fa fa-sign-out-alt"></i>
+        {{ 'SIDEBAR.USER.SALIR' | translate }}
       </a>
     </div>
   </div>
 </aside>
 
-<br><br><br>
+<br /><br /><br />

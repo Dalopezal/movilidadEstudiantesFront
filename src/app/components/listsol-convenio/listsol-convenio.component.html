@@ -1,0 +1,327 @@
+
+<app-sidebar *ngIf="!embebido"></app-sidebar>
+<div class="container fuente" [style.padding-top]="embebido ? '0px' : '30px'">
+  <div class="row h-100">
+    <main class="col-12 col-md-12 d-flex flex-column" style="height: 100%;">
+      <div class="row g-4 flex-grow-1">
+
+        <!--Tabla -->
+        <section class="col-12 col-lg-12 d-flex flex-column" style="height: 70vh;font-size: 14px;">
+          <div class="card shadow-sm d-flex flex-column flex-grow-1">
+            <div class="card-header d-flex align-items-center" style="background: #E2E6F7;" *ngIf="!embebido" >
+              <button title="{{ 'SOLICITUDES_CONVENIO.BTN_VOLVER' | translate }}"
+                mat-icon-button
+                (click)="goBack()"
+                [disableRipple]="true"
+                class="me-2"
+                style="background-color: transparent; width: 40px; height: 40px; padding: 0;">
+                <mat-icon style="font-size: 14px; width: 14px; height: 14px;">arrow_back</mat-icon>
+              </button>
+              <p class="mb-0" style="color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TITULO' | translate }}</p>
+            </div>
+            <div class="card-header d-flex align-items-center gap-3" style="background: white;">
+              <button
+                class="btn btn-primary d-flex align-items-center gap-2"
+                style="background: #0D133F; border-color: #0D133F;font-size: 13px;padding: 5px 8px;"
+                (click)="tipoSolicitudId = 0; estadoConvenioId = 0; institucionId = 0; fetchSolicitudesConvenio()"
+              >
+                <i class="fas fa-sync-alt"></i> {{ 'SOLICITUDES_CONVENIO.BTN_ACTUALIZAR' | translate }}
+              </button>
+               <select
+                  class="form-select"
+                  id="tipoSolicitudId"
+                  name="tipoSolicitudId"
+                  required
+                  style="font-size: 13px;"
+                  [(ngModel)]="tipoSolicitudId"
+
+                >
+                <option value="0">{{ 'SOLICITUDES_CONVENIO.FILTROS.TIPO' | translate }}</option>
+                <option *ngFor="let t of tiposSolicitud" [value]="t.id">{{ t.nombre }}</option>
+                </select>
+               <select
+                  class="form-select"
+                  id="estadoConvenioId"
+                  name="estadoConvenioId"
+                  required
+                  style="font-size: 13px;"
+                  [(ngModel)]="estadoConvenioId"
+                >
+                <option value="0">{{ 'SOLICITUDES_CONVENIO.FILTROS.ESTADO' | translate }}</option>
+                <option *ngFor="let e of estadosConvenio" [value]="e.id">{{ e.nombre }}</option>
+                </select>
+                <select
+                  class="form-select"
+                  id="institucionId"
+                  name="institucionId"
+                  required
+                  style="font-size: 13px;"
+                  [(ngModel)]="institucionId"
+
+                >
+                <option value="0">{{ 'SOLICITUDES_CONVENIO.FILTROS.INSTITUCION' | translate }}</option>
+                <option *ngFor="let i of instituciones" [value]="i.id">{{ i.nombre }}</option>
+                </select>
+              <button
+                class="btn btn-primary d-flex align-items-center gap-2"
+                style="background: #0D133F; border-color: #0D133F;font-size: 13px;font-size: 13px;padding: 5px 8px;"
+                (click)="filterSolicitudesConvenio()"
+              >
+                <i class="fas fa-search"></i> {{ 'SOLICITUDES_CONVENIO.BTN_BUSCAR' | translate }}
+              </button>
+            </div>
+
+            <!-- Tabla -->
+            <div class="table-responsive flex-grow-1" style="overflow-y: auto;">
+              <table class="table table-striped mb-0">
+                <thead class="table-primary"  style="font-size: 13px">
+                  <tr align="center">
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.SOLICITUD' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.DESCRIPCION' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.SOLICITANTE' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.INSTITUCION' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.FECHA' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.ESTADO' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.ADMINISTRADORES' | translate }}</th>
+                    <th style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.ACCIONES' | translate }}</th>
+                    <th *ngIf="!embebido && esOriInterno()" style="background: white;color: #0D133F;">{{ 'SOLICITUDES_CONVENIO.TABLE.OPCIONES' | translate }}</th>
+
+                  </tr>
+                </thead>
+                <tbody style="font-size: 13px">
+                <div *ngIf="loading" class="table-overlay">
+                  <i class="fas fa-spinner fa-spin fa-3x"></i>
+                  <p style="background: transparent;;">{{ 'SOLICITUDES_CONVENIO.CARGANDO' | translate }}</p>
+                </div>
+                  <tr *ngFor="let item of pagedData; trackBy: trackBySolicitudId">
+                    <td align="center">{{ item.id }}</td>
+                    <td>{{ item.descripcion }}</td>
+                    <td>{{ usuarioCache.get(item.solicitanteId)?.nombre || item.solicitanteId }}</td>
+                    <td>{{ item.institucionNombre}}</td>
+                    <td align="center">{{ item.fechacreacion }}</td>
+                    <td align="center"><button class="button-completed">{{item.estadoNombre}}</button></td>
+                    <td align="center" title="{{ 'SOLICITUDES_CONVENIO.TABLE.VER_ADMINISTRADORES' | translate }}" (click)="abrirModalAdministradores(item)">
+                      <i class="fa-duotone fa-solid fa-users button-eye"></i>
+                    </td>
+                    <td align="center" title="{{ 'SOLICITUDES_CONVENIO.TABLE.VER_ACCIONES' | translate }}" (click)="abrirModalAccionesConvenio(item)">
+                      <i class="fa-duotone fa-solid fa-tasks button-eye"></i>
+                    </td>
+                    <td align="center" *ngIf="!embebido && esOriInterno()">
+                      <div class="d-flex gap-2 justify-content-center align-items-center">
+
+                        <!-- ========== GESTOR ORI ========== -->
+                        <!-- Ve TODAS las solicitudes, pero solo puede aprobar/rechazar las que están "Aprobado jefe inmediato" -->
+
+                          <!-- Mostrar botones de aprobar/rechazar solo si está en el estado correcto -->
+                          <button
+                          *ngIf="esOriInterno()"
+                          type="button"
+                          class="btn-opcion aprobar"
+                          title="{{ 'SOLICITUDES_CONVENIO.ACCIONES.APROBAR_ORI' | translate }}"
+                          (click)="aprobarSolicitud(item)">
+                          <i class="fa-solid fa-check"></i>
+                          Aprobar
+                        </button>
+
+                        <button
+                        *ngIf="esOriInterno()"
+                          type="button"
+                          class="btn-opcion rechazar"
+                          title="{{ 'SOLICITUDES_CONVENIO.ACCIONES.RECHAZAR_ORI' | translate }}"
+                          (click)="rechazarSolicitud(item)">
+                          <i class="fa-solid fa-times"></i>
+                          Rechazar
+                        </button>
+
+
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!loading && pagedData.length === 0">
+                    <td [attr.colspan]="embebido ? 8 : 9" class="text-center">{{ 'SOLICITUDES_CONVENIO.SIN_REGISTROS' | translate }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paginación -->
+            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
+              <div class="items-per-page d-flex align-items-center gap-2">
+                <label for="itemsPerPageSelect" class="mb-0">{{ 'SOLICITUDES_CONVENIO.PAGINACION.MOSTRAR' | translate }}</label>
+                <select id="itemsPerPageSelect" (change)="onPageSizeChange($event)" [value]="pageSize">
+                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+                <span>{{ 'SOLICITUDES_CONVENIO.PAGINACION.DE' | translate }} {{ solicitudesConvenio.length }}</span>
+              </div>
+              <nav>
+                <ul class="pagination mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <button class="page-link text-white" (click)="goToPage(currentPage - 1)" style="background:#0D133F">
+                      &laquo;
+                    </button>
+                  </li>
+                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
+                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  </li>
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <button class="page-link text-white" (click)="goToPage(currentPage + 1)" style="background:#0D133F">
+                      &raquo;
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Notificaciones -->
+<ngx-sonner-toaster />
+<!-- Confirm Dialog -->
+<p-confirmDialog appendTo="body"></p-confirmDialog>
+
+<!-- Modal Acciones del Convenio -->
+<div *ngIf="selectedItemAcciones"
+     class="custom-card-float"
+     [class.animate-slide-in]="!isClosingAcciones"
+     [class.animate-slide-out]="isClosingAcciones"
+     [style.top.px]="cardPositionAcciones.top"
+     [style.left.px]="cardPositionAcciones.left">
+  <div class="card shadow-glow">
+    <div class="card-header gradient-header text-white p-2">
+      <strong><i class="fas fa-tasks me-2"></i>{{ 'SOLICITUDES_CONVENIO.MODAL_ACCIONES.TITULO' | translate }}</strong>
+      <button type="button" class="btn-close btn-close-white float-end pulse-button"
+              (click)="closeCardAcciones()"></button>
+    </div>
+
+    <div class="card-body glass-effect scroll-body" style="font-size: 13px;">
+      <!-- Información de la solicitud -->
+      <div class="info-row mb-3">
+        <span class="label-glow">{{ 'SOLICITUDES_CONVENIO.MODAL_ACCIONES.SOLICITUD' | translate }}:</span> {{ selectedItemAcciones.id }} - {{ selectedItemAcciones.descripcion }}
+      </div>
+
+      <hr style="border-color: rgba(255,255,255,0.2);">
+
+      <!-- Lista de Acciones -->
+      <div *ngIf="accionesConvenio.length > 0">
+        <div *ngFor="let accion of accionesConvenio" class="info-row mb-3 p-2"
+             style="background: rgba(255,255,255,0.05); border-radius: 8px;">
+          <div class="d-flex justify-content-between align-items-center">
+            <div style="flex: 1;">
+              <span class="label-glow">{{ accion.descripcion }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+              <span class="badge"
+                    [ngClass]="accion.aprobado ? 'bg-success' : 'bg-secondary'">
+                {{ accion.aprobado ? ('SOLICITUDES_CONVENIO.MODAL_ACCIONES.APROBADO' | translate) : ('SOLICITUDES_CONVENIO.MODAL_ACCIONES.NO_APROBADO' | translate) }}
+              </span>
+              <div class="form-check form-switch" *ngIf="puedeEditarAcciones()">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  [id]="'accion-' + accion.id"
+                  [(ngModel)]="accion.aprobado"
+                  (change)="actualizarAccionEstado(accion)"
+                  style="cursor: pointer;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="accionesConvenio.length === 0" class="text-center text-muted py-3">
+        <i class="fas fa-inbox fa-2x mb-2"></i>
+        <p>{{ 'SOLICITUDES_CONVENIO.MODAL_ACCIONES.SIN_ACCIONES' | translate }}</p>
+      </div>
+
+      <!-- Botón Guardar (solo para Gestor ORI) -->
+      <!--
+      <div class="text-end mt-3" *ngIf="puedeEditarAcciones()">
+        <button
+          class="btn btn-primary d-flex align-items-center gap-2"
+          style="background: #0D133F; border-color: #0D133F;font-size: 13px;font-size: 13px;"
+          (click)="guardarAcciones()">
+          <i class="fas fa-save me-2"></i>{{ 'SOLICITUDES_CONVENIO.MODAL_ACCIONES.BTN_GUARDAR' | translate }}
+        </button>
+      </div>
+      -->
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal Administradores del Convenio -->
+<div *ngIf="selectedItemAdministradores"
+     class="custom-card-float"
+     [class.animate-slide-in]="!isClosingAdministradores"
+     [class.animate-slide-out]="isClosingAdministradores"
+     [style.top.px]="cardPositionAdministradores.top"
+     [style.left.px]="cardPositionAdministradores.left">
+  <div class="card shadow-glow">
+    <div class="card-header gradient-header text-white p-2">
+      <strong><i class="fas fa-users me-2"></i>{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.TITULO' | translate }}</strong>
+      <button type="button" class="btn-close btn-close-white float-end pulse-button"
+              (click)="closeCardAdministradores()"></button>
+    </div>
+
+    <div class="card-body glass-effect scroll-body" style="font-size: 13px;">
+      <!-- Información de la solicitud -->
+      <div class="info-row mb-3">
+        <span class="label-glow">{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.SOLICITUD' | translate }}:</span> {{ selectedItemAdministradores.id }} - {{ selectedItemAdministradores.descripcion }}
+      </div>
+
+      <!-- Botón agregar (solo Gestor ORI) -->
+      <!--
+      <div class="mb-3">
+        <button
+        class="btn btn-primary d-flex align-items-center gap-2"
+        style="background: #0D133F; border-color: #0D133F;font-size: 13px;font-size: 13px;"
+        (click)="agregarAdministrador()">
+          <i class="fas fa-plus me-2"></i>{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.BTN_AGREGAR' | translate }}
+        </button>
+      </div>
+      -->
+
+      <hr style="border-color: rgba(255,255,255,0.2);">
+
+      <!-- Lista de Administradores -->
+      <div *ngIf="administradoresConvenio.length > 0">
+        <div *ngFor="let admin of administradoresConvenio"
+             class="info-row mb-3 p-3"
+             style="background: rgba(255,255,255,0.05); border-radius: 8px;">
+          <div class="d-flex justify-content-between align-items-start">
+            <div style="flex: 1;">
+              <div class="mb-2">
+                <span class="label-glow">{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.NOMBRE' | translate }}:</span> {{ admin.nombre }}
+              </div>
+              <div class="mb-2">
+                <span class="label-glow">{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.EMAIL' | translate }}:</span> {{ admin.email }}
+              </div>
+              <div>
+                <span class="label-glow">{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.DOCUMENTO' | translate }}:</span> {{ admin.documento }}
+              </div>
+            </div>
+            <div >
+              <!--
+              <button
+                class="btn btn-sm btn-danger"
+                (click)="eliminarAdministrador(admin)"
+                title="{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.BTN_ELIMINAR' | translate }}">
+                <i class="fas fa-trash"></i>
+              </button>
+              -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="administradoresConvenio.length === 0" class="text-center text-muted py-3">
+        <i class="fas fa-user-slash fa-2x mb-2"></i>
+        <p>{{ 'SOLICITUDES_CONVENIO.MODAL_ADMIN.SIN_ADMINISTRADORES' | translate }}</p>
+      </div>
+    </div>
+  </div>
+</div>

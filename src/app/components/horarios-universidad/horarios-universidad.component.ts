@@ -9,11 +9,20 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { HorariosUniversidadModel } from '../../models/HorariosUniversidadModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-horarios-universidad',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './horarios-universidad.component.html',
   styleUrls: ['./horarios-universidad.component.css'],
   providers: [ConfirmationService]
@@ -37,7 +46,11 @@ export class HorariosUniversidadComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit(): void {
     this.fetchHorarios();
@@ -74,7 +87,7 @@ export class HorariosUniversidadComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar horarios', err);
-          this.showError('No se pudo cargar la información de los horarios.');
+          this.showError(this.translate.instant('HORARIOS_UNIVERSIDAD.ERROR_CARGAR'));
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
@@ -88,7 +101,7 @@ export class HorariosUniversidadComponent implements OnInit, OnDestroy {
   // -----------------------
   filterHorarios() {
     if (!this.filtro.trim()) {
-      this.showWarning('Debe digitar un valor para buscar.');
+      this.showWarning(this.translate.instant('HORARIOS_UNIVERSIDAD.ADVERTENCIA_BUSQUEDA'));
       return;
     }
 
@@ -116,7 +129,7 @@ export class HorariosUniversidadComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error en búsqueda de horarios', err);
-          this.showError('No se pudieron cargar los resultados.');
+          this.showError(this.translate.instant('HORARIOS_UNIVERSIDAD.ERROR_BUSQUEDA'));
           this.loadingTable = false;
         }
       });
@@ -153,19 +166,19 @@ export class HorariosUniversidadComponent implements OnInit, OnDestroy {
         } else if (response.error) {
           this.showError(response.error);
         } else {
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('HORARIOS_UNIVERSIDAD.RESPUESTA_DESCONOCIDA'));
         }
       },
       error: (err) => {
         console.error('Error al guardar horario', err);
-        this.showError('No se pudo procesar la solicitud.');
+        this.showError(this.translate.instant('HORARIOS_UNIVERSIDAD.ERROR_PROCESAR'));
         this.loading = false;
       }
     });
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Seguro que deseas eliminar este horario?');
+    const confirmado = await this.showConfirm(this.translate.instant('HORARIOS_UNIVERSIDAD.CONFIRMAR_ELIMINAR'));
     if (!confirmado) return;
 
     this.api.delete(`HorarioNoLaborales/Eliminar_Horario/${id}`)
@@ -173,11 +186,11 @@ export class HorariosUniversidadComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchHorarios();
-          this.showSuccess('Horario eliminado correctamente.');
+          this.showSuccess(this.translate.instant('HORARIOS_UNIVERSIDAD.ELIMINADO_EXITO'));
         },
         error: (err) => {
           console.error('Error al eliminar horario', err);
-          this.showError('Error al eliminar horario.');
+          this.showError(this.translate.instant('HORARIOS_UNIVERSIDAD.ERROR_ELIMINAR'));
         }
       });
   }
@@ -230,7 +243,7 @@ export class HorariosUniversidadComponent implements OnInit, OnDestroy {
   // TOASTS / CONFIRMS
   // -----------------------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('HORARIOS_UNIVERSIDAD.OPERACION_EXITOSA'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -238,7 +251,7 @@ export class HorariosUniversidadComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('HORARIOS_UNIVERSIDAD.ERROR'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -246,7 +259,7 @@ export class HorariosUniversidadComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('HORARIOS_UNIVERSIDAD.ATENCION'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -257,10 +270,10 @@ export class HorariosUniversidadComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('HORARIOS_UNIVERSIDAD.CONFIRMAR_ACCION'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('HORARIOS_UNIVERSIDAD.SI_CONFIRMO'),
+        rejectLabel: this.translate.instant('HORARIOS_UNIVERSIDAD.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

@@ -9,11 +9,20 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { CondicionModel } from '../../models/CondicionModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-condicion',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './condicion.component.html',
   styleUrls: ['./condicion.component.css'],
   providers: [ConfirmationService]
@@ -42,7 +51,11 @@ export class CondicionComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService       // ⬅️ para mensajes en TS
+  ) {}
 
   ngOnInit() {
     this.fetchCondiciones();
@@ -76,7 +89,6 @@ export class CondicionComponent implements OnInit, OnDestroy {
             }
           }
           this.estados = items.map(item => ({ id: item.id, nombre: item.nombre }));
-
         },
         error: (err) => {
           console.error('Error al cargar estado para select', err);
@@ -91,7 +103,11 @@ export class CondicionComponent implements OnInit, OnDestroy {
   fetchCondiciones() {
     this.error = null;
     this.loadingTable = true;
-    this.api.get<any>(this.idConvocatoria == 'undefined' || this.idConvocatoria == null ?  'Condicion/Consultar_Condicion' : `CondicionConvocatoria/Consultar_CondicionesConvocatoriaConvocatoria?idConvocatoria=${this.idConvocatoria}`)
+    this.api.get<any>(
+      this.idConvocatoria == 'undefined' || this.idConvocatoria == null
+        ? 'Condicion/Consultar_Condicion'
+        : `CondicionConvocatoria/Consultar_CondicionesConvocatoriaConvocatoria?idConvocatoria=${this.idConvocatoria}`
+    )
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -119,12 +135,13 @@ export class CondicionComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar condiciones', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          const msg = this.translate.instant('CONDICIONES.MENSAJES.ERROR_CARGA');
+          this.error = msg;
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(msg);
           this.loadingTable = false;
         }
       });
@@ -137,7 +154,8 @@ export class CondicionComponent implements OnInit, OnDestroy {
     this.error = null;
 
     if (!this.filtro || this.filtro.trim() === '') {
-      this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
+      const msg = this.translate.instant('CONDICIONES.MENSAJES.FILTRO_VACIO');
+      this.showWarning(msg);
       return;
     }
     this.loadingTable = true;
@@ -169,12 +187,13 @@ export class CondicionComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al filtrar condiciones', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          const msg = this.translate.instant('CONDICIONES.MENSAJES.ERROR_CARGA');
+          this.error = msg;
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(msg);
           this.loadingTable = false;
         }
       });
@@ -191,7 +210,7 @@ export class CondicionComponent implements OnInit, OnDestroy {
 
     // validaciones adicionales
     if (!this.model.nombreCondicion?.trim() || !this.model.descripcion?.trim()) {
-      this.error = 'Nombre y descripción son obligatorios.';
+      this.error = this.translate.instant('CONDICIONES.MENSAJES.NOMBRE_DESC_REQUERIDOS');
       return;
     }
 
@@ -224,15 +243,15 @@ export class CondicionComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          // fallback por si llega algo inesperado
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('CONDICIONES.MENSAJES.RESPUESTA_DESCONOCIDA'));
         }
       },
       error: (err) => {
         console.error(isUpdate ? 'Error al actualizar condicion' : 'Error al crear condicion', err);
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
+        const msg = this.translate.instant('CONDICIONES.MENSAJES.ERROR_PROCESAR');
+        this.error = msg;
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
+        this.showError(msg);
       }
     });
   }
@@ -252,12 +271,12 @@ export class CondicionComponent implements OnInit, OnDestroy {
   startEdit(item: CondicionModel) {
     this.model = Object.assign(new CondicionModel(), item);
     this.isEditing = true;
-    // bring user to top of form (optional)
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
+    const question = this.translate.instant('CONDICIONES.MENSAJES.CONFIRMAR_ELIMINAR');
+    const confirmado = await this.showConfirm(question);
     if (!confirmado) return;
 
     this.api.delete(`Condicion/Eliminar_Condicion/${id}`)
@@ -265,11 +284,11 @@ export class CondicionComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchCondiciones();
-          this.showSuccess('Se elimino el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('CONDICIONES.MENSAJES.ELIMINAR_OK'));
         },
         error: (err) => {
           console.error('Error al eliminar condicion, el resgistro se encuentra asociado', err);
-          this.showError('Error al eliminar condicion, el resgistro se encuentra asociado');
+          this.showError(this.translate.instant('CONDICIONES.MENSAJES.ELIMINAR_ERROR_ASOCIADO'));
         }
       });
   }
@@ -314,7 +333,8 @@ export class CondicionComponent implements OnInit, OnDestroy {
   // Toasters / Confirm
   // -----------------------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    const title = this.translate.instant('CONDICIONES.TOASTS.EXITO_TITULO');
+    toast.success(title, {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -322,7 +342,8 @@ export class CondicionComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    const title = this.translate.instant('CONDICIONES.TOASTS.ERROR_TITULO');
+    toast.error(title, {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -330,7 +351,8 @@ export class CondicionComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    const title = this.translate.instant('CONDICIONES.TOASTS.WARNING_TITULO');
+    toast.warning(title, {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -341,10 +363,10 @@ export class CondicionComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('CONDICIONES.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('CONDICIONES.CONFIRM.ACEPTAR'),
+        rejectLabel: this.translate.instant('CONDICIONES.CONFIRM.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',

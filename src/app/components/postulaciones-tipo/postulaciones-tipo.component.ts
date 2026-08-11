@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { Subject, takeUntil } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
@@ -13,6 +12,9 @@ import { PostulacionTipoConsultaModel } from '../../models/PostulacionTipoModel'
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+
+import { Subject, takeUntil, of, from } from 'rxjs';
+import { catchError, map, mergeMap, toArray } from 'rxjs/operators';
 
 @Component({
   selector: 'app-postulaciones-tipo',
@@ -67,6 +69,8 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
   isClosing = false;
   nombreCombocatoria: any;
   idConvocatoria: any;
+  usuario: any = {};
+  categoria: any;
 
   @Input() tipoPostulacion: any;
 
@@ -79,9 +83,16 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
+
     this.fetchPostulaciones();
     this.fetchListaEstados();
     this.fetchListaTipoMovilidad();
+
+    const params = this.route.snapshot.queryParams;
+    this.categoria = params['categoria'];
   }
 
   ngOnDestroy(): void {
@@ -92,8 +103,7 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
   // ---------- CRUD / listado ----------
   fetchPostulaciones() {
 
-    //carga datos parametros
-
+    // Carga datos parámetros
     this.route.queryParams.subscribe(params => {
       this.nombreCombocatoria = params['nombre'];
       this.idConvocatoria = params['id'];
@@ -118,11 +128,75 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
             }
           }
 
-          this.data = items.map(item => PostulacionTipoConsultaModel.fromJSON(item));
-          this.filteredData = [...this.data];
-          this.calculateTotalPages();
-          this.updatePagedData();
-           this.loading = false;
+          let filteredItems = items;
+
+          const rol = Number(this.usuario?.rolId);
+
+          if ([9, 10, 11].includes(rol)) {
+            // Vicerrectoría, Director, Decanatura → solo estudiantes y profesores
+            filteredItems = items.filter(item => [1, 2, 3, 4].includes(Number(item?.rolId)));
+
+            // Director además filtra por su programa
+            if (rol === 10) {
+              filteredItems = filteredItems.filter(
+                item =>
+                  this.normalizarTexto(item?.programa || '') ===
+                  this.normalizarTexto(this.usuario?.programa || '')
+              );
+            }
+          } else if ([12, 13].includes(rol)) {
+            // Rectoría, Jefe inmediato → solo administrativos
+            filteredItems = items.filter(item => [5, 6].includes(Number(item?.rolId)));
+
+            // Jefe inmediato además filtra por su área
+            if (rol === 13) {
+              filteredItems = filteredItems.filter(
+                item =>
+                  this.normalizarTexto(item?.area || '') ===
+                  this.normalizarTexto(this.usuario?.area || '')
+              );
+            }
+          }
+
+          const baseModels = filteredItems.map(item =>
+            PostulacionTipoConsultaModel.fromJSON(item)
+          );
+
+          from(baseModels).pipe(
+            takeUntil(this.destroy$),
+            mergeMap((m) => {
+              if (!m?.usuarioId) return of(m);
+
+              return this.api.getExterno<any>(`orisiga/nombrestudiante/?idestudiante=${m.usuarioId}`).pipe(
+                map(resp => this.mapStudentInfoToModel(m, resp)),
+                catchError(err => {
+                  console.error('Error consultando estudiante ORISIGA, usuarioId=', m.usuarioId, err);
+                  return of(m);
+                })
+              );
+            }, 5),
+            toArray()
+          ).subscribe({
+            next: (enrichedModels) => {
+              this.data = enrichedModels;
+              this.filteredData = [...this.data];
+              this.calculateTotalPages();
+              this.updatePagedData();
+              this.loading = false;
+            },
+            error: (err) => {
+              console.error('Error enriqueciendo datos de estudiantes', err);
+              this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+              this.data = [];
+              this.filteredData = [];
+              this.pagedData = [];
+              this.calculateTotalPages();
+              this.showError();
+              this.loading = false;
+            }
+          });
+
+          // NOTA: ya no ponemos loading=false aquí porque ahora dependemos del subscribe interno
         },
         error: (err) => {
           console.error('Error al consultar convocatorias', err);
@@ -132,9 +206,35 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
-           this.loading = false;
+          this.loading = false;
         }
       });
+  }
+
+  private normalizarTexto(texto: string): string {
+  return texto
+    ?.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // elimina tildes
+    .trim()
+    .toUpperCase();
+  }
+
+  private mapStudentInfoToModel(
+    item: PostulacionTipoConsultaModel,
+    resp: any
+  ): PostulacionTipoConsultaModel {
+
+    const data = Array.isArray(resp) ? resp[0] : resp;
+
+    const nombreCompleto = data?.nombre ?? data?.nombreCompleto ?? '';
+    const documento = data?.identificacion ?? data?.documento ?? String(item.usuarioId ?? '');
+    const correo = data?.correo ?? data?.email ?? '';
+
+    item.nombreCompleto = nombreCompleto;
+    item.documento = documento;
+    item.correo = correo;
+
+    return item;
   }
 
   filterPostulaciones() {
@@ -150,8 +250,8 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
     const fInicial = encodeURIComponent(this.fechaInicial.trim());
     const fFinal = encodeURIComponent(this.fechaFinal.trim());
     const estadoId = encodeURIComponent(this.estadoId);
-    this.api.get<any>(this.tipoPostulacion == 'entrante' ? `ConsulltaPostuladosTipo/Consultar_PostuladosTipoEntrante?idEstado=${estadoId}&IdTipo=${tipoMovilidad}&DocumentoPostulado=${nombre}l&FechaInicioConvocatoria=${fInicial}&FechaFinConvocatoria=${fFinal}`
-                                                         : `ConsulltaPostuladosTipo/Consultar_PostuladosTipoSaliente?idEstado=${estadoId}&IdTipo=${tipoMovilidad}&DocumentoPostulado=${nombre}l&FechaInicioConvocatoria=${fInicial}&FechaFinConvocatoria=${fFinal}`)
+    this.api.get<any>(this.tipoPostulacion == 'entrante' ? `ConsulltaPostuladosTipo/Consultar_PostuladosTipoEntrante?idEstado=${estadoId}&IdTipo=${tipoMovilidad}&DocumentoPostulado=${this.filtro}&FechaInicioConvocatoria=${fInicial}&FechaFinConvocatoria=${fFinal}`
+                                                         : `ConsulltaPostuladosTipo/Consultar_PostuladosTipoSaliente?idEstado=${estadoId}&IdTipo=${tipoMovilidad}&DocumentoPostulado=${this.filtro}&FechaInicioConvocatoria=${fInicial}&FechaFinConvocatoria=${fFinal}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -327,6 +427,9 @@ export class PostulcionesEntrantesComponent implements OnInit, OnDestroy {
       nombre: item.nombreConvocatoria,
       id: item.id,
       idConvocatoria: item.convocatoriaId,
+      categoria: this.categoria,
+      nombreMovilida: item.nombreModalidad,
+      nombreConvenio: item.nombreConvenio
     }
     });
   }

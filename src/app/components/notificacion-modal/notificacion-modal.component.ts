@@ -39,7 +39,7 @@ interface NotificacionData {
 export class NotificacionModalComponent {
   asunto = '';
   nombre = '';
-  descripcion = '';
+  mensaje = '';
   enviando = false;
 
   constructor(
@@ -49,7 +49,7 @@ export class NotificacionModalComponent {
   ) {}
 
   isFormValid(): boolean {
-    return !!(this.nombre?.trim() && this.descripcion?.trim());
+    return !!(this.nombre?.trim() && this.mensaje?.trim());
   }
 
   async enviarNotificacion() {
@@ -60,8 +60,8 @@ export class NotificacionModalComponent {
     const payload = {
       postulacionId: this.data.postulacionId,
       nombre: this.nombre.trim(),
-      asunto: this.nombre.trim(),
-      descripcion: this.descripcion.trim()
+      asunto: this.asunto.trim(),
+      mensaje: this.mensaje.trim()
     };
 
     try {

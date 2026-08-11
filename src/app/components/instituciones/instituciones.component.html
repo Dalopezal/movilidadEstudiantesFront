@@ -7,19 +7,23 @@
         <section class="col-12 col-lg-3 d-flex flex-column" style="height: 75vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
             <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;font-size: 14px">Administrar Instituciones</p>
+              <p class="mb-0" style="color: #0D133F;font-size: 14px">
+                {{ 'INSTITUCIONES.FORM.TITULO' | translate }}
+              </p>
             </div>
 
             <div class="card-body d-flex flex-column flex-grow-1">
               <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
                 <div class="mb-3">
-                  <label for="nombre" class="form-label fw-bold">Nombre</label>
+                  <label for="nombre" class="form-label fw-bold">
+                    {{ 'INSTITUCIONES.FORM.NOMBRE_LABEL' | translate }}
+                  </label>
                   <input
                     type="text"
                     class="form-control"
                     id="nombre"
                     name="nombre"
-                    placeholder="Digite Nombre"
+                    [placeholder]="'INSTITUCIONES.FORM.NOMBRE_PLACEHOLDER' | translate"
                     required
                     minlength="3"
                     [(ngModel)]="model.nombre"
@@ -27,19 +31,25 @@
                     style="font-size: 13px;"
                   />
                   <div class="text-danger small mt-1" *ngIf="nombreCtrl.invalid && (nombreCtrl.touched || nombreCtrl.dirty)">
-                    <div *ngIf="nombreCtrl.errors?.['required']">El nombre es obligatorio.</div>
-                    <div *ngIf="nombreCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                    <div *ngIf="nombreCtrl.errors?.['required']">
+                      {{ 'INSTITUCIONES.FORM.NOMBRE_REQUERIDO' | translate }}
+                    </div>
+                    <div *ngIf="nombreCtrl.errors?.['minlength']">
+                      {{ 'INSTITUCIONES.FORM.NOMBRE_MINLENGTH' | translate }}
+                    </div>
                   </div>
                 </div>
 
                 <div class="mb-3">
-                  <label for="contactoDescripcion" class="form-label fw-bold">Descripción Contacto</label>
+                  <label for="contactoDescripcion" class="form-label fw-bold">
+                    {{ 'INSTITUCIONES.FORM.DESCRIPCION_LABEL' | translate }}
+                  </label>
                   <textarea
                     class="form-control"
                     id="contactoDescripcion"
                     name="contactoDescripcion"
                     rows="4"
-                    placeholder="Digite Descripción Contacto"
+                    [placeholder]="'INSTITUCIONES.FORM.DESCRIPCION_PLACEHOLDER' | translate"
                     required
                     minlength="10"
                     [(ngModel)]="model.contactoDescripcion"
@@ -47,13 +57,19 @@
                     style="font-size: 13px;"
                   ></textarea>
                   <div class="text-danger small mt-1" *ngIf="descCtrl.invalid && (descCtrl.touched || descCtrl.dirty)">
-                    <div *ngIf="descCtrl.errors?.['required']">La descripción es obligatoria.</div>
-                    <div *ngIf="descCtrl.errors?.['minlength']">Mínimo 10 caracteres.</div>
+                    <div *ngIf="descCtrl.errors?.['required']">
+                      {{ 'INSTITUCIONES.FORM.DESCRIPCION_REQUERIDA' | translate }}
+                    </div>
+                    <div *ngIf="descCtrl.errors?.['minlength']">
+                      {{ 'INSTITUCIONES.FORM.DESCRIPCION_MINLENGTH' | translate }}
+                    </div>
                   </div>
                 </div>
 
                 <div class="mb-3">
-                  <label for="pais" class="form-label fw-bold">País</label>
+                  <label for="pais" class="form-label fw-bold">
+                    {{ 'INSTITUCIONES.FORM.PAIS_LABEL' | translate }}
+                  </label>
                   <select
                     class="form-select"
                     id="pais"
@@ -68,13 +84,17 @@
                     <option *ngFor="let p of paises" [ngValue]="p.id">{{ p.nombre }}</option>
                   </select>
                   <div class="text-danger small mt-1" *ngIf="paisCtrl.invalid && (paisCtrl.touched || paisCtrl.dirty)">
-                    <div *ngIf="paisCtrl.errors?.['required']">Debe seleccionar un país.</div>
+                    <div *ngIf="paisCtrl.errors?.['required']">
+                      {{ 'INSTITUCIONES.FORM.PAIS_REQUERIDO' | translate }}
+                    </div>
                   </div>
                 </div>
 
                 <div class="mb-3">
-                  <label for="ciudad" class="form-label fw-bold">Ciudad</label>
-                 <select
+                  <label for="ciudad" class="form-label fw-bold">
+                    {{ 'INSTITUCIONES.FORM.CIUDAD_LABEL' | translate }}
+                  </label>
+                  <select
                     class="form-select"
                     id="ciudad"
                     name="ciudadId"
@@ -88,7 +108,9 @@
                     <option *ngFor="let c of ciudades" [ngValue]="c.id">{{ c.nombre }}</option>
                   </select>
                   <div class="text-danger small mt-1" *ngIf="ciudadCtrl.invalid && (ciudadCtrl.touched || ciudadCtrl.dirty)">
-                    <div *ngIf="ciudadCtrl.errors?.['required']">Debe seleccionar una ciudad.</div>
+                    <div *ngIf="ciudadCtrl.errors?.['required']">
+                      {{ 'INSTITUCIONES.FORM.CIUDAD_REQUERIDA' | translate }}
+                    </div>
                   </div>
                 </div>
 
@@ -100,13 +122,22 @@
                     [ngStyle]="{ 'background': '#0D133F' }"
                     style="font-size: 13px;"
                   >
-                    <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
-                    <span *ngIf="loading">Guardando...</span>
+                    <span *ngIf="!loading">
+                      {{ isEditing ? ('INSTITUCIONES.FORM.BTN_ACTUALIZAR' | translate) : ('INSTITUCIONES.FORM.BTN_INGRESAR' | translate) }}
+                    </span>
+                    <span *ngIf="loading">
+                      {{ 'INSTITUCIONES.FORM.BTN_GUARDANDO' | translate }}
+                    </span>
                   </button>
 
-                  <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading"
-                    style="font-size: 13px;">
-                    Cancelar
+                  <button
+                    type="button"
+                    class="btn btn-secondary flex-grow-1"
+                    (click)="resetForm(myForm)"
+                    [disabled]="loading"
+                    style="font-size: 13px;"
+                  >
+                    {{ 'INSTITUCIONES.FORM.BTN_CANCELAR' | translate }}
                   </button>
                 </div>
               </form>
@@ -118,12 +149,29 @@
         <section class="col-12 col-lg-9 d-flex flex-column" style="height: 75vh;">
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
-              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchInstituciones(); filtro=''">
-                <i class="fas fa-sync-alt"></i> Actualizar
+              <button
+                class="btn btn-primary d-flex align-items-center gap-2"
+                style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;"
+                (click)="fetchInstituciones(); filtro=''"
+              >
+                <i class="fas fa-sync-alt"></i>
+                {{ 'INSTITUCIONES.TABLA.BTN_ACTUALIZAR' | translate }}
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite nombre institución" [(ngModel)]="filtro" name="filtro"/>
-              <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterInstituciones()">
-                <i class="fas fa-search"></i> Buscar
+              <input
+                style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;"
+                type="text"
+                class="form-control"
+                [placeholder]="'INSTITUCIONES.TABLA.FILTRO_PLACEHOLDER' | translate"
+                [(ngModel)]="filtro"
+                name="filtro"
+              />
+              <button
+                class="btn btn-primary d-flex align-items-center gap-2"
+                style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;"
+                (click)="filterInstituciones()"
+              >
+                <i class="fas fa-search"></i>
+                {{ 'INSTITUCIONES.TABLA.BTN_BUSCAR' | translate }}
               </button>
             </div>
 
@@ -131,17 +179,29 @@
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
                   <tr>
-                    <th style="background: white !important;">Nombre</th>
-                    <th style="background: white !important;">Descripción</th>
-                    <th style="background: white !important;">País</th>
-                    <th style="background: white !important;">Ciudad</th>
-                    <th style="background: white !important;">Opciones</th>
+                    <th style="background: white !important;">
+                      {{ 'INSTITUCIONES.TABLA.COL_NOMBRE' | translate }}
+                    </th>
+                    <th style="background: white !important;">
+                      {{ 'INSTITUCIONES.TABLA.COL_DESCRIPCION' | translate }}
+                    </th>
+                    <th style="background: white !important;">
+                      {{ 'INSTITUCIONES.TABLA.COL_PAIS' | translate }}
+                    </th>
+                    <th style="background: white !important;">
+                      {{ 'INSTITUCIONES.TABLA.COL_CIUDAD' | translate }}
+                    </th>
+                    <th style="background: white !important;">
+                      {{ 'INSTITUCIONES.TABLA.COL_OPCIONES' | translate }}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   <div *ngIf="loadingTable" class="table-overlay">
-                  <i class="fas fa-spinner fa-spin fa-3x"></i>
-                  <p style="background: transparent;">Cargando datos</p>
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <p style="background: transparent;">
+                      {{ 'INSTITUCIONES.TABLA.CARGANDO' | translate }}
+                    </p>
                   </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.nombre }}</td>
@@ -149,16 +209,25 @@
                     <td>{{ item.nombrePais }}</td>
                     <td>{{ item.nombreCiudad }}</td>
                     <td>
-                      <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">
+                      <button
+                        style="margin-bottom: 3px;"
+                        class="btn btn-sm btn-primary me-1 button-completed"
+                        (click)="startEdit(item)"
+                      >
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="btn btn-sm btn-danger button-completed" (click)="deleteItem(item.id)">
+                      <button
+                        class="btn btn-sm btn-danger button-completed"
+                        (click)="deleteItem(item.id)"
+                      >
                         <i class="fas fa-trash"></i>
                       </button>
                     </td>
                   </tr>
                   <tr *ngIf="!loadingTable && pagedData.length === 0">
-                    <td colspan="5" class="text-center">No hay registros.</td>
+                    <td colspan="5" class="text-center">
+                      {{ 'INSTITUCIONES.TABLA.SIN_REGISTROS' | translate }}
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -166,17 +235,26 @@
 
             <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
               <div class="items-per-page d-flex align-items-center gap-2">
-                <label for="itemsPerPageSelect" class="mb-0">Mostrar</label>
+                <label for="itemsPerPageSelect" class="mb-0">
+                  {{ 'INSTITUCIONES.PAGINACION.MOSTRAR' | translate }}
+                </label>
                 <select id="itemsPerPageSelect" (change)="onPageSizeChange($event)" [value]="pageSize">
                   <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
                 </select>
-                <span>de {{ data.length }}</span>
+                <span>
+                  {{ 'INSTITUCIONES.PAGINACION.DE' | translate }} {{ data.length }}
+                </span>
               </div>
 
               <nav aria-label="Page navigation example">
                 <ul class="pagination mb-0">
                   <li class="page-item" [class.disabled]="currentPage === 1">
-                    <button class="page-link text-white" (click)="goToPage(currentPage - 1)" aria-label="Previous" style="background: #0D133F;">
+                    <button
+                      class="page-link text-white"
+                      (click)="goToPage(currentPage - 1)"
+                      aria-label="Previous"
+                      style="background: #0D133F;"
+                    >
                       <span aria-hidden="true">&laquo;</span>
                     </button>
                   </li>
@@ -184,7 +262,12 @@
                     <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
                   </li>
                   <li class="page-item" [class.disabled]="currentPage === totalPages">
-                    <button class="page-link text-white" (click)="goToPage(currentPage + 1)" aria-label="Next" style="background: #0D133F;">
+                    <button
+                      class="page-link text-white"
+                      (click)="goToPage(currentPage + 1)"
+                      aria-label="Next"
+                      style="background: #0D133F;"
+                    >
                       <span aria-hidden="true">&raquo;</span>
                     </button>
                   </li>
@@ -199,7 +282,5 @@
   </div>
 </div>
 
-<!-- Notificaciones de ngx-sonner -->
 <ngx-sonner-toaster />
-<!-- ConfirmDialog de PrimeNG -->
 <p-confirmDialog appendTo="body" styleClass="custom-confirm-dialog"></p-confirmDialog>

@@ -335,3 +335,8 @@
   height: auto;
   object-fit: contain;
 }
+
+.large-checkbox {
+  width: 24px;
+  height: 24px;
+}

@@ -7,19 +7,23 @@
         <section class="col-12 col-lg-4 d-flex flex-column" style="min-height: 80vh;">
           <div class="card shadow-sm flex-grow-1 d-flex flex-column">
             <div class="card-header text-white" style="background: #E2E6F7;">
-              <p class="mb-0" style="color: #0D133F;font-size: 14px">Administración Convocatorias</p>
+              <p class="mb-0" style="color: #0D133F;font-size: 14px">
+                {{ 'CONVOCATORIAS.FORM.TITULO' | translate }}
+              </p>
             </div>
 
             <div class="card-body d-flex flex-column flex-grow-1">
               <form class="d-flex flex-column flex-grow-1" #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
                 <div class="mb-3">
-                  <label for="nombre" class="form-label fw-bold">Nombre</label>
+                  <label for="nombre" class="form-label fw-bold">
+                    {{ 'CONVOCATORIAS.FORM.NOMBRE_LABEL' | translate }}
+                  </label>
                   <input
                     type="text"
                     class="form-control"
                     id="nombre"
                     name="nombre"
-                    placeholder="Digite Nombre"
+                    [placeholder]="'CONVOCATORIAS.FORM.NOMBRE_PLACEHOLDER' | translate"
                     required
                     minlength="3"
                     [(ngModel)]="model.nombre"
@@ -27,18 +31,24 @@
                     style="font-size: 13px;"
                   />
                   <div class="text-danger small mt-1" *ngIf="nombreCtrl.invalid && (nombreCtrl.touched || nombreCtrl.dirty)">
-                    <div *ngIf="nombreCtrl.errors?.['required']">El nombre es obligatorio.</div>
-                    <div *ngIf="nombreCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                    <div *ngIf="nombreCtrl.errors?.['required']">
+                      {{ 'CONVOCATORIAS.FORM.NOMBRE_REQUERIDO' | translate }}
+                    </div>
+                    <div *ngIf="nombreCtrl.errors?.['minlength']">
+                      {{ 'CONVOCATORIAS.FORM.NOMBRE_MINLENGTH' | translate }}
+                    </div>
                   </div>
                 </div>
 
                 <div class="mb-3">
-                  <label for="descripcion" class="form-label fw-bold">Descripción</label>
+                  <label for="descripcion" class="form-label fw-bold">
+                    {{ 'CONVOCATORIAS.FORM.DESCRIPCION_LABEL' | translate }}
+                  </label>
                   <textarea
                     class="form-control"
                     id="descripcion"
                     name="descripcion"
-                    placeholder="Digite Descripción"
+                    [placeholder]="'CONVOCATORIAS.FORM.DESCRIPCION_PLACEHOLDER' | translate"
                     required
                     minlength="3"
                     rows="3"
@@ -47,14 +57,20 @@
                     style="font-size: 13px;"
                   ></textarea>
                   <div class="text-danger small mt-1" *ngIf="descripcionCtrl.invalid && (descripcionCtrl.touched || descripcionCtrl.dirty)">
-                    <div *ngIf="descripcionCtrl.errors?.['required']">La descripción es obligatoria.</div>
-                    <div *ngIf="descripcionCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                    <div *ngIf="descripcionCtrl.errors?.['required']">
+                      {{ 'CONVOCATORIAS.FORM.DESCRIPCION_REQUERIDA' | translate }}
+                    </div>
+                    <div *ngIf="descripcionCtrl.errors?.['minlength']">
+                      {{ 'CONVOCATORIAS.FORM.DESCRIPCION_MINLENGTH' | translate }}
+                    </div>
                   </div>
                 </div>
 
                 <div class="row g-3" style="margin-bottom: 20px;">
                   <div class="col-12 col-md-6">
-                    <label for="fechaInicio" class="form-label fw-bold">Fecha Inicio</label>
+                    <label for="fechaInicio" class="form-label fw-bold">
+                      {{ 'CONVOCATORIAS.FORM.FECHA_INICIO_LABEL' | translate }}
+                    </label>
                     <input
                       type="date"
                       class="form-control"
@@ -66,11 +82,15 @@
                       style="font-size: 13px;"
                     />
                     <div class="text-danger small mt-1" *ngIf="fechaInicioCtrl.invalid && (fechaInicioCtrl.touched || fechaInicioCtrl.dirty)">
-                      <div *ngIf="fechaInicioCtrl.errors?.['required']">La fecha de inicio es obligatoria.</div>
+                      <div *ngIf="fechaInicioCtrl.errors?.['required']">
+                        {{ 'CONVOCATORIAS.FORM.FECHA_INICIO_REQUERIDA' | translate }}
+                      </div>
                     </div>
                   </div>
                   <div class="col-12 col-md-6">
-                    <label for="fechaCierre" class="form-label fw-bold">Fecha Cierre</label>
+                    <label for="fechaCierre" class="form-label fw-bold">
+                      {{ 'CONVOCATORIAS.FORM.FECHA_CIERRE_LABEL' | translate }}
+                    </label>
                     <input
                       type="date"
                       class="form-control"
@@ -82,14 +102,18 @@
                       style="font-size: 13px;"
                     />
                     <div class="text-danger small mt-1" *ngIf="fechaCierreCtrl.invalid && (fechaCierreCtrl.touched || fechaCierreCtrl.dirty)">
-                      <div *ngIf="fechaCierreCtrl.errors?.['required']">La fecha de cierre es obligatoria.</div>
+                      <div *ngIf="fechaCierreCtrl.errors?.['required']">
+                        {{ 'CONVOCATORIAS.FORM.FECHA_CIERRE_REQUERIDA' | translate }}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <div class="row g-3" style="margin-bottom: 20px;">
                   <div class="col-12 col-md-6">
-                    <label for="categoriaMovilidad" class="form-label fw-bold">Categoría Movilidad</label>
+                    <label for="categoriaMovilidad" class="form-label fw-bold">
+                      {{ 'CONVOCATORIAS.FORM.CATEGORIA_MOVILIDAD_LABEL' | translate }}
+                    </label>
                     <select
                       class="form-select"
                       id="categoriaMovilidad"
@@ -102,11 +126,15 @@
                       <option *ngFor="let c of categoriasMovilidad" [ngValue]="c.id">{{ c.nombre }}</option>
                     </select>
                     <div class="text-danger small mt-1" *ngIf="categoriaMovilidadCtrl.invalid && (categoriaMovilidadCtrl.touched || categoriaMovilidadCtrl.dirty)">
-                      <div *ngIf="categoriaMovilidadCtrl.errors?.['required']">La categoría de movilidad es obligatoria.</div>
+                      <div *ngIf="categoriaMovilidadCtrl.errors?.['required']">
+                        {{ 'CONVOCATORIAS.FORM.CATEGORIA_MOVILIDAD_REQUERIDA' | translate }}
+                      </div>
                     </div>
                   </div>
                   <div class="col-12 col-md-6">
-                    <label for="modalidad" class="form-label fw-bold">Modalidad</label>
+                    <label for="modalidad" class="form-label fw-bold">
+                      {{ 'CONVOCATORIAS.FORM.MODALIDAD_LABEL' | translate }}
+                    </label>
                     <select
                       class="form-select"
                       id="modalidad"
@@ -119,18 +147,22 @@
                       <option *ngFor="let m of modalidades" [ngValue]="m.id">{{ m.nombre }}</option>
                     </select>
                     <div class="text-danger small mt-1" *ngIf="modalidadCtrl.invalid && (modalidadCtrl.touched || modalidadCtrl.dirty)">
-                      <div *ngIf="modalidadCtrl.errors?.['required']">La modalidad es obligatoria.</div>
+                      <div *ngIf="modalidadCtrl.errors?.['required']">
+                        {{ 'CONVOCATORIAS.FORM.MODALIDAD_REQUERIDA' | translate }}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <div class="mb-3">
-                  <label for="requisitos" class="form-label fw-bold">Requisitos</label>
+                  <label for="requisitos" class="form-label fw-bold">
+                    {{ 'CONVOCATORIAS.FORM.REQUISITOS_LABEL' | translate }}
+                  </label>
                   <textarea
                     class="form-control"
                     id="requisitos"
                     name="requisitos"
-                    placeholder="Digite Requisitos"
+                    [placeholder]="'CONVOCATORIAS.FORM.REQUISITOS_PLACEHOLDER' | translate"
                     required
                     minlength="3"
                     rows="3"
@@ -139,8 +171,12 @@
                     style="font-size: 13px;"
                   ></textarea>
                   <div class="text-danger small mt-1" *ngIf="requisitosCtrl.invalid && (requisitosCtrl.touched || requisitosCtrl.dirty)">
-                    <div *ngIf="requisitosCtrl.errors?.['required']">Los requisitos son obligatorios.</div>
-                    <div *ngIf="requisitosCtrl.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                    <div *ngIf="requisitosCtrl.errors?.['required']">
+                      {{ 'CONVOCATORIAS.FORM.REQUISITOS_REQUERIDOS' | translate }}
+                    </div>
+                    <div *ngIf="requisitosCtrl.errors?.['minlength']">
+                      {{ 'CONVOCATORIAS.FORM.REQUISITOS_MINLENGTH' | translate }}
+                    </div>
                   </div>
                 </div>
 
@@ -154,7 +190,9 @@
                       [(ngModel)]="model.esActiva"
                       style="font-size: 13px;"
                     />
-                    <label for="esActiva" class="form-check-label fw-bold">Estado Activo</label>
+                    <label for="esActiva" class="form-check-label fw-bold">
+                      {{ 'CONVOCATORIAS.FORM.ESTADO_ACTIVO_LABEL' | translate }}
+                    </label>
                   </div>
                 </div>
 
@@ -166,13 +204,17 @@
                     [ngStyle]="{ 'background': '#0D133F' }"
                     style="font-size: 13px;"
                   >
-                    <span *ngIf="!loading">{{ isEditing ? 'Actualizar' : 'Ingresar' }}</span>
-                    <span *ngIf="loading">Guardando...</span>
+                    <span *ngIf="!loading">
+                      {{ isEditing ? ('CONVOCATORIAS.FORM.BTN_ACTUALIZAR' | translate) : ('CONVOCATORIAS.FORM.BTN_INGRESAR' | translate) }}
+                    </span>
+                    <span *ngIf="loading">
+                      {{ 'CONVOCATORIAS.FORM.BTN_GUARDANDO' | translate }}
+                    </span>
                   </button>
 
                   <button type="button" class="btn btn-secondary flex-grow-1" (click)="resetForm(myForm)" [disabled]="loading"
                     style="font-size: 13px;">
-                    Cancelar
+                    {{ 'CONVOCATORIAS.FORM.BTN_CANCELAR' | translate }}
                   </button>
                 </div>
               </form>
@@ -185,11 +227,11 @@
           <div class="card shadow-sm d-flex flex-column flex-grow-1" style="height: 100%;">
             <div class="card-header d-flex align-items-center gap-3 text-white" style="background-color: white;">
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="fetchConvocatorias(); filtro=''">
-                <i class="fas fa-sync-alt"></i> Actualizar
+                <i class="fas fa-sync-alt"></i> {{ 'CONVOCATORIAS.TABLA.BTN_ACTUALIZAR' | translate }}
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" placeholder="Digite nombre convocatoria" [(ngModel)]="filtro" name="filtro"/>
+              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;" type="text" class="form-control" [placeholder]="'CONVOCATORIAS.TABLA.FILTRO_PLACEHOLDER' | translate" [(ngModel)]="filtro" name="filtro"/>
               <button class="btn btn-primary d-flex align-items-center gap-2" style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;" (click)="filterConvocatorias()">
-                <i class="fas fa-search"></i> Buscar
+                <i class="fas fa-search"></i> {{ 'CONVOCATORIAS.TABLA.BTN_BUSCAR' | translate }}
               </button>
             </div>
 
@@ -197,25 +239,27 @@
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
                   <tr>
-                    <th style="background: white !important;">Nombre</th>
-                    <th style="background: white !important;">Estado</th>
-                    <th style="background: white !important;">Beneficios</th>
-                    <th style="background: white !important;">Condiciones</th>
-                    <th style="background: white !important;">Entregables</th>
-                    <th style="background: white !important;">Detalle</th>
-                    <th style="background: white !important;">Opciones</th>
+                    <th style="background: white !important;">{{ 'CONVOCATORIAS.TABLA.COL_NOMBRE' | translate }}</th>
+                    <th style="background: white !important;">{{ 'CONVOCATORIAS.TABLA.COL_ESTADO' | translate }}</th>
+                    <th style="background: white !important;">{{ 'CONVOCATORIAS.TABLA.COL_BENEFICIOS' | translate }}</th>
+                    <th style="background: white !important;">{{ 'CONVOCATORIAS.TABLA.COL_CONDICIONES' | translate }}</th>
+                    <th style="background: white !important;">{{ 'CONVOCATORIAS.TABLA.COL_ENTREGABLES' | translate }}</th>
+                    <th style="background: white !important;">{{ 'CONVOCATORIAS.TABLA.COL_DETALLE' | translate }}</th>
+                    <th style="background: white !important;">{{ 'CONVOCATORIAS.TABLA.COL_OPCIONES' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <div *ngIf="loadingTable" class="table-overlay">
                     <i class="fas fa-spinner fa-spin fa-3x"></i>
-                    <p style="background: transparent;">Cargando datos</p>
+                    <p style="background: transparent;">
+                      {{ 'CONVOCATORIAS.TABLA.CARGANDO' | translate }}
+                    </p>
                   </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
                     <td>{{ item.nombre }}</td>
                     <td align="center">
-                      <button *ngIf="item.esActiva" class="button-completed">Activa</button>
-                      <button *ngIf="!item.esActiva" class="button-pending">Inactiva</button>
+                      <button *ngIf="item.esActiva" class="button-completed">{{ 'CONVOCATORIAS.TABLA.ESTADO_ACTIVA' | translate }}</button>
+                      <button *ngIf="!item.esActiva" class="button-pending">{{ 'CONVOCATORIAS.TABLA.ESTADO_INACTIVA' | translate }}</button>
                     </td>
                     <td align="center" (click)="openModalBeneficio(item)"><i class="fa-duotone fa-regular fa-eye button-eye"></i></td>
                     <td align="center" (click)="openModalCondicion(item)"><i class="fa-duotone fa-regular fa-eye button-eye"></i></td>
@@ -235,7 +279,7 @@
                     </td>
                   </tr>
                   <tr *ngIf="!loadingTable && pagedData.length === 0">
-                    <td colspan="8" class="text-center">No hay registros.</td>
+                    <td colspan="8" class="text-center">{{ 'CONVOCATORIAS.TABLA.SIN_REGISTROS' | translate }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -243,11 +287,11 @@
 
             <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
               <div class="items-per-page d-flex align-items-center gap-2">
-                <label for="itemsPerPageSelect" class="mb-0">Mostrar</label>
+                <label for="itemsPerPageSelect" class="mb-0">{{ 'CONVOCATORIAS.PAGINACION.MOSTRAR' | translate }}</label>
                 <select id="itemsPerPageSelect" (change)="onPageSizeChange($event)" [value]="pageSize">
                   <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
                 </select>
-                <span>de {{ data.length }}</span>
+                <span>{{ 'CONVOCATORIAS.PAGINACION.DE' | translate }} {{ data.length }}</span>
               </div>
 
               <nav aria-label="Page navigation example">
@@ -287,7 +331,7 @@
      [style.left.px]="cardPosition.left">
   <div class="card shadow-glow">
     <div class="card-header gradient-header text-white p-2">
-      <strong><i class="fa-duotone fa-solid fa-circle-info me-2"></i>Detalle Convocatoria</strong>
+      <strong><i class="fa-duotone fa-solid fa-circle-info me-2"></i>{{ 'CONVOCATORIAS.DETALLE.TITULO' | translate }}</strong>
       <button type="button" class="btn-close btn-close-white float-end pulse-button"
               (click)="closeCard()"></button>
     </div>
@@ -295,52 +339,52 @@
     <div class="card-body glass-effect scroll-body" style="font-size: 13px;">
       <!-- Información básica -->
       <div class="info-row">
-        <span class="label-glow">ID:</span> {{ selectedItemCard.id || 'N/A' }}
+        <span class="label-glow">{{ 'CONVOCATORIAS.DETALLE.ID' | translate }}:</span> {{ selectedItemCard.id || 'N/A' }}
       </div>
       <div class="info-row">
-        <span class="label-glow">Nombre:</span> {{ selectedItemCard.nombre || 'Sin nombre' }}
+        <span class="label-glow">{{ 'CONVOCATORIAS.DETALLE.NOMBRE' | translate }}:</span> {{ selectedItemCard.nombre || ('CONVOCATORIAS.DETALLE.SIN_NOMBRE' | translate) }}
       </div>
       <div class="info-row">
-        <span class="label-glow">Descripción:</span>
-        <span class="text-wrap">{{ selectedItemCard.descripcion || 'Sin descripción' }}</span>
+        <span class="label-glow">{{ 'CONVOCATORIAS.DETALLE.DESCRIPCION' | translate }}:</span>
+        <span class="text-wrap">{{ selectedItemCard.descripcion || ('CONVOCATORIAS.DETALLE.SIN_DESCRIPCION' | translate) }}</span>
       </div>
 
       <!-- Fechas -->
       <div class="info-row">
-        <span class="label-glow">Fecha Inicio:</span> {{ selectedItemCard.fechaInicio || 'No definida' }}
+        <span class="label-glow">{{ 'CONVOCATORIAS.DETALLE.FECHA_INICIO' | translate }}:</span> {{ selectedItemCard.fechaInicio || ('CONVOCATORIAS.DETALLE.NO_DEFINIDA' | translate) }}
       </div>
       <div class="info-row">
-        <span class="label-glow">Fecha Cierre:</span> {{ selectedItemCard.fechaCierre || 'No definida' }}
+        <span class="label-glow">{{ 'CONVOCATORIAS.DETALLE.FECHA_CIERRE' | translate }}:</span> {{ selectedItemCard.fechaCierre || ('CONVOCATORIAS.DETALLE.NO_DEFINIDA' | translate) }}
       </div>
       <div class="info-row">
-        <span class="label-glow">Periodo:</span>
+        <span class="label-glow">{{ 'CONVOCATORIAS.DETALLE.PERIODO' | translate }}:</span>
         {{ selectedItemCard.fechaInicio && selectedItemCard.fechaCierre ?
-           (selectedItemCard.fechaInicio + ' → ' + selectedItemCard.fechaCierre) : 'Fechas no definidas' }}
+           (selectedItemCard.fechaInicio + ' → ' + selectedItemCard.fechaCierre) : ('CONVOCATORIAS.DETALLE.FECHAS_NO_DEFINIDAS' | translate) }}
       </div>
 
       <!-- Requisitos -->
       <div class="info-row">
-        <span class="label-glow">Requisitos:</span>
+        <span class="label-glow">{{ 'CONVOCATORIAS.DETALLE.REQUISITOS' | translate }}:</span>
         <div class="text-wrap mt-1" style="max-height: 80px; overflow-y: auto;">
-          {{ selectedItemCard.requisitos || 'Sin requisitos especificados' }}
+          {{ selectedItemCard.requisitos || ('CONVOCATORIAS.DETALLE.SIN_REQUISITOS' | translate) }}
         </div>
       </div>
 
       <!-- Categorías y modalidades -->
       <div class="info-row">
-        <span class="label-glow">Categoría Movilidad:</span>
-        {{ selectedItemCard.categoriaMovilidadNombre || 'No asignada' }}
+        <span class="label-glow">{{ 'CONVOCATORIAS.DETALLE.CATEGORIA_MOVILIDAD' | translate }}:</span>
+        {{ selectedItemCard.categoriaMovilidadNombre || ('CONVOCATORIAS.DETALLE.NO_ASIGNADA' | translate) }}
       </div>
       <div class="info-row">
-        <span class="label-glow">Modalidad:</span>
-        {{ selectedItemCard.movilidadNombre || 'No asignada' }}
+        <span class="label-glow">{{ 'CONVOCATORIAS.DETALLE.MODALIDAD' | translate }}:</span>
+        {{ selectedItemCard.movilidadNombre || ('CONVOCATORIAS.DETALLE.NO_ASIGNADA' | translate) }}
       </div>
 
       <!-- Estado -->
       <div class="info-row">
-        <span class="label-glow">Estado:</span>
-        <button *ngIf="selectedItemCard.esActiva" class="button-completed">Activa</button>
-                      <button *ngIf="!selectedItemCard.esActiva" class="button-pending">Inactiva</button>
+        <span class="label-glow">{{ 'CONVOCATORIAS.DETALLE.ESTADO' | translate }}:</span>
+        <button *ngIf="selectedItemCard.esActiva" class="button-completed">{{ 'CONVOCATORIAS.DETALLE.ESTADO_ACTIVA' | translate }}</button>
+        <button *ngIf="!selectedItemCard.esActiva" class="button-pending">{{ 'CONVOCATORIAS.DETALLE.ESTADO_INACTIVA' | translate }}</button>
       </div>
     </div>
   </div>
@@ -352,7 +396,7 @@
     <div class="modal-content">
       <div class="modal-header" style="background: #E2E6F7;">
         <p class="modal-title" id="BeneficioModalLabel" style="color: #0D133F;">
-          Beneficios de la Convocatoria
+          {{ 'CONVOCATORIAS.MODAL.BENEFICIOS_TITULO' | translate }}
         </p>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -373,7 +417,7 @@
     <div class="modal-content">
       <div class="modal-header" style="background: #E2E6F7;">
         <p class="modal-title" id="CondicionModalLabel" style="color: #0D133F;">
-          Condiciones de la Convocatoria
+          {{ 'CONVOCATORIAS.MODAL.CONDICIONES_TITULO' | translate }}
         </p>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -394,7 +438,7 @@
     <div class="modal-content">
       <div class="modal-header" style="background: #E2E6F7;">
         <p class="modal-title" id="EntregableModalLabel" style="color: #0D133F;">
-          Entregables de la Convocatoria
+          {{ 'CONVOCATORIAS.MODAL.ENTREGABLES_TITULO' | translate }}
         </p>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>

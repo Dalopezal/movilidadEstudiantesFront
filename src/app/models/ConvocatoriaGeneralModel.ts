@@ -11,6 +11,7 @@ export class ConvocatoriaGeneralModel {
   modalidadId: number | null = null;
   categoriaMovilidadNombre?: string;
   movilidadNombre?: string;
+  convenioNombre?: string;
 
   constructor(init?: Partial<ConvocatoriaGeneralModel>) {
     Object.assign(this, init);
@@ -29,6 +30,7 @@ export class ConvocatoriaGeneralModel {
       modalidadId: json.modalidadId,
       categoriaMovilidadNombre: json.categoriaMovilidadNombre,
       movilidadNombre: json.movilidadNombre,
+      convenioNombre: json.convenioNombre,
     });
   }
 

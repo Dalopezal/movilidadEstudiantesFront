@@ -13,6 +13,7 @@ import { CondicionComponent } from '../condicion/condicion.component';
 import { BeneficioConvocatoriaComponent } from '../beneficio-convocatoria/beneficio-convocatoria.component';
 import { EntregableComponent } from '../entregable/entregable.component';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-convocatorias-general',
@@ -25,7 +26,8 @@ import { Router } from '@angular/router';
     NgxSonnerToaster,
     CondicionComponent,
     BeneficioConvocatoriaComponent,
-    EntregableComponent
+    EntregableComponent,
+    TranslateModule
   ],
   templateUrl: './convocatorias-general.component.html',
   styleUrl: './convocatorias-general.component.css',
@@ -66,7 +68,8 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   constructor(
     private api: GenericApiService,
     private confirmationService: ConfirmationService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -90,6 +93,10 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   fetchConvocatorias() {
     this.error = null;
     this.loading = true;
+
+    // Verificar si el usuario es ORI
+    const esORI = this.usuario?.rolId === 7;
+
     this.api.get<any>('Convocatoria/ConsultarConvocatoria_Tipo?NombreTipo=' + this.categoria)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -105,21 +112,27 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
             }
           }
 
+          // Filtrar según el rol del usuario
+          if (!esORI) {
+            // Si no es ORI, solo mostrar convocatorias activas
+            items = items.filter(item => item.esActiva === true);
+          }
+
           this.data = items.map(item => ConvocatoriaGeneralModel.fromJSON(item));
           this.filteredData = [...this.data];
           this.calculateTotalPages();
           this.updatePagedData();
-           this.loading = false;
+          this.loading = false;
         },
         error: (err) => {
           console.error('Error al consultar convocatorias', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('CONVOCATORIAS_GENERAL.MENSAJES.ERROR_CARGA');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
           this.showError();
-           this.loading = false;
+          this.loading = false;
         }
       });
   }
@@ -127,7 +140,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   filterConvocatorias() {
     this.error = null;
     if ((!this.filtro || this.filtro.trim() === '') && (!this.fechaInicial || this.fechaInicial.trim() === '') && (!this.fechaFinal || this.fechaFinal.trim() === '') && (!this.movilidadId || this.movilidadId == 0)) {
-      this.showWarning('Debe digitar o seleccionar un valor para ejecutar la búsqueda');
+      this.showWarning(this.translate.instant('CONVOCATORIAS_GENERAL.MENSAJES.FILTRO_VACIO'));
       return;
     }
     this.loading = true;
@@ -199,7 +212,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar esta convocatoria?');
+    const confirmado = await this.showConfirm(this.translate.instant('CONVOCATORIAS_GENERAL.CONFIRM.ELIMINAR'));
     if (!confirmado) return;
 
     this.api.delete(`Convocatorias/Eliminar/${id}`)
@@ -210,7 +223,7 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
           this.showSuccess();
         },
         error: (err) => {
-          console.error('Error al eliminar convocatoria, el resgistro se encuentra asociado', err);
+          console.error('Error al eliminar convocatoria', err);
           this.showError();
         }
       });
@@ -252,23 +265,23 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
 
   // ---------- Toasters / Confirm ----------
   showSuccess() {
-    toast.success('¡Operación exitosa!', {
-      description: 'Tus datos se procesaron correctamente',
+    toast.success(this.translate.instant('CONVOCATORIAS_GENERAL.TOASTS.EXITO_TITULO'), {
+      description: this.translate.instant('CONVOCATORIAS_GENERAL.TOASTS.EXITO_DESC'),
       unstyled: true,
       class: 'my-success-toast'
     });
   }
 
   showError() {
-    toast.error('Error al procesar', {
-      description: 'No se puede consultar el id de postulación',
+    toast.error(this.translate.instant('CONVOCATORIAS_GENERAL.TOASTS.ERROR_TITULO'), {
+      description: this.translate.instant('CONVOCATORIAS_GENERAL.TOASTS.ERROR_DESC'),
       unstyled: true,
       class: 'my-error-toast'
     });
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('CONVOCATORIAS_GENERAL.TOASTS.WARNING_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -278,11 +291,11 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   showConfirm(mensaje: string): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
-        message: mensaje,
-        header: 'Confirmar acción',
+        message: `¿${mensaje}?`,
+        header: this.translate.instant('CONVOCATORIAS_GENERAL.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('CONVOCATORIAS_GENERAL.CONFIRM.ACEPTAR'),
+        rejectLabel: this.translate.instant('CONVOCATORIAS_GENERAL.CONFIRM.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',
@@ -321,20 +334,22 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
 
   selectedItem: ConvocatoriaGeneralModel | null = null;
 
-  openModalCondicion(item: ConvocatoriaGeneralModel) {
+  openModalBeneficio(item: ConvocatoriaGeneralModel) {
     this.selectedItem = item;
     this.convocatoriaId = item.id;
-    const modalElement = document.getElementById('CondicionModal');
+    const modalId = 'BeneficioModal' + this.categoria;
+    const modalElement = document.getElementById(modalId);
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();
     }
   }
 
-  openModalBeneficio(item: ConvocatoriaGeneralModel) {
+  openModalCondicion(item: ConvocatoriaGeneralModel) {
     this.selectedItem = item;
     this.convocatoriaId = item.id;
-    const modalElement = document.getElementById('BeneficioModal');
+    const modalId = 'CondicionModal' + this.categoria;
+    const modalElement = document.getElementById(modalId);
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();
@@ -344,7 +359,8 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   openModalEntregable(item: ConvocatoriaGeneralModel) {
     this.selectedItem = item;
     this.convocatoriaId = item.id;
-    const modalElement = document.getElementById('EntregableModal');
+    const modalId = 'EntregableModal' + this.categoria;
+    const modalElement = document.getElementById(modalId);
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();
@@ -354,7 +370,8 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
   abrirPostulaciones(item: ConvocatoriaGeneralModel) {
     this.router.navigate(['/postulacion-convocatoria'], {queryParams: {
       id: item.id,
-      nombre: item.nombre
+      nombre: item.nombre,
+      categoria: this.categoria
     }
     });
   }
@@ -374,6 +391,9 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
               idConvocatoria: item.id,
               nombre: item.nombre,
               idPostulacion: 0,
+              categoria: this.categoria,
+              nombreMovilida: item.movilidadNombre,
+              nombreConvenio: item.movilidadNombre
             }
           });
         }else{
@@ -381,6 +401,8 @@ export class ConvocatoriasGeneralComponent implements OnInit, OnDestroy {
               idConvocatoria: item.id,
               nombre: item.nombre,
               idPostulacion: response.datos[0].id,
+              categoria: this.categoria,
+              nombreMovilida: item.movilidadNombre
             }
           });
         }

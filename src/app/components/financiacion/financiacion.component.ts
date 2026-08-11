@@ -8,11 +8,19 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { FinanciacionModel } from '../../models/FinanciacionModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-financiacion',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './financiacion.component.html',
   styleUrls: ['./financiacion.component.css'],
   providers: [ConfirmationService]
@@ -32,6 +40,7 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
   pages: number[] = [];
 
   loading = false;
+  loadingTable = false;
   error: string | null = null;
   filtro: string = '';
 
@@ -39,15 +48,23 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
   isEditing = false;
 
   private destroy$ = new Subject<void>();
-  loadingTable: any;
-  @Input() postulacionId: any;
+  @Input() postulacionId!: any;
 
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit() {
+    this.translate.setDefaultLang('es');
+    const lang = localStorage.getItem('lang') || 'es';
+    this.translate.use(lang);
+
     this.fetchTiposFinanciacionExterna();
     this.fetchTiposFinanciacion();
     this.fetchFinanciaciones();
+    this.model.postulacionId = this.postulacionId
   }
 
   ngOnDestroy() {
@@ -71,9 +88,15 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.tiposFinanciacionExterna = items.map(i => ({ id: Number(i.id), descripcion: i.nombre }));
+          this.tiposFinanciacionExterna = items.map(i => ({
+            id: Number(i.id),
+            descripcion: i.nombre
+          }));
         },
-        error: (err) => { console.error('Error cargando tipos financiacion externa', err); this.tiposFinanciacionExterna = []; }
+        error: (err) => {
+          console.error('Error cargando tipos financiacion externa', err);
+          this.tiposFinanciacionExterna = [];
+        }
       });
   }
 
@@ -92,9 +115,15 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
               if (Array.isArray(arr)) items = arr;
             }
           }
-          this.tiposFinanciacion = items.map(i => ({ id: Number(i.id), descripcion: i.nombre }));
+          this.tiposFinanciacion = items.map(i => ({
+            id: Number(i.id),
+            descripcion: i.nombre
+          }));
         },
-        error: (err) => { console.error('Error cargando tipos financiacion', err); this.tiposFinanciacion = []; }
+        error: (err) => {
+          console.error('Error cargando tipos financiacion', err);
+          this.tiposFinanciacion = [];
+        }
       });
   }
 
@@ -102,7 +131,7 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
   fetchFinanciaciones() {
     this.error = null;
     this.loadingTable = true;
-    this.api.get<any>('FinanciacionUCM/Consultar_FinanciacionesPostulacion?PostulacionId=' + this.postulacionId)
+    this.api.get<any>(`FinanciacionUCM/Consultar_FinanciacionesPostulacion?PostulacionId=${this.postulacionId}`)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -125,12 +154,13 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar financiaciones', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          const msg = this.translate.instant('FINANCIACION.MENSAJES.ERROR_CARGA');
+          this.error = msg;
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(msg);
           this.loadingTable = false;
         }
       });
@@ -139,7 +169,8 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
   filterFinanciaciones() {
     this.error = null;
     if (!this.filtro || this.filtro.trim() === '') {
-      this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
+      const msg = this.translate.instant('FINANCIACION.MENSAJES.FILTRO_VACIO');
+      this.showWarning(msg);
       return;
     }
     this.loadingTable = true;
@@ -167,7 +198,9 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al filtrar financiaciones', err);
-          this.showError('Error al filtrar financiaciones');
+          const msg = this.translate.instant('FINANCIACION.MENSAJES.ERROR_FILTRO');
+          this.error = msg;
+          this.showError(msg);
           this.loadingTable = false;
         }
       });
@@ -186,8 +219,12 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
     const isUpdate = this.isEditing && this.model.id && this.model.id > 0;
     const payload = this.model.toJSON();
 
-    const endpoint = isUpdate ? 'FinanciacionUCM/actualiza_Financiacion' : 'FinanciacionUCM/crear_Financiacion';
-    const obs = isUpdate ? this.api.put<any>(endpoint, payload) : this.api.post<any>(endpoint, payload);
+    const endpoint = isUpdate
+      ? 'FinanciacionUCM/actualiza_Financiacion'
+      : 'FinanciacionUCM/crear_Financiacion';
+    const obs = isUpdate
+      ? this.api.put<any>(endpoint, payload)
+      : this.api.post<any>(endpoint, payload);
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
@@ -200,14 +237,15 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('FINANCIACION.MENSAJES.RESPUESTA_DESCONOCIDA'));
         }
       },
       error: (err) => {
         console.error(isUpdate ? 'Error al actualizar financiacion' : 'Error al crear financiacion', err);
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
+        const msg = this.translate.instant('FINANCIACION.MENSAJES.ERROR_PROCESAR');
+        this.error = msg;
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
+        this.showError(msg);
       }
     });
   }
@@ -216,7 +254,6 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
     this.model = new FinanciacionModel();
     this.isEditing = false;
     if (form) form.resetForm({
-      postulacionId: 0,
       arl: 0,
       comisionServicios: 0,
       descuentoMatricula: 0,
@@ -236,7 +273,8 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
+    const msg = this.translate.instant('FINANCIACION.MENSAJES.CONFIRMAR_ELIMINAR');
+    const confirmado = await this.showConfirm(msg);
     if (!confirmado) return;
 
     this.api.delete(`Financiacion/Eliminar_Financiacion/${id}`)
@@ -244,11 +282,11 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchFinanciaciones();
-          this.showSuccess('Se eliminó el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('FINANCIACION.MENSAJES.ELIMINAR_OK'));
         },
         error: (err) => {
           console.error('Error al eliminar financiacion', err);
-          this.showError('Error al eliminar financiacion');
+          this.showError(this.translate.instant('FINANCIACION.MENSAJES.ELIMINAR_ERROR'));
         }
       });
   }
@@ -261,7 +299,10 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
   }
 
   updatePagedData() {
-    if (!Array.isArray(this.filteredData)) { this.pagedData = []; return; }
+    if (!Array.isArray(this.filteredData)) {
+      this.pagedData = [];
+      return;
+    }
     const start = (this.currentPage - 1) * this.pageSize;
     this.pagedData = this.filteredData.slice(start, start + this.pageSize);
   }
@@ -286,7 +327,8 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
 
   // ---------- Toasters / Confirm ----------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    const title = this.translate.instant('FINANCIACION.TOASTS.EXITO_TITULO');
+    toast.success(title, {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -294,7 +336,8 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    const title = this.translate.instant('FINANCIACION.TOASTS.ERROR_TITULO');
+    toast.error(title, {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -302,7 +345,8 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    const title = this.translate.instant('FINANCIACION.TOASTS.WARNING_TITULO');
+    toast.warning(title, {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -313,17 +357,17 @@ export class FinanciacionComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('FINANCIACION.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('FINANCIACION.CONFIRM.ACEPTAR'),
+        rejectLabel: this.translate.instant('FINANCIACION.CONFIRM.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',
         rejectButtonStyleClass: 'custom-reject-btn',
         defaultFocus: 'reject',
         accept: () => resolve(true),
-        reject: () => resolve(false),
+        reject: () => resolve(false)
       });
     });
   }

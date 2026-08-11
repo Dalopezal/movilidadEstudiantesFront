@@ -78,6 +78,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   loading = false;
   idPostulacion: any;
   idConvocatoria: any;
+  categoria: any;
   nombreConvocatoria: any;
   documento: any;
   nombreCompleto: any;
@@ -89,9 +90,13 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
   campoEstado: Record<number, FieldConfig[]> = {};
   idCovocatoria: any;
   nombreCombocatoria: any;
+  nombreMovilidad: any;
+  nombreConvenio: any;
+  convenioId: any;
   instituciones: any[] = [];
   convenios: any[] = [];
   tiposMovlidad: any[] = [];
+  periodo: number = this.obtenerPeriodoActual();
   accionesEstado: Record<number, { texto: string; accion: (form?: NgForm) => void }[]> = {};
 
   postulantStepIndex: number = 0;
@@ -124,6 +129,11 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
     22: 'Finalizado'
   };
 
+  private obtenerPeriodoActual(): number {
+    const mesActual = new Date().getMonth() + 1; // getMonth() va de 0 a 11
+    return mesActual >= 1 && mesActual <= 6 ? 1 : 2;
+  }
+
   ngOnInit() {
     window.addEventListener("storage", this.onStorageChange.bind(this));
     const data = localStorage.getItem('usuario');
@@ -133,12 +143,16 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
 
     // lee params sólo una vez
     const params = this.route.snapshot.queryParams;
-    this.idPostulacion = this.usuario.rolId == 7 ? params['id'] ? Number(params['id']) : undefined : params['idPostulacion'] ? Number(params['idPostulacion']) : undefined;
+    const rolesRevisores = [7, 9, 10, 11, 12, 13];
+    this.idPostulacion = rolesRevisores.includes(Number(this.usuario.rolId))
+        ? params['id'] ? Number(params['id']) : undefined
+        : params['idPostulacion'] ? Number(params['idPostulacion']) : undefined;
     this.idConvocatoria = params['idConvocatoria'];
     this.nombreConvocatoria = params['nombre'];
 
     this.cargatSecciones();
     this.getEstados();
+    this.categoria = params['categoria'];
   }
 
   cargatSecciones(){
@@ -148,8 +162,15 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
         { name: 'convocatoriaId', label: 'Convocatoria', tipo: 'readonly' }, // Default seleccionada previamente
         { name: 'estadoPostulacionId', label: 'Estado', tipo: 'readonly' }, // "Pendiente Pre-Postulación" o "Pre-postulado"
         { name: 'fechaPrePostulacion', label: 'Fecha Pre-Postulación', tipo: 'readonly' }, // Automático sistema
-        { name: 'periodo', label: 'Periodo', tipo: 'number', editable: true},
-        { name: 'institucionId', label: this.usuario.tipoUsuario == '1' ? 'Institución Destino' : 'Institución Origen', tipo: 'selectChange', editable: true, opciones: this.instituciones }, // Label cambia según rol
+        { name: 'periodo', label: 'Periodo', tipo: 'readonly', editable: false},
+        // { name: 'institucionId', label: this.usuario.tipoUsuario == '1' ? 'Institución Destino' : 'Institución Origen', tipo: 'selectChange', editable: true, opciones: this.instituciones }, // Label cambia según rol
+        {
+          name: 'institucionId',
+          label: this.getInstitucionLabel(this.categoria),
+          tipo: 'selectChange',
+          editable: true,
+          opciones: this.instituciones
+        },
         { name: 'convenioId', label: 'Convenio', tipo: 'select', editable: true, opciones: this.convenios }, // Dependiente de institución
         { name: 'observaciones', label: 'Observaciones', tipo: 'textarea', editable: true },
         { name: 'tipoMovilidadId', label: 'Tipo Movilidad', tipo: 'select', editable: true, opciones: this.tiposMovlidad },
@@ -182,7 +203,14 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
         { name: 'objetivo', label: 'Objetivo', tipo: 'textarea', editable: true }, // Obligatorio
         { name: 'fechaInicioMovilidad', label: 'Fecha Inicio Movilidad', tipo: 'date', editable: true },
         { name: 'fechaFinMovilidad', label: 'Fecha Fin Movilidad', tipo: 'date', editable: true },
-        { name: 'institucionId', label: 'Institución', tipo: 'select', editable: true },
+        {
+          name: 'institucionId',
+          label: this.getInstitucionLabel(this.categoria),
+          tipo: 'selectChange',
+          editable: true,
+          opciones: this.instituciones
+        },
+        // { name: 'institucionId', label: this.usuario.tipoUsuario == '1' ? 'Institución Destino' : 'Institución Origen', tipo: 'selectChange', editable: true, opciones: this.instituciones }, // Label cambia según rol
         { name: 'fechaEntregable', label: 'Fecha Entregable', tipo: 'date', editable: true },
         { name: 'asistioEntrevista', label: 'Asistió Entrevista', tipo: 'checkbox', editable: true }
       ],
@@ -339,7 +367,7 @@ export class PostulacionesDetalleComponent implements OnInit, OnDestroy {
 
           this.route.queryParams.subscribe(params => {
             //this.idPostulacion = params['id'];
-            this.idPostulacion = this.usuario.rolId == 7 ? params['id'] ? Number(params['id']) : undefined : params['idPostulacion'] ? Number(params['idPostulacion']) : undefined;
+            this.idPostulacion = this.usuario.rolId == 7 || this.usuario.rolId == 9 || this.usuario.rolId == 10 || this.usuario.rolId == 11 || this.usuario.rolId == 13 || this.usuario.rolId == 12 ? params['id'] ? Number(params['id']) : undefined : params['idPostulacion'] ? Number(params['idPostulacion']) : undefined;
           });
           this.getBitacora(this.idPostulacion);
 
@@ -359,6 +387,8 @@ private fetchListaInstituciones() {
   this.route.queryParams.subscribe(params => {
     this.idCovocatoria = params['idConvocatoria'];
     this.nombreCombocatoria = params['nombre'];
+    this.nombreMovilidad = params['nombreMovilida'];
+    this.nombreConvenio = params['nombreConvenio'];
   });
 
   // this.api.get<any>('InstitucionConvenio/Consultar_InstitucionConvenioEspecifico?id=' + this.idCovocatoria)
@@ -396,8 +426,8 @@ private fetchListaInstituciones() {
   }
 
   onFieldChange(field: FieldConfig, value: any) {
-    this.steps[this.currentStep].data = {
-      ...this.steps[this.currentStep].data,
+    this.steps[this.selectedStepIndex].data = {
+      ...this.steps[this.selectedStepIndex].data,
       [field.name]: value
     };
 
@@ -462,234 +492,201 @@ private fetchListaInstituciones() {
   private fasesPermitidasPorRol(rolId: any): number[] {
     const r = Number(rolId);
 
-    const ROL_ORI = 7;
-    const ROL_DIRECTOR = 100;
-    const ROL_DECANATURA = 101;
-    const ROL_VICERRECTORIA = 102;
-    const ROL_JEFE = 103;
-    const ROL_RECTORIA = 104;
-    const ROL_UNIV_DESTINO = 105;
-
     switch (r) {
-      case ROL_ORI:
-        return [1,2,21,3,4,5,16,17,18,19,20];
-      case ROL_DIRECTOR:
-        return [6,7];
-      case ROL_DECANATURA:
-        return [8,9];
-      case ROL_VICERRECTORIA:
-        return [10,11];
-      case ROL_JEFE:
-        return [12,13];
-      case ROL_RECTORIA:
-        return [14,15];
-      case ROL_UNIV_DESTINO:
-        return [16,17,18];
+      case 7:  // ORI
+        return [1, 2, 21, 3, 4, 5,16, 17, 18, 19, 20];
+      case 10: // Director programa
+        return [6, 7];
+      case 11: // Decanatura
+        return [8, 9];
+      case 9:  // Vicerrectoría académica
+        return [10, 11];
+      case 13: // Jefe inmediato
+        return [12, 13];
+      case 12: // Rectoría
+        return [14, 15];
       default:
         return [];
     }
   }
 
   private getFocusableIndexes(): number[] {
-    if (!this.steps?.length) return [];
+  if (!this.steps?.length) return [];
 
-    const rolId = this.usuario?.rolId;
-    const permitidas = this.fasesPermitidasPorRol(rolId);
+  const rolId = this.usuario?.rolId;
+  const permitidas = this.fasesPermitidasPorRol(rolId);
 
-    if (permitidas.length > 0) {
-      const indices = permitidas
-        .map(idEstado => this.steps.findIndex(s => s.id === idEstado))
-        .filter(i => i >= 0);
-      return indices;
-    }
-
-    const estadoRealId = this.steps[this.postulantStepIndex]?.id;
-    const destinoEstadoId = this.computeDestinoEstadoId(estadoRealId, rolId);
-    const destinoIndex = this.steps.findIndex(s => s.id === destinoEstadoId);
-    return destinoIndex >= 0 ? [destinoIndex] : [this.postulantStepIndex];
+  if (permitidas.length > 0) {
+    const indices = permitidas
+      .map(idEstado => this.steps.findIndex(s => s.id === idEstado))
+      .filter(i => i >= 0);
+    return indices;
   }
 
-  private canFocusStep(targetIndex: number): boolean {
-    return this.getFocusableIndexes().includes(targetIndex);
-  }
+  const estadoRealId = this.steps[this.postulantStepIndex]?.id;
+  const destinoEstadoId = this.computeDestinoEstadoId(estadoRealId, rolId);
+  const destinoIndex = this.steps.findIndex(s => s.id === destinoEstadoId);
+  return destinoIndex >= 0 ? [destinoIndex] : [this.postulantStepIndex];
+}
 
-  // Paso 2 – bitácora, asignar a los steps existentes
-    getBitacora(id: number) {
+private canFocusStep(targetIndex: number): boolean {
+  return this.getFocusableIndexes().includes(targetIndex);
+}
 
-    this.steps.forEach(step => {
-        const fieldsForThisStep = this.campoEstado[step.id] || [];
-        const stepData: any = {};
+// Paso 2 – bitácora, asignar a los steps existentes
+getBitacora(id: number) {
+  this.steps.forEach(step => {
+    const fieldsForThisStep = this.campoEstado[step.id] || [];
+    const stepData: any = {};
 
-        this.route.queryParams.subscribe(params => {
-          this.idCovocatoria = params['idConvocatoria'];
-          this.nombreCombocatoria = params['nombre'];
-        });
+    this.route.queryParams.subscribe(params => {
+      this.idCovocatoria = params['idConvocatoria'];
+      this.nombreCombocatoria = params['nombre'];
+    });
 
-        // PASO 1: Cargar datos del localStorage primero
-        fieldsForThisStep.forEach(field => {
-          if (field.name === 'usuarioId' && this.usuario?.nombre) {
-            stepData[field.name] = `${this.usuario.nombre}`;
+    // PASO 1: Cargar datos del localStorage primero
+    fieldsForThisStep.forEach(field => {
+      if (field.name === 'usuarioId' && this.usuario?.nombre) {
+        stepData[field.name] = `${this.usuario.nombre}`;
+      }
+
+      if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
+        stepData[field.name] = `${this.nombreCombocatoria}`;
+      }
+
+      if (field.name === 'periodo') {
+        stepData[field.name] = this.obtenerPeriodoActual();
+      }
+
+      if (field.name === 'estadoPostulacionId' && 'Pre-postulación') {
+        stepData[field.name] = 'Pre-postulación';
+        stepData['fechaPrePostulacion'] = new Date().toLocaleDateString();
+      }
+    });
+
+    step.data = { ...step.data, ...stepData };
+  });
+
+  this.api.get<any>(`Postulaciones/Consultar_PostulacionBitacora?id=${id}`)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (resp) => {
+        let bitacora: any[] = [];
+
+        if (Array.isArray(resp)) {
+          bitacora = resp;
+        } else if (resp && typeof resp === 'object') {
+          if (Array.isArray(resp.data)) bitacora = resp.data;
+          else if (Array.isArray(resp.items)) bitacora = resp.items;
+          else {
+            const arr = Object.values(resp).find(v => Array.isArray(v));
+            if (Array.isArray(arr)) bitacora = arr;
           }
+        }
 
-          if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
-            stepData[field.name] = `${this.nombreCombocatoria}`;
-          }
+        console.log("bitacora:", bitacora);
 
-          if (field.name === 'estadoPostulacionId' && 'Pre-postulación') {
-            stepData[field.name] = 'Pre-postulación';
-            stepData['fechaPrePostulacion'] = new Date().toLocaleDateString();
-          }
-        });
+        this.steps.forEach(step => {
+          const fieldsForThisStep = this.campoEstado[step.id] || [];
+          const stepData: any = {};
 
-        step.data = stepData;
-      });
+          bitacora.forEach(entry => {
+            fieldsForThisStep.forEach(field => {
+              if (field.name === 'usuarioId' && this.usuario?.nombre) {
+                //stepData[field.name] = this.usuario.nombre;
+                stepData[field.name] = entry[field.name];
+              } else if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
+                stepData[field.name] = this.nombreCombocatoria;
+              } else if (field.name === 'tipoMovilidadId') {
+                stepData[field.name] = entry.tipoMovilidadId;
+              } else if (field.name === 'convenioId') {
+                stepData[field.name] = entry.convenioId;
+              } else if (field.name === 'estadoPostulacionId') {
+                const estado = entry.estadoPostulacionId;
+                stepData[field.name] = this.estadosMap[estado] ?? estado;
 
-    this.api.get<any>(`Postulaciones/Consultar_PostulacionBitacora?id=${id}`)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (resp) => {
-          let bitacora: any[] = [];
-
-          if (Array.isArray(resp)) {
-            bitacora = resp;
-          } else if (resp && typeof resp === 'object') {
-            if (Array.isArray(resp.data)) bitacora = resp.data;
-            else if (Array.isArray(resp.items)) bitacora = resp.items;
-            else {
-              const arr = Object.values(resp).find(v => Array.isArray(v));
-              if (Array.isArray(arr)) bitacora = arr;
-            }
-          }
-
-          console.log("bitacora:", bitacora);
-
-          this.steps.forEach(step => {
-            const fieldsForThisStep = this.campoEstado[step.id] || [];
-            const stepData: any = {};
-
-            bitacora.forEach(entry => {
-              fieldsForThisStep.forEach(field => {
-                if (field.name === 'usuarioId' && this.usuario?.nombre) {
-                  //stepData[field.name] = this.usuario.nombre;
-                  stepData[field.name] = entry[field.name];
-                }else
-
-                if (field.name === 'convocatoriaId' && this.nombreCombocatoria) {
-                  stepData[field.name] = this.nombreCombocatoria;
-                }else
-
-                if (field.name === 'estadoPostulacionId') {
-                  const estado = entry.estadoPostulacionId;
-                  stepData[field.name] = this.estadosMap[estado] ?? estado;
-
-                  if (estado === 1) {
-                    stepData['fechaPrePostulacion'] = new Date().toLocaleDateString();
-                  }
-                } else if (entry[field.name] !== undefined && entry[field.name] !== null) {
-                  stepData[field.name] = entry[field.name];
+                if (estado === 1) {
+                  stepData['fechaPrePostulacion'] = new Date().toLocaleDateString();
                 }
-              });
+              } else if (entry[field.name] !== undefined && entry[field.name] !== null) {
+                stepData[field.name] = entry[field.name];
+              }
             });
-
-            step.data = stepData;
           });
 
-          if (bitacora.length > 0) {
-            const ultimo = bitacora[bitacora.length - 1];
-            console.log("ultimo registro:", ultimo);
+          step.data = { ...step.data, ...stepData };
+        });
 
-            const index = this.steps.findIndex(s =>
-              String(s.id) === String(ultimo.estadoPostulacionId)
-            );
-            console.log("index encontrado:", index);
+        if (bitacora.length > 0) {
+          const ultimo = bitacora[bitacora.length - 1];
+          console.log("ultimo registro:", ultimo);
 
-            if (index >= 0) {
-              // Índice real donde está el postulante
-              this.postulantStepIndex = index;
+          const index = this.steps.findIndex(s =>
+            String(s.id) === String(ultimo.estadoPostulacionId)
+          );
+          console.log("index encontrado:", index);
 
-              const estadoRealId = this.steps[index]?.id;
-              const destinoEstadoId = this.computeDestinoEstadoId(estadoRealId, this.usuario?.rolId);
-              const destinoIndex = this.steps.findIndex(s => s.id === destinoEstadoId);
+          if (index >= 0) {
+            // Índice real donde está el postulante
+            this.postulantStepIndex = index;
 
-              // Si encontramos el destino, enfocamos ahí; si no, al real
-              const destino = destinoIndex >= 0 ? destinoIndex : index;
+            const estadoRealId = this.steps[index]?.id;
+            const destinoEstadoId = this.computeDestinoEstadoId(estadoRealId, this.usuario?.rolId);
+            const destinoIndex = this.steps.findIndex(s => s.id === destinoEstadoId);
 
-              this.selectedStepIndex = destino;
-              this.currentStep = destino;
+            // Si encontramos el destino, enfocamos ahí; si no, al real
+            const destino = destinoIndex >= 0 ? destinoIndex : index;
 
-              this.documento = ultimo.documento;
-              this.nombreCompleto = ultimo.nombreCompleto;
-              this.convocatoria = ultimo.nombreConvocatoria;
-              this.convocatoriaId = ultimo.convocatoriaId;
-              this.idUsuario = ultimo.usuarioId;
+            this.selectedStepIndex = destino;
+            this.currentStep = destino;
 
-              this.focusCurrentStep();
-            }
+            this.documento = ultimo.documento == null ? ultimo.usuarioId.toString() : ultimo.documento;
+            this.nombreCompleto = ultimo.nombreCompleto;
+            this.convocatoria = ultimo.nombreConvocatoria;
+            this.convocatoriaId = ultimo.convocatoriaId;
+            this.idUsuario = ultimo.usuarioId;
+
+            this.focusCurrentStep();
           }
-
-          this.fetchListaInstituciones();
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error('Error al cargar bitácora', err);
-          this.loading = false;
         }
-      });
-      this.fetchListaInstituciones();
+
+        this.fetchListaInstituciones();
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar bitácora', err);
+        this.loading = false;
+      }
+    });
+    this.fetchListaInstituciones();
 }
 
 // Devuelve el id de estado a enfocar (del catálogo) según estado real y rol
 private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
-    const esORI = Number(rolId) === 7;
+    const esORI      = Number(rolId) === 7;
+    const esDIR      = Number(rolId) === 10;
+    const esDEC      = Number(rolId) === 11;
+    const esVICE     = Number(rolId) === 9;
+    const esJEFE     = Number(rolId) === 13;
+    const esRECTORIA = Number(rolId) === 12;
 
-    // Reglas por estado (catálogo):
-    // 1: Pre‑postulación
-    if (estadoRealId === 1) {
-      // Usuario normal ve el 1
-      return esORI ? 21 : 1;
-    }
-
-    // 2: Rechazado Pre‑postulación → mantener foco en 2
-    if (estadoRealId === 2) return 2;
-
-    // 21: Aceptado Pre‑postulación → usuario debe ir a Postulación (id=4 “Postulado” lo crea el usuario,
-    // pero el formulario que llena es el de la fase “Postulación”, tu step id=3 con campos a diligenciar).
-    // Si quieres que ambos (ORI y usuario) aterricen en el formulario de Postulación, usa id=3.
+    if (estadoRealId === 1)  return esORI ? 21 : 1;
+    if (estadoRealId === 2)  return 2;
     if (estadoRealId === 21) return 3;
 
-    // 4: Postulado → ORI puede aprobar/rechazar (5/3 según tu API), usuario sigue viendo 3 para editar/objetivo.
-    if (estadoRealId === 4) {
-      return esORI ? 4 : 3;
-    }
+    if (estadoRealId === 4)  return esDIR ? 6 : 3;
+    if (estadoRealId === 5)  return 5;
 
-    // 5: Rechazado Postulación → mantener foco en 5
-    if (estadoRealId === 5) return 5;
+    if (estadoRealId === 6 || estadoRealId === 7)   return esDEC ? 8 : estadoRealId;
+    if (estadoRealId === 8 || estadoRealId === 9)   return esVICE ? 10 : estadoRealId;
+    if (estadoRealId === 10 || estadoRealId === 11) return esJEFE ? 12 : estadoRealId;
+    if (estadoRealId === 12 || estadoRealId === 13) return esRECTORIA ? 14 : estadoRealId;
+    if (estadoRealId === 14 || estadoRealId === 15) return esORI ? 17 : estadoRealId;
 
-    // 6/7: Director (Aprobado/Rechazado)
-    if (estadoRealId === 6 || estadoRealId === 7) return estadoRealId;
-
-    // 8/9: Decanatura (Aprobado/Rechazado)
-    if (estadoRealId === 8 || estadoRealId === 9) return estadoRealId;
-
-    // 10/11: Vicerrectoría (Aprobado/Rechazado)
-    if (estadoRealId === 10 || estadoRealId === 11) return estadoRealId;
-
-    // 12/13: Jefe Inmediato (Aprobado/Rechazado)
-    if (estadoRealId === 12 || estadoRealId === 13) return estadoRealId;
-
-    // 14/15: Rectoría (Aprobado/Rechazado)
-    if (estadoRealId === 14 || estadoRealId === 15) return estadoRealId;
-
-    // 16/17/18/19: Universidad Destino (Postulado/Aceptado/Rechazado/Aprobado)
-    if ([16, 17, 18, 19].includes(estadoRealId)) return estadoRealId;
-
-    // 20: En Movilidad
+    if ([17, 18, 19].includes(estadoRealId)) return estadoRealId;
     if (estadoRealId === 20) return 20;
+    if (estadoRealId === 22) return 22;
 
-    // 22: Finalizado
-    if (estadoRealId === 22) return 20; // si quieres mostrar “Finalizado” en el step 20 (tu catálogo lo etiqueta como Finalizado)
-
-    // Por defecto, mantener el real
     return estadoRealId;
   }
 
@@ -728,90 +725,57 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
   }
 
   private buildAccionesEstado() {
+    const rol = Number(this.usuario.rolId);
+    const esPostulante = [1, 2, 3, 4, 5, 6].includes(rol);
+    const esORI        = rol === 7;
+    const esDIR        = rol === 10;
+    const esDEC        = rol === 11;
+    const esVICE       = rol === 9;
+    const esJEFE       = rol === 13;
+    const esRECTORIA   = rol === 12;
+
     this.accionesEstado = {
-    // ---------------- FASE PRE ----------------
-      1: this.usuario.rolId != 7 ? [ // Pre-postulación
-        { texto: 'Prepostularme', accion: (form?: NgForm) => this.onPrepostular(form) }
-      ] : [],
-      2: this.usuario.rolId == 7 ?[ // Rechazado Pre-postulación
-        { texto: 'Rechazado Pre-postulación', accion: (form?: NgForm) => this.onRechazarPre(form) }
-      ] : [],
-      21: this.usuario.rolId == 7 ?[ // Aceptado Pre-postulación
-        { texto: 'Aceptar Pre-postulación', accion: (form?: NgForm) => this.onAceptarPre(form) }
-      ] : [],
+      // PRE-POSTULACIÓN
+      1:  esPostulante ? [{ texto: 'Prepostularme', accion: (form?: NgForm) => this.onPrepostular(form) }] : [],
+      2:  esORI ? [{ texto: 'Rechazado Pre-postulación', accion: (form?: NgForm) => this.onRechazarPre(form) }] : [],
+      21: esORI ? [{ texto: 'Aceptar Pre-postulación',   accion: (form?: NgForm) => this.onAceptarPre(form) }] : [],
 
-      // ---------------- FASE POSTULACIÓN ----------------
-      3: [ // En postulación (usuario llena formulario y confirma postulacion)
-        { texto: 'Postularme', accion: () => this.onPostular() },
+      // POSTULACIÓN
+      3: esPostulante ? [
+        { texto: 'Postularme',              accion: () => this.onPostular() },
         { texto: 'Cancelar la postulación', accion: () => this.onCancelar() }
-      ],
-      4: [ // Aprobado Postulación (ORI)
-        { texto: 'Aprobar postulación', accion: (form?: NgForm) => this.onAprobarPostulacion(form) }
-      ],
-      5: [ // Rechazado Postulación (ORI)
-        { texto: 'Rechazar postulación', accion: (form?: NgForm) => this.onRechazarPostulacion(form) }
-      ],
+      ] : [],
+      4: esORI ? [{ texto: 'Aprobar postulación',  accion: (form?: NgForm) => this.onAprobarPostulacion(form) }] : [],
+      5: esORI ? [{ texto: 'Rechazar postulación', accion: (form?: NgForm) => this.onRechazarPostulacion(form) }] : [],
 
-      // ---------------- FASE DIRECTOR ----------------
-      6: [
-        { texto: 'Aprobar director de programa', accion: () => this.onAprobarDirector() },
-        // { texto: 'Rechazar director de programa', accion: () => this.onRechazarDirector() }
-      ],
-      7: [
-        { texto: 'Rechazar director programa', accion: () => this.onConfirmarRechazoDirector() }
-      ],
+      // DIRECTOR DE PROGRAMA (rolId 10)
+      6: esDIR ? [{ texto: 'Aprobar director de programa', accion: () => this.onAprobarDirector() }] : [],
+      7: esDIR ? [{ texto: 'Rechazar director programa',   accion: () => this.onConfirmarRechazoDirector() }] : [],
 
-      // ---------------- FASE DECANATURA ----------------
-      8: [
-        { texto: 'Aprobado Decanatura', accion: () => this.onAprobarDecanatura() }
-      ],
-      9: [
-        { texto: 'Rechazo Decanatura', accion: () => this.onRechazarDecanatura() }
-      ],
+      // DECANATURA (rolId 11)
+      8: esDEC ? [{ texto: 'Aprobar decanatura', accion: () => this.onAprobarDecanatura() }] : [],
+      9: esDEC ? [{ texto: 'Rechazar decanatura', accion: () => this.onRechazarDecanatura() }] : [],
 
-      // ---------------- FASE VICERRECTORÍA ----------------
-      10: [
-        { texto: 'Aprobado Vicerrectoría Académica', accion: () => this.onAprobarVicerrectoria() }
-      ],
-      11: [
-        { texto: 'Rechazo Vicerrectoría Académica', accion: () => this.onRechazarVicerrectoria() }
-      ],
+      // VICERRECTORÍA ACADÉMICA (rolId 9)
+      10: esVICE ? [{ texto: 'Aprobar vicerrectoría', accion: () => this.onAprobarVicerrectoria() }] : [],
+      11: esVICE ? [{ texto: 'Rechazar vicerrectoría', accion: () => this.onRechazarVicerrectoria() }] : [],
 
-      // ---------------- JEFE INMEDIATO ----------------
-      12: [
-        { texto: 'Aprobado Jefe Inmediato', accion: () => this.onAprobarJefe() }
-      ],
-      13: [
-        { texto: 'Rechazado Jefe Inmediato', accion: () => this.onRechazarJefe() }
-      ],
+      // JEFE INMEDIATO (rolId 13)
+      12: esJEFE ? [{ texto: 'Aprobar jefe inmediato', accion: () => this.onAprobarJefe() }] : [],
+      13: esJEFE ? [{ texto: 'Rechazar jefe inmediato', accion: () => this.onRechazarJefe() }] : [],
 
-      // ---------------- RECTORÍA ----------------
-      14: [
-        { texto: 'Aprobado Rectoría', accion: () => this.onAprobarRectoria() }
-      ],
-      15: [
-        { texto: 'Rechazo Rectoría', accion: () => this.onRechazarRectoria() }
-      ],
+      // RECTORÍA (rolId 12)
+      14: esRECTORIA ? [{ texto: 'Aprobar rectoría', accion: () => this.onAprobarRectoria() }] : [],
+      15: esRECTORIA ? [{ texto: 'Rechazar rectoría', accion: () => this.onRechazarRectoria() }] : [],
 
-      // ---------------- UNIVERSIDAD DESTINO ----------------
-      16: [
-        { texto: 'Postulado Universidad Destino', accion: () => this.onPostularUniversidad() },
-        { texto: 'Cancelar postulación', accion: () => this.onCancelar() }
-      ],
-      17: [
-        { texto: 'Aceptado Universidad Destino', accion: () => this.onAprobarUniversidad() }
-      ],
-      18: [
-        { texto: 'Rechazado Universidad Destino', accion: () => this.onRechazarUniversidad() }
-      ],
+      // UNIVERSIDAD DESTINO (ORI)
+      16: esORI ? [{ texto: 'Postulado Universidad Destino', accion: () => this.onPostularUniversidad() }] : [],
+      17: esORI ? [{ texto: 'Aceptado Universidad Destino',  accion: () => this.onAprobarUniversidad() }] : [],
+      18: esORI ? [{ texto: 'Rechazado Universidad Destino', accion: () => this.onRechazarUniversidad() }] : [],
 
-      // ---------------- ETAPA FINAL ----------------
-      19: [
-        { texto: 'En movilidad', accion: () => this.onEnMovilidad() }
-      ],
-      20: [
-        { texto: 'Finalizado', accion: () => this.onFinalizado() }
-      ]
+      // EN MOVILIDAD / FINALIZADO (ORI)
+      19: esORI ? [{ texto: 'En Movilidad', accion: () => this.onEnMovilidad() }] : [],
+      20: esORI ? [{ texto: 'Finalizado',   accion: () => this.onFinalizado() }] : [],
     };
   }
 
@@ -844,10 +808,12 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
     }
 
     const payload = {
-      ...this.steps[0].data,
+      ...this.resolverIds(this.steps[0].data),
       estadoPostulacionId: 1,
       convocatoriaId: this.idCovocatoria,
       usuarioId: this.usuario.idUsuario,
+      programa: this.usuario.programa,
+      rolId: this.usuario.rolId
     };
 
     this.loading = true;
@@ -908,10 +874,12 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
     }
 
     const payload = {
-      ...this.steps[0].data,
+      ...this.resolverIds(this.steps[0].data),
       convocatoriaId: this.idCovocatoria,
-      estadoPostulacionId: 21
+      estadoPostulacionId: 21,
+      rolId: this.usuario.rolId
     };
+
     this.api.post('Postulaciones/crear_Postulacion', payload).subscribe(() => {
       this.refreshBitacora();
     });
@@ -919,23 +887,25 @@ private computeDestinoEstadoId(estadoRealId: number, rolId: number): number {
 
   onPostular() {
   const currentStepData = this.steps[this.selectedStepIndex]?.data || {};
+  const resolved = this.resolverIds(currentStepData);
   const payload = {
-    usuarioId: this.usuario.rolId == 7 ? this.idUsuario : this.usuario.usuarioId,
+    usuarioId: this.idUsuario,
     convocatoriaId: this.idCovocatoria,
     estadoPostulacionId: 4,
     fechaPostulacion: currentStepData['fechaPostulacion'],
     periodo: currentStepData['periodo'],
-    convenioId: currentStepData['convenioId'],
     observaciones: currentStepData['observaciones'],
-    tipoMovilidadId: currentStepData['tipoMovilidadId'],
     urlEncuestaSatisfaccion: currentStepData['urlEncuestaSatisfaccion'],
     objetivo: currentStepData['objetivo'], // Obligatorio
-    fechaInicioMovilidad: currentStepData['fechaFinMovilidad'],
+    fechaInicioMovilidad: currentStepData['fechaInicioMovilidad'],
     fechaFinMovilidad: currentStepData['fechaFinMovilidad'],
-    institucionId: 1,
     fechaEntregable: currentStepData['fechaEntregable'],
-    asistioEntrevista: currentStepData['asistioEntrevista'] || false,
-    UrlEncuestaSatisfaccion: "https://docs.google.com/forms/d/e/1FAIpQLSe1piZ1G84UYLDpToyN86EZhhFDSB01FdUyRVmlksoGyAJ8-w/viewform"
+    asistioEntrevista: currentStepData['asistioEntrevista'] ?? false,
+    UrlEncuestaSatisfaccion: "https://docs.google.com/forms/d/e/1FAIpQLSe1piZ1G84UYLDpToyN86EZhhFDSB01FdUyRVmlksoGyAJ8-w/viewform",
+    convenioId: resolved['convenioId'],
+    tipoMovilidadId: resolved['tipoMovilidadId'],
+    institucionId: resolved['institucionId'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
@@ -964,7 +934,8 @@ onRechazarPostulacion(form?: NgForm) {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: this.idUsuario,
     convocatoriaId: this.idCovocatoria,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
@@ -978,9 +949,7 @@ onRechazarPostulacion(form?: NgForm) {
 
 onAprobarPostulacion(form?: NgForm) {
 
-  // Si hay formulario y no es válido: marcar touched y mostrar advertencia
   if (form && !form.valid) {
-    // marcar todos los controls como touched para que aparezcan errores
     Object.values(form.controls).forEach(ctrl => ctrl.markAsTouched());
     this.showWarning('Complete todos los campos obligatorios antes de continuar.');
     return;
@@ -994,6 +963,7 @@ onAprobarPostulacion(form?: NgForm) {
     estadoPostulacionId: 4,
     usuarioId: this.idUsuario,
     convocatoriaId: this.idCovocatoria,
+    rolId: this.usuario.rolId
   };
 
   this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
@@ -1013,10 +983,11 @@ onRechazarDirector() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/RechazarDirector', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Rechazado Director:', resp);
       this.refreshBitacora();
@@ -1029,10 +1000,13 @@ onAprobarDirector() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 6,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
+    rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/AprobarDirector', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Aprobado Director:', resp);
       this.refreshBitacora();
@@ -1049,10 +1023,11 @@ onConfirmarRechazoDirector() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/ConfirmarRechazoDirector', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Confirmado Rechazo Director:', resp);
       this.refreshBitacora();
@@ -1065,10 +1040,13 @@ onAprobarDecanatura() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 8,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
+    rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/AprobarDecanatura', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Aprobado Decanatura:', resp);
       this.refreshBitacora();
@@ -1085,10 +1063,11 @@ onRechazarDecanatura() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/RechazarDecanatura', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Rechazado Decanatura:', resp);
       this.refreshBitacora();
@@ -1101,10 +1080,13 @@ onAprobarVicerrectoria() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 10,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/AprobarVicerrectoria', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Aprobado Vicerrectoría:', resp);
       this.refreshBitacora();
@@ -1121,10 +1103,11 @@ onRechazarVicerrectoria() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/RechazarVicerrectoria', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Rechazado Vicerrectoría:', resp);
       this.refreshBitacora();
@@ -1137,10 +1120,13 @@ onAprobarJefe() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 12,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/AprobarJefe', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Aprobado Jefe Inmediato:', resp);
       this.refreshBitacora();
@@ -1157,10 +1143,11 @@ onRechazarJefe() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/RechazarJefe', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Rechazado Jefe Inmediato:', resp);
       this.refreshBitacora();
@@ -1173,10 +1160,13 @@ onAprobarRectoria() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 14,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/AprobarRectoria', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Aprobado Rectoría:', resp);
       this.refreshBitacora();
@@ -1193,10 +1183,11 @@ onRechazarRectoria() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/RechazarRectoria', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Rechazado Rectoría:', resp);
       this.refreshBitacora();
@@ -1209,10 +1200,13 @@ onPostularUniversidad() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 16,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/PostularUniversidad', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Postulado Universidad Destino:', resp);
       this.refreshBitacora();
@@ -1225,10 +1219,13 @@ onAprobarUniversidad() {
   const currentStepData = this.steps[this.currentStep]?.data || {};
   const payload = {
     estadoPostulacionId: 17,
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/AprobarUniversidad', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Aprobado Universidad Destino:', resp);
       this.refreshBitacora();
@@ -1245,10 +1242,11 @@ onRechazarUniversidad() {
     esNotificadoCorreo: currentStepData['esNotificadoCorreo'] || false,
     usuarioId: currentStepData['usuarioId'],
     convocatoriaId: currentStepData['convocatoriaId'],
-    fechaPostulacion: currentStepData['fechaPostulacion']
+    fechaPostulacion: currentStepData['fechaPostulacion'],
+    rolId: this.usuario.rolId
   };
 
-  this.api.post('Postulaciones/RechazarUniversidad', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Rechazado Universidad Destino:', resp);
       this.refreshBitacora();
@@ -1263,10 +1261,13 @@ onEnMovilidad() {
     estadoPostulacionId: 19,
     fechaPostulacion: currentStepData['fechaPostulacion'],
     esMatriculadoSiiga: currentStepData['esMatriculadoSiiga'] || false,
-    esNotificadoRegistroAcademico: currentStepData['esNotificadoRegistroAcademico'] || false
+    esNotificadoRegistroAcademico: currentStepData['esNotificadoRegistroAcademico'] || false,
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/EnMovilidad', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('En Movilidad:', resp);
       this.refreshBitacora();
@@ -1284,10 +1285,13 @@ onFinalizado() {
     realizoEncuestaSatisfaccion: currentStepData['realizoEncuestaSatisfaccion'] || false,
     registradoSire: currentStepData['registradoSire'] || false,
     financiacionExterna: currentStepData['financiacionExterna'],
-    financiacioUcm: currentStepData['financiacioUcm']
+    financiacioUcm: currentStepData['financiacioUcm'],
+    rolId: this.usuario.rolId,
+    usuarioId: this.idUsuario,
+    convocatoriaId: this.idCovocatoria,
   };
 
-  this.api.post('Postulaciones/Finalizado', payload).subscribe({
+  this.api.post('Postulaciones/crear_Postulacion', payload).subscribe({
     next: (resp) => {
       console.log('Finalizado:', resp);
       // Aquí puedes agregar lógica para generar el PDF del certificado
@@ -1393,10 +1397,6 @@ getColorEstado(id: number): string {
 
   onGestioDocumental(step: any) {
     this.idPostulacion = this.idPostulacion;
-    alert(this.idPostulacion);
-    alert(this.convocatoriaId);
-    alert(this.convocatoria);
-    alert(this.documento);
     const modalElement = document.getElementById('GestionDocumentalnModal');
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
@@ -1487,4 +1487,44 @@ getColorEstado(id: number): string {
 
     return customFormat;
   }
+
+  private getInstitucionLabel(tipoMovilidadId: any): string {
+  // Intentar resolver por los tipos cargados desde el backend
+  const tipo = this.tiposMovlidad?.find(t => String(t.value) === String(tipoMovilidadId))?.label?.toLowerCase();
+
+  if (tipo) {
+    if (tipo.includes('entr')) return 'Institución Origen';
+    if (tipo.includes('sal')) return 'Institución Destino';
+  }
+
+  // Fallback por valores habituales (ajusta '1'/'2' si tu backend usa otros ids)
+  const val = String(tipoMovilidadId || '').toLowerCase();
+  if (val === 'entrante' || val === 'entr' || val === '1') return 'Institución Origen';
+  if (val === 'saliente' || val === 'sal' || val === '2') return 'Institución Destino';
+
+  // Por defecto neutro
+  return 'Institución';
+}
+
+private resolverIds(data: any): any {
+  const resolved = { ...data };
+
+  // Solo resolver si por alguna razón llegó como string
+  if (typeof resolved['tipoMovilidadId'] === 'string') {
+    const tipo = this.tiposMovlidad.find(t => t.label === resolved['tipoMovilidadId']);
+    if (tipo) resolved['tipoMovilidadId'] = tipo.value;
+  }
+
+  if (typeof resolved['convenioId'] === 'string') {
+    const convenio = this.convenios.find(c => c.label === resolved['convenioId']);
+    if (convenio) resolved['convenioId'] = convenio.value;
+  }
+
+  if (typeof resolved['institucionId'] === 'string') {
+    const inst = this.instituciones.find(i => i.label === resolved['institucionId']);
+    if (inst) resolved['institucionId'] = inst.value;
+  }
+
+  return resolved;
+}
 }

@@ -41,13 +41,33 @@ export class BeneficiosComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   loadingTable: any;
   beneficios: any[] = [];
+  usuario: any;
+  esEstudiante: boolean = false;
 
   constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
 
   ngOnInit() {
+    this.model.postulacionId = this.postulacionId;
+
     this.fetchBeneficios();
     this.fetchBeneficioConvocatoria();
-    this.model.postulacionId = this.postulacionId;
+
+    window.addEventListener('storage', this.onStorageChange.bind(this));
+
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
+
+    if (
+      this.usuario.rolId == '3' ||
+      this.usuario.rolId == '7' ||
+      this.usuario.rolId == '10'
+    ) {
+      this.esEstudiante = true;
+    }
+  }
+
+  private onStorageChange() {
+    const user = JSON.parse(localStorage.getItem("usuario") || "{}");
   }
 
   ngOnDestroy() {
@@ -57,21 +77,46 @@ export class BeneficiosComponent implements OnInit, OnDestroy {
 
   // ---------- CRUD ----------
   fetchBeneficios() {
+    if (!this.postulacionId) {
+      console.warn('No existe postulacionId para consultar los beneficios.');
+      return;
+    }
+
     this.error = null;
     this.loadingTable = true;
-    this.api.get<any>('BeneficioPostulacion/Consultar_PostulacionBeneficios')
+
+    this.api
+      .get<any>(
+        'BeneficioPostulacion/Consultar_BeneficiosPostu?postula=' +
+            this.postulacionId,
+      )
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          let items: any[] = Array.isArray(response) ? response : response?.data ?? [];
-          this.data = items.map(item => BeneficioPostulacionaModel.fromJSON(item));
+          console.log('Respuesta beneficios:', response);
+
+          // Tu API devuelve los registros dentro de "datos".
+          const items: any[] = Array.isArray(response)
+              ? response
+              : Array.isArray(response?.datos)
+                  ? response.datos
+                  : [];
+
+          this.data = items.map((item) =>
+            BeneficioPostulacionaModel.fromJSON(item),
+          );
+
           this.filteredData = [...this.data];
+          this.currentPage = 1;
           this.calculateTotalPages();
           this.updatePagedData();
           this.loadingTable = false;
+
+          console.log('Datos cargados en tabla:', this.pagedData);
         },
         error: (err) => {
           console.error('Error al consultar beneficios', err);
+
           this.error = 'No se pudo cargar la información. Intenta de nuevo.';
           this.data = [];
           this.filteredData = [];
@@ -79,7 +124,7 @@ export class BeneficiosComponent implements OnInit, OnDestroy {
           this.calculateTotalPages();
           this.showError('No se pudo cargar la información. Intenta de nuevo');
           this.loadingTable = false;
-        }
+        },
       });
   }
 
@@ -144,6 +189,10 @@ export class BeneficiosComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
+    this.model.postulacionId = this.postulacionId;
+
+    //this.model.nombreBeneficio = "esto es una prueba"
+
     const isUpdate = this.isEditing && this.model.id > 0;
     const payload = this.model.toJSON();
 
@@ -175,6 +224,7 @@ export class BeneficiosComponent implements OnInit, OnDestroy {
 
   resetForm(form?: NgForm) {
     this.model = new BeneficioPostulacionaModel();
+    this.model.postulacionId = this.postulacionId;
     this.isEditing = false;
     if (form) form.resetForm({
       beneficioConvocatoriaId: null,

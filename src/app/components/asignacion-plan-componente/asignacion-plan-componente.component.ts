@@ -2,6 +2,7 @@ import {
   Component,
   OnInit,
   OnDestroy,
+  OnChanges,
   Input,
   SimpleChanges
 } from '@angular/core';
@@ -15,6 +16,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { AsignacionPlanComponenteModel } from '../../models/AsignacionPlanComponentModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core'; // ✅
 
 @Component({
   selector: 'app-asignacion-plan-componente',
@@ -25,14 +27,15 @@ import { AsignacionPlanComponenteModel } from '../../models/AsignacionPlanCompon
     FormsModule,
     HttpClientModule,
     ConfirmDialogModule,
-    NgxSonnerToaster
+    NgxSonnerToaster,
+    TranslateModule // ✅
   ],
   templateUrl: './asignacion-plan-componente.component.html',
   styleUrls: ['./asignacion-plan-componente.component.css'],
   providers: [ConfirmationService]
 })
 export class AsignacionPlanComponenteComponent
-  implements OnInit, OnDestroy
+  implements OnInit, OnDestroy, OnChanges
 {
   data: AsignacionPlanComponenteModel[] = [];
   filteredData: AsignacionPlanComponenteModel[] = [];
@@ -56,8 +59,8 @@ export class AsignacionPlanComponenteComponent
   gruposUCM: any[] = [];
   componentesUCM: any[] = [];
 
-  docentesTitulares: any[] = [];   // asignaciondocente
-  docentesAuxiliares: any[] = [];  // API futuro
+  docentesTitulares: any[] = [];
+  docentesAuxiliares: any[] = [];
 
   loading = false;
   loadingTable = false;
@@ -67,18 +70,21 @@ export class AsignacionPlanComponenteComponent
   model: AsignacionPlanComponenteModel = new AsignacionPlanComponenteModel();
   isEditing = false;
   @Input() idConvocatoria!: any;
+  usuario: any = {};
 
   private destroy$ = new Subject<void>();
-facultadUCM: any;
 
   constructor(
     private api: GenericApiService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit() {
     this.fetchCombosIniciales();
     this.fetchAsignaciones();
+    // Institución por defecto: Universidad Católica = 3
+    this.model.institucionId = 3;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -94,7 +100,11 @@ facultadUCM: any;
 
   // -------- Combos iniciales ----------
   private fetchCombosIniciales() {
-    // Planeaciones (usa 'id')
+
+    const data = localStorage.getItem('usuario');
+    this.usuario = data ? JSON.parse(data) : {};
+
+    // Planeaciones
     this.api
       .get<any>('Planeacion/Consultar_Planeacion')
       .pipe(takeUntil(this.destroy$))
@@ -108,7 +118,7 @@ facultadUCM: any;
         }
       });
 
-    // Estrategias (usa 'id')
+    // Estrategias
     this.api
       .get<any>('Estrategia/Consultar_Estrategias')
       .pipe(takeUntil(this.destroy$))
@@ -122,9 +132,9 @@ facultadUCM: any;
         }
       });
 
-    // Estados (usa 'id')
+    // Estados
     this.api
-      .get<any>('EstadosPostulacion/Consultar_Estado')
+      .get<any>('Estado/Consultar_Estados')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
@@ -136,13 +146,15 @@ facultadUCM: any;
         }
       });
 
-    // Instituciones (usa 'id')
+    // Instituciones (EXCLUYENDO Universidad Católica id = 3 del listado)
     this.api
       .get<any>('Institucion/Consultar_Institucion')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
-          this.instituciones = this.uniqueByKey(this.mapArray(resp), 'id');
+          this.instituciones = this
+            .uniqueByKey(this.mapArray(resp), 'id')
+            .filter((i) => i.id !== 3); // excluir U. Católica del combo
         },
         error: (err) => {
           console.error('Error al cargar instituciones', err);
@@ -150,27 +162,62 @@ facultadUCM: any;
         }
       });
 
-    // Facultades UCM (usa 'facultad_codigo')
+    if (this.usuario?.idUsuario) {
+    const url = `orisiga/asignaciondocente/?identificacion=${this.usuario.idUsuario}`;
+
     this.api
-      .getExterno<any[]>('orisiga/facultades/')
+      .getExterno<any>(url)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
-          this.facultadesUCM = this.uniqueByKey(this.mapArray(resp), 'facultad_codigo');
+          console.log('RESPUESTA BRUTA asignaciondocente:', resp);
+
+          const rawArray: any[] = Array.isArray(resp)
+            ? resp
+            : resp?.datos ?? resp?.data ?? [];
+
+          const items = typeof this.mapArray === 'function' ? this.mapArray(rawArray) : rawArray;
+          console.log('ITEMS PROCESADOS:', items);
+
+          const facultades = items
+            .map((i: any) => {
+              const f = i?.facultad ?? i?.facultado ?? '';
+              return f ? String(f).trim() : '';
+            })
+            .filter((f: string) => f.length > 0);
+
+          const facultadesUnicas = Array.from(new Set(facultades));
+
+          this.facultadesUCM = facultadesUnicas.map((f: string, idx: number) => ({
+            facultad_codigo: f,
+            facultad_nombre: f
+          }));
+
+          console.log('facultadesUCM asignadas:', this.facultadesUCM);
+
+          if ((this as any).cd && typeof (this as any).cd.detectChanges === 'function') {
+            (this as any).cd.detectChanges();
+          }
         },
         error: (err) => {
-          console.error('Error al cargar facultades', err);
+          console.error('Error al cargar facultades desde asignaciondocente', err);
           this.facultadesUCM = [];
         }
       });
+  } else {
+    this.facultadesUCM = [];
+  }
 
-    // Programas UCM (usa 'programa.codigo' - anidado)
+    // Programas UCM
     this.api
-      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion='+this.usuario.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
-          this.programasUCM = this.uniqueByNestedKey(this.mapArray(resp), 'programa.codigo');
+          this.programasUCM = this.uniqueByNestedKey(
+            this.mapArray(resp),
+            'programa.nombre'
+          );
         },
         error: (err) => {
           console.error('Error al cargar programas', err);
@@ -178,9 +225,9 @@ facultadUCM: any;
         }
       });
 
-    // Grupos UCM (usa 'grupo')
+    // Grupos UCM
     this.api
-      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion='+this.usuario.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
@@ -192,13 +239,16 @@ facultadUCM: any;
         }
       });
 
-    // Planes de Estudio UCM (usa 'plan_id')
+    // Planes de estudio UCM
     this.api
-      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion='+this.usuario.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
-          this.planesEstudioUCM = this.uniqueByKey(this.mapArray(resp), 'plan_id');
+          this.planesEstudioUCM = this.uniqueByKey(
+            this.mapArray(resp),
+            'plan_id'
+          );
         },
         error: (err) => {
           console.error('Error al cargar planes de estudio', err);
@@ -206,13 +256,16 @@ facultadUCM: any;
         }
       });
 
-    // Componentes UCM (usa 'componente_codigo')
+    // Componentes UCM
     this.api
-      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
+      .getExterno<any[]>('orisiga/asignaciondocente/?identificacion='+this.usuario.idUsuario)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
-          this.componentesUCM = this.uniqueByKey(this.mapArray(resp), 'componente_codigo');
+          this.componentesUCM = this.uniqueByKey(
+            this.mapArray(resp),
+            'componente_codigo'
+          );
         },
         error: (err) => {
           console.error('Error al cargar componentes', err);
@@ -220,37 +273,9 @@ facultadUCM: any;
         }
       });
 
-
-    // Asignaciondocente para combos UCM (facultad, programa, plan, grupo, componente, docente titular)
-    // this.api
-    //   .getExterno<any[]>('orisiga/asignaciondocente/?identificacion=24341126')
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe({
-    //     next: (resp) => {
-    //       const items = this.mapArray(resp);
-    //       // aquí asumo que el backend te manda colecciones separadas;
-    //       // si no, ajustas según la respuesta real
-    //       this.facultadesUCM = items.filter((x) => x.tipo === 'facultad');
-    //       this.programasUCM = items.filter((x) => x.tipo === 'programa');
-    //       this.planesEstudioUCM = items.filter((x) => x.tipo === 'plan');
-    //       this.gruposUCM = items.filter((x) => x.tipo === 'grupo');
-    //       this.componentesUCM = items.filter((x) => x.tipo === 'componente');
-    //       this.docentesTitulares = items.filter((x) => x.tipo === 'docenteTitular');
-    //     },
-    //     error: (err) => {
-    //       console.error('Error al cargar combos de asignación docente', err);
-    //       this.facultadesUCM = [];
-    //       this.programasUCM = [];
-    //       this.planesEstudioUCM = [];
-    //       this.gruposUCM = [];
-    //       this.componentesUCM = [];
-    //       this.docentesTitulares = [];
-    //     }
-    //   });
-
-    // Docente auxiliar (déjalo listo, endpoint pendiente)
+    // Docentes auxiliares (cuando exista)
     this.api
-      .get<any>('Docentes/Consultar_DocentesAuxiliares') // cuando exista
+      .get<any>('Docentes/Consultar_DocentesAuxiliares')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => (this.docentesAuxiliares = this.mapArray(resp)),
@@ -258,11 +283,6 @@ facultadUCM: any;
       });
   }
 
-  /**
-   * Filtra duplicados por una propiedad específica
-   * @param arr Array a filtrar
-   * @param key Nombre de la propiedad que actúa como identificador único
-   */
   private uniqueByKey(arr: any[], key: string): any[] {
     const seen = new Set<any>();
     return arr.filter((item) => {
@@ -275,11 +295,6 @@ facultadUCM: any;
     });
   }
 
-  /**
-   * Para objetos anidados (ej: item.programa.codigo)
-   * @param arr Array a filtrar
-   * @param keyPath Ruta de la propiedad, ej: 'programa.codigo'
-   */
   private uniqueByNestedKey(arr: any[], keyPath: string): any[] {
     const seen = new Set<any>();
     return arr.filter((item) => {
@@ -311,7 +326,7 @@ facultadUCM: any;
     this.error = null;
     this.loadingTable = true;
 
-    const url =  `AsignacionPlanComponente/Consultar_AsignacionPlanComponente`;
+    const url = `AsignacionPlanComponente/Consultar_AsignacionPlanComponente`;
 
     this.api
       .get<any>(url)
@@ -330,18 +345,98 @@ facultadUCM: any;
         },
         error: (err) => {
           console.error('Error al consultar asignaciones', err);
-          this.error =
-            'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_CARGAR_INFO');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError(
-            'No se pudo cargar la información. Intenta de nuevo'
-          );
+          this.showError(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_CARGAR_INFO'));
           this.loadingTable = false;
         }
       });
+  }
+
+  // -------- Cargar info de componente (créditos y semestre) --------
+  private cargarInfoComponente(planId: any, componenteCodigo: any) {
+    // Solo llamamos si ambos existen
+    if (!planId || !componenteCodigo) {
+      return;
+    }
+
+    const url = `orisiga/infcomponente/?planestudio=${planId}&componente=${componenteCodigo}`;
+
+    this.api
+      .getExterno<any>(url)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resp) => {
+          const items = this.mapArray(resp);
+          if (!items || items.length === 0) {
+            // Si el servicio no devuelve nada, dejamos campos en blanco
+            this.model.creditosUCM = undefined as any;
+            this.model.semestreUCM = undefined as any;
+            return;
+          }
+
+          const info = items[0];
+
+          // Ajusta estos nombres según lo que devuelva realmente tu servicio
+          // Ejemplos: info.creditos, info.creditos_ucm, info.semestre, info.semestre_ucm
+          this.model.creditosUCM = info.creditos ?? info.creditos_ucm ?? this.model.creditosUCM;
+          this.model.semestreUCM = info.semestre ?? info.semestre_ucm ?? this.model.semestreUCM;
+        },
+        error: (err) => {
+          console.error('Error al cargar info de componente', err);
+          // En error, opcionalmente limpias o dejas lo que haya
+          // this.model.creditosUCM = undefined as any;
+          // this.model.semestreUCM = undefined as any;
+        }
+      });
+  }
+
+  onPlanOrComponenteChange() {
+    this.cargarInfoComponente(this.model.planestudioId, this.model.componenteCodigoUCM);
+  }
+
+  private getNombreComponenteByCodigo(codigo: string): string {
+    if (!codigo || !this.componentesUCM || !Array.isArray(this.componentesUCM)) {
+      return '';
+    }
+    const found = this.componentesUCM.find((c: any) =>
+      c.componente_codigo === codigo || c.componente_codigo === String(codigo)
+    );
+    return found ? (found.componente_nombre ?? '') : '';
+  }
+
+  private getNombreProgramaByCodigo(codigo: string): string {
+    if (!codigo || !this.programasUCM || !Array.isArray(this.programasUCM)) {
+      return '';
+    }
+
+    const found = this.programasUCM.find((p: any) =>
+      String(p?.programa?.codigo) === String(codigo)
+    );
+
+    return found?.programa?.nombre ?? '';
+  }
+
+  private getNombreProgramaByHoras(codigo: string): string {
+    if (!codigo || !this.programasUCM || !Array.isArray(this.programasUCM)) {
+      return '';
+    }
+
+    const found = this.programasUCM.find((p: any) =>
+      String(p?.programa?.nombre) === String(codigo)
+    );
+
+    return found?.programa?.horasinternacionaliza ?? '';
+  }
+
+  private formatDateToYMD(date: Date): string {
+    const y = date.getFullYear();
+    const m = ('0' + (date.getMonth() + 1)).slice(-2);
+    const d = ('0' + date.getDate()).slice(-2);
+    return `${y}-${m}-${d}`;
   }
 
   // -------- Form --------
@@ -358,17 +453,29 @@ facultadUCM: any;
       new Date(this.model.fechafinSemestreUCM) <
         new Date(this.model.fechainicioSemestreUCM)
     ) {
-      this.showWarning(
-        'La fecha final no puede ser menor a la fecha inicial.'
-      );
+      this.showWarning(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.FECHA_FINAL_MENOR'));
       return;
+    }
+
+    // Si no hay institución seleccionada, poner por defecto 3
+    if (!this.model.institucionId) {
+      this.model.institucionId = 3;
     }
 
     this.loading = true;
     this.error = null;
 
     const isUpdate = this.isEditing && this.model.id && this.model.id > 0;
-    const payload = this.model.toJSON();
+    const payload = {
+    ...(this.model.toJSON ? this.model.toJSON() : { ...this.model }),
+      id: this.model.id ?? null,
+      docentetitularId: this.usuario?.idUsuario ?? null,
+      nombreComponenteUCM: this.getNombreComponenteByCodigo(this.model.componenteCodigoUCM),
+      programaUCM: this.model.programaUCM,
+      fechacreacion: this.formatDateToYMD(new Date()),
+      horasInternacionalizacion: this.getNombreProgramaByHoras(this.model.programaUCM),
+      periodo: this.getPeriodoAcademico()
+    };
 
     const endpoint = isUpdate
       ? 'AsignacionPlanComponente/actualiza_AsignacionPlanComponente'
@@ -389,7 +496,7 @@ facultadUCM: any;
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.RESPUESTA_DESCONOCIDA'));
         }
       },
       error: (err) => {
@@ -399,15 +506,23 @@ facultadUCM: any;
             : 'Error al crear asignación',
           err
         );
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
+        this.error = this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_PROCESAR_SOLICITUD');
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
+        this.showError(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_PROCESAR_SOLICITUD'));
       }
     });
   }
 
+
+  getPeriodoAcademico() {
+    const now = new Date();
+    const mesIndex = now.getMonth();
+    return (mesIndex >= 0 && mesIndex <= 5) ? 1 : 2;
+  }
+
   resetForm(form?: NgForm) {
     this.model = new AsignacionPlanComponenteModel();
+    this.model.institucionId = 3; // por defecto U. Católica
     this.isEditing = false;
     if (form) form.resetForm({});
   }
@@ -415,12 +530,18 @@ facultadUCM: any;
   startEdit(item: AsignacionPlanComponenteModel) {
     this.model = Object.assign(new AsignacionPlanComponenteModel(), item);
     this.isEditing = true;
+
+    // Cargar info de créditos y semestre con los valores del item
+    if (this.model.planestudioId && this.model.componenteCodigoUCM) {
+      this.cargarInfoComponente(this.model.planestudioId, this.model.componenteCodigoUCM);
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async deleteItem(id: number) {
     const confirmado = await this.showConfirm(
-      '¿Estás seguro de eliminar este registro?'
+      this.translate.instant('ASIGNACION_PLAN_COMPONENTE.CONFIRMAR_ELIMINAR')
     );
     if (!confirmado) return;
 
@@ -430,16 +551,14 @@ facultadUCM: any;
       .subscribe({
         next: () => {
           this.fetchAsignaciones();
-          this.showSuccess('Se eliminó el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ELIMINADO_EXITOSO'));
         },
         error: (err) => {
           console.error(
             'Error al eliminar asignación, el registro se encuentra asociado',
             err
           );
-          this.showError(
-            'Error al eliminar asignación, el registro se encuentra asociado'
-          );
+          this.showError(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_ELIMINAR_ASOCIADO'));
         }
       });
   }
@@ -482,7 +601,7 @@ facultadUCM: any;
 
   // -------- Toasters / Confirm --------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.OPERACION_EXITOSA'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -490,7 +609,7 @@ facultadUCM: any;
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ERROR_PROCESAR'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -498,7 +617,7 @@ facultadUCM: any;
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('ASIGNACION_PLAN_COMPONENTE.ATENCION'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -509,10 +628,10 @@ facultadUCM: any;
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('ASIGNACION_PLAN_COMPONENTE.CONFIRMAR_ACCION'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('ASIGNACION_PLAN_COMPONENTE.SI_CONFIRMO'),
+        rejectLabel: this.translate.instant('ASIGNACION_PLAN_COMPONENTE.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',
@@ -524,26 +643,30 @@ facultadUCM: any;
     });
   }
 
-  // ------- Helpers de lógica de UCM -------
-  get esInstitucionUCM(): boolean {
-    const instId = Number(this.model.institucionId);
-    return instId === 3;
+  // ------- Lógica de colaboración -------
+  get mostrarCamposColaboracion(): boolean {
+    return !!this.model.colaboracion;
   }
 
-  onInstitucionChange() {
-    // cuando cambia institución y NO es UCM, limpiamos combos UCM
-    if (!this.esInstitucionUCM) {
-      this.model.facultadoUCM = '';
-      this.model.programaUCM = '';
-      this.model.planestudioId = null;
-      this.model.numerogrupo = null;
-      this.model.componenteCodigoUCM = '';
-      this.model.nombreComponenteUCM = '';
+  onColaboracionChange() {
+    if (this.model.colaboracion) {
+      // Al activar colaboración, limpiar campos externos por si vienen de una edición previa
+      this.model.facultaExterno = '';
+      this.model.programaExterno = '';
+      this.model.componenteExterno = '';
+      this.model.docenteauxNombre = '';
+      this.model.docenteauxCorreo = '';
     } else {
-      // si es UCM, limpiamos campos externos
-      this.model.facultaExterno = null;
-      this.model.programaExterno = null;
-      this.model.componenteExterno = null;
+      // Al desactivar colaboración, limpiar igualmente campos externos
+      this.model.facultaExterno = '';
+      this.model.programaExterno = '';
+      this.model.componenteExterno = '';
+      this.model.docenteauxNombre = '';
+      this.model.docenteauxCorreo = '';
     }
+  }
+
+  tieneColaboracion(item: AsignacionPlanComponenteModel): boolean {
+    return !!item.colaboracion;
   }
 }

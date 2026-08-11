@@ -175,7 +175,7 @@
                                   [name]="'ctrl-'+selectedStepIndex+'-'+j"
                                   [(ngModel)]="steps[selectedStepIndex].data[field.name]"
                                   (ngModelChange)="field.tipo === 'selectChange' ? onFieldChange(field, $event) : null"
-                                  [disabled]="!field.editable"
+                                  [required]="field.name === 'convocatoriaId' ? false : false">
                                   [required]="!!field.editable">
                             <option value="" disabled *ngIf="field.editable">Seleccione...</option>
                             <option *ngFor="let opt of field.opciones" [value]="opt.value">{{ opt.label }}</option>
@@ -194,8 +194,7 @@
                             <input type="checkbox" class="form-check-input"
                                   [name]="'ctrl-'+selectedStepIndex+'-'+j"
                                   [(ngModel)]="steps[selectedStepIndex].data[field.name]"
-                                  [disabled]="!field.editable"
-                                  [required]="!!field.editable">
+                                  [disabled]="!field.editable">
                             <span class="form-check-label small">
                               {{ steps[selectedStepIndex].data[field.name] ? 'Sí' : 'No' }}
                             </span>

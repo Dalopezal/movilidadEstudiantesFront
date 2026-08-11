@@ -1,4 +1,4 @@
-import { Component, Inject, Input, model } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, model, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -46,7 +46,10 @@ export class SharePointDriveComponent {
 
   @Input() convocatoria!: any;
   @Input() documento!: any;
-  @Input() EntregablePostulacionModel!: EntregablePostulacionModel;
+  @Input() registroActual: any;
+  @Input() tipoRegistro: 'entregable' | 'condicion' = 'entregable';
+
+  @Output() registroActualizado = new EventEmitter<any>();
 
   // driveId de Procesos_Movilidad
   private driveId = "b!hxInP5NdSkWGDF706k5q4NgI4QHbbA9MuYfs3fRJTRQp2TIIFpMeSKgCChkFV0A1";
@@ -79,18 +82,29 @@ export class SharePointDriveComponent {
     }
   }
 
+  private async getRootFolderName(): Promise<string> {
+    return this.tipoRegistro === 'condicion' ? 'Condiciones' : 'Movilidad';
+  }
+
   // Listar archivos en {documento}/{convocatoria}
   async loadFiles() {
     this.loading = true;
     try {
-      const documentoFolderId = await this.getOrCreateFolder(this.documento);
+      console.log('documento recibido:', JSON.stringify(this.documento));
+      console.log('convocatoria recibida:', JSON.stringify(this.convocatoria));
+      console.log('tipo de registro:', this.tipoRegistro);
+
+      const rootFolderName = await this.getRootFolderName();
+      const rootFolderId = await this.getOrCreateFolder(rootFolderName);
+
+      const documentoFolderId = await this.getOrCreateFolder(this.documento, rootFolderId);
       const convocatoriaFolderId = await this.getOrCreateFolder(this.convocatoria, documentoFolderId);
 
       const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
       const headers = { Authorization: `Bearer ${token}` };
 
       const resp: any = await this.http.get(
-        `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${convocatoriaFolderId}/children`,
+        `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${convocatoriaFolderId}/children?$select=id,name,webUrl,parentReference,@microsoft.graph.downloadUrl`,
         { headers }
       ).toPromise();
 
@@ -104,38 +118,64 @@ export class SharePointDriveComponent {
 
   // Subida de archivo
   async uploadFile(file: File) {
+    const cleanFileName = file.name
+      .replace(/\s+/g, '_')
+      .replace(/[^\w._-]/g, '')
+      .replace(/_{2,}/g, '_')
+      .trim();
+    const finalFileName = cleanFileName || `archivo_${new Date().getTime()}`;
+
     this.uploading = true;
     this.uploadProgress = 0;
+
     try {
-      const documentoFolderId = await this.getOrCreateFolder(this.documento);
+      const rootFolderName = await this.getRootFolderName();
+      const rootFolderId = await this.getOrCreateFolder(rootFolderName);
+      const documentoFolderId = await this.getOrCreateFolder(this.documento, rootFolderId);
       const convocatoriaFolderId = await this.getOrCreateFolder(this.convocatoria, documentoFolderId);
 
       const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
       const headers = { Authorization: `Bearer ${token}` };
+      const putUrl = `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${convocatoriaFolderId}:/${encodeURIComponent(finalFileName)}:/content`;
 
-      const url = `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${convocatoriaFolderId}:/${file.name}:/content`;
-
-      this.http.put(url, file, {
+      this.http.put(putUrl, file, {
         headers,
         reportProgress: true,
         observe: 'events'
       }).subscribe({
-        next: (event: any) => {
+        next: async (event: any) => {
           if (event.type === 1 && event.total) {
             this.uploadProgress = Math.round((event.loaded / event.total) * 100);
           }
           if (event.type === 4) {
             this.showSuccess('¡Archivo listo!', 'Subido exitosamente');
             this.uploading = false;
-            this.loadFiles();
 
-            // event.body contiene el driveItem creado/actualizado
-            const driveItem = event.body;
+            let driveItem = event.body;
 
-            // URL de SharePoint para abrir en navegador
-            const webUrl: string | undefined = driveItem?.webUrl;
-            this.registrarUrl(webUrl);
+            let webUrlCompleta: string | undefined = driveItem?.webUrl;
+            if (!webUrlCompleta && driveItem?.id) {
+              try {
+                const token2 = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
+                const headers2 = { Authorization: `Bearer ${token2}` };
+                const meta: any = await this.http.get(
+                  `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${driveItem.id}?$select=webUrl,parentReference`,
+                  { headers: headers2 }
+                ).toPromise();
+                webUrlCompleta = meta?.webUrl;
+                driveItem = { ...driveItem, ...meta };
+              } catch (err) {}
             }
+
+            if (!webUrlCompleta && driveItem?.parentReference?.path) {
+              const fullPath = driveItem.parentReference.path.split(':/')[1] || '';
+              webUrlCompleta = `https://ucmeduco.sharepoint.com/sites/Internacionalizacion/${fullPath}/${finalFileName}`;
+            }
+
+            await this.registrarUrl(webUrlCompleta, webUrlCompleta);
+
+            this.loadFiles();
+          }
         },
         error: (err) => {
           this.showError('Error al subir', err.message);
@@ -148,18 +188,31 @@ export class SharePointDriveComponent {
     }
   }
 
-  async registrarUrl(webUrl: any) {
+  async registrarUrl(webUrl: string | undefined, rutaCompleta: string | undefined) {
+    const modelAux = {
+      ...this.registroActual,
+      url: webUrl || null,
+      rutaArchivo: webUrl || rutaCompleta || null
+    };
 
-    let modelAux = this.EntregablePostulacionModel;
-    modelAux.url = webUrl;
+    let endpoint = '';
+    let mensajeExito = '';
 
-    this.api.post('EntregablePostulacion/Actualiza_EntregablePostulacion', modelAux).subscribe({
+    if (this.tipoRegistro === 'condicion') {
+      endpoint = 'CumplimientoCondicion/Actualiza_CumplimientoCondiciones';
+      mensajeExito = 'Url de condición registrada exitosamente';
+    } else {
+      endpoint = 'EntregablePostulacion/Actualiza_EntregablePostulacion';
+      mensajeExito = 'Url Entregable registrado exitosamente';
+    }
+
+    this.api.put(endpoint, modelAux).subscribe({
       next: (resp) => {
-        this.showSuccess('Url Entregable registrado exitosamente');
+        this.showSuccess(mensajeExito);
+        this.registroActualizado.emit(modelAux);
       },
       error: (err) => {
-        // Asegúrate de extraer el mensaje correcto del error
-        const mensaje = err?.error?.message || err?.message || 'Error al registrar url del entregable';
+        const mensaje = err?.error?.message || err?.message || 'Error al registrar url';
         this.showError(mensaje);
       }
     });
@@ -221,7 +274,7 @@ export class SharePointDriveComponent {
       ).toPromise();
 
       if (metadata && metadata.webUrl) {
-        window.open(metadata.webUrl, '_blank'); // ← link directo de SharePoint
+        window.open(metadata.webUrl, '_blank');
       } else {
         this.showError('No se pudo obtener el enlace de visualización');
       }
@@ -289,12 +342,20 @@ export class SharePointDriveComponent {
 
   // Obtener o crear carpeta en el drive de SharePoint
   private async getOrCreateFolder(folderName: string, parentId?: string): Promise<string> {
+    const nombreCarpeta = String(folderName ?? '').trim();
+
+    if (!nombreCarpeta) {
+      throw new Error('El nombre de la carpeta no puede estar vacío.');
+    }
+
     const token = await this.getToken(['Sites.ReadWrite.All', 'Files.ReadWrite.All']);
     const headers = { Authorization: `Bearer ${token}` };
 
-    let url = parentId
-      ? `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${parentId}/children?$filter=name eq '${folderName}'`
-      : `https://graph.microsoft.com/v1.0/drives/${this.driveId}/root/children?$filter=name eq '${folderName}'`;
+    const nombreParaFiltro = nombreCarpeta.replace(/'/g, "''");
+
+    const url = parentId
+      ? `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${parentId}/children?$filter=name eq '${nombreParaFiltro}'`
+      : `https://graph.microsoft.com/v1.0/drives/${this.driveId}/root/children?$filter=name eq '${nombreParaFiltro}'`;
 
     const resp: any = await this.http.get(url, { headers }).toPromise();
 
@@ -307,13 +368,12 @@ export class SharePointDriveComponent {
       ? `https://graph.microsoft.com/v1.0/drives/${this.driveId}/items/${parentId}/children`
       : `https://graph.microsoft.com/v1.0/drives/${this.driveId}/root/children`;
 
-    const createBody = { name: folderName, folder: {} };
+    const createBody = { name: nombreCarpeta, folder: {} };
     const created: any = await this.http.post(createUrl, createBody, { headers }).toPromise();
 
     return created.id;
   }
 
-  // En tu SharePointDriveComponent
   getFileIcon(file: any): string {
     if (file.folder) {
       return 'folder';
@@ -322,69 +382,35 @@ export class SharePointDriveComponent {
     const fileName = file.name?.toLowerCase() || '';
     const extension = fileName.split('.').pop() || '';
 
-    // Documentos
-    if (['pdf'].includes(extension)) {
-      return 'picture_as_pdf';
-    }
-    if (['doc', 'docx'].includes(extension)) {
-      return 'description';
-    }
-    if (['xls', 'xlsx'].includes(extension)) {
-      return 'grid_on';
-    }
-    if (['ppt', 'pptx'].includes(extension)) {
-      return 'slideshow';
-    }
-    if (['txt'].includes(extension)) {
-      return 'text_snippet';
-    }
+    if (['pdf'].includes(extension)) return 'picture_as_pdf';
+    if (['doc', 'docx'].includes(extension)) return 'description';
+    if (['xls', 'xlsx'].includes(extension)) return 'grid_on';
+    if (['ppt', 'pptx'].includes(extension)) return 'slideshow';
+    if (['txt'].includes(extension)) return 'text_snippet';
+    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].includes(extension)) return 'image';
+    if (['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv'].includes(extension)) return 'movie';
+    if (['mp3', 'wav', 'flac', 'aac', 'ogg'].includes(extension)) return 'audiotrack';
+    if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) return 'archive';
+    if (['js', 'ts', 'html', 'css', 'json', 'xml', 'py', 'java', 'cpp', 'c'].includes(extension)) return 'code';
 
-    // Imágenes
-    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].includes(extension)) {
-      return 'image';
-    }
-
-    // Videos
-    if (['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv'].includes(extension)) {
-      return 'movie';
-    }
-
-    // Audio
-    if (['mp3', 'wav', 'flac', 'aac', 'ogg'].includes(extension)) {
-      return 'audiotrack';
-    }
-
-    // Archivos comprimidos
-    if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) {
-      return 'archive';
-    }
-
-    // Código
-    if (['js', 'ts', 'html', 'css', 'json', 'xml', 'py', 'java', 'cpp', 'c'].includes(extension)) {
-      return 'code';
-    }
-
-    // Por defecto
     return 'insert_drive_file';
   }
 
   getFileColor(file: any): string {
     const extension = (file.name?.split('.').pop() || '').toLowerCase();
     if (['pdf'].includes(extension)) return '#e53935';
-    if (['doc','docx'].includes(extension)) return '#1976d2';
-    if (['xls','xlsx'].includes(extension)) return '#2e7d32';
-    if (['ppt','pptx'].includes(extension)) return '#e65100';
-    if (['jpg','jpeg','png','gif'].includes(extension)) return '#8e24aa';
+    if (['doc', 'docx'].includes(extension)) return '#1976d2';
+    if (['xls', 'xlsx'].includes(extension)) return '#2e7d32';
+    if (['ppt', 'pptx'].includes(extension)) return '#e65100';
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) return '#8e24aa';
     return '#424242';
   }
 
-  getFechaActual(){
+  getFechaActual(): string {
     const date = new Date();
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
-    const customFormat = `${year}-${month}-${day}`;
-
-    return customFormat;
+    return `${year}-${month}-${day}`;
   }
 }

@@ -47,7 +47,7 @@
                 </div>
 
                 <!-- Botones -->
-                <div class="d-flex gap-3 mt-auto">
+                <div *ngIf="this.esEstudiante" class="d-flex gap-3 mt-auto">
                   <button type="submit" class="btn btn-ucm flex-grow-1 text-white"
                           [disabled]="myForm.invalid || loading"
                           [ngStyle]="{ 'background': '#0D133F' }" style="font-size: 13px;">
@@ -74,7 +74,7 @@
                       (click)="fetchBeneficios(); filtro=''">
                 <i class="fas fa-sync-alt"></i> Actualizar
               </button>
-              <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;"
+              <!-- <input style="border-radius: 22px;background: rgb(242, 240, 240);font-size: 13px;"
                      type="text" class="form-control"
                      placeholder="Digite nombre beneficio"
                      [(ngModel)]="filtro" name="filtro"/>
@@ -82,13 +82,14 @@
                       style="background: #0D133F;border-color: #0D133F;font-size: 13px;padding: 5px 8px;"
                       (click)="filterBeneficios()">
                 <i class="fas fa-search"></i> Buscar
-              </button>
+              </button> -->
             </div>
 
             <div class="table-responsive flex-grow-1" style="min-height: 0; overflow-y: auto;">
               <table class="table table-striped mb-0">
                 <thead class="table-primary">
                   <tr>
+                    <th style="background: white !important;">#</th>
                     <th style="background: white !important;">Beneficio</th>
                     <th style="background: white !important;">Estado</th>
                     <th style="background: white !important;">Opciones</th>
@@ -100,20 +101,19 @@
                     <p style="background: transparent;">Cargando datos</p>
                   </div>
                   <tr *ngFor="let item of pagedData; trackBy: trackByIndex">
-                    <td>{{ item.beneficioConvocatoriaId }}</td>
-                    <td>{{ item.nombreBeneficio }}</td>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.nombreBeneficioConvocatoria }}</td>
                     <td>
-                      <span [class.text-success]="item.estado" [class.text-danger]="!item.estado">
-                        {{item.estado ? 'Activo' : 'Inactivo'}}
-                      </span>
+                      <button *ngIf="item.estado" class="button-completed">Activo</button>
+                      <button *ngIf="!item.estado" class="button-pending">Inactivo</button>
                     </td>
                     <td>
-                      <button class="btn btn-sm btn-primary me-1" (click)="startEdit(item)">
+                      <button style="margin-bottom: 3px;" class="btn btn-sm btn-primary me-1 button-completed" (click)="startEdit(item)">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="btn btn-sm btn-danger" (click)="deleteItem(item.beneficioConvocatoriaId)">
+                      <!-- <button class="btn btn-sm btn-danger" (click)="deleteItem(item.beneficioConvocatoriaId)">
                         <i class="fas fa-trash"></i>
-                      </button>
+                      </button> -->
                     </td>
                   </tr>
                   <tr *ngIf="!loadingTable && pagedData.length === 0">

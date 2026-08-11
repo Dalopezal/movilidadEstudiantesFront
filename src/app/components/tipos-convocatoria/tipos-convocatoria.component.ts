@@ -2,19 +2,25 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { ConvocatoriasGeneralComponent } from '../convocatorias-general/convocatorias-general.component';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   standalone: true,
   selector: 'app-tipos-convocatoria',
-  imports: [SidebarComponent, ConvocatoriasGeneralComponent, CommonModule],
+  imports: [
+    SidebarComponent,
+    ConvocatoriasGeneralComponent,
+    CommonModule,
+    TranslateModule
+  ],
   templateUrl: './tipos-convocatoria.component.html',
-  styleUrls: ['./tipos-convocatoria.component.css']  // corregido
+  styleUrls: ['./tipos-convocatoria.component.css']
 })
 export class TiposConvocatoriaComponent implements OnInit, OnDestroy {
 
   usuario: any = {};
-  isInternal = false;
-  isExternal = false;
+  isInternal = false;  // Para mostrar tab "Saliente"
+  isExternal = false;  // Para mostrar tab "Entrante"
   activeTab: 'general' | 'condiciones' | null = null;
 
   private storageHandler = this.onStorageChange.bind(this);
@@ -35,23 +41,35 @@ export class TiposConvocatoriaComponent implements OnInit, OnDestroy {
     const tipo = this.usuario?.tipoUsuario != null ? Number(this.usuario.tipoUsuario) : null;
     const rol = this.usuario?.rolId != null ? Number(this.usuario.rolId) : null;
 
-    if(rol == 7){
-      this.isInternal = true;
+    if (rol === 7 || rol === 10 || rol === 11 || rol === 12 || rol === 9 || rol === 13) {
+      // ORI: mostrar ambos tabs
+      this.isInternal = true;  // Saliente
+      this.isExternal = true;  // Entrante
+    } else if (rol === 2) {
+      // Usuario tipo 2: solo Entrante
+      this.isInternal = false;
       this.isExternal = true;
-    }else{
-      this.isInternal = tipo === 2;
-    this.isExternal = tipo === 1;
+    } else if (tipo === 3 || tipo === 1) {
+      // Usuario tipo 1: solo Saliente
+      this.isInternal = true;
+      this.isExternal = false;
+    } else {
+      // Otros casos: no mostrar tabs
+      this.isInternal = false;
+      this.isExternal = false;
     }
 
-
     // Selecciona automáticamente el primer tab visible
-    if (this.isInternal) this.activeTab = 'general';
-    else if (this.isExternal) this.activeTab = 'condiciones';
-    else this.activeTab = null;
+    if (this.isExternal) {
+      this.activeTab = 'general';       // Entrantes
+    } else if (this.isInternal) {
+      this.activeTab = 'condiciones';   // Salientes
+    } else {
+      this.activeTab = null;
+    }
   }
 
   private onStorageChange(): void {
-    // Cuando localStorage cambie (login, logout, cambio de rol...) recargamos
     this.loadUsuarioFromStorage();
   }
 

@@ -9,11 +9,20 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { ConvenioModel } from '../../models/ConvenioModel';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-convenios',
   standalone: true,
-  imports: [SidebarComponent, CommonModule, FormsModule, HttpClientModule, ConfirmDialogModule, NgxSonnerToaster],
+  imports: [
+    SidebarComponent,
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    ConfirmDialogModule,
+    NgxSonnerToaster,
+    TranslateModule
+  ],
   templateUrl: './convenios.component.html',
   styleUrls: ['./convenios.component.css'],
   providers: [ConfirmationService]
@@ -41,14 +50,24 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   isEditing = false;
 
   dateRangeInvalid = false;
+  fechaInicioInvalida = false;
+  diasVigenciaInvalida = false;
+
+  /** Para min en inputs type="date" */
+  todayStr = '';
 
   private destroy$ = new Subject<void>();
   loadingTable: any;
 
-
-  constructor(private api: GenericApiService, private confirmationService: ConfirmationService) {}
+  constructor(
+    private api: GenericApiService,
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit() {
+    this.todayStr = this.getTodayAsYmd();
+
     this.fetchTipos();
     this.fetchClasificaciones();
     this.fetchTiposActividad();
@@ -151,12 +170,12 @@ export class ConveniosComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al consultar convenios', err);
-          this.error = 'No se pudo cargar la información. Intenta de nuevo.';
+          this.error = this.translate.instant('CONVENIOS.MENSAJES.ERROR_CARGA');
           this.data = [];
           this.filteredData = [];
           this.pagedData = [];
           this.calculateTotalPages();
-          this.showError('No se pudo cargar la información. Intenta de nuevo');
+          this.showError(this.translate.instant('CONVENIOS.MENSAJES.ERROR_CARGA'));
           this.loadingTable = false;
         }
       });
@@ -165,7 +184,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   filterConvenios() {
     this.error = null;
     if (!this.filtro || this.filtro.trim() === '') {
-      this.showWarning('Debe digitar un valor para ejecutar la búsqueda');
+      this.showWarning(this.translate.instant('CONVENIOS.MENSAJES.FILTRO_VACIO'));
       return;
     }
     this.loadingTable = true;
@@ -193,7 +212,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error al filtrar convenios', err);
-          this.showError('Error al filtrar convenios');
+          this.showError(this.translate.instant('CONVENIOS.MENSAJES.ERROR_FILTRO'));
           this.loadingTable = false;
         }
       });
@@ -201,16 +220,21 @@ export class ConveniosComponent implements OnInit, OnDestroy {
 
   // ---------- Form handlers ----------
   onSubmit(form: NgForm) {
+    // Aseguramos que las validaciones se ejecuten aunque no haya disparado change
+    this.validateFechaInicio();
+    this.validateDateRange();
+    this.calculateDiasVigencia();
+    this.validateDiasVigencia();
+
     if (form.invalid) {
       form.control.markAllAsTouched();
       return;
     }
 
-    //this.validateDateRange();
-    if (this.dateRangeInvalid) return;
+    if (this.dateRangeInvalid || this.fechaInicioInvalida || this.diasVigenciaInvalida) return;
 
     if (!this.model.descripcion?.trim()) {
-      this.error = 'La descripción es obligatoria.';
+      this.error = this.translate.instant('CONVENIOS.MENSAJES.DESCRIPCION_OBLIGATORIA');
       return;
     }
 
@@ -234,31 +258,59 @@ export class ConveniosComponent implements OnInit, OnDestroy {
         } else if (response.error && response.datos === false) {
           this.showError(response.error);
         } else {
-          // fallback por si llega algo inesperado
-          this.showError('Respuesta desconocida del servidor.');
+          this.showError(this.translate.instant('CONVENIOS.MENSAJES.RESPUESTA_DESCONOCIDA'));
         }
       },
       error: (err) => {
         console.error(isUpdate ? 'Error al actualizar convenio' : 'Error al crear convenio', err);
-        this.error = 'No se pudo procesar la solicitud. Intenta de nuevo.';
+        this.error = this.translate.instant('CONVENIOS.MENSAJES.ERROR_PROCESAR');
         this.loading = false;
-        this.showError('No se pudo procesar la solicitud. Intenta de nuevo');
+        this.showError(this.translate.instant('CONVENIOS.MENSAJES.ERROR_PROCESAR'));
       }
     });
   }
 
+  /** Cambio de fechas (para mantenerlo ordenado desde el HTML) */
+  onFechaInicioChange() {
+    this.validateFechaInicio();
+    this.validateDateRange();
+    this.calculateDiasVigencia();
+    this.validateDiasVigencia();
+  }
+
+  onFechaFinChange() {
+    this.validateDateRange();
+    this.calculateDiasVigencia();
+    this.validateDiasVigencia();
+  }
+
   validateDateRange() {
     this.dateRangeInvalid = false;
+
     if (!this.model.fechaInicio || !this.model.fechaVencimiento) return;
+
     const inicio = new Date(this.model.fechaInicio);
     const fin = new Date(this.model.fechaVencimiento);
-    if (fin < inicio) this.dateRangeInvalid = true;
+
+    // Normalizamos horas para evitar falsos negativos por TZ
+    inicio.setHours(0, 0, 0, 0);
+    fin.setHours(0, 0, 0, 0);
+
+    if (fin < inicio) {
+      this.dateRangeInvalid = true;
+      // Si el rango es inválido, deja los días en 0 para evitar incoherencias
+      this.model.diasVigencia = 0;
+    }
   }
 
   resetForm(form?: NgForm) {
     this.model = new ConvenioModel();
     this.isEditing = false;
+
     this.dateRangeInvalid = false;
+    this.fechaInicioInvalida = false;
+    this.diasVigenciaInvalida = false;
+
     if (form) form.resetForm({
       codigoUcm: '',
       descripcion: '',
@@ -275,12 +327,18 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   startEdit(item: any) {
     this.model = ConvenioModel.fromJSON(item);
     this.isEditing = true;
+    this.calcularFechaVencimientoDesdeVigencia();
+
+    this.validateFechaInicio();
     this.validateDateRange();
+    // this.calculateDiasVigencia();
+    // this.validateDiasVigencia();
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async deleteItem(id: number) {
-    const confirmado = await this.showConfirm('¿Estás seguro de eliminar este registro?');
+    const confirmado = await this.showConfirm(this.translate.instant('CONVENIOS.CONFIRM.ELIMINAR'));
     if (!confirmado) return;
 
     this.api.delete(`Convenios/Eliminar_Entregable/${id}`)
@@ -288,11 +346,11 @@ export class ConveniosComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.fetchConvenios();
-          this.showSuccess('Se elimino el registro satisfactoriamente');
+          this.showSuccess(this.translate.instant('CONVENIOS.MENSAJES.ELIMINADO_EXITO'));
         },
         error: (err) => {
-          console.error('Error al eliminar convenio, el resgistro se encuentra asociado', err);
-          this.showError('Error al eliminar convenio, el resgistro se encuentra asociado');
+          console.error('Error al eliminar convenio', err);
+          this.showError(this.translate.instant('CONVENIOS.MENSAJES.ERROR_ELIMINAR'));
         }
       });
   }
@@ -330,7 +388,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
 
   // ---------- Toasters / Confirm ----------
   showSuccess(mensaje: any) {
-    toast.success('¡Operación exitosa!', {
+    toast.success(this.translate.instant('CONVENIOS.TOASTS.EXITO_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-success-toast'
@@ -338,7 +396,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   }
 
   showError(mensaje: any) {
-    toast.error('Error al procesar', {
+    toast.error(this.translate.instant('CONVENIOS.TOASTS.ERROR_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-error-toast'
@@ -346,7 +404,7 @@ export class ConveniosComponent implements OnInit, OnDestroy {
   }
 
   showWarning(mensaje: string) {
-    toast.warning('Atención', {
+    toast.warning(this.translate.instant('CONVENIOS.TOASTS.WARNING_TITULO'), {
       description: mensaje,
       unstyled: true,
       class: 'my-warning-toast'
@@ -357,10 +415,10 @@ export class ConveniosComponent implements OnInit, OnDestroy {
     return new Promise<boolean>((resolve) => {
       this.confirmationService.confirm({
         message: mensaje,
-        header: 'Confirmar acción',
+        header: this.translate.instant('CONVENIOS.CONFIRM.HEADER'),
         icon: 'pi pi-exclamation-triangle custom-confirm-icon',
-        acceptLabel: 'Sí, Confirmo',
-        rejectLabel: 'Cancelar',
+        acceptLabel: this.translate.instant('CONVENIOS.CONFIRM.ACEPTAR'),
+        rejectLabel: this.translate.instant('CONVENIOS.CONFIRM.CANCELAR'),
         acceptIcon: 'pi pi-check',
         rejectIcon: 'pi pi-times',
         acceptButtonStyleClass: 'custom-accept-btn',
@@ -370,5 +428,82 @@ export class ConveniosComponent implements OnInit, OnDestroy {
         reject: () => resolve(false),
       });
     });
+  }
+
+  validateFechaInicio() {
+    if (!this.model.fechaInicio) {
+      this.fechaInicioInvalida = false;
+      return;
+    }
+    const hoy = new Date();
+    const fechaInicio = new Date(this.model.fechaInicio);
+    hoy.setHours(0, 0, 0, 0);
+    fechaInicio.setHours(0, 0, 0, 0);
+
+    // Tu regla actual: inicio NO puede ser menor que hoy
+    this.fechaInicioInvalida = false;
+  }
+
+  get formInvalidCustom(): boolean {
+    // Lo dejo (no lo usas en el disable), pero lo alineo con tu regla
+    //if (!this.model.fechaInicio) return false;
+    // const hoy = new Date();
+    // const fechaInicio = new Date(this.model.fechaInicio);
+    // hoy.setHours(0, 0, 0, 0);
+    // fechaInicio.setHours(0, 0, 0, 0);
+
+    //if (fechaInicio < hoy) return true;
+    if (this.model.diasVigencia === null || this.model.diasVigencia < 1) return true;
+    if (this.dateRangeInvalid) return true;
+    return false;
+  }
+
+  calculateDiasVigencia() {
+    if (!this.model.fechaInicio || !this.model.fechaVencimiento) {
+      this.model.diasVigencia = 0;
+      return;
+    }
+
+    const inicio = new Date(this.model.fechaInicio);
+    const fin = new Date(this.model.fechaVencimiento);
+    inicio.setHours(0, 0, 0, 0);
+    fin.setHours(0, 0, 0, 0);
+
+    if (fin < inicio) {
+      this.model.diasVigencia = 0;
+      return;
+    }
+
+    // Cálculo INCLUSIVO: mismo día => 1 día
+    const diffTime = fin.getTime() - inicio.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    this.model.diasVigencia = diffDays > 0 ? diffDays : 0;
+  }
+
+  validateDiasVigencia() {
+    this.diasVigenciaInvalida = this.model.diasVigencia !== null && this.model.diasVigencia < 1;
+  }
+
+  private getTodayAsYmd(): string {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  private calcularFechaVencimientoDesdeVigencia() {
+    if (!this.model.fechaInicio || !this.model.diasVigencia || this.model.diasVigencia < 1) return;
+
+    const [year, month, day] = this.model.fechaInicio.split('-').map(Number);
+    const inicio = new Date(year, month - 1, day);
+
+    inicio.setDate(inicio.getDate() + (this.model.diasVigencia - 1));
+
+    const y = inicio.getFullYear();
+    const m = String(inicio.getMonth() + 1).padStart(2, '0');
+    const d = String(inicio.getDate()).padStart(2, '0');
+
+    this.model.fechaVencimiento = `${y}-${m}-${d}`;
   }
 }
